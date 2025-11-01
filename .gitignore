@@ -1,1 +1,16 @@
+# --- Dependencies ---
+/vendor/
+/node_modules/
+
+# --- Configuration & Secrets ---
+.env
+
+# --- IDE & OS Files ---
 .idea/
+.vscode/
+.DS_Store
+
+# --- Runtime Files ---
+*.log
+/cache/
+/tmp/
