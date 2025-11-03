@@ -1,0 +1,12 @@
+# Source Control & IDE Files
+.git
+.gitignore
+.idea/      # PhpStorm configuration files
+.vscode/    # VS Code configuration files
+
+# Dependencies
+vendor/
+node_modules/
+
+# Security
+.env

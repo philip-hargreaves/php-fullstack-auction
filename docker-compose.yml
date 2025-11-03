@@ -1,0 +1,17 @@
+services:
+
+# PHP/Apache container
+  web:
+    build: .
+
+    # Connect http://localhost:8003 to port 80 inside the container
+    ports:
+      - "8003:80"
+
+    volumes:
+      # 1. Link project folder ('.') to the '/var/www/html' folder inside the container
+      - .:/var/www/html
+
+      # Overwrite default Apache config with custom apache-config.conf file
+      - ./apache-config.conf:/etc/apache2/sites-available/000-default.conf
+
