@@ -11,7 +11,7 @@ include("../views/partials/header.php");
             <div class="card-body">
                 <!-- Note: This form does not do any dynamic / client-side /
                 JavaScript-based validation of data. -->
-                <form method="post" action="create_auction_result.php">
+                <form method="post" action="/create-auction-result">
                     <div class="form-group row">
                         <label for="auctionTitle" class="col-sm-2 col-form-label text-right">Title of auction</label>
                         <div class="col-sm-10">

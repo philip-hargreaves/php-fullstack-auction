@@ -11,6 +11,7 @@ $routes = [
     "/listing" => "../controllers/listing.php",
     "/my-listings" => "../controllers/my-listings.php",
     "/register" => "../controllers/register.php",
+    "/create-auction-result" => "../controllers/create-auction-result.php",
 ];
 
 // Load and execute the corresponding controller if route exits

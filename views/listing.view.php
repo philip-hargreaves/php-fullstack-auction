@@ -135,3 +135,5 @@ include_once("../views/partials/header.php");
 
         } // End of addToWatchlist func
     </script>
+
+<?php include_once("../views/partials/footer.php");
