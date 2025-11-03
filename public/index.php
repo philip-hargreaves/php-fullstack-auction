@@ -7,6 +7,10 @@ $uri = parse_url($_SERVER["REQUEST_URI"])["path"];
 
 $routes = [
     "/" => "../controllers/index.php",
+    "/create-auction" => "../controllers/create-auction.php",
+    "/listing" => "../controllers/listing.php",
+    "/my-listings" => "../controllers/my-listings.php",
+    "/register" => "../controllers/register.php",
 ];
 
 // Load and execute the corresponding controller if route exits
