@@ -80,7 +80,7 @@ include("../views/partials/header.php");
             <!-- Previous button -->
             <?php if ($curr_page != 1) : ?>
                 <li class="page-item">
-                    <a class="page-link" href="index.php?<?php echo $querystring; ?>page=<?php echo $curr_page - 1; ?>" aria-label="Previous">
+                    <a class="page-link" href="/?<?php echo $querystring; ?>page=<?php echo $curr_page - 1; ?>" aria-label="Previous">
                         <span aria-hidden="true"><i class="fa fa-arrow-left"></i></span>
                         <span class="sr-only">Previous</span>
                     </a>
@@ -95,14 +95,14 @@ include("../views/partials/header.php");
                     <li class="page-item">
                 <?php endif; ?>
 
-                <a class="page-link" href="index.php?<?php echo $querystring; ?>page=<?php echo $i; ?>"><?php echo $i; ?></a>
+                <a class="page-link" href="/?<?php echo $querystring; ?>page=<?php echo $i; ?>"><?php echo $i; ?></a>
                 </li>
             <?php endfor; ?>
 
             <!-- Next Button -->
             <?php if ($curr_page != $max_page) : ?>
                 <li class="page-item">
-                    <a class="page-link" href="index.php?<?php echo $querystring; ?>page=<?php echo $curr_page + 1; ?>" aria-label="Next">
+                    <a class="page-link" href="/?<?php echo $querystring; ?>page=<?php echo $curr_page + 1; ?>" aria-label="Next">
                         <span aria-hidden="true"><i class="fa fa-arrow-right"></i></span>
                         <span class="sr-only">Next</span>
                     </a>
