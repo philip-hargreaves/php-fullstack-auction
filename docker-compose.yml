@@ -1,6 +1,6 @@
 services:
 
-# PHP/Apache container
+# PHP/Apache service
   web:
     build: .
 
@@ -14,4 +14,30 @@ services:
 
       # Overwrite default Apache config with custom apache-config.conf file
       - ./apache-config.conf:/etc/apache2/sites-available/000-default.conf
+
+    depends_on:
+      - db
+
+  # Database service
+  db:
+    image: mysql:8.0
+    # Map container port 3306 to host port 3306
+    ports:
+      - "3306:3306"
+
+    # Set necessary environment variables (Matching your Core/config.php)
+    environment:
+      # These must match the credentials you put in Core/config.php
+      MYSQL_ROOT_PASSWORD: root_password # Use a strong password here
+      MYSQL_DATABASE: auction_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+
+    # Persist the data in a named volume so data is not lost when containers restart
+    volumes:
+      - db-data:/var/lib/mysql
+
+# Named volumes
+volumes:
+  db-data:
 

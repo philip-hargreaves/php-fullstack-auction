@@ -1,6 +1,9 @@
 <?php
 require "../Core/utilities.php";
+require "../Core/Database.php";
 
+// Connect to MySQL db
+$db = new Database();
 
 // Extract clean path from URI
 $uri = parse_url($_SERVER["REQUEST_URI"])["path"];
@@ -22,3 +25,4 @@ if (array_key_exists($uri, $routes)) {
     echo "404 Page Not Found";
     die();
 }
+
