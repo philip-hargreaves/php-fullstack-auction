@@ -1,28 +1,21 @@
 <?php
 require "../Core/utilities.php";
 require "../Core/Database.php";
+require "../Core/Router.php";
 
-// Connect to MySQL db
+
+// Initialise Router and Database
+$router = new Router();
 $db = new Database();
+require __DIR__ . '/../routes.php';
 
-// Extract clean path from URI
+// Extract clean path from URI and get HTTP method
 $uri = parse_url($_SERVER["REQUEST_URI"])["path"];
+$method = $_SERVER['REQUEST_METHOD'];
 
-$routes = [
-    "/" => "../controllers/index.php",
-    "/create-auction" => "../controllers/create-auction.php",
-    "/listing" => "../controllers/listing.php",
-    "/my-listings" => "../controllers/my-listings.php",
-    "/register" => "../controllers/register.php",
-    "/create-auction-result" => "../controllers/create-auction-result.php",
-];
+// Execute router
+$router->route($uri, $method);
 
-// Load and execute the corresponding controller if route exits
-if (array_key_exists($uri, $routes)) {
-    require $routes[$uri];
-} else {
-    http_response_code(404);
-    echo "404 Page Not Found";
-    die();
-}
+
+
 
