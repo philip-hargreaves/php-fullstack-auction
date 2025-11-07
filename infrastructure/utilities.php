@@ -1,5 +1,13 @@
 <?php
 
+// Define project's absolute root path
+define("BASE_PATH", __DIR__ . "/../");
+
+function base_path($path) {
+    return BASE_PATH . $path;
+}
+
+
 // "Dump and Die"
 function dd($value)
 {

@@ -1,5 +1,7 @@
 <?php
 
+// Auction service etc should take care of TODO's. Keep controllers thin
+
 /* TODO #1: Connect to MySQL database (perhaps by requiring a file that
             already does this). */
 
@@ -15,4 +17,4 @@
             data into the database. */
 
 
-require '../views/create-auction-result.view.php';
+require base_path('views/create-auction-result.view.php');

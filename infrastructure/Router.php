@@ -22,7 +22,7 @@ class Router {
     public function route($uri, $method)
     {
         if ($this->routes[$method][$uri] ?? false) {
-            return require $this->routes[$method][$uri];
+            return require base_path($this->routes[$method][$uri]);
             }
         $this->abort();
     }
