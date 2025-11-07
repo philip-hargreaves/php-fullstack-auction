@@ -1,5 +1,7 @@
 <?php
 
+// Auction service etc should take care of TODO's. Keep controllers thin
+
 /* TODO #1: Connect to MySQL database (perhaps by requiring a file that
             already does this). */
 

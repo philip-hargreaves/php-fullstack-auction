@@ -1,33 +1,16 @@
 <?php
 
-// Retrieve and validate search parameters from the URL query string ($_GET)
-// Needs refactoring
-if (!isset($_GET['keyword'])) {
-    // TODO:
-}
-else {
-    $keyword = $_GET['keyword'];
-}
-if (!isset($_GET['cat'])) {
-    // TODO:
-}
-else {
-    $category = $_GET['cat'];
-}
-if (!isset($_GET['order_by'])) {
-    // TODO:
-}
-else {
-    $ordering = $_GET['order_by'];
-}
+
+// A LOT to be moved to dedicated services, controllers should be minimal
+
+
+// Retrieve keyword, category and ordering parameters, defaults are placeholders for now
+$keyword = Request::get('keyword', '');
+$category = Request::get('cat', 'all');
+$ordering = Request::get('order_by', 'date');
 
 // Handle page number, defaulting to page 1
-if (!isset($_GET['page'])) {
-    $curr_page = 1;
-}
-else {
-    $curr_page = $_GET['page'];
-}
+$curr_page = Request::get('page', 1);
 
 /* TODO: Use above values to construct a query. */
 $num_results = 96; // TODO: Calculate me for real

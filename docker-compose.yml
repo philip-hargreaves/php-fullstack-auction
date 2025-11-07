@@ -25,9 +25,9 @@ services:
     ports:
       - "3306:3306"
 
-    # Set necessary environment variables (Matching your Core/config.php)
+    # Set necessary environment variables (Matching your Infrastructure/config.php)
     environment:
-      # These must match the credentials you put in Core/config.php
+      # These must match the credentials you put in Infrastructure/config.php
       MYSQL_ROOT_PASSWORD: root_password # Use a strong password here
       MYSQL_DATABASE: auction_db
       MYSQL_USER: user

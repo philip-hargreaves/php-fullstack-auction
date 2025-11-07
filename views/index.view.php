@@ -1,5 +1,5 @@
 <?php
-base_path("views/partials/header.php");
+require base_path("views/partials/header.php");
 ?>
 
     <!-- Browsing -->
@@ -112,4 +112,4 @@ base_path("views/partials/header.php");
     </nav>
     <!-- Pagination -->
 
-<?php base_path("views/partials/footer.php");
+<?php require base_path("views/partials/footer.php");
