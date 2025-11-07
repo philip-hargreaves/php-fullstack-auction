@@ -1,5 +1,5 @@
 <?php
-include_once("../views/partials/header.php");
+base_path("views/partials/header.php");
 ?>
 
 <div class="container">
@@ -136,4 +136,4 @@ include_once("../views/partials/header.php");
         } // End of addToWatchlist func
     </script>
 
-<?php include_once("../views/partials/footer.php");
+<?php base_path("views/partials/footer.php");

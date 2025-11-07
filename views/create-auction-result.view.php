@@ -1,5 +1,5 @@
 <?php
-include("../views/partials/header.php");
+base_path("views/partials/header.php");
 ?>
 
 <div class="container my-5">
@@ -30,4 +30,4 @@ echo('<div class="text-center">Auction successfully created! <a href="FIXME">Vie
 </div>
 
 
-<?php include_once("../views/partials/footer.php");
+<?php base_path("views/partials/footer.php");
