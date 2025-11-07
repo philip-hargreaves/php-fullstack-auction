@@ -1,5 +1,5 @@
 <?php
-include("../views/partials/header.php");
+base_path("views/partials/header.php");
 ?>
 
     <!-- Browsing -->
@@ -112,4 +112,4 @@ include("../views/partials/header.php");
     </nav>
     <!-- Pagination -->
 
-<?php include_once("../views/partials/footer.php");
+<?php base_path("views/partials/footer.php");

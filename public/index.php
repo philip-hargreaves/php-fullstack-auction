@@ -1,7 +1,7 @@
 <?php
-require "../Core/utilities.php";
-require "../Core/Database.php";
-require "../Core/Router.php";
+require base_path("Core/utilities.php");
+require base_path( "Core/Database.php");
+require base_path("Core/Router.php");
 
 
 // Initialise Router and Database

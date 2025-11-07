@@ -94,4 +94,4 @@ foreach ($raw_auctions as $auction) {
     $dummy_auctions[] = $auction;
 }
 
-require '../views/index.view.php';
+require base_path('views/index.view.php');

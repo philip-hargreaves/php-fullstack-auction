@@ -15,4 +15,4 @@
             data into the database. */
 
 
-require '../views/create-auction-result.view.php';
+require base_path('views/create-auction-result.view.php');
