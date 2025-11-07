@@ -1,5 +1,5 @@
 <?php
-include("../views/partials/header.php");
+base_path("views/partials/header.php");
 ?>
 
 <div class="container">
@@ -52,4 +52,4 @@ include("../views/partials/header.php");
 
 
 
-<?php include_once("../views/partials/footer.php");
+<?php base_path("views/partials/footer.php");

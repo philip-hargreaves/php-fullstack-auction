@@ -35,5 +35,5 @@ $watching = false;
 // 4. At the very end, load the "View"
 // This "passes" all the single-item variables ($item_id, $title,
 // $description, etc.) into the 'views/listing.view.php' file.
-require '../views/listing.view.php';
+require base_path('views/listing.view.php');
 ?>
