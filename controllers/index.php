@@ -1,8 +1,6 @@
 <?php
 
-
 // A LOT to be moved to dedicated services, controllers should be minimal
-
 
 // Retrieve keyword, category and ordering parameters, defaults are placeholders for now
 $keyword = Request::get('keyword', '');
@@ -31,7 +29,7 @@ $low_page = max(1, $curr_page - 2 - $low_page_boost);
 $high_page = min($max_page, $curr_page + 2 + $high_page_boost);
 
 
-//  Get "raw" dummy data, will be replaced by db query in model
+//  Get "raw" dummy data, will be replaced by db query in application layer
 $raw_auctions = [
     [
         'item_id' => "87021",
