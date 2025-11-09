@@ -20,7 +20,7 @@ class AuthService {
         }
 
         // Verify password
-        if (!password_verify($password, $user->getPassword())) {
+        if (!$user->verifyPassword($password)) {
             return false;
         }
 

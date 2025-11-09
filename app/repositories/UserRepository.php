@@ -1,5 +1,7 @@
 <?php
 
+use app\models\User;
+
 // Data access for user
 class UserRepository {
     protected $db;
@@ -9,6 +11,7 @@ class UserRepository {
     }
 
     public function getUserAndRoles($email) {
+        // Query to get user and roles
         $query = "SELECT u.id, u.username, u.email, u.password, u.is_active, r.role_name
                 FROM users u
                 LEFT JOIN user_roles ur ON u.id = ur.user_id
@@ -20,21 +23,25 @@ class UserRepository {
         // Check if user exists
         if (empty($results)) return false;
 
-        // Create User object
-        $user = new User();
-        $user->user_id = $results[0]['id'];
-        $user->username = $results[0]['username'];
-        $user->email = $results[0]['email'];
-        $user->password = $results[0]['password'];
-        $user->is_active = $results[0]['is_active'];
-        $user->roles = [];
+        // Create User object using constructor
+        $user = new User(
+            (int)$results[0]['id'],           // userID: int
+            $results[0]['username'],          // username: string
+            $results[0]['email'],             // email: string
+            $results[0]['password'],          // password: string
+            (bool)$results[0]['is_active']    // isActive: bool
+        );
 
         // Collect all roles from query results
+        $roles = [];
         foreach ($results as $row) {
             if ($row['role_name']) {
-                $user->roles[] = $row['role_name'];
+                $roles[] = $row['role_name'];
             }
         }
+
+        // Set roles using setter method
+        $user->setRoles($roles);
 
         // Return User object
         return $user;
