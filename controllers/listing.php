@@ -2,6 +2,7 @@
 
 // 2. Get info from the URL
 //$item_id = $_GET['item_id'];
+//$item_id = Request::get('item_id'); (sanitise)
 
 
 //dd($item_id);

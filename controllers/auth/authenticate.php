@@ -6,14 +6,14 @@ require_once base_path('app/repositories/UserRepository.php');
 require_once base_path('app/services/AuthService.php');
 
 // Check if POST request
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+if (!Request::isPost()) {
     header('Location: /');
     exit;
 }
 
 // Get and sanitise form data
-$email = trim($_POST['email'] ?? '');
-$password = $_POST['password'] ?? '';
+$email = Request::post('email', '');
+$password = Request::postRaw('password', '');
 
 // Validate
 if (empty($email) || empty($password)) {
