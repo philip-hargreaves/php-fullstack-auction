@@ -1,19 +1,25 @@
 <?php
 
-// 2. Get info from the URL
-//$item_id = $_GET['item_id'];
+// Get auction_id from the URL
+use app\models\Auction;
 
+$auction_id = $_GET['auction_id'];
 
-//dd($item_id);
-// TODO: Use item_id to make a query to the database.
+// Use auction_id to make a query to the database
+$auction = new Auction();
+$item = $auction->getItem();
 
-// DELETEME: For now, using placeholder data.
-$title = "Dell 24 Monitor - SE2425HM, Full HD (1920x1080)";
-$sellerID = $auction['sellerID'];
-$description = "Description blah blah blah";
+// Variables required in the view
+$title = $item->getItemName();
+$sellerID = $item->getSellerID();
+$description = $item->getItemDescription();
 $current_price = 30.50;
 $num_bids = 1;
-$end_time = new DateTime('2020-11-02T00:00:00');
+$start_time = $auction->getStartDateTime();
+$end_time = $auction->getEndDateTime();
+$starting_price = $auction->getStartingPrice();
+$reserve_price = $auction->getReservePrice();
+$auction_status = $auction->getAuctionStatus();
 
 // TODO: Note: Auctions that have ended may pull a different set of data,
 //       like whether the auction ended in a sale or was cancelled due
@@ -22,9 +28,15 @@ $end_time = new DateTime('2020-11-02T00:00:00');
 // Calculate time to auction end:
 $now = new DateTime();
 
-if ($now < $end_time) {
-    $time_to_end = date_diff($now, $end_time);
-    $time_remaining = ' (in ' . display_time_remaining($time_to_end) . ')';
+if ($auction_status == 'finished') {
+    $item_status = $item->getItemStatus();
+    if ($item_status == 'available'){
+
+    } else {
+
+    }
+} else if ($auction_status == 'reserved') {
+
 }
 
 // TODO: If the user has a session, use it to make a query to the database
@@ -36,6 +48,5 @@ $watching = false;
 
 // 4. At the very end, load the "View"
 // This "passes" all the single-item variables ($item_id, $title,
-// $description, etc.) into the 'views/listing.view.php' file.
-require base_path('views/listing.view.php');
-?>
+// $description, etc.) into the 'views/auction.view.php' file.
+require base_path('views/auction.view.php');
