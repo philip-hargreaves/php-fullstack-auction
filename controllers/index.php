@@ -48,7 +48,7 @@ $raw_auctions = [
         'end_date' => new DateTime('2020-11-02T00:00:00')
     ]
 ];
-$dummy_auctions = [];
+$listings = [];
 
 foreach ($raw_auctions as $auction) {
     if (strlen($auction['description']) > 250) {

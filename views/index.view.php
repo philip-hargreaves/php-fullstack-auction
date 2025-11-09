@@ -58,10 +58,11 @@ require base_path("views/partials/header.php");
         <?php foreach ($dummy_auctions as $auction): ?>
             <li class="list-group-item d-flex justify-content-between">
                 <div class="p-2 mr-5">
-                    <h5><a href="../controllers/listing.php?item_id=<?php echo $auction['item_id']; ?>">
+<!--                    <h5><a href="../listing?item_id=--><?php //echo $auction['item_id']; ?><!--">-->
+                        <h5><a href="../listing?auctionID=12345">
                             <?php echo $auction['title']; ?>
                         </a></h5>
-                    <?php echo $auction['description_short']; // We will create this in the controller ?>
+                        <?php echo $auction['description_short']; // We will create this in the controller ?>
                 </div>
                 <div class="text-center text-nowrap">
                     <span style="font-size: 1.5em">£<?php echo number_format($auction['current_price'], 2); ?></span><br/>
