@@ -1,13 +1,15 @@
 <?php
 
 // 2. Get info from the URL
-$item_id = $_GET['item_id'];
+//$item_id = $_GET['item_id'];
 
 
+//dd($item_id);
 // TODO: Use item_id to make a query to the database.
 
 // DELETEME: For now, using placeholder data.
-$title = "Placeholder title for item ";
+$title = "Dell 24 Monitor - SE2425HM, Full HD (1920x1080)";
+$sellerID = $auction['sellerID'];
 $description = "Description blah blah blah";
 $current_price = 30.50;
 $num_bids = 1;
