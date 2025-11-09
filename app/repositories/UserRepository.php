@@ -25,11 +25,11 @@ class UserRepository {
 
         // Create User object using constructor
         $user = new User(
-            (int)$results[0]['id'],           // userID: int
-            $results[0]['username'],          // username: string
-            $results[0]['email'],             // email: string
-            $results[0]['password'],          // password: string
-            (bool)$results[0]['is_active']    // isActive: bool
+            (int)$results[0]['id'],
+            $results[0]['username'],
+            $results[0]['email'],
+            $results[0]['password'],
+            (bool)$results[0]['is_active']
         );
 
         // Collect all roles from query results
