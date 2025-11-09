@@ -2,7 +2,6 @@
 
 namespace app\models;
 
-// This is the model for the "junction" table between User and Role.
 class UserRole
 {
     // 1. PROPERTIES
@@ -20,5 +19,39 @@ class UserRole
     ) {
         $this->userID = $userID;
         $this->roleID = $roleID;
+    }
+
+    // 4. GETTERS
+
+    public function getUserID(): int
+    {
+        return $this->userID;
+    }
+
+    public function getRoleID(): int
+    {
+        return $this->roleID;
+    }
+
+    // 5. RELATIONSHIP GETTERS/SETTERS
+
+    public function setUser(User $user): void
+    {
+        $this->user = $user;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setRole(Role $role): void
+    {
+        $this->role = $role;
+    }
+
+    public function getRole(): ?Role
+    {
+        return $this->role;
     }
 }

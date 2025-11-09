@@ -9,7 +9,8 @@ class Role
     private string $roleName;
 
     // 2. RELATIONSHIP PROPERTIES
-    private array $userRoles = []; // This links to the junction table
+    // Remove $userRoles: when the Role is created, we don't want to create objects for all the userRoles.
+//    private array $userRoles = [];
 
     // 3. CONSTRUCTOR
     public function __construct(
@@ -19,4 +20,26 @@ class Role
         $this->roleID = $roleID;
         $this->roleName = $roleName;
     }
+
+    // 4. GETTERS
+
+    public function getRoleID(): int
+    {
+        return $this->roleID;
+    }
+
+    public function getRoleName(): string
+    {
+        return $this->roleName;
+    }
+
+    // 5. SETTERS
+
+    public function setRoleName(string $roleName): void
+    {
+        $this->roleName = $roleName;
+    }
+
+    // 6. RELATIONSHIP GETTERS/SETTERS
+
 }

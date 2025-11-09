@@ -29,8 +29,55 @@ class Bid
         $this->buyerID = $buyerID;
         $this->auctionID = $auctionID;
         $this->bidAmount = $bidAmount;
-
-        // Handle string-to-DateTime conversion from database
         $this->bidDateTime = is_string($bidDateTime) ? new DateTime($bidDateTime) : $bidDateTime;
+    }
+
+    // 4. GETTERS (No Setters - A bid is a record and should not be changed)
+
+    public function getBidID(): int
+    {
+        return $this->bidID;
+    }
+
+    public function getBuyerID(): int
+    {
+        return $this->buyerID;
+    }
+
+    public function getAuctionID(): int
+    {
+        return $this->auctionID;
+    }
+
+    public function getBidAmount(): float
+    {
+        return $this->bidAmount;
+    }
+
+    public function getBidDateTime(): DateTime
+    {
+        return $this->bidDateTime;
+    }
+
+    // 5. RELATIONSHIP GETTERS/SETTERS
+
+    public function setBuyer(User $buyer): void
+    {
+        $this->buyer = $buyer;
+    }
+
+    public function getBuyer(): ?User
+    {
+        return $this->buyer;
+    }
+
+    public function setAuction(Auction $auction): void
+    {
+        $this->auction = $auction;
+    }
+
+    public function getAuction(): ?Auction
+    {
+        return $this->auction;
     }
 }
