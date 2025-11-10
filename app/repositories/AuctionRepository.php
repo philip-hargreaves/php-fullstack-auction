@@ -19,7 +19,7 @@ class AuctionRepository
     {
         // Query to get the record
         $queryRow = "SELECT id, item_id, winning_bid_id, start_datetime, end_datetime, starting_price, reserve_price, auction_status 
-                         FROM auction 
+                         FROM auctions
                          WHERE id = :auction_id";
         $row = $this->db->query($queryRow, ['auction_id' => $auctionId])->fetch(PDO::FETCH_ASSOC);
 

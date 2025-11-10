@@ -17,7 +17,7 @@ class ItemRepository
     public function getItemByItemId(int $itemId): ?Item {
         // Query to get the record
         $sql = "SELECT id, seller_id, item_name, item_description, item_condition, item_status 
-                FROM Item 
+                FROM items 
                 WHERE id = :item_id";
         $row = $this->db->query($sql, ['item_id' => $itemId])->fetch(PDO::FETCH_ASSOC);
 
@@ -28,12 +28,12 @@ class ItemRepository
 
         // Create the object using constructor
         $object = new Item(
-            (int)$row['itemID'],
-            (int)$row['sellerID'],
-            (string)$row['itemName'],
-            (string)$row['ItemDescription'],
-            (string)$row['ItemCondition'],
-            (string)$row['ItemStatus']
+            (int)$row['id'],
+            (int)$row['seller_id'],
+            (string)$row['item_name'],
+            (string)$row['item_description'],
+            (string)$row['item_condition'],
+            (string)$row['item_status']
         );
 
         // Set relationship properties

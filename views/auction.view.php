@@ -1,14 +1,20 @@
 <?php
 /**
+ * @var $auctionId int
  * @var $title string
+ * @var $sellerName string
+ * @var $description string
  * @var $now DateTime
- * @var $end_time DateTime
- * @var $has_session
- * @var $watching
- * @var $description
- * @var $time_remaining
- * @var $current_price
- * @var $item_id
+ * @var $startTime DateTime
+ * @var $endTime DateTime
+ * @var $startingPrice float
+ * @var $reservePrice float
+ * @var $currentPrice float
+ * @var $auctionStatus string
+ * @var $itemStatus string
+ * @var $timeRemaining string
+ * @var $hasSession bool
+ * @var $isWatched bool
  */
 ?>
 
@@ -20,12 +26,12 @@
         <div class="col-sm-4 align-self-center"> <?php
             /* The following watchlist functionality uses JavaScript, but could
                just as easily use PHP as in other places in the code */
-            if ($now < $end_time):
+            if ($now < $endTime):
                 ?>
-                <div id="watch_nowatch" <?php if ($has_session && $watching) echo('style="display: none"');?>>
+                <div id="watch_nowatch" <?php if ($hasSession && $isWatched) echo('style="display: none"');?>>
                     <button type="button" class="btn btn-outline-secondary btn-sm" onclick="addToWatchlist()">+ Add to watchlist</button>
                 </div>
-                <div id="watch_watching" <?php if (!$has_session || !$watching) echo('style="display: none"');?>>
+                <div id="watch_watching" <?php if (!$hasSession || !$isWatched) echo('style="display: none"');?>>
                     <button type="button" class="btn btn-success btn-sm" disabled>Watching</button>
                     <button type="button" class="btn btn-danger btn-sm" onclick="removeFromWatchlist()">Remove watch</button>
                 </div>
@@ -40,11 +46,11 @@
         </div>
 
         <div class="col-sm-4"> <p>
-                <?php if ($now > $end_time): ?>
-                    This auction ended <?= date_format($end_time, 'j M H:i') ?>
+                <?php if ($now > $endTime): ?>
+                    This auction ended <?= date_format($endTime, 'j M H:i') ?>
                 <?php else: ?>
-                Auction ends <?= date_format($end_time, 'j M H:i') . $time_remaining ?></p>
-            <p class="lead">Current bid: £<?= number_format($current_price, 2) ?></p>
+                Auction ends <?= date_format($endTime, 'j M H:i') . $timeRemaining ?></p>
+            <p class="lead">Current bid: £<?= number_format($currentPrice, 2) ?></p>
 
             <form method="POST" action="/bid">
                 <div class="input-group">
@@ -72,7 +78,7 @@
             // Sends item ID as an argument to that function.
             $.ajax('watchlist_funcs.php', {
                 type: "POST",
-                data: {functionname: 'add_to_watchlist', arguments: [<?php echo($item_id);?>]},
+                data: {functionname: 'add_to_watchlist', arguments: [<?php echo($auctionId);?>]},
 
                 success:
                     function (obj, textstatus) {
@@ -104,7 +110,7 @@
             // Sends item ID as an argument to that function.
             $.ajax('watchlist_funcs.php', {
                 type: "POST",
-                data: {functionname: 'remove_from_watchlist', arguments: [<?php echo($item_id);?>]},
+                data: {functionname: 'remove_from_watchlist', arguments: [<?php echo($auctionId);?>]},
 
                 success:
                     function (obj, textstatus) {

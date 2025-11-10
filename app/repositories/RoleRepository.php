@@ -46,7 +46,7 @@ class RoleRepository
         $roles = [];
         foreach ($results as $row) {
             // Re-use an existing Role object if it's already in the map.
-            $role = $this->findRole((int)$row['id']);
+            $role = $this->getRole((int)$row['id']);
             if ($role) $roles[] = $role;
         }
 

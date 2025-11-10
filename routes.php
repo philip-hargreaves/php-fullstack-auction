@@ -8,8 +8,8 @@ $router->get('/create-auction', 'controllers/create-auction.php');
 $router->post('/create-auction-result', 'controllers/create-auction-result.php');
 
 // GET Pages
-$router->get('/listing', 'controllers/listing.php');
-$router->get('/my-listings', 'controllers/my-listings.php');
+$router->get('/auction', 'controllers/auction.php');
+$router->get('/my-auctions', 'controllers/my-auctions.php');
 
 
 // Auth

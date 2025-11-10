@@ -2,10 +2,14 @@
 
 // Get auction_id from the URL
 use app\models\Auction;
-require_once base_path('Database.php');
+require_once base_path('infrastructure/Database.php');
 require_once base_path('app/repositories/AuctionRepository.php');
+require_once base_path('app/repositories/RoleRepository.php');
+require_once base_path('app/repositories/ItemRepository.php');
+require_once base_path('app/repositories/UserRepository.php');
 
-$auction_id = $_GET['auction_id'];
+$auctionId = $_GET['auction_id'];
+
 
 // Dependency Injection
 $db = new Database();
@@ -15,7 +19,7 @@ $itemRepo = new ItemRepository($db, $userRepo);
 $auctionRepo = new AuctionRepository($db, $itemRepo);
 
 // Use auction_id to make a query to the database
-$auction = $auctionRepo->getAuctionByAuctionId($auction_id);
+$auction = $auctionRepo->getAuctionByAuctionId($auctionId);
 $item = $auction->getItem();
 $bids = []; // Get all bids from BidRepo
 
@@ -24,17 +28,19 @@ $title = $item->getItemName();
 $sellerName = $item->getSeller()->getUsername();
 $description = $item->getItemDescription();
 $currentBids = [];
-$currentPrice = 0;
+$currentPrice = 120;
 $startTime = $auction->getStartDateTime();
 $endTime = $auction->getEndDateTime();
 $startingPrice = $auction->getStartingPrice();
 $reservePrice = $auction->getReservePrice();
 $auctionStatus = $auction->getAuctionStatus();
+$timeRemaining = "";
 
+$now = new DateTime();
 // Display different data for different $auctionStatus and $itemStatus
 if ($auctionStatus == 'active') {
-    $now = new DateTime();
-    $time_remaining = $now->diff($endTime);
+    $timeRemaining = $now->diff($endTime);
+    $timeRemaining = (string)$timeRemaining;
 } else if ($auctionStatus == 'finished') {
     $itemStatus = $item->getItemStatus();
     if ($itemStatus == 'available') {
@@ -49,13 +55,13 @@ if ($auctionStatus == 'active') {
 // Session Status
 if (session_status() === PHP_SESSION_ACTIVE) {
     // Define actions restricted users
-    $has_session = true;
+    $hasSession = true;
     $user = $userRepo->getUserByUserId($_SESSION['user_id']);
 
     //$isWatched = WatchlistRepository->getIsWatchedByUserIdAndAuctionId($_SESSION['user_id'], $auction->getAuctionId());
     $isWatched = false;
 } else {
-    $has_session = false;
+    $hasSession = false;
 }
 
 
