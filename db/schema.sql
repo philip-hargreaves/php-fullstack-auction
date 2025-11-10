@@ -1,3 +1,6 @@
+DROP database auction_db;
+CREATE database auction_db;
+
 USE auction_db;
 
 CREATE TABLE `roles` (

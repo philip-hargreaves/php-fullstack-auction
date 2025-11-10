@@ -8,6 +8,7 @@ include("../views/partials/header.php");
     <div style="max-width: 800px; margin: 10px auto">
         <h2 class="my-3">Create new auction</h2>
         <div class="card">
+
             <div class="card-body">
                 <!-- Note: This form does not do any dynamic / client-side /
                 JavaScript-based validation of data. -->
