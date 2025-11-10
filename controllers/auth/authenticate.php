@@ -3,7 +3,6 @@ session_start();
 require_once base_path('infrastructure/Database.php');
 require_once base_path('app/models/User.php');
 require_once base_path('app/repositories/UserRepository.php');
-require_once base_path('app/repositories/RoleRepository.php');
 require_once base_path('app/services/AuthService.php');
 
 // Check if POST request
@@ -26,8 +25,7 @@ if (empty($email) || empty($password)) {
 try {
     // Create instances
     $db = new Database();
-    $roleRepository = new RoleRepository($db);
-    $userRepository = new UserRepository($db, $roleRepository);
+    $userRepository = new UserRepository($db);
     $authService = new AuthService($userRepository);
 
     // Attempt login
@@ -41,7 +39,6 @@ try {
         exit;
     }
 } catch (Exception $e) {
-    dd($e->getMessage());
     $_SESSION['login_error'] = 'An error occurred. Please try again.';
     header('Location: /');
     exit;

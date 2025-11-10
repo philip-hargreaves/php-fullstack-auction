@@ -13,10 +13,8 @@ class AuthService {
             session_start();
         }
 
-
-
         // Get user from repository
-        $user = $this->userRepository->getUserByEmail($email);
+        $user = $this->userRepository->getUserAndRoles($email);
         if (!$user) {
             return false;
         }
@@ -32,7 +30,6 @@ class AuthService {
         $_SESSION['logged_in'] = true;
         $_SESSION['roles'] = $user->getRoles();
         $_SESSION['account_type'] = $user->getRoles()[0] ?? null;
-
 
         return true;
     }
