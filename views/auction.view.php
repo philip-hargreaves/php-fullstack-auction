@@ -21,31 +21,45 @@
 <?php require base_path("views/partials/header.php"); ?>
 
 <div class="container">
-    <div class="row"> <div class="col-sm-8"> <h2 class="my-3"><?= htmlspecialchars($title) ?></h2>
+    <div class="row">
+        <div class="col-sm-8">
+            <h2 class="my-3"><?= htmlspecialchars($title) ?></h2>
+            <p>Seller: <?= $sellerName ?></p>
+            <p>Item Description: <?= $description ?></p>
+            <p>Started from: <?= date_format($startTime, 'j M H:i') ?></p>
+            <p>Ended at: <?= date_format($endTime, 'j M H:i') ?></p>
+            <p>Time Remaining: <?= $timeRemaining ?></p>
+            <p>Starting Price: <?= $startingPrice ?></p>
+            <p>Reserve Price: <?= $reservePrice ?></p>
+            <p>Current Price: <?= $currentPrice ?></p>
+            <p>Auction Status: <?= $auctionStatus ?></p>
         </div>
         <div class="col-sm-4 align-self-center"> <?php
-            /* The following watchlist functionality uses JavaScript, but could
-               just as easily use PHP as in other places in the code */
             if ($now < $endTime):
                 ?>
-                <div id="watch_nowatch" <?php if ($hasSession && $isWatched) echo('style="display: none"');?>>
-                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="addToWatchlist()">+ Add to watchlist</button>
+                <div id="watch_nowatch" <?php if ($hasSession && $isWatched) echo('style="display: none"'); ?>>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="addToWatchlist()">+ Add to
+                        watchlist
+                    </button>
                 </div>
-                <div id="watch_watching" <?php if (!$hasSession || !$isWatched) echo('style="display: none"');?>>
+                <div id="watch_watching" <?php if (!$hasSession || !$isWatched) echo('style="display: none"'); ?>>
                     <button type="button" class="btn btn-success btn-sm" disabled>Watching</button>
-                    <button type="button" class="btn btn-danger btn-sm" onclick="removeFromWatchlist()">Remove watch</button>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="removeFromWatchlist()">Remove watch
+                    </button>
                 </div>
             <?php endif; /* Print nothing otherwise */ ?>
         </div>
     </div>
 
-    <div class="row"> <div class="col-sm-8"> <div class="itemDescription">
+    <div class="row">
+        <div class="col-sm-8">
+            <div class="itemDescription">
                 <?= htmlspecialchars($description) ?>
             </div>
 
         </div>
 
-        <div class="col-sm-4"> <p>
+        <div class="col-sm-4"><p>
                 <?php if ($now > $endTime): ?>
                     This auction ended <?= date_format($endTime, 'j M H:i') ?>
                 <?php else: ?>
@@ -60,13 +74,14 @@
                     <input type="number" class="form-control" id="bid" name="bid_amount">
                 </div>
 
-<!--                <input type="hidden" name="item_id" value="--><?php //= $item_id ?><!--">-->
+                <!--                <input type="hidden" name="item_id" value="--><?php //= $item_id ?><!--">-->
 
                 <button type="submit" class="btn btn-primary form-control">Place bid</button>
             </form>
             <?php endif; ?>
 
-        </div> </div> <?php require base_path("views/partials/footer.php"); ?>
+        </div>
+    </div> <?php require base_path("views/partials/footer.php"); ?>
 
     <script>
         // JavaScript functions: addToWatchlist and removeFromWatchlist.
@@ -89,8 +104,7 @@
                         if (objT == "success") {
                             $("#watch_nowatch").hide();
                             $("#watch_watching").show();
-                        }
-                        else {
+                        } else {
                             var mydiv = document.getElementById("watch_nowatch");
                             mydiv.appendChild(document.createElement("br"));
                             mydiv.appendChild(document.createTextNode("Add to watch failed. Try again later."));
@@ -121,8 +135,7 @@
                         if (objT == "success") {
                             $("#watch_watching").hide();
                             $("#watch_nowatch").show();
-                        }
-                        else {
+                        } else {
                             var mydiv = document.getElementById("watch_watching");
                             mydiv.appendChild(document.createElement("br"));
                             mydiv.appendChild(document.createTextNode("Watch removal failed. Try again later."));
