@@ -5,41 +5,38 @@ namespace app\models;
 class Role
 {
     // 1. PROPERTIES
-    private int $roleID;
-    private string $roleName;
+    private int $id;
+    private string $name;
 
     // 2. RELATIONSHIP PROPERTIES
-    // Remove $userRoles: when the Role is created, we don't want to create objects for all the userRoles.
-//    private array $userRoles = [];
+    // N/A for now
 
     // 3. CONSTRUCTOR
-    public function __construct(
-        int $roleID,
-        string $roleName
-    ) {
-        $this->roleID = $roleID;
-        $this->roleName = $roleName;
-    }
-
-    // 4. GETTERS
-
-    public function getRoleID(): int
+    public function __construct(int $id, string $name)
     {
-        return $this->roleID;
+        $this->id = $id;
+        $this->name = $name;
     }
+    // 4. BUSINESS LOGIC METHODS
+    // N/A for now
 
-    public function getRoleName(): string
+    // 5. GETTERS
+    public function getId(): int
     {
-        return $this->roleName;
+        return $this->id;
     }
 
-    // 5. SETTERS
-
-    public function setRoleName(string $roleName): void
+    public function getName(): string
     {
-        $this->roleName = $roleName;
+        return $this->name;
     }
 
-    // 6. RELATIONSHIP GETTERS/SETTERS
+    // 6. SETTERS
+    // Roles are immutable
 
+    // 7. RELATIONSHIP GETTERS/SETTERS
+    // N/A for now
+
+    // 8. PRIVATE HELPERS
+    // N/A for now
 }
