@@ -5,37 +5,45 @@ use app\models\User;
 // Data access for user
 class UserRepository {
     protected $db;
-    protected RoleRepository $roleRepo;
 
-    public function __construct(Database $db, RoleRepository $roleRepo) {
+    public function __construct(Database $db) {
         $this->db = $db;
-        $this->roleRepo = $roleRepo;
     }
 
-    public function getUserByEmail($email) : ?User {
-        // Query to get the User (without roles)
-        // Select only from the users table.
-        $queryRow = "SELECT id, username, email, password, is_active FROM users WHERE email = :email";
-        $row = $this->db->query($queryRow, ['email' => $email])->fetch();
+    public function getUserAndRoles($email) {
+        // Query to get user and roles
+        $query = "SELECT u.id, u.username, u.email, u.password, u.is_active, r.role_name
+                FROM users u
+                LEFT JOIN user_roles ur ON u.id = ur.user_id
+                LEFT JOIN roles r ON ur.role_id = r.id
+                WHERE u.email = :email";
+
+        $results = $this->db->query($query, ['email' => $email])->fetchAll();
 
         // Check if user exists
-        if (empty($row)) return null;
+        if (empty($results)) return false;
 
-        // Create the User object using constructor
-        $object = new User(
-            (int)$row['id'],
-            $row['username'],
-            $row['email'],
-            $row['password'],
-            (bool)$row['is_active']
+        // Create User object using constructor
+        $user = new User(
+            (int)$results[0]['id'],           // userID: int
+            $results[0]['username'],          // username: string
+            $results[0]['email'],             // email: string
+            $results[0]['password'],          // password: string
+            (bool)$results[0]['is_active']    // isActive: bool
         );
 
-        // Ask the RoleRepository to get the Role objects by userID
-        $roles = $this->roleRepo->getRolesByUserId($object->getUserID());
+        // Collect all roles from query results
+        $roles = [];
+        foreach ($results as $row) {
+            if ($row['role_name']) {
+                $roles[] = $row['role_name'];
+            }
+        }
 
-        // Set the array of real Role objects on the user
-        $object->setRoles($roles);
+        // Set roles using setter method
+        $user->setRoles($roles);
 
-        return $object;
+        // Return User object
+        return $user;
     }
 }
