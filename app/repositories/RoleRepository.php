@@ -14,7 +14,7 @@ class RoleRepository
         $this->db = $db;
     }
 
-    public function findRole(int $roleId): ?Role {
+    public function getRole(int $roleId): ?Role {
         // Check if $roleId is already created and stored in the map
         if (isset($this->identityMap[$roleId])) {
             return $this->identityMap[$roleId];
@@ -34,7 +34,7 @@ class RoleRepository
         return $role;
     }
 
-    public function findRolesForUser(int $userId): array
+    public function getRolesByUserId(int $userId): array
     {
         // Query to get roles
         $queryRoles = "SELECT r.id FROM roles r
