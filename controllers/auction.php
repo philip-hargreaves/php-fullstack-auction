@@ -20,6 +20,7 @@ $end_time = $auction->getEndDateTime();
 $starting_price = $auction->getStartingPrice();
 $reserve_price = $auction->getReservePrice();
 $auction_status = $auction->getAuctionStatus();
+//dummy
 
 // TODO: Note: Auctions that have ended may pull a different set of data,
 //       like whether the auction ended in a sale or was cancelled due
