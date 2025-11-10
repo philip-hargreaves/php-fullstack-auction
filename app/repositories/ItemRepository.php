@@ -7,7 +7,7 @@ require_once base_path('app/models/User.php');
 class ItemRepository
 {
     protected $db;
-    protected $userRepo;
+    protected UserRepository $userRepo;
 
     public function __construct(Database $db, UserRepository $userRepo) {
         $this->db = $db;
@@ -37,7 +37,7 @@ class ItemRepository
         );
 
         // Set relationship properties
-        $seller = new User(); //change this to UserRepository->getUserByUserId()
+        $seller = $this->userRepo->getUserByUserId();
         $object->setSeller($seller);
 
         return $object;
