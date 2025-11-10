@@ -1,8 +1,15 @@
 <?php
-// Dummy session
-  session_start();
-  $_SESSION['logged_in'] = false;
-  $_SESSION['account_type'] = 'seller';
+// Start session
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+// Only set default values if they don't exist (don't overwrite login state)
+if (!isset($_SESSION['logged_in'])) {
+    $_SESSION['logged_in'] = false;
+}
+if (!isset($_SESSION['account_type'])) {
+    $_SESSION['account_type'] = null;
+}
 ?>
 
 <!doctype html>
@@ -71,6 +78,27 @@
   </ul>
 </nav>
 
+<!-- Error/Success Messages -->
+<?php if (isset($_SESSION['login_error'])): ?>
+    <div class="alert alert-danger alert-dismissible fade show mx-2 mt-2" role="alert">
+        <?php echo htmlspecialchars($_SESSION['login_error']); ?>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <?php unset($_SESSION['login_error']); ?>
+<?php endif; ?>
+
+<?php if (isset($_SESSION['login_success'])): ?>
+    <div class="alert alert-success alert-dismissible fade show mx-2 mt-2" role="alert">
+        <?php echo htmlspecialchars($_SESSION['login_success']); ?>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <?php unset($_SESSION['login_success']); ?>
+<?php endif; ?>
+
 <!-- Login modal -->
 <div class="modal fade" id="loginModal">
   <div class="modal-dialog">
@@ -83,17 +111,17 @@
 
       <!-- Modal body -->
       <div class="modal-body">
-        <form method="POST" action="/login_result.php">
-          <div class="form-group">
-            <label for="email">Email</label>
-            <input type="text" class="form-control" id="email" placeholder="Email">
-          </div>
-          <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" class="form-control" id="password" placeholder="Password">
-          </div>
-          <button type="submit" class="btn btn-primary form-control">Sign in</button>
-        </form>
+          <form method="POST" action="/login">
+              <div class="form-group">
+                  <label for="email">Email</label>
+                  <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
+              </div>
+              <div class="form-group">
+                  <label for="password">Password</label>
+                  <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+              </div>
+              <button type="submit" class="btn btn-primary form-control">Sign in</button>
+          </form>
         <div class="text-center">or <a href="/register">create an account</a></div>
       </div>
 

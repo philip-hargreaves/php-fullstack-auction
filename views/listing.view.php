@@ -10,9 +10,8 @@
  * @var $current_price
  * @var $item_id
  */
+require base_path("views/partials/header.php");
 ?>
-
-<?php require base_path("views/partials/header.php"); ?>
 
 <div class="container">
     <div class="row"> <div class="col-sm-8"> <h2 class="my-3"><?= htmlspecialchars($title) ?></h2>
@@ -131,3 +130,5 @@
 
         } // End of addToWatchlist func
     </script>
+
+<?php require base_path("views/partials/footer.php");
