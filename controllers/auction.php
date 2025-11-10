@@ -4,7 +4,7 @@
 use app\models\Auction;
 require_once base_path('infrastructure/Database.php');
 require_once base_path('app/repositories/AuctionRepository.php');
-require_once base_path('app/repositories/RoleRepository.php');
+//require_once base_path('app/repositories/RoleRepository.php');
 require_once base_path('app/repositories/ItemRepository.php');
 require_once base_path('app/repositories/UserRepository.php');
 
@@ -13,8 +13,9 @@ $auctionId = $_GET['auction_id'];
 
 // Dependency Injection
 $db = new Database();
-$roleRepo = new RoleRepository($db);
-$userRepo = new UserRepository($db, $roleRepo);
+//$roleRepo = new RoleRepository($db);
+//$userRepo = new UserRepository($db, $roleRepo);
+$userRepo = new UserRepository($db);
 $itemRepo = new ItemRepository($db, $userRepo);
 $auctionRepo = new AuctionRepository($db, $itemRepo);
 
