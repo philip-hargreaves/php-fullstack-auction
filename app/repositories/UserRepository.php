@@ -12,17 +12,17 @@ class UserRepository {
         $this->roleRepo = $roleRepo;
     }
 
-    public function getUser($email) {
+    public function getUserByEmail($email) : ?User {
         // Query to get the User (without roles)
         // Select only from the users table.
-        $queryUser = "SELECT id, username, email, password, is_active FROM users WHERE email = :email";
-        $row = $this->db->query($queryUser, ['email' => $email])->fetch();
+        $queryRow = "SELECT id, username, email, password, is_active FROM users WHERE email = :email";
+        $row = $this->db->query($queryRow, ['email' => $email])->fetch();
 
         // Check if user exists
-        if (empty($row)) return false;
+        if (empty($row)) return null;
 
         // Create the User object using constructor
-        $user = new User(
+        $object = new User(
             (int)$row['id'],
             $row['username'],
             $row['email'],
@@ -31,11 +31,11 @@ class UserRepository {
         );
 
         // Ask the RoleRepository to get the Role objects by userID
-        $roles = $this->roleRepo->findRolesForUser($user->getUserID());
+        $roles = $this->roleRepo->getRolesByUserId($object->getUserID());
 
         // Set the array of real Role objects on the user
-        $user->setRoles($roles);
+        $object->setRoles($roles);
 
-        return $user;
+        return $object;
     }
 }

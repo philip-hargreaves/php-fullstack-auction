@@ -16,7 +16,7 @@ class AuthService {
 
 
         // Get user from repository
-        $user = $this->userRepository->getUser($email);
+        $user = $this->userRepository->getUserByEmail($email);
         if (!$user) {
             return false;
         }
