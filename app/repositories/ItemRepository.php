@@ -37,7 +37,7 @@ class ItemRepository
         );
 
         // Set relationship properties
-        $seller = $this->userRepo->getUserByUserId();
+        $seller = $this->userRepo->getUserByUserId($object->getSellerId());
         $object->setSeller($seller);
 
         return $object;
