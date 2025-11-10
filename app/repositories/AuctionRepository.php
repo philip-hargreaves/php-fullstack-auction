@@ -15,6 +15,26 @@ class AuctionRepository
         $this->itemRepo = $itemRepo;
     }
 
+    private function dbToObjectConverter($row) : Auction {
+        // Create the object using constructor
+        $object = new Auction(
+            (int)$row['id'],
+            (int)$row['item_id'],
+            ($row['winning_bid_id'] ? (int)$row['winning_bid_id'] : null),
+            $row['start_datetime'],
+            $row['end_datetime'],
+            (float)$row['starting_price'],
+            (float)$row['reserve_price'],
+            $row['auction_status']
+        );
+
+        // Set relationship properties
+            $item = $this->itemRepo->getItemByItemId($object->getItemId());
+            $object->setItem($item);
+
+            return $object;
+    }
+
     public function getAuctionByAuctionId(int $auctionId): ?Auction
     {
         // Query to get the record
@@ -28,23 +48,13 @@ class AuctionRepository
             return null;
         }
 
-        // Create the object using constructor
-        $object = new Auction(
-            (int)$row['id'],
-            (int)$row['item_id'],
-            ($row['winning_bid_id'] ? (int)$row['winning_bid_id'] : null),
-            $row['start_datetime'],
-            $row['end_datetime'],
-            (float)$row['starting_price'],
-            (float)$row['reserve_price'],
-            $row['auction_status']
-        );
-
-        // Set $item
-        $item = $this->itemRepo->getItemByItemId($object->getItemId());
-        $object->setItem($item);
-
-        return $object;
+        // Create object with $row
+        try {
+            return $this->dbToObjectConverter($row);
+        } catch (Exception $e) {
+            // Log the error $e->getMessage()
+            return null; // Failed to build the object
+        }
     }
 
     public function getAuctionsByItemId(int $itemId) : array {
