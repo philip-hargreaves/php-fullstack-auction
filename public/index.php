@@ -1,8 +1,8 @@
 <?php
-require "../infrastructure/utilities.php";
-require "../infrastructure/Database.php";
-require "../infrastructure/Router.php";
-require "../infrastructure/Request.php";
+require_once "../infrastructure/utilities.php";
+require_once "../infrastructure/Database.php";
+require_once "../infrastructure/Router.php";
+require_once "../infrastructure/Request.php";
 
 
 // Initialise Router and Database

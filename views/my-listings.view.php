@@ -1,5 +1,5 @@
 <?php
-base_path("views/partials/header.php");
+require base_path("views/partials/header.php");
 ?>
 
     <div class="container">
@@ -8,4 +8,4 @@ base_path("views/partials/header.php");
 
 
 
-<?php base_path("views/partials/footer.php");
+<?php require base_path("views/partials/footer.php");

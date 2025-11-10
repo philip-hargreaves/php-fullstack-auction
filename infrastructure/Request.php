@@ -6,8 +6,8 @@ class Request
     public static function get($key, $default = null)
     {
         if (isset($_GET[$key])) {
-            // Retrieve and sanitise the input by stripping HTML tags
-            return htmlspecialchars(strip_tags($_GET[$key]));
+            // Retrieve and sanitise the input by stripping HTML tags and trimming whitespace
+            return trim(htmlspecialchars(strip_tags($_GET[$key])));
         }
         return $default;
     }
@@ -16,7 +16,7 @@ class Request
     public static function post($key, $default = null)
     {
         if (isset($_POST[$key])) {
-            return htmlspecialchars(strip_tags($_POST[$key]));
+            return trim(htmlspecialchars(strip_tags($_POST[$key])));
         }
         return $default;
     }
@@ -25,5 +25,10 @@ class Request
     public static function isPost()
     {
         return $_SERVER['REQUEST_METHOD'] === 'POST';
+    }
+
+    public static function postRaw($key, $default = null)
+    {
+        return $_POST[$key] ?? $default;
     }
 }
