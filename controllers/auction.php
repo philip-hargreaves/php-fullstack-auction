@@ -2,11 +2,18 @@
 
 // Get auction_id from the URL
 use app\models\Auction;
+require_once base_path('Database.php');
+require_once base_path('app/repositories/AuctionRepository.php');
 
 $auction_id = $_GET['auction_id'];
 
 // Use auction_id to make a query to the database
-$auction = new Auction();
+$db = new Database();
+$userRepo = new UserRepository();
+$itemRepo = new ItemRepository($db, $userRepo);
+$auctionRepo = new AuctionRepository($db, $itemRepo);
+
+$auction = $auctionRepo->getAuctionByAuctionId($auction_id);
 $item = $auction->getItem();
 
 // Variables required in the view
