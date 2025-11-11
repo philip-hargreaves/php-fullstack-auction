@@ -12,8 +12,10 @@ class UserRepository {
         $this->roleRepository = $roleRepository;
     }
 
-    public function getUserAndRoles($email) {
+    public function getUserAndRoles(string $email): ?User
+    {
         // Query to get user and roles
+        // ***For now, using two joins rather than two queries so the db is only hit once, to be discussed later***
         $query = "SELECT u.id, u.username, u.email, u.password, u.is_active, r.id AS role_id, r.role_name
                 FROM users u
                 LEFT JOIN user_roles ur ON u.id = ur.user_id
@@ -42,4 +44,41 @@ class UserRepository {
 
         return $user;
     }
+
+    // Check if user exists by email
+    public function existsByEmail(string $email): bool
+    {
+        return $this->db
+            ->query('SELECT 1 FROM users WHERE email = :email LIMIT 1', ['email' => $email])
+            ->fetchColumn() !== false;
+    }
+
+    // Check if user exists by username
+    public function existsByUsername(string $username): bool
+    {
+        return $this->db
+            ->query('SELECT 1 FROM users WHERE username = :username LIMIT 1', ['username' => $username])
+            ->fetchColumn() !== false;
+    }
+
+    // Create a new user
+    public function create(string $username, string $email, string $hashedPassword, bool $isActive = true): User
+    {
+        $this->db->query(
+            'INSERT INTO users (username, email, password, is_active)
+             VALUES (:username, :email, :password, :is_active)',
+            [
+                'username'  => $username,
+                'email'     => $email,
+                'password'  => $hashedPassword,
+                'is_active' => $isActive ? 1 : 0,
+            ]
+        );
+
+        $id = (int)$this->db->connection->lastInsertId();
+
+        return new User($id, $username, $email, $hashedPassword, $isActive);
+    }
+
+
 }
