@@ -1,9 +1,6 @@
 <?php
 
 use app\models\User;
-use PDO;
-use Throwable;
-
 
 class RegistrationService
 {
@@ -34,13 +31,10 @@ class RegistrationService
             return $this->fail($errors);
         }
 
-        // Make sure the buyer role exists before we start writing to the DB
+        // Each user starts as a buyer by default
         $buyerRole = $this->roleRepository->findByName('buyer');
-        if ($buyerRole === null) {
-            return $this->fail(['Buyer role is not configured.']);
-        }
 
-        // DB connection is required for transactions
+        // Get the DB connection
         $pdo = $this->db->connection;
 
         try {
@@ -61,7 +55,7 @@ class RegistrationService
                 'errors'  => [],
                 'user'    => $user,
             ];
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             // Any exception should roll back the transaction to avoid partial state
             if ($pdo->inTransaction()) {
                 $pdo->rollBack();
@@ -129,7 +123,7 @@ class RegistrationService
     }
 
     // Start a transaction if the connection doesn't already have one
-    private function beginTransaction(PDO $pdo): void
+    private function beginTransaction(\PDO $pdo): void
     {
         if (!$pdo->inTransaction()) {
             $pdo->beginTransaction();

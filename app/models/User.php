@@ -14,7 +14,6 @@ class User
     // 2. RELATIONSHIP PROPERTIES (started empty, will be filled by repositories)
     private array $roles = [];  // roles will now be stored as role objects
 
-
     // 3. CONSTRUCTOR
     public function __construct(
         int $userID,
@@ -29,7 +28,6 @@ class User
         $this->password = $password;
         $this->isActive = (bool)$isActive;
     }
-
 
     // 4. BUSINESS LOGIC METHODS
     public function verifyPassword(string $password): bool
@@ -66,7 +64,6 @@ class User
     }
 
     // 6. GETTERS
-
     public function getUserID(): int
     {
         return $this->userID;

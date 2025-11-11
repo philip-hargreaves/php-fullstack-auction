@@ -41,7 +41,7 @@ try {
     // Delegate registration to the service
     $result = $registrationService->register($input);
 
-    if ($result->succeeded()) {
+    if ($result['success']) {
         // Auto-login newly created user for a smoother experience
         $authService->attemptLogin($input['email'], $input['password']);
         $_SESSION['registration_success'] = 'Account created successfully!';
@@ -50,14 +50,13 @@ try {
     }
 
     // To get here, registration failed, so redirect back to the registration page with errors
-    $_SESSION['registration_errors'] = $result->errors();
+    $_SESSION['registration_errors'] = $result['errors'];
     $_SESSION['old_registration_username'] = $input['username'];
     $_SESSION['old_registration_email']    = $input['email'];
     header('Location: /register');
     exit;
-
 } catch (Exception $e) {
-    // Show generic error to user
+    // Show generic error to user (optionally log $e for diagnostics)
     $_SESSION['registration_errors'] = ['Registration failed. Please try again.'];
     header('Location: /register');
     exit;
