@@ -6,8 +6,8 @@ require_once base_path('app/models/User.php');
 
 class ItemRepository
 {
-    protected Database $db;
-    protected UserRepository $userRepo;
+    private Database $db;
+    private UserRepository $userRepo;
 
     public function __construct(Database $db, UserRepository $userRepo) {
         $this->db = $db;

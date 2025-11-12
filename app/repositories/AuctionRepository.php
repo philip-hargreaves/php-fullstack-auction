@@ -7,7 +7,7 @@ require_once base_path('app/repositories/ItemRepository.php');
 
 class AuctionRepository
 {
-    protected Database $db;
+    private Database $db;
     protected ItemRepository $itemRepo;
 
     public function __construct(Database $db, ItemRepository $itemRepo) {
