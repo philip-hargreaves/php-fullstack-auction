@@ -28,38 +28,50 @@
 
         <div class="col-md-7">
             <?php
-            // Get the first image, or a placeholder if the array is empty
             $firstImage = $imageUrls[0] ?? 'https://via.placeholder.com/600x400.png?text=No+Image';
             ?>
 
-            <div id="image-gallery" class="gallery-container mb-3" style="position: relative;">
-
+            <!-- Main Image Gallery -->
+            <div id="image-gallery" class="gallery-container mb-2"> <!-- Reduced margin -->
                 <img src="<?= htmlspecialchars($firstImage) ?>"
                      alt="<?= htmlspecialchars($title) ?>"
                      class="img-fluid rounded border"
                      id="main-image"
                      style="max-height: 500px; width: 100%; object-fit: contain;">
-
-                <?php if (count($imageUrls) > 1): ?>
-                    <div class="d-flex justify-content-center mt-3">
-                        <button class="btn btn-outline-primary me-2" id="prev-image">&larr;</button>
-                        <button class="btn btn-outline-primary ml-2" id="next-image">&rarr;</button>
-                    </div>
-
-                <?php endif; ?>
             </div>
 
+            <!-- Main Image Nav Buttons (Centered) -->
             <?php if (count($imageUrls) > 1): ?>
-                <div class="d-flex justify-content-center mt-3" id="thumbnail-container">
+                <div class="d-flex justify-content-center mb-3"> <!-- Added margin-bottom -->
+                    <button class="btn btn-outline-primary me-2" id="prev-image">&larr; Previous</button>
+                    <button class="btn btn-outline-primary" id="next-image">Next &rarr;</button>
+                </div>
+            <?php endif; ?>
 
-                    <?php foreach ($imageUrls as $index => $url): ?>
-                        <img src="<?= htmlspecialchars($url) ?>"
-                             alt="Thumbnail <?= $index + 1 ?>"
-                             class="img-thumbnail me-2 gallery-thumb <?= $index == 0 ? 'active-thumb' : '' ?>"
-                             style="width: 80px; height: 80px; object-fit: cover; cursor: pointer;"
-                             data-index="<?= $index ?>">
-                    <?php endforeach; ?>
 
+            <!-- ===== NEW THUMBNAIL SCROLLER ===== -->
+            <?php if (count($imageUrls) > 1): ?>
+                <div class="thumbnail-scroller-wrapper">
+                    <!-- Thumbnail Left Button -->
+                    <button class="thumb-nav-btn prev" id="thumb-prev">&#10094;</button>
+
+                    <!-- Viewport (the visible, fixed-width area) -->
+                    <div class="thumbnail-viewport" id="thumbnail-viewport">
+
+                        <!-- Container (the long, scrolling strip of images) -->
+                        <div class="d-flex" id="thumbnail-container">
+                            <?php foreach ($imageUrls as $index => $url): ?>
+                                <img src="<?= htmlspecialchars($url) ?>"
+                                     alt="Thumbnail <?= $index + 1 ?>"
+                                     class="img-thumbnail me-2 gallery-thumb <?= $index == 0 ? 'active-thumb' : '' ?>"
+                                     style="width: 80px; height: 80px; object-fit: cover; cursor: pointer; flex-shrink: 0;"
+                                     data-index="<?= $index ?>">
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+
+                    <!-- Thumbnail Right Button -->
+                    <button class="thumb-nav-btn next" id="thumb-next">&#10095;</button>
                 </div>
             <?php endif; ?>
         </div>
@@ -145,7 +157,7 @@
 
     <div class="row">
         <div class="col-12">
-            <h3>Item Description</h3>
+            <h3 class="mb-3">Item Description</h3>
             <div class="itemDescription bg-white p-3 rounded border">
                 <?= nl2br(htmlspecialchars($description)) ?>
             </div>
@@ -285,6 +297,105 @@
                 showImage(index);
             });
         });
+
+    });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const imageUrls = <?= json_encode($imageUrls ?? []) ?>;
+        if (imageUrls.length <= 1) return;
+
+        // --- 1. Main Image Gallery Logic (EXISTING) ---
+        let currentIndex = 0;
+        const mainImage = document.getElementById('main-image');
+        const prevButton = document.getElementById('prev-image');
+        const nextButton = document.getElementById('next-image');
+        const thumbnails = document.querySelectorAll('.gallery-thumb');
+
+        function showImage(index) {
+            if (index >= imageUrls.length) index = 0;
+            if (index < 0) index = imageUrls.length - 1;
+
+            mainImage.src = imageUrls[index];
+            currentIndex = index;
+
+            thumbnails.forEach((thumb, i) => {
+                thumb.classList.toggle('active-thumb', i === currentIndex);
+            });
+
+            // New function call to sync scroller
+            centerThumbnailInView(index);
+        }
+
+        prevButton.addEventListener('click', () => showImage(currentIndex - 1));
+        nextButton.addEventListener('click', () => showImage(currentIndex + 1));
+        thumbnails.forEach(thumb => {
+            thumb.addEventListener('click', () => {
+                showImage(parseInt(thumb.dataset.index, 10));
+            });
+        });
+
+
+        // --- 2. NEW Thumbnail Scroller Logic ---
+        const viewport = document.getElementById('thumbnail-viewport');
+        const thumbContainer = document.getElementById('thumbnail-container');
+        const thumbPrev = document.getElementById('thumb-prev');
+        const thumbNext = document.getElementById('thumb-next');
+
+        let scrollAmount = 0;
+        // Calculate scroll amount (width of one thumb + margin-right)
+        // 80px (width) + 8px (me-2 margin) = 88
+        const thumbScrollWidth = thumbnails[0] ? thumbnails[0].offsetWidth + 8 : 88;
+
+        function updateThumbNav() {
+            // Show/hide prev button
+            thumbPrev.style.display = (scrollAmount <= 0) ? 'none' : 'block';
+
+            // Show/hide next button
+            const maxScroll = thumbContainer.scrollWidth - viewport.clientWidth;
+            thumbNext.style.display = (scrollAmount >= maxScroll) ? 'none' : 'block';
+        }
+
+        thumbPrev.addEventListener('click', () => {
+            scrollAmount -= thumbScrollWidth * 3; // Scroll by 3 images
+            if (scrollAmount < 0) scrollAmount = 0;
+            thumbContainer.style.transform = `translateX(-${scrollAmount}px)`;
+            updateThumbNav();
+        });
+
+        thumbNext.addEventListener('click', () => {
+            const maxScroll = thumbContainer.scrollWidth - viewport.clientWidth;
+            scrollAmount += thumbScrollWidth * 3; // Scroll by 3 images
+            if (scrollAmount > maxScroll) scrollAmount = maxScroll;
+            thumbContainer.style.transform = `translateX(-${scrollAmount}px)`;
+            updateThumbNav();
+        });
+
+        // This new function centers the active thumb in the scroller
+        function centerThumbnailInView(index) {
+            const activeThumb = thumbnails[index];
+            if (!activeThumb) return;
+
+            const viewportWidth = viewport.clientWidth;
+            const thumbLeft = activeThumb.offsetLeft;
+            const thumbWidth = activeThumb.offsetWidth;
+
+            // Calculate new scroll amount to center the thumb
+            let newScroll = thumbLeft - (viewportWidth / 2) + (thumbWidth / 2);
+
+            const maxScroll = thumbContainer.scrollWidth - viewportWidth;
+            if (newScroll < 0) newScroll = 0;
+            if (newScroll > maxScroll) newScroll = maxScroll;
+
+            scrollAmount = newScroll;
+            thumbContainer.style.transform = `translateX(-${scrollAmount}px)`;
+            updateThumbNav();
+        }
+
+        // Initial check
+        updateThumbNav();
 
     });
 </script>
