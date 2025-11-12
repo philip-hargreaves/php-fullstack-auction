@@ -4,7 +4,7 @@ session_start();
 use app\models\Auction;
 require_once base_path('infrastructure/Database.php');
 require_once base_path('app/repositories/AuctionRepository.php');
-//require_once base_path('app/repositories/RoleRepository.php');
+require_once base_path('app/repositories/RoleRepository.php');
 require_once base_path('app/repositories/ItemRepository.php');
 require_once base_path('app/repositories/UserRepository.php');
 require_once base_path('app/services/BidService.php');
@@ -13,9 +13,8 @@ $auctionId = $_GET['auction_id'];
 
 // Dependency Injection
 $db = new Database();
-//$roleRepo = new RoleRepository($db);
-//$userRepo = new UserRepository($db, $roleRepo);
-$userRepo = new UserRepository($db);
+$roleRepo = new RoleRepository($db);
+$userRepo = new UserRepository($db, $roleRepo);
 $itemRepo = new ItemRepository($db, $userRepo);
 $auctionRepo = new AuctionRepository($db, $itemRepo);
 $bidRepo = new BidRepository($db, $userRepo, $auctionRepo);
@@ -86,18 +85,15 @@ if ($auctionStatus == 'Active') {
 }
 
 // Session Status
-if (session_status() === PHP_SESSION_ACTIVE) {
-    // Define actions restricted to (User.UserRole == Buyer or Seller)
+if (session_status() === PHP_SESSION_ACTIVE) { // login
     $hasSession = true;
-//    $user = $userRepo->getUserByUserId($_SESSION['user_id']);
-    $user = $userRepo->getUserAndRoles($_SESSION['email']);
+    $user = $userRepo->findById($_SESSION['user_id']);
 
     //$isWatched = WatchlistRepository->getIsWatchedByUserIdAndAuctionId($_SESSION['user_id'], $auction->getAuctionId());
     $isWatched = false;
-} else {
+} else { // logout
     $hasSession = false;
 }
-
 
 
 require base_path('views/auction.view.php');

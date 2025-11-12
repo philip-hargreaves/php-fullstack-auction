@@ -4,6 +4,8 @@ session_start();
 require_once base_path("app/services/BidService.php");
 require_once base_path("app/repositories/AuctionRepository.php");
 require_once base_path("app/repositories/UserRepository.php");
+require_once base_path("app/repositories/RoleRepository.php");
+require_once base_path("app/repositories/UserRoleRepository.php");
 require_once base_path("app/repositories/ItemRepository.php");
 require_once base_path("app/repositories/BidRepository.php");
 
@@ -27,7 +29,9 @@ if ($bid_amount <= 0) {
 if (empty($errors)) {
     // Instantiate services
     $db = new Database();
-    $userRepo = new UserRepository($db); // Assuming this is needed by ItemRepo
+    $userRoleRepo = new UserRoleRepository($db);
+    $RoleRepo = new RoleRepository($db);
+    $userRepo = new UserRepository($db, $RoleRepo);
     $itemRepo = new ItemRepository($db, $userRepo);
     $auctionRepo = new AuctionRepository($db, $itemRepo);
     $bidRepo = new BidRepository($db, $userRepo, $auctionRepo);
