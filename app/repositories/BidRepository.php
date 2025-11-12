@@ -16,7 +16,11 @@ class BidRepository
         $this->auctionRepo = $auctionRepo;
     }
 
-    private function dbToObjectConverter(array $row) : Bid {
+    private function dbToObjectConverter($row) : ?Bid {
+        if (empty($row)) {
+            return null;
+        }
+
         // Create the object using constructor
         $object = new Bid(
             (int)$row['id'],
@@ -39,36 +43,30 @@ class BidRepository
 
     private function objectToDbConverter(bid $bid) : array {
         // Create the object using constructor
-        $row['id'] = 0;
+        $row = [];
         $row['buyer_id'] = $bid->getBuyerId();
         $row['auction_id'] = $bid->getAuctionId();
         $row['bid_amount'] = $bid->getBidAmount();
-        $row['bid_datetime'] = $bid->getBidDatetime();
+        $row['bid_datetime'] = $bid->getBidDatetime()->format('Y-m-d H:i:s');
 
         return $row;
     }
 
-    public function getBidByBidId(int $auctionId): ?Bid
+    public function getBidByBidId(int $bidId): ?Bid
     {
-//        // Query to get the record
-//        $queryRow = "SELECT id, item_id, winning_bid_id, start_datetime, end_datetime, starting_price, reserve_price, auction_status
-//                         FROM auctions
-//                         WHERE id = :auction_id";
-//        $row = $this->db->query($queryRow, ['auction_id' => $auctionId])->fetch(PDO::FETCH_ASSOC);
-//
-//        // Check if a record was returned
-//        if (empty($row)) {
-//            return null;
-//        }
-//
-//        // Create object with $row
-//        try {
-//            return $this->dbToObjectConverter($row);
-//        } catch (Exception $e) {
-//            // Log the error $e->getMessage()
-//            return null; // Failed to build the object
-//        }
-        return null;
+        try {
+            // Query
+            $sql = "SELECT * FROM bids WHERE bid_id = :bid_id";
+            $params = ['bid_id' => $bidId];
+            $row = $this->db->query($sql, $params)->fetch(PDO::FETCH_ASSOC);
+
+            // dbToObjectConverter will handle the empty row and return null
+            return $this->dbToObjectConverter($row);
+
+        } catch (PDOException $e) {
+            error_log($e->getMessage());
+            return null;
+        }
     }
 
     public function createBid(Bid $bid): bool
@@ -88,13 +86,30 @@ class BidRepository
             } else {
                 return false; // Statement preparation failed
             }
-
         } catch (PDOException $e) {
             // error_log($e->getMessage());
             return false;
         }
     }
 
+    public function getHighestBidByAuctionId(int $auctionId): ?Bid
+    {
+        try {
+            // Query
+            $sql = "SELECT * FROM bids 
+                    WHERE auction_id = :auction_id 
+                    ORDER BY bid_amount DESC 
+                    LIMIT 1";
+            $params = ['auction_id' => $auctionId];
+            $row = $this->db->query($sql, $params)->fetch(PDO::FETCH_ASSOC);
 
+            // dbToObjectConverter will handle the empty row and return null
+            return $this->dbToObjectConverter($row);
+
+        } catch (PDOException $e) {
+            error_log($e->getMessage());
+            return null;
+        }
+    }
 
 }

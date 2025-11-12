@@ -18,5 +18,5 @@ $router->get('/logout', 'controllers/auth/logout.php');
 
 
 // Auction Page
-$router->post('/bid', 'controllers/bid.php');
-$router->get('/auction', 'controllers/auction.php');
+$router->post('/bid', 'controllers/auction/place-bid.php');
+$router->get('/auction', 'controllers/auction/auction.php');

@@ -7,9 +7,9 @@ require_once base_path('app/repositories/AuctionRepository.php');
 //require_once base_path('app/repositories/RoleRepository.php');
 require_once base_path('app/repositories/ItemRepository.php');
 require_once base_path('app/repositories/UserRepository.php');
+require_once base_path('app/services/BidService.php');
 
 $auctionId = $_GET['auction_id'];
-
 
 // Dependency Injection
 $db = new Database();
@@ -18,6 +18,8 @@ $db = new Database();
 $userRepo = new UserRepository($db);
 $itemRepo = new ItemRepository($db, $userRepo);
 $auctionRepo = new AuctionRepository($db, $itemRepo);
+$bidRepo = new BidRepository($db, $userRepo, $auctionRepo);
+$bidServ = new BidService($bidRepo, $auctionRepo, $db);
 
 // Get Auction, Item, and Bids entities
 $auction = $auctionRepo->getAuctionByAuctionId($auctionId);
@@ -31,7 +33,7 @@ $auctionStatus = $auction->getAuctionStatus();
 $title = $item->getItemName();
 $sellerName = $item->getSeller()->getUsername();
 $description = $item->getItemDescription();
-$highestBid = 120;
+$highestBid = $bidServ->getHighestBidByAuctionId($auctionId);
 $startTime = $auction->getStartDateTime();
 $endTime = $auction->getEndDateTime();
 $startingPrice = $auction->getStartingPrice();

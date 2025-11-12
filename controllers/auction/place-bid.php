@@ -1,79 +1,75 @@
 <?php
 
-// Start session to handle errors
 session_start();
+require_once base_path("app/services/BidService.php");
+require_once base_path("app/repositories/AuctionRepository.php");
+require_once base_path("app/repositories/UserRepository.php");
+require_once base_path("app/repositories/ItemRepository.php");
+require_once base_path("app/repositories/BidRepository.php");
 
-// Get the form data using the static Request class
-$bid_amount = Request::post('bid_amount');
-$auction_id = Request::post('auction_id');
+$bid_amount = (float)Request::post('bid_amount');
+$auction_id = (int)Request::post('auction_id');
 $user_id = $_SESSION['user_id'] ?? null;
-
-// Validate data
 $errors = [];
 
+// 2. RUN VALIDATION (UI & BUSINESS LOGIC)
 // A. Check if user is logged in
 if (!$user_id) {
     $errors[] = 'You must be logged in to place a bid.';
 }
 
-// B. Check if data is valid
-if (!is_numeric($bid_amount) || $bid_amount <= 0) {
+// B. Check if bid amount is a valid number
+if ($bid_amount <= 0) {
     $errors[] = 'Your bid amount is not valid.';
 }
 
-// C. Check business logic
-// You'll need to connect to your database here.
-// This is a simplified example.
-// $db = new Database($config);
-
-// (MODEL) Fetch the auction's *actual* current bid from the DB
-// **Never trust data sent from the form (like $highestBid)**
-// $auction = $db->query("SELECT * FROM auctions WHERE id = ?", [$auction_id])->find();
-// $current_highest_bid = $auction['current_bid'] ?? 0;
-
-/* --- Start Example DB Logic --- */
-// This is placeholder logic. Replace with your actual database call.
-//$current_highest_bid = 100.00; // Example: $auction['current_bid'];
-//if ($auction_id == '123') { // Example: $auction is found
-//    if ($bid_amount <= $current_highest_bid) {
-//        $errors[] = 'Your bid must be higher than the current highest bid of £' . number_format($current_highest_bid, 2);
-//    }
-//} else {
-//    $errors[] = 'Auction not found.';
-//}
-/* --- End Example DB Logic --- */
-
-
-// 3. PROCESS (If validation passed)
+// Only executed if the basic checks pass.
 if (empty($errors)) {
-    // Validation passed!
+    // Instantiate services
+    $db = new Database();
+    $userRepo = new UserRepository($db); // Assuming this is needed by ItemRepo
+    $itemRepo = new ItemRepository($db, $userRepo);
+    $auctionRepo = new AuctionRepository($db, $itemRepo);
+    $bidRepo = new BidRepository($db, $userRepo, $auctionRepo);
+    $bidServ = new BidService($bidRepo, $auctionRepo, $db);
+}
 
-    // (MODEL) Save the new bid to the database
-    // $db->query("INSERT INTO bids (auction_id, user_id, amount) VALUES (?, ?, ?)", [
-    //     $auction_id,
-    //     $user_id,
-    //     $bid_amount
-    // ]);
+// 3. PROCESS THE REQUEST
 
-    // (MODEL) Update the auction's main price
-    // $db->query("UPDATE auctions SET current_bid = ? WHERE id = ?", [
-    //     $bid_amount,
-    //     $auction_id
-    // ]);
+// VALIDATION FAILED
+if (!empty($errors)) {
+    // Store errors in the session so the view can show them
+    $_SESSION['place_bid_errors'] = $errors;
+    header('Location: /auction?auction_id=' . $auction_id); // Redirect back to auction
+    exit();
+}
 
-    // 4. REDIRECT (on success)
-    // Redirect back to the auction page.
-    header('Location: /auction?id=' . $auction_id);
+// VALIDATION PASSED
+try {
+    // Build the $input array for the service
+    $input = [
+        'buyerId' => $user_id,
+        'auctionId' => $auction_id,
+        'bidAmount' => $bid_amount,
+    ];
+
+    // Use the BidService to place the bid
+    $success = $bidServ->placeBid($input);
+
+    // FAIL
+    if (!$success) {
+        $_SESSION['place_bid_errors'] = ['Failed to place a bid. Please try again.'];
+        header('Location: /auction?auction_id=' . $auction_id);
+        exit();
+    }
+
+    // SUCCESS
+    $_SESSION['place_bid_success'] = 'Your bid was placed successfully!';
+    header('Location: /auction?auction_id=' . $auction_id);
     exit();
 
-} else {
-    // Validation failed!
-
-    // Store errors in the session so the view can show them
-    $_SESSION['errors'] = $errors;
-
-    // 4. REDIRECT (on failure)
-    // Send the user back to the form
-    header('Location: /auction?id=' . $auction_id);
+} catch (Exception $e) {
+    $_SESSION['place_bid_errors'] = ['An unexpected error occurred: ' . $e->getMessage()];
+    header('Location: /auction?auction_id=' . $auction_id);
     exit();
 }
