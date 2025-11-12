@@ -23,10 +23,10 @@
 
 <?php require base_path("views/partials/header.php"); ?>
 
-<div class="container my-4">
+<div class="container my-4" >
     <div class="row">
 
-        <div class="col-md-7">
+        <div class="col mx-auto" style="max-width: 600px;">
             <?php
             $firstImage = $imageUrls[0] ?? 'https://via.placeholder.com/600x400.png?text=No+Image';
             ?>
@@ -37,28 +37,26 @@
                      alt="<?= htmlspecialchars($title) ?>"
                      class="img-fluid rounded border"
                      id="main-image"
-                     style="max-height: 500px; width: 100%; object-fit: contain;">
+                     style=" object-fit: contain;">
             </div>
 
             <!-- Main Image Nav Buttons (Centered) -->
             <?php if (count($imageUrls) > 1): ?>
                 <div class="d-flex justify-content-center mb-3"> <!-- Added margin-bottom -->
-                    <button class="btn btn-outline-primary me-2" id="prev-image">&larr; Previous</button>
-                    <button class="btn btn-outline-primary" id="next-image">Next &rarr;</button>
+                    <button class="btn btn-outline-primary" id="prev-image">&larr;</button>
+                    <button class="btn btn-outline-primary ml-2" id="next-image">&rarr;</button>
                 </div>
             <?php endif; ?>
 
 
             <!-- ===== NEW THUMBNAIL SCROLLER ===== -->
             <?php if (count($imageUrls) > 1): ?>
-                <div class="thumbnail-scroller-wrapper">
-                    <!-- Thumbnail Left Button -->
-                    <button class="thumb-nav-btn prev" id="thumb-prev">&#10094;</button>
 
-                    <!-- Viewport (the visible, fixed-width area) -->
-                    <div class="thumbnail-viewport" id="thumbnail-viewport">
+                <div class="d-flex align-items-center">
 
-                        <!-- Container (the long, scrolling strip of images) -->
+                    <button class="btn btn-outline-primary" id="thumb-prev" style="height: 40px; width: 40px; flex-shrink: 0;">&larr;</button>
+
+                    <div class="thumbnail-viewport flex-grow-1 mx-2" id="thumbnail-viewport">
                         <div class="d-flex" id="thumbnail-container">
                             <?php foreach ($imageUrls as $index => $url): ?>
                                 <img src="<?= htmlspecialchars($url) ?>"
@@ -70,9 +68,9 @@
                         </div>
                     </div>
 
-                    <!-- Thumbnail Right Button -->
-                    <button class="thumb-nav-btn next" id="thumb-next">&#10095;</button>
+                    <button class="btn btn-outline-primary" id="thumb-next" style="height: 40px; width: 40px; flex-shrink: 0;">&rarr;</button>
                 </div>
+
             <?php endif; ?>
         </div>
 
@@ -351,11 +349,11 @@
 
         function updateThumbNav() {
             // Show/hide prev button
-            thumbPrev.style.display = (scrollAmount <= 0) ? 'none' : 'block';
+            thumbPrev.style.display = 'block';
 
             // Show/hide next button
             const maxScroll = thumbContainer.scrollWidth - viewport.clientWidth;
-            thumbNext.style.display = (scrollAmount >= maxScroll) ? 'none' : 'block';
+            thumbNext.style.display = 'block';
         }
 
         thumbPrev.addEventListener('click', () => {
