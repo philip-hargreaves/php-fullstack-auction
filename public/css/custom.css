@@ -1,2 +1,13 @@
 /* Any custom CSS you would like to specify for your site can go here. */
 
+/* --- Image Gallery Styles --- */
+/* Active thumbnail style */
+.gallery-thumb {
+    border: 2px solid transparent;
+    opacity: 0.7;
+}
+
+.gallery-thumb.active-thumb {
+    border-color: #0d6efd; /* Bootstrap primary color */
+    opacity: 1;
+}

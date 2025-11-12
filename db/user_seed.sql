@@ -2,8 +2,8 @@ USE auction_db;
 
 -- Insert roles (if they don't exist)
 INSERT IGNORE INTO roles (id, role_name) VALUES
-                                             (1, 'buyer'),
-                                             (2, 'seller');
+         (1, 'buyer'),
+         (2, 'seller');
 
 -- Insert test users with hashed passwords
 -- Password: password123 (hashed with bcrypt)
