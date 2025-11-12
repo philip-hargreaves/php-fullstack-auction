@@ -25,21 +25,7 @@ if ($bid_amount <= 0) {
     $errors[] = 'Your bid amount is not valid.';
 }
 
-// Only executed if the basic checks pass.
-if (empty($errors)) {
-    // Instantiate services
-    $db = new Database();
-    $userRoleRepo = new UserRoleRepository($db);
-    $RoleRepo = new RoleRepository($db);
-    $userRepo = new UserRepository($db, $RoleRepo);
-    $itemRepo = new ItemRepository($db, $userRepo);
-    $auctionRepo = new AuctionRepository($db, $itemRepo);
-    $bidRepo = new BidRepository($db, $userRepo, $auctionRepo);
-    $bidServ = new BidService($bidRepo, $auctionRepo, $db);
-}
-
 // 3. PROCESS THE REQUEST
-
 // VALIDATION FAILED
 if (!empty($errors)) {
     // Store errors in the session so the view can show them
@@ -50,6 +36,16 @@ if (!empty($errors)) {
 
 // VALIDATION PASSED
 try {
+    // Instantiate services
+    $db = new Database();
+    $userRoleRepo = new UserRoleRepository($db);
+    $RoleRepo = new RoleRepository($db);
+    $userRepo = new UserRepository($db, $RoleRepo);
+    $itemRepo = new ItemRepository($db, $userRepo);
+    $auctionRepo = new AuctionRepository($db, $itemRepo);
+    $bidRepo = new BidRepository($db, $userRepo, $auctionRepo);
+    $bidServ = new BidService($bidRepo, $auctionRepo, $db);
+
     // Build the $input array for the service
     $input = [
         'buyerId' => $user_id,

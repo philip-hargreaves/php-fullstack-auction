@@ -7,9 +7,9 @@ use DateTime;
 class Bid
 {
     // 1. PROPERTIES
-    private int $bidID;
-    private int $buyerID;
-    private int $auctionID;
+    private int $bidId;
+    private int $buyerId;
+    private int $auctionId;
     private float $bidAmount; // decimal(10,2)
     private DateTime $bidDateTime;
 
@@ -19,34 +19,34 @@ class Bid
 
     // 3. CONSTRUCTOR
     public function __construct(
-        int $bidID,
-        int $buyerID,
-        int $auctionID,
+        int $bidId,
+        int $buyerId,
+        int $auctionId,
         float $bidAmount,
         string|DateTime $bidDateTime
     ) {
-        $this->bidID = $bidID;
-        $this->buyerID = $buyerID;
-        $this->auctionID = $auctionID;
+        $this->bidId = $bidId;
+        $this->buyerId = $buyerId;
+        $this->auctionId = $auctionId;
         $this->bidAmount = $bidAmount;
         $this->bidDateTime = is_string($bidDateTime) ? new DateTime($bidDateTime) : $bidDateTime;
     }
 
     // 4. GETTERS (No Setters - A bid is a record and should not be changed)
 
-    public function getBidID(): int
+    public function getBidId(): int
     {
-        return $this->bidID;
+        return $this->bidId;
     }
 
-    public function getBuyerID(): int
+    public function getBuyerId(): int
     {
-        return $this->buyerID;
+        return $this->buyerId;
     }
 
-    public function getAuctionID(): int
+    public function getAuctionId(): int
     {
-        return $this->auctionID;
+        return $this->auctionId;
     }
 
     public function getBidAmount(): float
