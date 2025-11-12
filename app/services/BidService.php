@@ -53,7 +53,7 @@ class BidService
                     $errors[] = 'This auction is not currently active.';
                 }
                 // Check if the bid is high enough
-                if (!$this->validateBidAmount($auction->getAuctionID(), $input['bidAmount'])) {
+                if (!$this->validateBidAmount($auction->getAuctionId(), $input['bidAmount'])) {
                     $errors[] = 'Your bid must be higher than the current highest bid.';
                 }
             }

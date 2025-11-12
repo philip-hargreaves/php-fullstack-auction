@@ -45,7 +45,7 @@ class RegistrationService
             $user = $this->createUser($input);
 
             // Assign the buyer role to the user
-            $this->userRoleRepository->assignRole($user->getUserID(), $buyerRole);
+            $this->userRoleRepository->assignRole($user->getUserId(), $buyerRole);
             
             // Commit the transaction
             $pdo->commit();
