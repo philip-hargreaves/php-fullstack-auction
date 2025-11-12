@@ -11,8 +11,9 @@ $router->post('/create-auction-result', 'controllers/create-auction-result.php')
 $router->get('/my-auctions', 'controllers/my-auctions.php');
 
 
-// Auth
+// Registration and authentication
 $router->get('/register', 'controllers/auth/register.php');
+$router->post('/register', 'controllers/auth/register.store.php');
 $router->post('/login', 'controllers/auth/authenticate.php');
 $router->get('/logout', 'controllers/auth/logout.php');
 
