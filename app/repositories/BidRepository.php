@@ -6,9 +6,9 @@ require_once base_path('app/models/Bid.php');
 
 class BidRepository
 {
-    protected $db;
-    protected $userRepo;
-    protected $auctionRepo;
+    protected Database $db;
+    protected UserRepository $userRepo;
+    protected AuctionRepository $auctionRepo;
 
     public function __construct(Database $db, UserRepository $userRepo, AuctionRepository $auctionRepo) {
         $this->db = $db;
