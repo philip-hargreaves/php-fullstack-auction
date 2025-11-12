@@ -85,7 +85,7 @@ if ($auctionStatus == 'Active') {
 }
 
 // Session Status
-if (session_status() === PHP_SESSION_ACTIVE) { // login
+if ($_SESSION['logged_in']) { // login
     $hasSession = true;
     $user = $userRepo->findById($_SESSION['user_id']);
 
