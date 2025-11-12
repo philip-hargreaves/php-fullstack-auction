@@ -12,37 +12,36 @@ class UserRepository {
         $this->roleRepository = $roleRepository;
     }
 
-    public function getUserAndRoles(string $email): ?User
+    // Find user by email
+    public function findByEmail(string $email): ?User
     {
-        // Query to get user and roles
-        // ***For now, using two joins rather than two queries so the db is only hit once, to be discussed later***
-        $query = "SELECT u.id, u.username, u.email, u.password, u.is_active, r.id AS role_id, r.role_name
-                FROM users u
-                LEFT JOIN user_roles ur ON u.id = ur.user_id
-                LEFT JOIN roles r ON ur.role_id = r.id
-                WHERE u.email = :email";
+        // *** CHECK ONE QUERY W/REDUDANT DATA VS TWO QUERIES WITH NO REDUDANT DATA ***
+        $query = "SELECT u.id, u.username, u.email, u.password, u.is_active,
+                         r.id AS role_id, r.role_name
+                  FROM users u
+                  LEFT JOIN user_roles ur ON u.id = ur.user_id
+                  LEFT JOIN roles r       ON ur.role_id = r.id
+                  WHERE u.email = :email";
 
         $rows = $this->db->query($query, ['email' => $email])->fetchAll();
-        if (empty($rows)) return null;
 
-        // Create User object using constructor
-        $user = new User(
-            (int)$rows[0]['id'],
-            $rows[0]['username'],
-            $rows[0]['email'],
-            $rows[0]['password'],
-            (bool)$rows[0]['is_active']
-        );
+        return empty($rows) ? null : $this->hydrateUser($rows);
+    }
 
-        // Filter out rows where the left join produced no role.
-        $roleRows = array_filter(
-            $rows,
-            static fn(array $row) => !empty($row['role_id']) && !empty($row['role_name'])
-        );
+    // Find user by id
+    public function findById(int $userId): ?User
+    {
+        // *** CHECK ONE QUERY W/REDUDANT DATA VS TWO QUERIES WITH NO REDUDANT DATA ***
+        $query = "SELECT u.id, u.username, u.email, u.password, u.is_active,
+                         r.id AS role_id, r.role_name
+                  FROM users u
+                  LEFT JOIN user_roles ur ON u.id = ur.user_id
+                  LEFT JOIN roles r       ON ur.role_id = r.id
+                  WHERE u.id = :id";
 
-        $user->setRoles($this->roleRepository->hydrateCollection($roleRows));
+        $rows = $this->db->query($query, ['id' => $userId])->fetchAll();
 
-        return $user;
+        return empty($rows) ? null : $this->hydrateUser($rows);
     }
 
     // Check if user exists by email
@@ -80,5 +79,24 @@ class UserRepository {
         return new User($id, $username, $email, $hashedPassword, $isActive);
     }
 
+    private function hydrateUser(array $rows): User
+    {
+        $user = new User(
+            (int)$rows[0]['id'],
+            $rows[0]['username'],
+            $rows[0]['email'],
+            $rows[0]['password'],
+            (bool)$rows[0]['is_active']
+        );
 
+        // Filter out empty role rows
+        $roleRows = array_filter(
+            $rows,
+            static fn(array $row) => !empty($row['role_id']) && !empty($row['role_name'])
+        );
+
+        $user->setRoles($this->roleRepository->hydrateCollection($roleRows));
+
+        return $user;
+    }
 }

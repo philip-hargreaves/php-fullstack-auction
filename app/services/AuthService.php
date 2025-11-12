@@ -16,7 +16,7 @@ class AuthService {
         $this->ensureSessionStarted();
 
         // Fetch user by email, including all associated Role objects.
-        $user = $this->userRepository->getUserAndRoles($email);
+        $user = $this->userRepository->findByEmail($email);
         if ($user === null || !$user->isActive()) {
             // User not found or deactivated
             return false;
