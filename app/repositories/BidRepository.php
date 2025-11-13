@@ -35,7 +35,7 @@ class BidRepository
 
         // Set relationship properties
 //        $buyer = $this->userRepo->getUserById($row['buyer_id']);
-        $buyer = $this->userRepo->findById($row['buyer_id']);
+        $buyer = $this->userRepo->getById($row['buyer_id']);
         $object->setBuyer($buyer);
 
         $auction = $this->auctionRepo->getById($row['auction_id']);
