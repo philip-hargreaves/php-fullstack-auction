@@ -5,6 +5,8 @@ use infrastructure\Database;
 
 require_once base_path('app/models/Role.php');
 
+require_once base_path('app/models/Role.php');
+
 class RoleRepository
 {
     private Database $db;
