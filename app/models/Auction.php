@@ -102,6 +102,10 @@ class Auction
     }
 
     // 6. SETTERS
+    public function setAuctionId(int $auctionId): void
+    {
+        $this->auctionId = $auctionId;
+    }
 
     public function setAuctionStatus(string $auctionStatus): void
     {

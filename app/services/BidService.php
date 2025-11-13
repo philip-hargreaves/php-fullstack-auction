@@ -79,7 +79,7 @@ class BidService
             );
 
             // Execute bid insertion
-            $success = $this->bidRepo->createBid($bid);
+            $success = $this->bidRepo->create($bid);
 
             // Check if insertion succeed
             if (!$success) {

@@ -90,6 +90,11 @@ class Item
         $this->itemStatus = $itemStatus;
     }
 
+    public function setItemId(int $itemId): void
+    {
+        $this->itemId = $itemId;
+    }
+
     // 6. RELATIONSHIP GETTERS/SETTERS
 
     public function setSeller(User $seller): void

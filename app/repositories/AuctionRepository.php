@@ -30,7 +30,7 @@ class AuctionRepository
         );
 
         // Set relationship properties
-        $item = $this->itemRepo->getItemByItemId($object->getItemId());
+        $item = $this->itemRepo->getById($object->getItemId());
         $object->setItem($item);
 
         return $object;
@@ -54,7 +54,7 @@ class AuctionRepository
             return $this->hydrate($row);
         } catch (PDOException $e) {
             // Log the error $e->getMessage()
-            return null; // Failed to build the object
+            return null;
         }
     }
 

@@ -59,7 +59,13 @@ class Bid
         return $this->bidDateTime;
     }
 
-    // 5. RELATIONSHIP GETTERS/SETTERS
+    // 5. SETTER
+    public function setBidId(int $bidId): void
+    {
+        $this->bidId = $bidId;
+    }
+
+    // 6. RELATIONSHIP GETTERS/SETTERS
 
     public function setBuyer(User $buyer): void
     {

@@ -97,6 +97,11 @@ class User
         return $this->isActive;
     }
 
+    public function setUserId(int $userId): void
+    {
+        $this->userId = $userId;
+    }
+
 
     // 7. SETTERS
     public function setRoles(array $roles): void
