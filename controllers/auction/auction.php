@@ -87,7 +87,7 @@ if ($auctionStatus == 'Active') {
 if ($_SESSION['logged_in']) { // login
 
     $hasSession = true;
-    $user = $userRepo->findById($_SESSION['user_id']);
+    $user = $userRepo->getById($_SESSION['user_id']);
 
     //$isWatched = WatchlistRepository->getIsWatchedByUserIdAndAuctionId($_SESSION['user_id'], $auction->getAuctionId());
     $isWatched = false;

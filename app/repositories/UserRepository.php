@@ -2,6 +2,7 @@
 namespace app\repositories;
 use app\models\User;
 use infrastructure\Database;
+use PDOException;
 
 // Data access for user
 class UserRepository
@@ -63,23 +64,35 @@ class UserRepository
                 ->fetchColumn() !== false;
     }
 
-    // Create a new user
-    public function create(string $username, string $email, string $hashedPassword, bool $isActive = true): User
+
+    private function extract(User $user): array
     {
-        $this->db->query(
-            'INSERT INTO users (username, email, password, is_active)
+        return [
+            'username'  => $user->getUsername(),
+            'email'     => $user->getEmail(),
+            'password'  => $user->getPasswordHash(),
+            'is_active' => $user->isActive() ? 1 : 0,
+        ];
+    }
+
+    public function create(User $user): ?User
+    {
+        try {
+            $params = $this->extract($user);
+
+            $this->db->query(
+                'INSERT INTO users (username, email, password, is_active)
              VALUES (:username, :email, :password, :is_active)',
-            [
-                'username' => $username,
-                'email' => $email,
-                'password' => $hashedPassword,
-                'is_active' => $isActive ? 1 : 0,
-            ]
-        );
+                $params
+            );
 
-        $id = (int)$this->db->connection->lastInsertId();
+            $user->setUserId((int)$this->db->connection->lastInsertId());
 
-        return new User($id, $username, $email, $hashedPassword, $isActive);
+            return $user;
+        } catch (PDOException $e) {
+            // TODO: add logging
+            return null;
+        }
     }
 
     private function hydrate(array $rows): User
