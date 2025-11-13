@@ -1,14 +1,17 @@
 <?php
+namespace app\repositories;
 
 use app\models\Bid;
-
-require_once base_path('app/models/Bid.php');
+use infrastructure\Database;
+use app\repositories\UserRepository;
+use app\repositories\auctionRepository;
+use PDOException;
 
 class BidRepository
 {
-    protected $db;
-    protected $userRepo;
-    protected $auctionRepo;
+    private Database $db;
+    private UserRepository $userRepo;
+    private AuctionRepository $auctionRepo;
 
     public function __construct(Database $db, UserRepository $userRepo, AuctionRepository $auctionRepo) {
         $this->db = $db;
@@ -16,7 +19,7 @@ class BidRepository
         $this->auctionRepo = $auctionRepo;
     }
 
-    private function dbToObjectConverter($row) : ?Bid {
+    private function hydrate($row) : ?Bid {
         if (empty($row)) {
             return null;
         }
@@ -35,13 +38,13 @@ class BidRepository
         $buyer = $this->userRepo->findById($row['buyer_id']);
         $object->setBuyer($buyer);
 
-        $auction = $this->auctionRepo->getAuctionByAuctionId($row['auction_id']);
+        $auction = $this->auctionRepo->getById($row['auction_id']);
         $object->setAuction($auction);
 
         return $object;
     }
 
-    private function objectToDbConverter(bid $bid) : array {
+    private function extract(bid $bid) : array {
         // Create the object using constructor
         $row = [];
         $row['buyer_id'] = $bid->getBuyerId();
@@ -52,16 +55,16 @@ class BidRepository
         return $row;
     }
 
-    public function getBidByBidId(int $bidId): ?Bid
+    public function getById(int $bidId): ?Bid
     {
         try {
             // Query
             $sql = "SELECT * FROM bids WHERE bid_id = :bid_id";
             $params = ['bid_id' => $bidId];
-            $row = $this->db->query($sql, $params)->fetch(PDO::FETCH_ASSOC);
+            $row = $this->db->query($sql, $params)->fetch();
 
             // dbToObjectConverter will handle the empty row and return null
-            return $this->dbToObjectConverter($row);
+            return $this->hydrate($row);
 
         } catch (PDOException $e) {
             error_log($e->getMessage());
@@ -69,26 +72,26 @@ class BidRepository
         }
     }
 
-    public function createBid(Bid $bid): bool
+    public function create(Bid $bid): ?Bid
     {
         try {
-            // Convert the Bid object to a database-ready array.
-            $params = $this->objectToDbConverter($bid);
-
-            // Define and execute the SQL INSERT statement
+            $params = $this->extract($bid);
             $sql = "INSERT INTO bids (buyer_id, auction_id, bid_amount, bid_datetime) 
                     VALUES (:buyer_id, :auction_id, :bid_amount, :bid_datetime)";
-            $statement = $this->db->query($sql, $params);
+
+            $result = $this->db->query($sql, $params);
 
             // Check if the insert was successful.
-            if ($statement) {
-                return true;
+            if ($result) {
+                $id = (int)$this->db->connection->lastInsertId();
+                $bid->setBidId($id);
+                return $bid;
             } else {
-                return false; // Statement preparation failed
+                return null;
             }
         } catch (PDOException $e) {
             // error_log($e->getMessage());
-            return false;
+            return null;
         }
     }
 
@@ -101,15 +104,17 @@ class BidRepository
                     ORDER BY bid_amount DESC 
                     LIMIT 1";
             $params = ['auction_id' => $auctionId];
-            $row = $this->db->query($sql, $params)->fetch(PDO::FETCH_ASSOC);
+            $row = $this->db->query($sql, $params)->fetch();
 
-            // dbToObjectConverter will handle the empty row and return null
-            return $this->dbToObjectConverter($row);
+            // hydrate will handle the empty row and return null
+            return $this->hydrate($row);
 
         } catch (PDOException $e) {
-            error_log($e->getMessage());
+//            error_log($e->getMessage());
             return null;
         }
     }
+
+
 
 }

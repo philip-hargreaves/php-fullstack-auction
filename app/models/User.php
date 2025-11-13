@@ -5,7 +5,7 @@ namespace app\models;
 class User
 {
     // 1. PROPERTIES
-    private int $userID;
+    private int $userId;
     private string $username;
     private string $email;
     private string $password;
@@ -16,13 +16,13 @@ class User
 
     // 3. CONSTRUCTOR
     public function __construct(
-        int $userID,
+        int $userId,
         string $username,
         string $email,
         string $password,
         int|bool $isActive
     ) {
-        $this->userID = $userID;
+        $this->userId = $userId;
         $this->username = $username;
         $this->email = $email;
         $this->password = $password;
@@ -64,9 +64,9 @@ class User
     }
 
     // 6. GETTERS
-    public function getUserID(): int
+    public function getUserId(): int
     {
-        return $this->userID;
+        return $this->userId;
     }
 
     public function getUsername(): string
@@ -95,6 +95,11 @@ class User
     public function isActive(): bool
     {
         return $this->isActive;
+    }
+
+    public function setUserId(int $userId): void
+    {
+        $this->userId = $userId;
     }
 
 

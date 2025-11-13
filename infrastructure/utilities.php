@@ -33,3 +33,4 @@ function display_time_remaining($interval) {
     }
     return $time_remaining;
 }
+

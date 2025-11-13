@@ -1,6 +1,8 @@
 <?php
-
+namespace app\services;
 use app\models\User;
+use app\repositories\RoleRepository;
+use app\repositories\UserRepository;
 
 class AuthService {
     private UserRepository $userRepository;
@@ -31,7 +33,7 @@ class AuthService {
         $roleNames = $user->getRoleNames(); // e.g. ['buyer', 'seller']
 
         // Store the login details in the session.
-        $_SESSION['user_id']    = $user->getUserID();
+        $_SESSION['user_id']    = $user->getUserId();
         $_SESSION['email']      = $user->getEmail();
         $_SESSION['logged_in']  = true;
         $_SESSION['role_names'] = $roleNames;

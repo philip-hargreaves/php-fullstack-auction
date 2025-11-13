@@ -1,6 +1,7 @@
 <?php
-
+namespace app\repositories;
 use app\models\Role;
+use infrastructure\Database;
 
 class UserRoleRepository
 {

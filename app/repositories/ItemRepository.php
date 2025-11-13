@@ -1,20 +1,24 @@
 <?php
+namespace app\repositories;
+
 use app\models\Item;
 use app\models\User;
-require_once base_path('app/models/Item.php');
-require_once base_path('app/models/User.php');
+use app\repositories\UserRepository;
+use infrastructure\Database;
+use PDO;
+use PDOException;
 
 class ItemRepository
 {
-    protected $db;
-    protected UserRepository $userRepo;
+    private Database $db;
+    private UserRepository $userRepo;
 
     public function __construct(Database $db, UserRepository $userRepo) {
         $this->db = $db;
         $this->userRepo = $userRepo;
     }
 
-    private function dbToObjectConverter($row) : Item {
+    private function hydrate($row) : Item {
         // Create the object using constructor
         $object = new Item(
             (int)$row['id'],
@@ -32,12 +36,12 @@ class ItemRepository
         return $object;
     }
 
-    public function getItemByItemId(int $itemId): ?Item {
+    public function getById(int $itemId): ?Item {
         // Query to get the record
         $sql = "SELECT id, seller_id, item_name, item_description, item_condition, item_status 
                 FROM items 
                 WHERE id = :item_id";
-        $row = $this->db->query($sql, ['item_id' => $itemId])->fetch(PDO::FETCH_ASSOC);
+        $row = $this->db->query($sql, ['item_id' => $itemId])->fetch();
 
         // Check if a record was returned
         if (empty($row)) {
@@ -46,10 +50,10 @@ class ItemRepository
 
         // Create object with $row
         try {
-            return $this->dbToObjectConverter($row);
-        } catch (Exception $e) {
+            return $this->hydrate($row);
+        } catch (PDOException $e) {
             // Log the error $e->getMessage()
-            return null; // Failed to build the object
+            return null;
         }
     }
 

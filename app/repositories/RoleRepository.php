@@ -1,5 +1,9 @@
 <?php
+namespace app\repositories;
 use app\models\Role;
+use infrastructure\Database;
+
+require_once base_path('app/models/Role.php');
 
 require_once base_path('app/models/Role.php');
 

@@ -1,6 +1,10 @@
 <?php
-
+namespace app\services;
 use app\models\User;
+use app\repositories\UserRepository;
+use app\repositories\RoleRepository;
+use app\repositories\UserRoleRepository;
+use infrastructure\Database;
 
 class RegistrationService
 {
@@ -45,7 +49,7 @@ class RegistrationService
             $user = $this->createUser($input);
 
             // Assign the buyer role to the user
-            $this->userRoleRepository->assignRole($user->getUserID(), $buyerRole);
+            $this->userRoleRepository->assignRole($user->getUserId(), $buyerRole);
             
             // Commit the transaction
             $pdo->commit();
