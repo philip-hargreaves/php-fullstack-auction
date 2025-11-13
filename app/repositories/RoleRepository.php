@@ -1,6 +1,8 @@
 <?php
 use app\models\Role;
 
+require_once base_path('app/models/Role.php');
+
 class RoleRepository
 {
     private Database $db;

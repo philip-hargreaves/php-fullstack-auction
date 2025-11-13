@@ -95,7 +95,6 @@ class Item
     public function setSeller(User $seller): void
     {
         $this->seller = $seller;
-        $this->sellerID = $seller->getUserID();
     }
 
     public function getSeller(): ?User

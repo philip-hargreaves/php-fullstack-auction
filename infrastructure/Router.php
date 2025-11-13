@@ -8,7 +8,7 @@ class Router {
 
     public function get($uri, $controller)
     {
-        // eg ['GET']['/listing'] = 'controller/listing.php'
+        // eg ['GET']['/listing'] = 'controller/auction.php'
         $this->routes['GET'][$uri] = $controller;
     }
 
