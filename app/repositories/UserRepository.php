@@ -3,11 +3,13 @@
 use app\models\User;
 
 // Data access for user
-class UserRepository {
+class UserRepository
+{
     private Database $db;
     private RoleRepository $roleRepository;
 
-    public function __construct(Database $db, RoleRepository $roleRepository) {
+    public function __construct(Database $db, RoleRepository $roleRepository)
+    {
         $this->db = $db;
         $this->roleRepository = $roleRepository;
     }
@@ -48,16 +50,16 @@ class UserRepository {
     public function existsByEmail(string $email): bool
     {
         return $this->db
-            ->query('SELECT 1 FROM users WHERE email = :email LIMIT 1', ['email' => $email])
-            ->fetchColumn() !== false;
+                ->query('SELECT 1 FROM users WHERE email = :email LIMIT 1', ['email' => $email])
+                ->fetchColumn() !== false;
     }
 
     // Check if user exists by username
     public function existsByUsername(string $username): bool
     {
         return $this->db
-            ->query('SELECT 1 FROM users WHERE username = :username LIMIT 1', ['username' => $username])
-            ->fetchColumn() !== false;
+                ->query('SELECT 1 FROM users WHERE username = :username LIMIT 1', ['username' => $username])
+                ->fetchColumn() !== false;
     }
 
     // Create a new user
@@ -67,9 +69,9 @@ class UserRepository {
             'INSERT INTO users (username, email, password, is_active)
              VALUES (:username, :email, :password, :is_active)',
             [
-                'username'  => $username,
-                'email'     => $email,
-                'password'  => $hashedPassword,
+                'username' => $username,
+                'email' => $email,
+                'password' => $hashedPassword,
                 'is_active' => $isActive ? 1 : 0,
             ]
         );
@@ -89,13 +91,16 @@ class UserRepository {
             (bool)$rows[0]['is_active']
         );
 
-        // Filter out empty role rows
-        $roleRows = array_filter(
-            $rows,
-            static fn(array $row) => !empty($row['role_id']) && !empty($row['role_name'])
-        );
+        // Gather role IDs from non-empty join rows
+        $roleIds = [];
+        foreach ($rows as $row) {
+            if (!empty($row['role_id']) && !empty($row['role_name'])) {
+                $roleIds[] = (int)$row['role_id'];
+            }
+        }
 
-        $user->setRoles($this->roleRepository->hydrateCollection($roleRows));
+        // Hydrate roles via repository
+        $user->setRoles($this->roleRepository->getByIds($roleIds));
 
         return $user;
     }
