@@ -1,14 +1,13 @@
 <?php
-session_start();
+use app\repositories\UserRepository;
+use app\repositories\RoleRepository;
+use app\repositories\UserRoleRepository;
+use infrastructure\Database;
+use app\services\AuthService;
+use infrastructure\Request;
+use app\services\RegistrationService;
 
-require_once base_path('infrastructure/Database.php');
-require_once base_path('app/models/User.php');
-require_once base_path('app/models/Role.php');
-require_once base_path('app/repositories/RoleRepository.php');
-require_once base_path('app/repositories/UserRepository.php');
-require_once base_path('app/repositories/UserRoleRepository.php');
-require_once base_path('app/services/AuthService.php');
-require_once base_path('app/services/RegistrationService.php');
+session_start();
 
 // Only accept POST requests for registration attempts
 if (!Request::isPost()) {

@@ -5,8 +5,8 @@ namespace app\models;
 class Item
 {
     // 1. PROPERTIES
-    private int $itemID;
-    private int $sellerID;
+    private int $itemId;
+    private int $sellerId;
     private string $itemName;
     private string $itemDescription;
     private string $itemCondition; // enum('new','like new','used')
@@ -19,15 +19,15 @@ class Item
 
     // 3. CONSTRUCTOR
     public function __construct(
-        int $itemID,
-        int $sellerID,
+        int $itemId,
+        int $sellerId,
         string $itemName,
         string $itemDescription,
         string $itemCondition,
         string $itemStatus
     ) {
-        $this->itemID = $itemID;
-        $this->sellerID = $sellerID;
+        $this->itemId = $itemId;
+        $this->sellerId = $sellerId;
         $this->itemName = $itemName;
         $this->itemDescription = $itemDescription;
         $this->itemCondition = $itemCondition;
@@ -36,14 +36,14 @@ class Item
 
     // 4. GETTERS
 
-    public function getItemID(): int
+    public function getItemId(): int
     {
-        return $this->itemID;
+        return $this->itemId;
     }
 
-    public function getSellerID(): int
+    public function getSellerId(): int
     {
-        return $this->sellerID;
+        return $this->sellerId;
     }
 
     public function getItemName(): string
@@ -88,6 +88,11 @@ class Item
     {
         // Add Validation ('available', 'in_auction', 'sold')
         $this->itemStatus = $itemStatus;
+    }
+
+    public function setItemId(int $itemId): void
+    {
+        $this->itemId = $itemId;
     }
 
     // 6. RELATIONSHIP GETTERS/SETTERS

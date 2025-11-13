@@ -1,12 +1,12 @@
 <?php
-session_start();
 
-require_once base_path('infrastructure/Database.php');
-require_once base_path('app/models/User.php');
-require_once base_path('app/models/Role.php');
-require_once base_path('app/repositories/RoleRepository.php');
-require_once base_path('app/repositories/UserRepository.php');
-require_once base_path('app/services/AuthService.php');
+use app\repositories\UserRepository;
+use app\repositories\RoleRepository;
+use infrastructure\Database;
+use app\services\AuthService;
+use infrastructure\Request;
+
+session_start();
 
 // Only accept POST requests for login attempts
 if (!Request::isPost()) {

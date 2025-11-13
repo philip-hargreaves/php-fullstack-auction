@@ -1,7 +1,12 @@
 <?php
+namespace app\services;
 
 use app\models\Bid;
-require_once base_path('app/repositories/BidRepository.php');
+use app\repositories\AuctionRepository;
+use infrastructure\Database;
+use app\repositories\BidRepository;
+use DateTime;
+use PDOException;
 
 class BidService
 {
@@ -44,7 +49,7 @@ class BidService
             $this->db->connection->beginTransaction();
 
             // Business Logic Validation
-            $auction = $this->auctionRepo->getAuctionByAuctionId($input['auctionId']);
+            $auction = $this->auctionRepo->getById($input['auctionId']);
             if (is_null($auction)) { // Check if auction exists
                 $errors[] = 'Auction not found.';
             } else {
@@ -53,7 +58,7 @@ class BidService
                     $errors[] = 'This auction is not currently active.';
                 }
                 // Check if the bid is high enough
-                if (!$this->validateBidAmount($auction->getAuctionID(), $input['bidAmount'])) {
+                if (!$this->validateBidAmount($auction->getAuctionId(), $input['bidAmount'])) {
                     $errors[] = 'Your bid must be higher than the current highest bid.';
                 }
             }
@@ -74,7 +79,7 @@ class BidService
             );
 
             // Execute bid insertion
-            $success = $this->bidRepo->createBid($bid);
+            $success = $this->bidRepo->create($bid);
 
             // Check if insertion succeed
             if (!$success) {

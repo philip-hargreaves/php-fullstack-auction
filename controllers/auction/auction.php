@@ -1,14 +1,13 @@
 <?php
-session_start();
-// Get auction_id from the URL
-use app\models\Auction;
-require_once base_path('infrastructure/Database.php');
-require_once base_path('app/repositories/AuctionRepository.php');
-require_once base_path('app/repositories/RoleRepository.php');
-require_once base_path('app/repositories/ItemRepository.php');
-require_once base_path('app/repositories/UserRepository.php');
-require_once base_path('app/services/BidService.php');
+use app\repositories\UserRepository;
+use app\repositories\RoleRepository;
+use app\repositories\ItemRepository;
+use app\repositories\AuctionRepository;
+use app\repositories\BidRepository;
+use app\services\BidService;
+use infrastructure\Database;
 
+session_start();
 $auctionId = $_GET['auction_id'];
 
 // Dependency Injection
@@ -21,7 +20,7 @@ $bidRepo = new BidRepository($db, $userRepo, $auctionRepo);
 $bidServ = new BidService($bidRepo, $auctionRepo, $db);
 
 // Get Auction, Item, and Bids entities
-$auction = $auctionRepo->getAuctionByAuctionId($auctionId);
+$auction = $auctionRepo->getById($auctionId);
 $item = $auction->getItem();
 $bids = []; // Get all bids from BidRepo
 
@@ -86,6 +85,7 @@ if ($auctionStatus == 'Active') {
 
 // Session Status
 if ($_SESSION['logged_in']) { // login
+
     $hasSession = true;
     $user = $userRepo->findById($_SESSION['user_id']);
 
