@@ -1,21 +1,22 @@
 <?php
+namespace app\repositories;
 
+use infrastructure\Database;
 use app\models\Auction;
-
-require_once base_path('app/models/Auction.php');
-require_once base_path('app/repositories/ItemRepository.php');
+use app\repositories\ItemRepository;
+use PDOException;
 
 class AuctionRepository
 {
     private Database $db;
-    protected ItemRepository $itemRepo;
+    private ItemRepository $itemRepo;
 
     public function __construct(Database $db, ItemRepository $itemRepo) {
         $this->db = $db;
         $this->itemRepo = $itemRepo;
     }
 
-    private function dbToObjectConverter($row) : Auction {
+    private function hydrate($row) : Auction {
         // Create the object using constructor
         $object = new Auction(
             (int)$row['id'],
@@ -29,19 +30,19 @@ class AuctionRepository
         );
 
         // Set relationship properties
-            $item = $this->itemRepo->getItemByItemId($object->getItemId());
-            $object->setItem($item);
+        $item = $this->itemRepo->getItemByItemId($object->getItemId());
+        $object->setItem($item);
 
-            return $object;
+        return $object;
     }
 
-    public function getAuctionByAuctionId(int $auctionId): ?Auction
+    public function getById(int $auctionId): ?Auction
     {
         // Query to get the record
         $queryRow = "SELECT id, item_id, winning_bid_id, start_datetime, end_datetime, starting_price, reserve_price, auction_status 
-                         FROM auctions
-                         WHERE id = :auction_id";
-        $row = $this->db->query($queryRow, ['auction_id' => $auctionId])->fetch(PDO::FETCH_ASSOC);
+                     FROM auctions
+                     WHERE id = :auction_id";
+        $row = $this->db->query($queryRow, ['auction_id' => $auctionId])->fetch();
 
         // Check if a record was returned
         if (empty($row)) {
@@ -50,8 +51,8 @@ class AuctionRepository
 
         // Create object with $row
         try {
-            return $this->dbToObjectConverter($row);
-        } catch (Exception $e) {
+            return $this->hydrate($row);
+        } catch (PDOException $e) {
             // Log the error $e->getMessage()
             return null; // Failed to build the object
         }

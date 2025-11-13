@@ -1,13 +1,15 @@
 <?php
 
+use app\repositories\UserRepository;
+use app\repositories\RoleRepository;
+use app\repositories\ItemRepository;
+use app\repositories\AuctionRepository;
+use app\repositories\BidRepository;
+use app\services\BidService;
+use infrastructure\Database;
+use infrastructure\Request;
+
 session_start();
-require_once base_path("app/services/BidService.php");
-require_once base_path("app/repositories/AuctionRepository.php");
-require_once base_path("app/repositories/UserRepository.php");
-require_once base_path("app/repositories/RoleRepository.php");
-require_once base_path("app/repositories/UserRoleRepository.php");
-require_once base_path("app/repositories/ItemRepository.php");
-require_once base_path("app/repositories/BidRepository.php");
 
 $bid_amount = (float)Request::post('bid_amount');
 $auction_id = (int)Request::post('auction_id');

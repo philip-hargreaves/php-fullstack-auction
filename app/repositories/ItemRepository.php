@@ -1,8 +1,12 @@
 <?php
+namespace app\repositories;
+
 use app\models\Item;
 use app\models\User;
-require_once base_path('app/models/Item.php');
-require_once base_path('app/models/User.php');
+use app\repositories\UserRepository;
+use infrastructure\Database;
+use PDO;
+use PDOException;
 
 class ItemRepository
 {
@@ -47,7 +51,7 @@ class ItemRepository
         // Create object with $row
         try {
             return $this->dbToObjectConverter($row);
-        } catch (Exception $e) {
+        } catch (PDOException $e) {
             // Log the error $e->getMessage()
             return null; // Failed to build the object
         }

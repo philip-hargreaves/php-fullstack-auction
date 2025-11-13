@@ -1,6 +1,8 @@
 <?php
-
+namespace app\services;
 use app\models\User;
+use app\repositories\RoleRepository;
+use app\repositories\UserRepository;
 
 class AuthService {
     private UserRepository $userRepository;

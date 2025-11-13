@@ -1,6 +1,10 @@
 <?php
-
+namespace app\services;
 use app\models\User;
+use app\repositories\UserRepository;
+use app\repositories\RoleRepository;
+use app\repositories\UserRoleRepository;
+use infrastructure\Database;
 
 class RegistrationService
 {

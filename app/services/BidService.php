@@ -1,7 +1,10 @@
 <?php
+namespace app\services;
 
 use app\models\Bid;
-require_once base_path('app/repositories/BidRepository.php');
+use app\repositories\AuctionRepository;
+use infrastructure\Database;
+use app\repositories\BidRepository;
 
 class BidService
 {
@@ -44,7 +47,7 @@ class BidService
             $this->db->connection->beginTransaction();
 
             // Business Logic Validation
-            $auction = $this->auctionRepo->getAuctionByAuctionId($input['auctionId']);
+            $auction = $this->auctionRepo->getById($input['auctionId']);
             if (is_null($auction)) { // Check if auction exists
                 $errors[] = 'Auction not found.';
             } else {

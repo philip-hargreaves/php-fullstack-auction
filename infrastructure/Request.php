@@ -1,4 +1,5 @@
 <?php
+namespace infrastructure;
 
 class Request
 {

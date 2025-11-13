@@ -1,8 +1,11 @@
 <?php
+namespace app\repositories;
 
 use app\models\Bid;
-
-require_once base_path('app/models/Bid.php');
+use infrastructure\Database;
+use app\repositories\UserRepository;
+use app\repositories\auctionRepository;
+use PDOException;
 
 class BidRepository
 {
@@ -35,7 +38,7 @@ class BidRepository
         $buyer = $this->userRepo->findById($row['buyer_id']);
         $object->setBuyer($buyer);
 
-        $auction = $this->auctionRepo->getAuctionByAuctionId($row['auction_id']);
+        $auction = $this->auctionRepo->getById($row['auction_id']);
         $object->setAuction($auction);
 
         return $object;
@@ -58,7 +61,7 @@ class BidRepository
             // Query
             $sql = "SELECT * FROM bids WHERE bid_id = :bid_id";
             $params = ['bid_id' => $bidId];
-            $row = $this->db->query($sql, $params)->fetch(PDO::FETCH_ASSOC);
+            $row = $this->db->query($sql, $params)->fetch();
 
             // dbToObjectConverter will handle the empty row and return null
             return $this->dbToObjectConverter($row);
@@ -101,7 +104,7 @@ class BidRepository
                     ORDER BY bid_amount DESC 
                     LIMIT 1";
             $params = ['auction_id' => $auctionId];
-            $row = $this->db->query($sql, $params)->fetch(PDO::FETCH_ASSOC);
+            $row = $this->db->query($sql, $params)->fetch();
 
             // dbToObjectConverter will handle the empty row and return null
             return $this->dbToObjectConverter($row);
