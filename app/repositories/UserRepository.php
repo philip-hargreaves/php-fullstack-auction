@@ -13,7 +13,7 @@ class UserRepository {
     }
 
     // Find user by email
-    public function findByEmail(string $email): ?User
+    public function getByEmail(string $email): ?User
     {
         // *** CHECK ONE QUERY W/REDUDANT DATA VS TWO QUERIES WITH NO REDUDANT DATA ***
         $query = "SELECT u.id, u.username, u.email, u.password, u.is_active,
@@ -25,11 +25,11 @@ class UserRepository {
 
         $rows = $this->db->query($query, ['email' => $email])->fetchAll();
 
-        return empty($rows) ? null : $this->hydrateUser($rows);
+        return empty($rows) ? null : $this->hydrate($rows);
     }
 
     // Find user by id
-    public function findById(int $userId): ?User
+    public function getById(int $userId): ?User
     {
         // *** CHECK ONE QUERY W/REDUDANT DATA VS TWO QUERIES WITH NO REDUDANT DATA ***
         $query = "SELECT u.id, u.username, u.email, u.password, u.is_active,
@@ -41,7 +41,7 @@ class UserRepository {
 
         $rows = $this->db->query($query, ['id' => $userId])->fetchAll();
 
-        return empty($rows) ? null : $this->hydrateUser($rows);
+        return empty($rows) ? null : $this->hydrate($rows);
     }
 
     // Check if user exists by email
@@ -79,7 +79,7 @@ class UserRepository {
         return new User($id, $username, $email, $hashedPassword, $isActive);
     }
 
-    private function hydrateUser(array $rows): User
+    private function hydrate(array $rows): User
     {
         $user = new User(
             (int)$rows[0]['id'],

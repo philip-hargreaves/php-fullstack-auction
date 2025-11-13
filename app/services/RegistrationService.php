@@ -32,7 +32,7 @@ class RegistrationService
         }
 
         // Each user starts as a buyer by default
-        $buyerRole = $this->roleRepository->findByName('buyer');
+        $buyerRole = $this->roleRepository->getByName('buyer');
 
         // Get the DB connection
         $pdo = $this->db->connection;

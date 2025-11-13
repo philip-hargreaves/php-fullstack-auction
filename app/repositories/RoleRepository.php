@@ -16,7 +16,7 @@ class RoleRepository
         $this->db = $db;
     }
 
-    public function findById(int $id): ?Role
+    public function getById(int $id): ?Role
     {
         // Check cache first for $id
         if (isset($this->cacheById[$id])) {
@@ -31,7 +31,7 @@ class RoleRepository
         return $row ? $this->mapRowToRole($row) : null;
     }
 
-    public function findByName(string $name): ?Role
+    public function getByName(string $name): ?Role
     {
         // Normalise name to reduce errors when calling etc
         $key = strtolower($name);
