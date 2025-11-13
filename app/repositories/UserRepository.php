@@ -1,6 +1,7 @@
 <?php
-
+namespace app\repositories;
 use app\models\User;
+use infrastructure\Database;
 
 // Data access for user
 class UserRepository {
@@ -15,7 +16,7 @@ class UserRepository {
     // Find user by email
     public function findByEmail(string $email): ?User
     {
-        // *** CHECK ONE QUERY W/REDUDANT DATA VS TWO QUERIES WITH NO REDUDANT DATA ***
+        // *** CHECK ONE QUERY REDUNDANT DATA VS TWO QUERIES WITH NO REDUNDANT DATA ***
         $query = "SELECT u.id, u.username, u.email, u.password, u.is_active,
                          r.id AS role_id, r.role_name
                   FROM users u

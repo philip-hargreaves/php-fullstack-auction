@@ -7,9 +7,9 @@ use DateTime;
 class Auction
 {
     // 1. PROPERTIES
-    private int $auctionID;
-    private int $itemID;
-    private ?int $winningBidID; // This is nullable
+    private int $auctionId;
+    private int $itemId;
+    private ?int $winningBidId; // This is nullable
     private DateTime $startDateTime;
     private DateTime $endDateTime;
     private float $startingPrice; // decimal(10,2)
@@ -23,18 +23,18 @@ class Auction
 
     // 3. CONSTRUCTOR
     public function __construct(
-        int $auctionID,
-        int $itemID,
-        ?int $winningBidID,
+        int $auctionId,
+        int $itemId,
+        ?int $winningBidId,
         string|DateTime $startDateTime, // Accept string from DB
         string|DateTime $endDateTime,   // Accept string from DB
         float $startingPrice,
         float $reservePrice,
         string $auctionStatus
     ) {
-        $this->auctionID = $auctionID;
-        $this->itemID = $itemID;
-        $this->winningBidID = $winningBidID;
+        $this->auctionId = $auctionId;
+        $this->itemId = $itemId;
+        $this->winningBidId = $winningBidId;
         $this->startingPrice = $startingPrice;
         $this->reservePrice = $reservePrice;
         $this->auctionStatus = $auctionStatus;
@@ -61,19 +61,19 @@ class Auction
 
     // 5. GETTERS
 
-    public function getAuctionID(): int
+    public function getAuctionId(): int
     {
-        return $this->auctionID;
+        return $this->auctionId;
     }
 
-    public function getItemID(): int
+    public function getItemId(): int
     {
-        return $this->itemID;
+        return $this->itemId;
     }
 
-    public function getWinningBidID(): ?int
+    public function getWinningBidId(): ?int
     {
-        return $this->winningBidID;
+        return $this->winningBidId;
     }
 
     public function getStartDateTime(): DateTime
@@ -102,15 +102,19 @@ class Auction
     }
 
     // 6. SETTERS
+    public function setAuctionId(int $auctionId): void
+    {
+        $this->auctionId = $auctionId;
+    }
 
     public function setAuctionStatus(string $auctionStatus): void
     {
         $this->auctionStatus = $auctionStatus;
     }
 
-    public function setWinningBidID(?int $winningBidID): void
+    public function setWinningBidId(?int $winningBidId): void
     {
-        $this->winningBidID = $winningBidID;
+        $this->winningBidId = $winningBidId;
     }
 
     // 7. RELATIONSHIP GETTERS/SETTERS
