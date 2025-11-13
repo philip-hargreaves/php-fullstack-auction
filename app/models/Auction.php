@@ -49,7 +49,7 @@ class Auction
     public function isAuctionActive(): bool
     {
         $now = new DateTime();
-        return ($this->auctionStatus === 'active') &&
+        return ($this->auctionStatus === 'Active') &&
             ($now > $this->startDateTime) &&
             ($now < $this->endDateTime);
     }

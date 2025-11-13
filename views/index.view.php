@@ -1,7 +1,15 @@
 <?php
+/**
+ * @var $dummy_auctions array
+ * @var $curr_page
+ * @var $querystring
+ * @var $low_page
+ * @var $high_page
+ * @var $max_page
+ */
+
 require base_path("views/partials/header.php");
 ?>
-
     <!-- Browsing -->
     <div class="container">
         <h2 class="my-3">Browse listings</h2>
@@ -59,7 +67,7 @@ require base_path("views/partials/header.php");
             <li class="list-group-item d-flex justify-content-between">
                 <div class="p-2 mr-5">
 <!--                    <h5><a href="../listing?item_id=--><?php //echo $auction['item_id']; ?><!--">-->
-                        <h5><a href="../listing?auctionID=12345">
+                        <h5><a href="../auction?auction_id=2222">
                             <?php echo $auction['title']; ?>
                         </a></h5>
                         <?php echo $auction['description_short']; // We will create this in the controller ?>
