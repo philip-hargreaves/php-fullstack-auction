@@ -1,4 +1,5 @@
 <?php
+use infrastructure\Request;
 
 // A LOT to be moved to dedicated services, controllers should be minimal
 

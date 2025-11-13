@@ -5,6 +5,8 @@ use app\models\Bid;
 use app\repositories\AuctionRepository;
 use infrastructure\Database;
 use app\repositories\BidRepository;
+use DateTime;
+use PDOException;
 
 class BidService
 {

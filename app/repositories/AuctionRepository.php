@@ -58,10 +58,4 @@ class AuctionRepository
         }
     }
 
-    public function getAuctionsByItemId(int $itemId) : array {
-        return [];
-    }
-
-
-
 }

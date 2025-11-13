@@ -2,6 +2,7 @@
 
 use app\repositories\UserRepository;
 use app\repositories\RoleRepository;
+use app\repositories\UserRoleRepository;
 use app\repositories\ItemRepository;
 use app\repositories\AuctionRepository;
 use app\repositories\BidRepository;

@@ -1,11 +1,10 @@
 <?php
 
 require_once "../infrastructure/autoloader.php";
-
+require_once "../infrastructure/utilities.php";
 
 use infrastructure\Database;
 use infrastructure\Router;
-use infrastructure\Request;
 
 // Initialise Router and Database
 $router = new Router();

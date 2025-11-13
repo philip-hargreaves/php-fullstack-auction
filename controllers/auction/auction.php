@@ -1,7 +1,4 @@
 <?php
-
-session_start();
-
 use app\repositories\UserRepository;
 use app\repositories\RoleRepository;
 use app\repositories\ItemRepository;
@@ -10,6 +7,7 @@ use app\repositories\BidRepository;
 use app\services\BidService;
 use infrastructure\Database;
 
+session_start();
 $auctionId = $_GET['auction_id'];
 
 // Dependency Injection
