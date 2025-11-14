@@ -5,6 +5,8 @@ use app\repositories\UserRepository;
 use app\repositories\RoleRepository;
 use app\repositories\UserRoleRepository;
 use infrastructure\Database;
+use infrastructure\Utilities;
+
 
 class RegistrationService
 {
@@ -43,7 +45,7 @@ class RegistrationService
 
         try {
             // Wrap creation + role assignment in a transaction so they succeed or fail together
-            $this->beginTransaction($pdo);
+            Utilities::beginTransaction($pdo);
 
             // Create the user
             $user = $this->createUser($input);
@@ -106,14 +108,23 @@ class RegistrationService
         return $errors;
     }
 
-    // Create a new user
     private function createUser(array $input): User
     {
-        $username       = trim($input['username']);
-        $email          = trim($input['email']);
-        $hashedPassword = password_hash((string)$input['password'], PASSWORD_DEFAULT);
+        $user = new User(
+            0,
+            trim($input['username']),
+            trim($input['email']),
+            password_hash((string)$input['password'], PASSWORD_DEFAULT),
+            true
+        );
 
-        return $this->userRepository->create($username, $email, $hashedPassword, true);
+        $savedUser = $this->userRepository->create($user);
+
+        if ($savedUser === null) {
+            throw new \RuntimeException('Failed to create user.');
+        }
+
+        return $savedUser;
     }
 
     // Return a failure response
@@ -126,11 +137,4 @@ class RegistrationService
         ];
     }
 
-    // Start a transaction if the connection doesn't already have one
-    private function beginTransaction(\PDO $pdo): void
-    {
-        if (!$pdo->inTransaction()) {
-            $pdo->beginTransaction();
-        }
-    }
 }

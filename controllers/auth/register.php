@@ -1,2 +1,4 @@
-<?php require base_path( 'views/register.view.php');
+<?php
+use infrastructure\Utilities;
+require Utilities::basePath('views/register.view.php');
 

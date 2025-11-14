@@ -1,5 +1,8 @@
 <?php
-require base_path('views/partials/header.php');
+
+use infrastructure\Utilities;
+
+require Utilities::basePath('views/partials/header.php');
 ?>
 
 <div class="container">
@@ -107,4 +110,4 @@ require base_path('views/partials/header.php');
 
 <?php
 unset($_SESSION['old_registration_username'], $_SESSION['old_registration_email']);
-require base_path('views/partials/footer.php');
+require Utilities::basePath('views/partials/footer.php');

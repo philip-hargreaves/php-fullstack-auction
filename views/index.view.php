@@ -1,4 +1,5 @@
-<?php
+<?php use infrastructure\Utilities;
+require Utilities::basePath('views/partials/header.php');
 /**
  * @var $dummy_auctions array
  * @var $curr_page
@@ -7,9 +8,8 @@
  * @var $high_page
  * @var $max_page
  */
-
-require base_path("views/partials/header.php");
 ?>
+
     <!-- Browsing -->
     <div class="container">
         <h2 class="my-3">Browse listings</h2>
@@ -120,5 +120,4 @@ require base_path("views/partials/header.php");
         </ul>
     </nav>
     <!-- Pagination -->
-
-<?php require base_path("views/partials/footer.php");
+        <?php require Utilities::basePath('views/partials/footer.php'); ?>

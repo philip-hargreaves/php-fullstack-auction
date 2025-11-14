@@ -1,7 +1,7 @@
 <?php
 
 require_once "../infrastructure/autoloader.php";
-require_once "../infrastructure/utilities.php";
+require_once "../infrastructure/Utilities.php";
 
 use infrastructure\Database;
 use infrastructure\Router;

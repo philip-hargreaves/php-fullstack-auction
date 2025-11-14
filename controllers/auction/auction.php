@@ -6,6 +6,7 @@ use app\repositories\AuctionRepository;
 use app\repositories\BidRepository;
 use app\services\BidService;
 use infrastructure\Database;
+use infrastructure\Utilities;
 
 session_start();
 $auctionId = $_GET['auction_id'];
@@ -96,4 +97,4 @@ if ($_SESSION['logged_in']) { // login
 }
 
 
-require base_path('views/auction.view.php');
+require Utilities::basePath('views/auction.view.php');
