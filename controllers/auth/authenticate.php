@@ -1,10 +1,7 @@
 <?php
 
-use app\repositories\UserRepository;
-use app\repositories\RoleRepository;
-use infrastructure\Database;
-use app\services\AuthService;
 use infrastructure\Request;
+use infrastructure\DIContainer;
 
 session_start();
 
@@ -28,10 +25,7 @@ if (empty($email) || empty($password)) {
 
 try {
     // Dependencies (Database → RoleRepository → UserRepository → AuthService)
-    $db              = new Database();
-    $roleRepository  = new RoleRepository($db);
-    $userRepository  = new UserRepository($db, $roleRepository);
-    $authService     = new AuthService($userRepository);
+    $authService = DIContainer::get('authServ');
 
     // Attempt login via Authservice
     if ($authService->attemptLogin($email, $password)) {
