@@ -1,7 +1,6 @@
 <?php
 
 use infrastructure\Utilities;
-
 require Utilities::basePath('views/partials/header.php');
 ?>
 
