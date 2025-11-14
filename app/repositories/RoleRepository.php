@@ -1,9 +1,8 @@
 <?php
 namespace app\repositories;
 use app\models\Role;
-use infrastructure\Utilities;
 use infrastructure\Database;
-require_once Utilities::basePath('app/models/Role.php');
+
 
 class RoleRepository
 {
@@ -30,7 +29,7 @@ class RoleRepository
             ->query('SELECT id, role_name FROM roles WHERE id = :id', ['id' => $id])
             ->fetch();
 
-        return $row ? $this->hydrateSingle($row) : null;
+        return $row ? $this->hydrate($row) : null;
     }
 
     public function getByIds(array $ids): array
