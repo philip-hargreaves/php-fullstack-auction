@@ -1,4 +1,8 @@
 <?php
+/**
+ * @var $router
+*/
+
 
 // Index Page
 $router->get('/', 'controllers/index.php');

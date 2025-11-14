@@ -1,13 +1,6 @@
 <?php
-use infrastructure\Utilities;
-use app\repositories\UserRepository;
-use app\repositories\RoleRepository;
-use app\repositories\UserRoleRepository;
-use app\repositories\ItemRepository;
-use app\repositories\AuctionRepository;
-use app\repositories\BidRepository;
-use app\services\BidService;
-use infrastructure\Database;
+
+use infrastructure\DIContainer;
 use infrastructure\Request;
 
 session_start();
@@ -40,14 +33,7 @@ if (!empty($errors)) {
 // VALIDATION PASSED
 try {
     // Instantiate services
-    $db = new Database();
-    $userRoleRepo = new UserRoleRepository($db);
-    $RoleRepo = new RoleRepository($db);
-    $userRepo = new UserRepository($db, $RoleRepo);
-    $itemRepo = new ItemRepository($db, $userRepo);
-    $auctionRepo = new AuctionRepository($db, $itemRepo);
-    $bidRepo = new BidRepository($db, $userRepo, $auctionRepo);
-    $bidServ = new BidService($bidRepo, $auctionRepo, $db);
+    $bidServ = DIContainer::get('bidServ');
 
     // Build the $input array for the service
     $input = [

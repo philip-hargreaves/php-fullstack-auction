@@ -1,12 +1,7 @@
 <?php
-use infrastructure\Utilities;
-use app\repositories\UserRepository;
-use app\repositories\RoleRepository;
-use app\repositories\UserRoleRepository;
-use infrastructure\Database;
-use app\services\AuthService;
+
 use infrastructure\Request;
-use app\services\RegistrationService;
+use infrastructure\DIContainer;
 
 session_start();
 
@@ -26,17 +21,8 @@ $input = [
 
 // Dependencies (Database → RoleRepository → UserRepository → UserRoleRepository → AuthService → RegistrationService)
 try {
-    $db                 = new Database();
-    $roleRepository     = new RoleRepository($db);
-    $userRepository     = new UserRepository($db, $roleRepository);
-    $userRoleRepository = new UserRoleRepository($db);
-    $authService        = new AuthService($userRepository);
-    $registrationService = new RegistrationService(
-        $userRepository,
-        $userRoleRepository,
-        $roleRepository,
-        $db
-    );
+    $registrationService = DIContainer::get('registrationServ');
+    $authService = DIContainer::get('authServ');
 
     // Delegate registration to the service
     $result = $registrationService->register($input);
