@@ -1,11 +1,13 @@
 <?php
+require_once __DIR__ . '/../infrastructure/autoloader.php';
+require_once __DIR__ . '/../infrastructure/Utilities.php';
 
-require_once "../infrastructure/autoloader.php";
-require_once "../infrastructure/utilities.php";
-require_once base_path('bootstrap.php');
-
+use infrastructure\Utilities;
 use infrastructure\Database;
 use infrastructure\Router;
+
+require_once Utilities::basePath('bootstrap.php');
+
 
 // Initialise Router and Database
 $router = new Router();

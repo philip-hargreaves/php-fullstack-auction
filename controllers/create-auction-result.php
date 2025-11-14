@@ -1,5 +1,5 @@
 <?php
-
+use infrastructure\Utilities;
 // Auction service etc should take care of TODO's. Keep controllers thin
 
 /* TODO #1: Connect to MySQL database (perhaps by requiring a file that
@@ -17,4 +17,4 @@
             data into the database. */
 
 
-require base_path('views/create-auction-result.view.php');
+require Utilities::basePath('views/create-auction-result.view.php');

@@ -1,5 +1,5 @@
 <?php
-include("../views/partials/header.php");
+require \infrastructure\Utilities::basePath('views/partials/header.php');
 ?>
 
 <div class="container">
@@ -80,4 +80,4 @@ include("../views/partials/header.php");
 
 
 
-<?php require base_path("views/partials/footer.php");
+<?php require \infrastructure\Utilities::basePath('views/partials/footer.php');

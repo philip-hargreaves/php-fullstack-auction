@@ -1,5 +1,6 @@
 <?php
 use infrastructure\DIContainer;
+use infrastructure\Utilities;
 
 session_start();
 $auctionId = $_GET['auction_id'];
@@ -77,7 +78,7 @@ if ($auctionStatus == 'Active') {
 if ($_SESSION['logged_in']) { // login
 
     $hasSession = true;
-    $user = $userRepo->findById($_SESSION['user_id']);
+    $user = $userRepo->getById($_SESSION['user_id']);
 
     //$isWatched = WatchlistRepository->getIsWatchedByUserIdAndAuctionId($_SESSION['user_id'], $auction->getAuctionId());
     $isWatched = false;
@@ -86,4 +87,4 @@ if ($_SESSION['logged_in']) { // login
 }
 
 
-require base_path('views/auction.view.php');
+require Utilities::basePath('views/auction.view.php');

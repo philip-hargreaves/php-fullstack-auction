@@ -1,6 +1,4 @@
-<?php
-require base_path("views/partials/header.php");
-?>
+<?php require \infrastructure\Utilities::basePath('views/partials/header.php'); ?>
 
 <div class="container my-5">
 
@@ -30,4 +28,4 @@ echo('<div class="text-center">Auction successfully created! <a href="FIXME">Vie
 </div>
 
 
-<?php require base_path("views/partials/footer.php");
+<?php require \infrastructure\Utilities::basePath('views/partials/footer.php');

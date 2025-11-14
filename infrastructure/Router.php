@@ -1,6 +1,6 @@
 <?php
 namespace infrastructure;
-
+use infrastructure\Utilities;
 class Router {
     protected $routes = [
         'GET' => [],
@@ -23,7 +23,7 @@ class Router {
     public function route($uri, $method)
     {
         if ($this->routes[$method][$uri] ?? false) {
-            return require_once base_path($this->routes[$method][$uri]);
+            return require_once Utilities::basePath($this->routes[$method][$uri]);
             }
         $this->abort();
     }
@@ -31,7 +31,7 @@ class Router {
     protected function abort($code = 404)
     {
         http_response_code($code);
-        dd("{$code} Page Not Found");
+        Utilities::dd("{$code} Page Not Found");
     }
 }
 
