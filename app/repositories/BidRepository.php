@@ -5,6 +5,7 @@ use app\models\Bid;
 use infrastructure\Database;
 use app\repositories\UserRepository;
 use app\repositories\auctionRepository;
+use PDO;
 use PDOException;
 
 class BidRepository
@@ -37,6 +38,9 @@ class BidRepository
 //        $buyer = $this->userRepo->getUserById($row['buyer_id']);
         $buyer = $this->userRepo->getById($row['buyer_id']);
         $object->setBuyer($buyer);
+
+        $auction = $this->auctionRepo->getById($row['auction_id']);
+        $object->setAuction($auction);
 
         return $object;
     }
@@ -109,5 +113,32 @@ class BidRepository
 
         return $objects;
     }
+
+    public function getByUserId(int $userId): array
+    {
+        try {
+            $sql = "SELECT * FROM bids
+                    WHERE buyer_id = :user_id
+                    ORDER BY bid_datetime DESC";
+            $params = ['user_id' => $userId];
+            $rows = $this->db->query($sql, $params)->fetchAll(PDO::FETCH_ASSOC);
+
+            return $this->hydrateMany($rows);
+        } catch (PDOException $e) {
+            // error_log($e->getMessage());
+            return [];
+        }
+    }
+
+    public function hydrateMany(array $rows): array
+    {
+        $bids = [];
+
+        foreach ($rows as $row) {
+            $bids[] = $this->hydrate($row);
+        }
+        return $bids;
+    }
+
 
 }
