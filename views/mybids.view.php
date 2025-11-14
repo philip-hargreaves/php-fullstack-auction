@@ -1,8 +1,5 @@
 <?php
-
-use infrastructure\Utilities;
-
-require Utilities::basePath('views/partials/header.php');
+require \infrastructure\Utilities::basePath('views/partials/header.php');
 ?>
 
     <div class="container my-bids-page">
@@ -48,5 +45,5 @@ require Utilities::basePath('views/partials/header.php');
     </div>
 
 <?php
-require Utilities::basePath('views/partials/footer.php');
+require \infrastructure\Utilities::basePath('views/partials/footer.php');
 ?>
