@@ -1,5 +1,4 @@
 <?php
-// Start session and set default values
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
