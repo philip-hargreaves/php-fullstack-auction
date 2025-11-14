@@ -2,7 +2,6 @@
 
 require_once "../infrastructure/autoloader.php";
 require_once "../infrastructure/utilities.php";
-require_once "../infrastructure/DIContainer.php";
 require_once base_path('bootstrap.php');
 
 use infrastructure\Database;
