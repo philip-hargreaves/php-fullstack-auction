@@ -1,23 +1,13 @@
 <?php
-use app\repositories\UserRepository;
-use app\repositories\RoleRepository;
-use app\repositories\ItemRepository;
-use app\repositories\AuctionRepository;
-use app\repositories\BidRepository;
-use app\services\BidService;
-use infrastructure\Database;
+use infrastructure\DIContainer;
 
 session_start();
 $auctionId = $_GET['auction_id'];
 
 // Dependency Injection
-$db = new Database();
-$roleRepo = new RoleRepository($db);
-$userRepo = new UserRepository($db, $roleRepo);
-$itemRepo = new ItemRepository($db, $userRepo);
-$auctionRepo = new AuctionRepository($db, $itemRepo);
-$bidRepo = new BidRepository($db, $userRepo, $auctionRepo);
-$bidServ = new BidService($bidRepo, $auctionRepo, $db);
+$bidServ = DIContainer::get('bidServ');
+$auctionRepo = DIContainer::get('auctionRepo');
+$userRepo = DIContainer::get('userRepo');
 
 // Get Auction, Item, and Bids entities
 $auction = $auctionRepo->getById($auctionId);

@@ -1,8 +1,6 @@
 <?php
 spl_autoload_register(
     function ($class) {
-
-
         // base directory for the root folder
         $base_dir = dirname(__DIR__) . '/';
 
