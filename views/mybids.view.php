@@ -1,17 +1,15 @@
 <?php
-
-use infrastructure\Utilities;
-
-require Utilities::basePath('views/partials/header.php');
+require \infrastructure\Utilities::basePath('views/partials/header.php');
 ?>
 
-    <div class="container">
+    <div class="container my-bids-page">
         <h1>My Bids</h1>
 
         <?php if (empty($bids)): ?>
             <p>You have not placed any bids yet.</p>
         <?php else: ?>
-            <table class="table"> <thead>
+            <table class="bids-table">
+                <thead>
                 <tr>
                     <th>Item</th>
                     <th>Your Bid</th>
@@ -39,5 +37,5 @@ require Utilities::basePath('views/partials/header.php');
     </div>
 
 <?php
-require Utilities::basePath('views/partials/footer.php');
+require \infrastructure\Utilities::basePath('views/partials/footer.php');
 ?>

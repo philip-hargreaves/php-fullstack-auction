@@ -26,10 +26,9 @@ $isSeller = AuthService::hasRole('seller');
     <link rel="stylesheet" href="/css/custom.css">
     <link rel="stylesheet" href="/css/navbar.css">
     <link rel="stylesheet" href="/css/image-gallery.css">
+    <link rel="stylesheet" href="/css/mybids.css">
     <title>My Auction Site</title>
 </head>
-
-
 <body>
 
 <!-- Top Navigation Bar -->
