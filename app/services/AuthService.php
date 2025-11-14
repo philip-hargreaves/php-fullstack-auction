@@ -1,6 +1,8 @@
 <?php
 namespace app\services;
 use app\repositories\UserRepository;
+use app\repositories\RoleRepository;
+
 
 class AuthService {
     private UserRepository $userRepository;
@@ -16,7 +18,7 @@ class AuthService {
         $this->ensureSessionStarted();
 
         // Fetch user by email, including all associated Role objects.
-        $user = $this->userRepository->findByEmail($email);
+        $user = $this->userRepository->getByEmail($email);
         if ($user === null || !$user->isActive()) {
             // User not found or deactivated
             return false;

@@ -1,12 +1,13 @@
 <?php
 namespace app\services;
-
 use app\models\Bid;
 use app\repositories\AuctionRepository;
 use infrastructure\Database;
 use app\repositories\BidRepository;
 use DateTime;
 use PDOException;
+use infrastructure\Utilities;
+
 
 class BidService
 {
@@ -46,7 +47,7 @@ class BidService
 
         // --- START THE TRANSACTION ---
         try {
-            $this->db->connection->beginTransaction();
+            Utilities::beginTransaction($this->db->connection);
 
             // Business Logic Validation
             $auction = $this->auctionRepo->getById($input['auctionId']);

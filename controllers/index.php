@@ -1,4 +1,5 @@
 <?php
+use infrastructure\Utilities;
 use infrastructure\Request;
 
 // A LOT to be moved to dedicated services, controllers should be minimal
@@ -71,9 +72,9 @@ foreach ($raw_auctions as $auction) {
         $auction['time_remaining'] = 'This auction has ended';
     } else {
         $time_to_end = date_diff($now, $auction['end_date']);
-        $auction['time_remaining'] = display_time_remaining($time_to_end) . ' remaining';
+        $auction['time_remaining'] = Utilities::displayTimeRemaining($time_to_end) . ' remaining';
     }
     $dummy_auctions[] = $auction;
 }
 
-require base_path('views/index.view.php');
+require Utilities::basePath('views/index.view.php');
