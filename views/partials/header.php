@@ -56,6 +56,13 @@ $isSeller = AuthService::hasRole('seller');
         <!-- Right Section: Login/Logout -->
         <div class="right-section">
             <?php if ($isLoggedIn): ?>
+                <?php if (!$isSeller): ?>
+                    <form method="POST" action="/become-seller" style="display: inline;">
+                        <button type="submit" class="nav-button" style="background-color: #ff0211; color: white; border: none; border-radius: 4px; padding: 8px 16px; font-weight: 500; transition: opacity 0.2s;">
+                            Become a Seller
+                        </button>
+                    </form>
+                <?php endif; ?>
                 <a href="/notifications" class="nav-button notification-button">
                     <i class="fa fa-bell notification-icon"></i>
                 </a>
@@ -107,6 +114,28 @@ $isSeller = AuthService::hasRole('seller');
         </button>
     </div>
     <?php unset($_SESSION['login_success']); ?>
+<?php endif; ?>
+
+<!-- Display upgrade to seller success message -->
+<?php if (isset($_SESSION['upgrade_success'])): ?>
+    <div class="alert alert-success alert-dismissible fade show mx-2 mt-2" role="alert">
+        <?php echo htmlspecialchars($_SESSION['upgrade_success']); ?>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <?php unset($_SESSION['upgrade_success']); ?>
+<?php endif; ?>
+
+<!-- Display upgrade to seller error message -->
+<?php if (isset($_SESSION['upgrade_error'])): ?>
+    <div class="alert alert-danger alert-dismissible fade show mx-2 mt-2" role="alert">
+        <?php echo htmlspecialchars($_SESSION['upgrade_error']); ?>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <?php unset($_SESSION['upgrade_error']); ?>
 <?php endif; ?>
 
 <!-- Login modal -->

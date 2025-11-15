@@ -3,6 +3,13 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 <script src="/js/bootstrap.bundle.min.js"></script>
 
+<!-- Auto-dismiss alerts after 3 seconds -->
+<script>
+    $(document).ready(function() {
+        $('.alert-dismissible').delay(3000).fadeOut('slow');
+    });
+</script>
+
 </body>
 
 </html>
