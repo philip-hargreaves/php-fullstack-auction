@@ -53,11 +53,28 @@ $isSeller = AuthService::hasRole('seller');
             </form>
         </div>
 
+        <!-- Middle Section: Navigation Tabs (only when logged in) -->
+        <?php if ($isLoggedIn): ?>
+        <div class="middle-section">
+            <?php if ($isBuyer): ?>
+                <a href="/mybids" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/mybids') !== false ? 'active' : '' ?>">My Bids</a>
+                <a href="/recommendations" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/recommendations') !== false ? 'active' : '' ?>">Recommended</a>
+            <?php endif; ?>
+
+            <?php if ($isSeller): ?>
+                <a href="/my-listings" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/my-listings') !== false ? 'active' : '' ?>">My Listings</a>
+                <a href="/create-auction" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/create-auction') !== false ? 'active' : '' ?>">Create Auction</a>
+            <?php endif; ?>
+
+            <a href="/watchlist" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/watchlist') !== false ? 'active' : '' ?>">Watchlist</a>
+        </div>
+        <?php endif; ?>
+
         <!-- Right Section: Login/Logout -->
         <div class="right-section">
             <?php if ($isLoggedIn): ?>
                 <?php if (!$isSeller): ?>
-                    <button type="button" class="nav-button" data-toggle="modal" data-target="#becomeSellerModal" style="background-color: #ff0211; color: white; border: none; border-radius: 4px; padding: 8px 16px; font-weight: 500; transition: opacity 0.2s;">
+                    <button type="button" class="nav-button" data-toggle="modal" data-target="#becomeSellerModal" style="background-color: rgb(218, 62, 80); color: white; border: none; border-radius: 4px; padding: 8px 16px; font-weight: 500; transition: opacity 0.2s;">
                         Become a Seller
                     </button>
                 <?php endif; ?>
@@ -72,25 +89,6 @@ $isSeller = AuthService::hasRole('seller');
         </div>
     </div>
 </header>
-
-<!-- Navigation Bar Tabs -->
-<?php if ($isLoggedIn): ?>
-<nav class="category-nav">
-    <div class="category-nav-container">
-        <?php if ($isBuyer): ?>
-            <a href="/mybids" class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/mybids') !== false ? 'active' : '' ?>">My Bids</a>
-            <a href="/recommendations" class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/recommendations') !== false ? 'active' : '' ?>">Recommended</a>
-        <?php endif; ?>
-
-        <?php if ($isSeller): ?>
-            <a href="/my-listings" class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/my-listings') !== false ? 'active' : '' ?>">My Listings</a>
-            <a href="/create-auction" class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/create-auction') !== false ? 'active' : '' ?>">Create Auction</a>
-        <?php endif; ?>
-
-        <a href="/watchlist" class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/watchlist') !== false ? 'active' : '' ?>">Watchlist</a>
-    </div>
-</nav>
-<?php endif; ?>
 
 <!-- Display login error messages -->
 <?php if (isset($_SESSION['login_error'])): ?>
