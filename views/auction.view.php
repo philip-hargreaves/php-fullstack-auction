@@ -24,7 +24,7 @@
  */
 ?>
 
-<?php require base_path("views/partials/header.php"); ?>
+<?php require \infrastructure\Utilities::basePath('views/partials/header.php'); ?>
 
 <div class="container my-4" >
     <div class="row">
@@ -232,7 +232,7 @@
     </div>
 </div>
 
-<?php require base_path("views/partials/footer.php"); ?>
+<?php require \infrastructure\Utilities::basePath('views/partials/footer.php'); ?>
 
 <script>
     // JavaScript functions: addToWatchlist and removeFromWatchlist.

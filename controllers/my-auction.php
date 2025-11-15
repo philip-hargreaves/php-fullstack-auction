@@ -1,2 +1,4 @@
-<?php require base_path('views/my-auctions.view.php');
+<?php
+use infrastructure\Utilities;
+require Utilities::basePath('views/my-auctions.view.php');
 
