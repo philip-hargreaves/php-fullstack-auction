@@ -78,11 +78,11 @@ $isSeller = AuthService::hasRole('seller');
                         Become a Seller
                     </button>
                 <?php endif; ?>
-                <a href="/notifications" class="nav-button notification-button">
+                <a href="/notifications" class="nav-button notification-button" style="color: rgb(229, 229, 229) !important; text-decoration: none !important;">
                     <i class="fa fa-bell notification-icon"></i>
                 </a>
-                <a href="/account" class="nav-button">Account</a>
-                <a href="/logout" class="nav-button">Logout</a>
+                <a href="/account" class="nav-button" style="color: rgb(229, 229, 229) !important; text-decoration: none !important;">Account</a>
+                <a href="/logout" class="nav-button" style="color: rgb(229, 229, 229) !important; text-decoration: none !important;">Logout</a>
             <?php else: ?>
                 <button type="button" class="nav-button" data-toggle="modal" data-target="#loginModal">Log in</button>
             <?php endif; ?>

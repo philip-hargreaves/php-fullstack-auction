@@ -7,6 +7,15 @@
 <script>
     $(document).ready(function() {
         $('.alert-dismissible').delay(3000).fadeOut('slow');
+        
+        // Prevent blue color and underline on hover for right-section links
+        $('.right-section a.nav-button').on('mouseenter mouseleave', function(e) {
+            $(this).css({
+                'color': 'rgb(229, 229, 229)',
+                'text-decoration': 'none',
+                'border-bottom': 'none'
+            });
+        });
     });
 </script>
 
