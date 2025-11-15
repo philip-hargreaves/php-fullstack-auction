@@ -19,6 +19,21 @@
     });
 </script>
 
+<!-- Modal Utility Functions -->
+<script>
+    function showLoginModal() {
+        $('#loginModal').modal('show');
+    }
+
+    function showBecomeSellerModal() {
+        $('#becomeSellerModal').modal('show');
+    }
+
+    // Make functions globally available
+    window.showLoginModal = showLoginModal;
+    window.showBecomeSellerModal = showBecomeSellerModal;
+</script>
+
 </body>
 
 </html>

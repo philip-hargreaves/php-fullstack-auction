@@ -95,24 +95,30 @@
                     <h5 class="text-primary mb-2">Time Remaining: <?= $timeRemaining->format('%ad %hh %im') ?></h5>
                     <p class="small text-muted">Ends: <?= date_format($endTime, 'j M Y,  H:i') ?></p>
 
-                    <form method="POST" action="/bid">
-                        <label for="bid" class="form-label">Place your bid (must be > £<?= number_format($highestBid, 2) ?>)</label>
-                        <div class="input-group mb-3">
-                            <span class="input-group-text">£</span>
-                            <input type="number"
-                                   class="form-control form-control-lg"
-                                   id="bid"
-                                   name="bid_amount"
-                                   placeholder="<?= number_format($highestBid + 1, 2) ?>"
-                                   step="0.01"
-                                   min="<?= $highestBid + 0.01 ?>"
-                                   required>
-                        </div>
+                    <?php if ($hasSession): ?>
+                        <form method="POST" action="/bid">
+                            <label for="bid" class="form-label">Place your bid (must be > £<?= number_format($highestBid, 2) ?>)</label>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">£</span>
+                                <input type="number"
+                                       class="form-control form-control-lg"
+                                       id="bid"
+                                       name="bid_amount"
+                                       placeholder="<?= number_format($highestBid + 1, 2) ?>"
+                                       step="0.01"
+                                       min="<?= $highestBid + 0.01 ?>"
+                                       required>
+                            </div>
 
-                        <input type="hidden" name="auction_id" value="<?= $auctionId ?>">
+                            <input type="hidden" name="auction_id" value="<?= $auctionId ?>">
 
-                        <button type="submit" class="btn btn-primary btn-lg w-100">Place Bid</button>
-                    </form>
+                            <button type="submit" class="btn btn-primary btn-lg w-100">Place Bid</button>
+                        </form>
+                    <?php else: ?>
+                        <button type="button" class="btn btn-primary btn-lg w-100" onclick="showLoginModal()">
+                            Sign In to Place Bid
+                        </button>
+                    <?php endif; ?>
                 <?php elseif ($auctionStatus == 'Pending') : ?>
 
                 <?php endif; ?>
@@ -169,6 +175,11 @@
     // JavaScript functions: addToWatchlist and removeFromWatchlist.
 
     function addToWatchlist(button) {
+        <?php if (!$hasSession): ?>
+            showLoginModal();
+            return;
+        <?php endif; ?>
+        
         console.log("These print statements are helpful for debugging btw");
 
         // This performs an asynchronous call to a PHP function using POST method.

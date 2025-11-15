@@ -34,7 +34,6 @@ try {
 
     $userId = $_SESSION['user_id'];
 
-
     // Call service to upgrade user
     $result = $roleService->upgradeToSeller($userId);
 
