@@ -3,7 +3,7 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
 ?>
 
     <div class="container my-bids-page">
-        <h1>My Bids</h1>
+        <h2 class="my-3">My Bids</h2>
 
         <?php if (empty($bids)): ?>
             <p>You have not placed any bids yet.</p>

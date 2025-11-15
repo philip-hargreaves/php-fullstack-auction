@@ -18,6 +18,7 @@ class Auction
 
     // 2. RELATIONSHIP PROPERTIES
     private ?Item $item = null;
+    private ?float $currentPrice = null;
 //    private ?Bid $winningBid = null;
 //    private array $bids = [];
 
@@ -127,5 +128,15 @@ class Auction
     public function getItem(): ?Item
     {
         return $this->item;
+    }
+
+    public function setCurrentPrice(float $currentPrice): void
+    {
+        $this->currentPrice = $currentPrice;
+    }
+
+    public function getCurrentPrice(): ?float
+    {
+        return $this->currentPrice;
     }
 }

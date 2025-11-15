@@ -4,6 +4,7 @@ namespace app\repositories;
 use infrastructure\Database;
 use app\models\Auction;
 use app\repositories\ItemRepository;
+use PDO;
 use PDOException;
 
 class AuctionRepository
@@ -59,4 +60,29 @@ class AuctionRepository
         }
     }
 
+    public function getBySellerId(int $sellerId): array
+    {
+        try {
+            $sql = "SELECT a.* FROM auctions a
+                    JOIN items i ON a.item_id = i.id
+                    WHERE i.seller_id = :seller_id
+                    ORDER BY a.start_datetime DESC";
+
+            $params = ['seller_id' => $sellerId];
+            $rows = $this->db->query($sql, $params)->fetchAll(PDO::FETCH_ASSOC);
+
+            return $this->hydrateMany($rows);
+        } catch (PDOException $e) {
+            return [];
+        }
+    }
+
+    private function hydrateMany($rows) : array {
+        $auctions = [];
+
+        foreach ($rows as $row) {
+            $auctions[] = $this->hydrate($row);
+        }
+        return $auctions;
+    }
 }
