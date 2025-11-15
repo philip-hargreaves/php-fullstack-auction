@@ -1,6 +1,5 @@
 <?php
 
-use app\services\AuthService;
 use infrastructure\DIContainer;
 use infrastructure\Utilities;
 
@@ -29,6 +28,8 @@ if (!AuthService::hasRole("seller"))
 }
 
 $auctionServ = DIContainer::get('auctionServ');
+$userId = (int)$_SESSION['user_id'];
+
 $auctions = $auctionServ->getAuctionsForSeller($userId);
 
 require Utilities::basePath('views/my-listings.view.php');
