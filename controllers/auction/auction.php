@@ -1,5 +1,6 @@
 <?php
 use infrastructure\DIContainer;
+use infrastructure\Utilities;
 
 session_start();
 $auctionId = $_GET['auction_id'];
@@ -85,4 +86,4 @@ if ($_SESSION['logged_in']) { // login
     $isLoggedIn = false;
 }
 
-require base_path('views/auction.view.php');
+require Utilities::basePath('views/auction.view.php');
