@@ -62,3 +62,4 @@ class RoleService {
             'message' => null,
         ];
     }
+}
