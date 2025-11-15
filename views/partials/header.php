@@ -57,11 +57,9 @@ $isSeller = AuthService::hasRole('seller');
         <div class="right-section">
             <?php if ($isLoggedIn): ?>
                 <?php if (!$isSeller): ?>
-                    <form method="POST" action="/become-seller" style="display: inline;">
-                        <button type="submit" class="nav-button" style="background-color: #ff0211; color: white; border: none; border-radius: 4px; padding: 8px 16px; font-weight: 500; transition: opacity 0.2s;">
-                            Become a Seller
-                        </button>
-                    </form>
+                    <button type="button" class="nav-button" data-toggle="modal" data-target="#becomeSellerModal" style="background-color: #ff0211; color: white; border: none; border-radius: 4px; padding: 8px 16px; font-weight: 500; transition: opacity 0.2s;">
+                        Become a Seller
+                    </button>
                 <?php endif; ?>
                 <a href="/notifications" class="nav-button notification-button">
                     <i class="fa fa-bell notification-icon"></i>
@@ -157,6 +155,37 @@ $isSeller = AuthService::hasRole('seller');
                     <button type="submit" class="btn btn-primary form-control">Sign in</button>
                 </form>
                 <div class="text-center">or <a href="/register">create an account</a></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Become a Seller Modal -->
+<div class="modal fade" id="becomeSellerModal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Become a Seller</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h5>Unlock the power of selling on our platform!</h5>
+                <ul class="list-unstyled mt-3 mb-4">
+                    <li class="mb-2"><i class="fa fa-check text-success mr-2"></i> Create and manage your own auctions</li>
+                    <li class="mb-2"><i class="fa fa-check text-success mr-2"></i> Reach thousands of potential buyers</li>
+                    <li class="mb-2"><i class="fa fa-check text-success mr-2"></i> Set your own starting and reserve prices</li>
+                    <li class="mb-2"><i class="fa fa-check text-success mr-2"></i> Track all your listings in one place</li>
+                    <li class="mb-2"><i class="fa fa-check text-success mr-2"></i> No additional fees - upgrade is free!</li>
+                </ul>
+                <p class="text-muted">By upgrading to a seller account, you'll be able to create auctions and start selling your items immediately.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <form method="POST" action="/become-seller" style="display: inline;">
+                    <button type="submit" class="btn btn-primary">Confirm & Upgrade</button>
+                </form>
             </div>
         </div>
     </div>
