@@ -111,8 +111,7 @@ $isSeller = AuthService::hasRole('seller');
 
 <!-- Login modal -->
 <div class="modal fade" id="loginModal">
-    <div class="modal-dialog">
-        <div class="modal-content">
+    <div class="modal-dialog modal-dialog-centered"> <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">Login</h4>
             </div>
