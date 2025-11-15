@@ -4,7 +4,6 @@ namespace app\repositories;
 use infrastructure\Database;
 use app\models\Auction;
 use app\repositories\ItemRepository;
-use PDO;
 use PDOException;
 
 class AuctionRepository
