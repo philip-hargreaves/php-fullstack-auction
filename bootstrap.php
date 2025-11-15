@@ -21,7 +21,7 @@ DIContainer::bind('roleRepo', new RoleRepository(DIContainer::get('db')));
 DIContainer::bind('userRepo', new UserRepository(DIContainer::get('db'), DIContainer::get('roleRepo')));
 DIContainer::bind('userRoleRepo', new UserRoleRepository(DIContainer::get('db')));
 DIContainer::bind('itemRepo', new ItemRepository(DIContainer::get('db'), DIContainer::get('userRepo')));
-DIContainer::bind('auctionRepo', new AuctionRepository(DIContainer::get('db'), DIContainer::get('itemRepo')));
+DIContainer::bind('auctionRepo', new AuctionRepository(DIContainer::get('db'), DIContainer::get('itemRepo'), ));
 DIContainer::bind('bidRepo', new BidRepository(DIContainer::get('db'), DIContainer::get('userRepo'), DIContainer::get('auctionRepo')));
 
 // Bind Services (they depend on repositories)

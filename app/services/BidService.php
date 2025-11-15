@@ -98,4 +98,23 @@ class BidService
         }
     }
 
+    public function getBidsForAuction($auctionId): array {
+        return $this->bidRepo->getByAuctionId($auctionId);
+    }
+
+    public function getWinningBidForAuction($auctionId): ?Bid {
+        // Get Auction status
+        $auction = $this->auctionRepo->getById($auctionId);
+        $isAuctionActive = $auction->getAuctionStatus() == 'Active';
+        if ($isAuctionActive) {
+            // Get Item Status
+            $item = $auction->getItem();
+            $isItemSold = $item->getItemStatus() == 'Sold';
+            if ($isItemSold) {
+                return $this->bidRepo->getById($auction->getWinningBidID());
+            }
+        }
+        return null;
+    }
+
 }
