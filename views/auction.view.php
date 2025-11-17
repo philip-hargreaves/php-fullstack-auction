@@ -95,11 +95,10 @@
                 <?php if (!$isAuctionActive) : ?>
                     <h4 class="text-danger">Auction Ended</h4>
                     <p class="text-muted mb-0">Ended on: <?= date_format($endTime, 'j M Y,  H:i') ?></p>
-                <?php elseif ($auctionStatus == 'Active') : ?>
+                <?php elseif ($isAuctionActive) : ?>
                     <h5 class="text-primary mb-2">Time Remaining: <?= $timeRemaining->format('%ad %hh %im') ?></h5>
                     <p class="small text-muted">Ends: <?= date_format($endTime, 'j M Y,  H:i') ?></p>
-
-                    <?php if ($hasSession): ?>
+                    <?php if ($isLoggedIn): ?>
                         <form method="POST" action="/bid">
                             <label for="bid" class="form-label">Place your bid (must be > £<?= number_format($highestBid, 2) ?>)</label>
                             <div class="input-group mb-3">
@@ -113,9 +112,7 @@
                                        min="<?= $highestBid + 0.01 ?>"
                                        required>
                             </div>
-
                             <input type="hidden" name="auction_id" value="<?= $auctionId ?>">
-
                             <button type="submit" class="btn btn-primary btn-lg w-100">Place Bid</button>
                         </form>
                     <?php else: ?>
@@ -123,8 +120,8 @@
                             Sign In to Place Bid
                         </button>
                     <?php endif; ?>
-                <?php elseif ($auctionStatus == 'Pending') : ?>
-
+                <?php else : ?>
+                    <!-- Pending auction -->
                 <?php endif; ?>
             </div>
 
@@ -162,6 +159,7 @@
                     <li class="list-group-item"><strong>Status:</strong> <?= htmlspecialchars($itemStatus) ?></li>
                     <li class="list-group-item"><strong>Condition:</strong> <?= htmlspecialchars($itemCondition) ?></li>
                     <li class="list-group-item"><strong>Category:</strong> <?= htmlspecialchars($itemCondition) ?></li>
+                </ul>
             </div>
         </div>
         <div class="col">
@@ -242,7 +240,7 @@
     // JavaScript functions: addToWatchlist and removeFromWatchlist.
 
     function addToWatchlist(button) {
-        <?php if (!$hasSession): ?>
+        <?php if (!$isLoggedIn): ?>
             showLoginModal();
             return;
         <?php endif; ?>
