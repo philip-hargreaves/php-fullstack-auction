@@ -95,32 +95,33 @@
                 <?php if (!$isAuctionActive) : ?>
                     <h4 class="text-danger">Auction Ended</h4>
                     <p class="text-muted mb-0">Ended on: <?= date_format($endTime, 'j M Y,  H:i') ?></p>
+                <?php elseif ($isAuctionActive) : ?>
+                    <h5 class="text-primary mb-2">Time Remaining: <?= $timeRemaining->format('%ad %hh %im') ?></h5>
+                    <p class="small text-muted">Ends: <?= date_format($endTime, 'j M Y,  H:i') ?></p>
+                    <?php if ($isLoggedIn): ?>
+                        <form method="POST" action="/bid">
+                            <label for="bid" class="form-label">Place your bid (must be > £<?= number_format($highestBid, 2) ?>)</label>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">£</span>
+                                <input type="number"
+                                       class="form-control form-control-lg"
+                                       id="bid"
+                                       name="bid_amount"
+                                       placeholder="<?= number_format($highestBid + 1, 2) ?>"
+                                       step="0.01"
+                                       min="<?= $highestBid + 0.01 ?>"
+                                       required>
+                            </div>
+                            <input type="hidden" name="auction_id" value="<?= $auctionId ?>">
+                            <button type="submit" class="btn btn-primary btn-lg w-100">Place Bid</button>
+                        </form>
+                    <?php else: ?>
+                        <button type="button" class="btn btn-primary btn-lg w-100" onclick="showLoginModal()">
+                            Sign In to Place Bid
+                        </button>
+                    <?php endif; ?>
                 <?php else : ?>
-                    <!-- Remaining Time -->
-                    <h5 class="text-primary mb-3">Time Remaining: <?= $timeRemaining->format('%ad %hh %im') ?></h5>
-                    <p class="small text-muted mb-1">Starts: <?= date_format($startTime, 'j M Y,  H:i') ?></p>
-                    <p class="small text-muted mb-1">Ends: <?= date_format($endTime, 'j M Y,  H:i') ?></p>
-                    <hr class="mb-3">
-                    <!-- Bid Amount Input Box -->
-                    <form method="POST" action="/bid">
-                        <label for="bid" class="mb-3">Place your bid (must be > £<?= number_format($highestBid, 2) ?>)</label>
-                        <p class="small text-muted mb-1">Starting Price: <?= number_format($startingPrice, 2) ?></p>
-                        <p class="small text-muted mb-4">Reserve Price: <?= number_format($reservePrice, 2) ?></p>
-                        <div class="input-group mb-3">
-                            <span class="input-group-text">£</span>
-                            <input type="number"
-                                   class="form-control form-control-lg"
-                                   id="bid"
-                                   name="bid_amount"
-                                   placeholder="<?= number_format($highestBid + 1, 2) ?>"
-                                   step="0.01"
-                                   min="<?= $highestBid + 0.01 ?>"
-                                   required>
-                        </div>
-                        <input type="hidden" name="auction_id" value="<?= $auctionId ?>">
-                        <!-- Place Bid Button -->
-                        <button type="submit" class="btn btn-primary btn-lg w-100">Place Bid</button>
-                    </form>
+                    <!-- Pending auction -->
                 <?php endif; ?>
             </div>
 
@@ -158,6 +159,7 @@
                     <li class="list-group-item"><strong>Status:</strong> <?= htmlspecialchars($itemStatus) ?></li>
                     <li class="list-group-item"><strong>Condition:</strong> <?= htmlspecialchars($itemCondition) ?></li>
                     <li class="list-group-item"><strong>Category:</strong> <?= htmlspecialchars($itemCondition) ?></li>
+                </ul>
             </div>
         </div>
         <div class="col">
@@ -238,6 +240,11 @@
     // JavaScript functions: addToWatchlist and removeFromWatchlist.
 
     function addToWatchlist(button) {
+        <?php if (!$isLoggedIn): ?>
+            showLoginModal();
+            return;
+        <?php endif; ?>
+
         console.log("These print statements are helpful for debugging btw");
 
         // This performs an asynchronous call to a PHP function using POST method.

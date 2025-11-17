@@ -1,8 +1,6 @@
 <?php
 namespace app\services;
 use app\repositories\UserRepository;
-use app\repositories\RoleRepository;
-
 
 class AuthService {
     private UserRepository $userRepository;
@@ -15,7 +13,7 @@ class AuthService {
     public function attemptLogin(string $email, string $password): bool
     {
         // Make sure that the PHP session is active
-        $this->ensureSessionStarted();
+        self::ensureSessionStarted();
 
         // Fetch user by email, including all associated Role objects.
         $user = $this->userRepository->getByEmail($email);
@@ -44,17 +42,82 @@ class AuthService {
     // Log out current user by destroying all stored session data
     public function logout(): void
     {
-        $this->ensureSessionStarted();
+        self::ensureSessionStarted();
         $_SESSION = [];
         session_destroy();
     }
 
     // Helper to ensure session is active before reading and writing to it
-    private function ensureSessionStarted(): void
+    private static function ensureSessionStarted(): void
     {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
     }
+
+    // SESSION DATA RETRIEVAL FUNCTIONS
+
+    // Check if the current user is logged in
+    public static function isLoggedIn(): bool
+    {
+        self::ensureSessionStarted();
+        // Check if the key exists first to prevent accessing a non-existent key
+        return !empty($_SESSION['logged_in'] ?? false);
+    }
+
+    // Get the current logged-in user ID from session
+    public static function getUserId(): ?int
+    {
+        if (!self::isLoggedIn()) {
+            return null;
+        }
+        return $_SESSION['user_id'] ?? null;
+    }
+
+    // Get the current logged-in user's email from session
+    public static function getEmail(): ?string
+    {
+        if (!self::isLoggedIn()) {
+            return null;
+        }
+        return $_SESSION['email'] ?? null;
+    }
+
+    // Get the current logged-in user's role names from session
+    public static function getRoleNames(): array
+    {
+        if (!self::isLoggedIn()) {
+            return [];
+        }
+        return $_SESSION['role_names'] ?? [];
+    }
+
+    // Get all user data from session as an array
+    public static function getUserFromSession(): array
+    {
+        if (!self::isLoggedIn()) {
+            return [
+                'logged_in' => false,
+                'user_id' => null,
+                'email' => null,
+                'role_names' => []
+            ];
+        }
+
+        return [
+            'logged_in' => true,
+            'user_id' => self::getUserId(),
+            'email' => self::getEmail(),
+            'role_names' => self::getRoleNames()
+        ];
+    }
+
+    // Check if user has a specific role
+    public static function hasRole(string $roleName): bool
+    {
+        $roleNames = self::getRoleNames();
+        return in_array($roleName, $roleNames, true);
+    }
+
 
 }

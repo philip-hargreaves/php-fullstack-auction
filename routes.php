@@ -20,6 +20,7 @@ $router->get('/register', 'controllers/auth/register.php');
 $router->post('/register', 'controllers/auth/register.store.php');
 $router->post('/login', 'controllers/auth/authenticate.php');
 $router->get('/logout', 'controllers/auth/logout.php');
+$router->post('/become-seller', 'controllers/auth/become-seller.php');
 
 
 // Auction Page
