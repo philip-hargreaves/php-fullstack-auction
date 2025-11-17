@@ -10,14 +10,17 @@
  * @var $startingPrice float
  * @var $reservePrice float
  * @var $highestBid float
- * @var $auctionStatus string
+ * @var $isAuctionActive bool
  * @var $itemStatus string
  * @var $timeRemaining DateInterval
- * @var $hasSession bool
+ * @var $isLoggedIn bool
  * @var $isWatched bool
  * @var $imageUrls array
  * @var $bidText string
  * @var $statusText string
+ * @var $bids array
+ * @var $winningBid
+ * @var $itemCondition string
  */
 ?>
 
@@ -25,11 +28,10 @@
 
 <div class="container my-4" >
     <div class="row">
-
+        <!-- Image Gallery -->
         <div class="col mx-auto" style="max-width: 600px;">
-            <?php
-            $firstImage = $imageUrls[0] ?? 'https://via.placeholder.com/600x400.png?text=No+Image';
-            ?>
+            <!-- Define the First Image -->
+            <?php $firstImage = $imageUrls[0] ?? 'https://via.placeholder.com/600x400.png?text=No+Image'; ?>
 
             <!-- Main Image Gallery -->
             <div id="image-gallery" class="gallery-container mb-2"> <!-- Reduced margin -->
@@ -48,14 +50,12 @@
                 </div>
             <?php endif; ?>
 
-
-            <!-- ===== NEW THUMBNAIL SCROLLER ===== -->
+            <!-- Image Scroller -->
             <?php if (count($imageUrls) > 1): ?>
-
                 <div class="d-flex align-items-center">
-
+                    <!-- Scroll Left Button -->
                     <button class="btn btn-outline-primary" id="thumb-prev" style="height: 40px; width: 40px; flex-shrink: 0;">&larr;</button>
-
+                    <!-- List of Images -->
                     <div class="thumbnail-viewport flex-grow-1 mx-2" id="thumbnail-viewport">
                         <div class="d-flex" id="thumbnail-container">
                             <?php foreach ($imageUrls as $index => $url): ?>
@@ -67,28 +67,32 @@
                             <?php endforeach; ?>
                         </div>
                     </div>
-
+                    <!-- Scroll Right Button -->
                     <button class="btn btn-outline-primary" id="thumb-next" style="height: 40px; width: 40px; flex-shrink: 0;">&rarr;</button>
                 </div>
 
             <?php endif; ?>
         </div>
 
+        <!-- Auction Information -->
         <div class="col-md-5">
+            <!-- Auction Title / Item Name -->
             <h2 class="mb-3"><?= htmlspecialchars($title) ?></h2>
-
+            <!-- Auction Content -->
             <div class="card bg-light p-3 mb-3">
+                <!-- Current Highest Bid -->
                 <p class="h3 text-success mb-1">
                     <?=$bidText ?> : £<?= number_format($highestBid, 2) ?>
                 </p>
-
+                <!-- Auction Status -->
                 <?php if ($now < $endTime && $highestBid < $reservePrice): ?>
-                    <p class="text-danger small mb-2"><?=$statusText ?></p>
+                    <p class="text-danger small mb-1"><?=$statusText ?></p>
                 <?php endif; ?>
 
-                <hr class="my-2">
+                <hr class="mb-3">
 
-                <?php if ($auctionStatus == 'Finished') : ?>
+                <!-- Display Data Depending on Auction Status -->
+                <?php if (!$isAuctionActive) : ?>
                     <h4 class="text-danger">Auction Ended</h4>
                     <p class="text-muted mb-0">Ended on: <?= date_format($endTime, 'j M Y,  H:i') ?></p>
                 <?php elseif ($auctionStatus == 'Active') : ?>
@@ -124,14 +128,15 @@
                 <?php endif; ?>
             </div>
 
+            <!-- Add to Watchlist Button -->
             <?php if ($now < $endTime): ?>
-                <div class="text-center mb-3">
-                    <div id="watch_nowatch" <?php if ($hasSession && $isWatched) echo('style="display: none"'); ?>>
+                <div class="text-center mb-5">
+                    <div id="watch_nowatch" <?php if ($isLoggedIn && $isWatched) echo('style="display: none"'); ?>>
                         <button type="button" class="btn btn-outline-secondary" onclick="addToWatchlist()">
                             + Add to Watchlist
                         </button>
                     </div>
-                    <div id="watch_watching" <?php if (!$hasSession || !$isWatched) echo('style="display: none"'); ?>>
+                    <div id="watch_watching" <?php if (!$isLoggedIn || !$isWatched) echo('style="display: none"'); ?>>
                         <button type="button" class="btn btn-success" disabled>
                             Watching
                         </button>
@@ -141,18 +146,80 @@
                     </div>
                 </div>
             <?php endif; ?>
+        </div>
+    </div>
 
-            <div class="card">
-                <div class="card-header ">
-                    Item Details
-                </div>
+    <hr class="my-5">
+
+    <div class="row">
+        <div class="col">
+            <!-- Item Information Table -->
+            <h3 class="mb-3">Item Details</h3>
+            <div class="card mb-5">
+
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item"><strong>Seller:</strong> <?= htmlspecialchars($sellerName) ?></li>
-                    <li class="list-group-item"><strong>Item Status:</strong> <?= htmlspecialchars($itemStatus) ?></li>
-                    <li class="list-group-item"><strong>Starting Price:</strong> £<?= number_format($startingPrice, 2) ?></li>
-                    <li class="list-group-item"><strong>Auction Status:</strong> <?= htmlspecialchars($auctionStatus) ?></li>
-                    <li class="list-group-item"><strong>Started:</strong> <?= date_format($startTime, 'j M Y,  H:i') ?></li>
-                </ul>
+                    <li class="list-group-item"><strong>Status:</strong> <?= htmlspecialchars($itemStatus) ?></li>
+                    <li class="list-group-item"><strong>Condition:</strong> <?= htmlspecialchars($itemCondition) ?></li>
+                    <li class="list-group-item"><strong>Category:</strong> <?= htmlspecialchars($itemCondition) ?></li>
+            </div>
+        </div>
+        <div class="col">
+            <!-- Bid History Table -->
+            <h3 class="mb-3" >Bid History</h3>
+            <div class="card mb-5" >
+                <?php if (empty($bids)): ?>
+                    <div class="card-body">
+                        <div class="alert alert-info" role="alert" style="margin-bottom: 0;">
+                            No bids have been placed yet. Be the first!
+                        </div>
+                    </div>
+                <?php else: ?>
+                    <!--
+                      We use <table class="table mb-0"> to make it
+                      fit perfectly inside the card with no bottom margin.
+                    -->
+                    <table class="table table-striped table-hover mb-0" >
+                        <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">Date</th>
+                            <th scope="col">Time</th>
+                            <th scope="col">Bidder</th>
+                            <th scope="col">Bid Amount</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <?php foreach ($bids as $bid): ?>
+                            <?php
+                            // Check if this is the winning bid
+                            $isWinningBid = !$isAuctionActive && $winningBid && $winningBid->getBidId() == $bid->getBidId();
+                            ?>
+                            <tr class="<?= $isWinningBid ? 'table-success' : '' ?>">
+                                <!-- Bid Date Formatting -->
+                                <td>
+                                    <?= $bid->getBidDatetime()->format('j M Y') ?>
+                                </td>
+                                <!-- Bid Time Formatting -->
+                                <td>
+                                    <?= $bid->getBidDatetime()->format('H:i:s') ?>
+                                </td>
+                                <!-- Bidder Name Formatting -->
+                                <td>
+                                    <?= htmlspecialchars($bid->getBuyer()->getUsername()) ?>
+                                    <?php if ($isWinningBid): ?>
+                                        <span class="badge bg-success">Winner</span>
+                                    <?php endif; ?>
+                                </td>
+
+                                <!-- Bid Amount Formatting -->
+                                <td>
+                                    £<?= number_format($bid->getBidAmount(), 2) ?>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                <?php endif; ?>
             </div>
         </div>
     </div>
@@ -179,7 +246,7 @@
             showLoginModal();
             return;
         <?php endif; ?>
-        
+
         console.log("These print statements are helpful for debugging btw");
 
         // This performs an asynchronous call to a PHP function using POST method.

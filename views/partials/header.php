@@ -19,14 +19,17 @@ $isSeller = AuthService::hasRole('seller');
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/css/custom.css">
-    <link rel="stylesheet" href="/css/navbar.css">
-    <title>My Auction Site</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <!-- Bootstrap and FontAwesome CSS -->
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <!-- Custom CSS file -->
+  <link rel="stylesheet" href="/css/custom.css">
+  <title>My Auction Site</title>
 </head>
+
+
 <body>
 
 <!-- Top Navigation Bar -->
@@ -188,3 +191,5 @@ $isSeller = AuthService::hasRole('seller');
         </div>
     </div>
 </div>
+
+<main>

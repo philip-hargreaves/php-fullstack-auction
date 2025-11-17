@@ -61,3 +61,6 @@ DIContainer::bind('roleServ', new RoleService(
     DIContainer::get('roleRepo'),
     DIContainer::get('userRoleRepo')
 ));
+DIContainer::bind('bidServ', new BidService(DIContainer::get('bidRepo'), DIContainer::get('auctionRepo'), DIContainer::get('db')));
+DIContainer::bind('authServ', new AuthService(DIContainer::get('userRepo')));
+DIContainer::bind('registrationServ', new RegistrationService(DIContainer::get('userRepo'), DIContainer::get('userRoleRepo'), DIContainer::get('roleRepo'), DIContainer::get('db'),));

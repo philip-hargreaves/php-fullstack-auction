@@ -38,9 +38,6 @@ class BidRepository
         $buyer = $this->userRepo->getById($row['buyer_id']);
         $object->setBuyer($buyer);
 
-        $auction = $this->auctionRepo->getById($row['auction_id']);
-        $object->setAuction($auction);
-
         return $object;
     }
 
@@ -57,64 +54,60 @@ class BidRepository
 
     public function getById(int $bidId): ?Bid
     {
-        try {
-            // Query
-            $sql = "SELECT * FROM bids WHERE bid_id = :bid_id";
-            $params = ['bid_id' => $bidId];
-            $row = $this->db->query($sql, $params)->fetch();
+        // Query
+        $sql = "SELECT * FROM bids WHERE id = :bid_id";
+        $params = ['bid_id' => $bidId];
+        $row = $this->db->query($sql, $params)->fetch();
 
-            // dbToObjectConverter will handle the empty row and return null
-            return $this->hydrate($row);
-
-        } catch (PDOException $e) {
-            error_log($e->getMessage());
-            return null;
-        }
+        // hydrate() will handle the empty row and return null
+        return $this->hydrate($row);
     }
 
     public function create(Bid $bid): ?Bid
     {
-        try {
-            $params = $this->extract($bid);
-            $sql = "INSERT INTO bids (buyer_id, auction_id, bid_amount, bid_datetime) 
+        $params = $this->extract($bid);
+        $sql = "INSERT INTO bids (buyer_id, auction_id, bid_amount, bid_datetime) 
                     VALUES (:buyer_id, :auction_id, :bid_amount, :bid_datetime)";
 
-            $result = $this->db->query($sql, $params);
+        $result = $this->db->query($sql, $params);
 
-            // Check if the insert was successful.
-            if ($result) {
-                $id = (int)$this->db->connection->lastInsertId();
-                $bid->setBidId($id);
-                return $bid;
-            } else {
-                return null;
-            }
-        } catch (PDOException $e) {
-            // error_log($e->getMessage());
+        // Check if the insert was successful.
+        if ($result) {
+            $id = (int)$this->db->connection->lastInsertId();
+            $bid->setBidId($id);
+            return $bid;
+        } else {
             return null;
         }
     }
 
     public function getHighestBidByAuctionId(int $auctionId): ?Bid
     {
-        try {
-            // Query
-            $sql = "SELECT * FROM bids 
-                    WHERE auction_id = :auction_id 
-                    ORDER BY bid_amount DESC 
-                    LIMIT 1";
-            $params = ['auction_id' => $auctionId];
-            $row = $this->db->query($sql, $params)->fetch();
+        $sql = "SELECT * FROM bids 
+                WHERE auction_id = :auction_id 
+                ORDER BY bid_amount DESC 
+                LIMIT 1";
+        $params = ['auction_id' => $auctionId];
+        $row = $this->db->query($sql, $params)->fetch();
 
-            // hydrate will handle the empty row and return null
-            return $this->hydrate($row);
-
-        } catch (PDOException $e) {
-//            error_log($e->getMessage());
-            return null;
-        }
+        // hydrate will handle the empty row and return null
+        return $this->hydrate($row);
     }
 
+    public function getByAuctionId(int $auctionId): array{
+        $sql = "SELECT * FROM bids 
+                WHERE auction_id = :auction_id
+                ";
+        $params = ['auction_id' => $auctionId];
+        $rows = $this->db->query($sql, $params)->fetchAll();
 
+        // Hydrate all rows to objects
+        $objects = [];
+        foreach ($rows as $row) {
+            $objects[] =  $this->hydrate($row);
+        }
+
+        return $objects;
+    }
 
 }
