@@ -62,7 +62,7 @@ class AuthService {
     {
         self::ensureSessionStarted();
         // Check if the key exists first to prevent accessing a non-existent key
-        return ($_SESSION['logged_in'] ?? false) === true;
+        return !empty($_SESSION['logged_in'] ?? false);
     }
 
     // Get the current logged-in user ID from session
@@ -106,9 +106,9 @@ class AuthService {
 
         return [
             'logged_in' => true,
-            'user_id' => $_SESSION['user_id'] ?? null,
-            'email' => $_SESSION['email'] ?? null,
-            'role_names' => $_SESSION['role_names'] ?? []
+            'user_id' => self::getUserId(),
+            'email' => self::getEmail(),
+            'role_names' => self::getRoleNames()
         ];
     }
 
