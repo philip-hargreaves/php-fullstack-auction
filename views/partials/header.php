@@ -23,8 +23,9 @@ if (!isset($_SESSION['role_names'])) {
   <link rel="stylesheet" href="/css/custom.css">
   <title>My Auction Site</title>
 </head>
-<body>
 
+
+<body>
 
 <!-- Navbars -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light mx-2">
@@ -78,7 +79,6 @@ if (!isset($_SESSION['role_names'])) {
   </ul>
 </nav>
 
-
 <!-- Display login error messages -->
 <?php if (isset($_SESSION['login_error'])): ?>
     <div class="alert alert-danger alert-dismissible fade show mx-2 mt-2" role="alert">
@@ -100,7 +100,6 @@ if (!isset($_SESSION['role_names'])) {
     </div>
     <?php unset($_SESSION['login_success']); ?>
 <?php endif; ?>
-
 
 <!-- Login modal -->
 <div class="modal fade" id="loginModal">
@@ -130,3 +129,5 @@ if (!isset($_SESSION['role_names'])) {
     </div>
   </div>
 </div>
+
+<main>

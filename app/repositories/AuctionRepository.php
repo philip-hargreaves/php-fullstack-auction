@@ -38,11 +38,12 @@ class AuctionRepository
 
     public function getById(int $auctionId): ?Auction
     {
-        // Query to get the record
-        $queryRow = "SELECT id, item_id, winning_bid_id, start_datetime, end_datetime, starting_price, reserve_price, auction_status 
-                     FROM auctions
-                     WHERE id = :auction_id";
-        $row = $this->db->query($queryRow, ['auction_id' => $auctionId])->fetch();
+        // Query
+        $sql = "SELECT id, item_id, winning_bid_id, start_datetime, end_datetime, starting_price, reserve_price, auction_status 
+                 FROM auctions
+                 WHERE id = :auction_id";
+        $param = ['auction_id' => $auctionId];
+        $row = $this->db->query($sql, $param)->fetch();
 
         // Check if a record was returned
         if (empty($row)) {
