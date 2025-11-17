@@ -235,8 +235,6 @@
 <?php require \infrastructure\Utilities::basePath('views/partials/footer.php'); ?>
 
 <script>
-    // JavaScript functions: addToWatchlist and removeFromWatchlist.
-
     function addToWatchlist(button) {
         console.log("These print statements are helpful for debugging btw");
 
