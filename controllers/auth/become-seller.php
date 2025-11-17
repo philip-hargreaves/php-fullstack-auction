@@ -51,7 +51,7 @@ try {
         exit;
     } else {
         // Upgrade failed - show error
-        $_SESSION['upgrade_error'] = $result['errors'][0] ?? 'Failed to upgrade account.';
+        $_SESSION['upgrade_error'] = $result['message'] ?? 'Failed to upgrade account.';
         header('Location: /');
         exit;
     }

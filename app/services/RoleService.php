@@ -24,42 +24,37 @@ class RoleService {
         // Fetch and check user exists
         $user = $this->userRepository->getById($userId);
         if ($user === null) {
-            return $this->fail(['User not found.']);
+            return $this->response('User not found.');
         }
 
         if ($user->isSeller()) {
-            return $this->fail(['You are already a seller!']);
+            return $this->response('You are already a seller!');
         }
 
         // Get seller role from database
         $sellerRole = $this->roleRepository->getByName('seller');
         if ($sellerRole === null) {
-            return $this->fail(['Seller role not found in system. Please contact support.']);
+            return $this->response('Seller role not found in system. Please contact support.');
         }
 
         // Assign seller role
         try {
             $this->userRoleRepository->assignRole($userId, $sellerRole);
 
-            return [
-                'success' => true,
-                'errors'  => [],
-                'message' => 'Congratulations! You are now a seller. You can create auctions and manage your listings.'
-            ];
+            return $this->response('Congratulations! You are now a seller. You can create auctions and manage your listings.', true);
         } catch (\Exception $e) {
             // Log error for debugging
 
-            return $this->fail(['Failed to upgrade account. Please try again later.']);
+            return $this->response('Failed to upgrade account. Please try again later.');
         }
     }
 
-    // Return a failure response
-    private function fail(array $errors): array
+    // Return a response (success or failure)
+    private function response(string $message, bool $isSuccess = false): array
     {
         return [
-            'success' => false,
-            'errors'  => $errors,
-            'message' => null,
+            'success' => $isSuccess,
+            'message' => $message,
         ];
     }
 }
