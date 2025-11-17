@@ -3,20 +3,25 @@ namespace app\services;
 use app\repositories\UserRepository;
 use app\repositories\RoleRepository;
 use app\repositories\UserRoleRepository;
+use infrastructure\Database;
+use infrastructure\Utilities;
 
 class RoleService {
     private RoleRepository $roleRepository;
     private UserRoleRepository $userRoleRepository;
     private UserRepository $userRepository;
+    private Database $db;
 
     public function __construct(
         UserRepository $userRepository,
         RoleRepository $roleRepository,
-        UserRoleRepository $userRoleRepository)
+        UserRoleRepository $userRoleRepository,
+        Database $db)
     {
         $this->userRepository = $userRepository;
         $this->roleRepository = $roleRepository;
         $this->userRoleRepository = $userRoleRepository;
+        $this->db = $db;
     }
 
     public function upgradeToSeller(int $userId): array
@@ -37,13 +42,25 @@ class RoleService {
             return $this->response('Seller role not found in system. Please contact support.');
         }
 
-        // Assign seller role
+        // Get the DB connection
+        $pdo = $this->db->connection;
+
+        // Wrap role assignment in a transaction
         try {
+            Utilities::beginTransaction($pdo);
+
+            // Assign seller role
             $this->userRoleRepository->assignRole($userId, $sellerRole);
 
+            // Commit the transaction
+            $pdo->commit();
+
             return $this->response('Congratulations! You are now a seller. You can create auctions and manage your listings.', true);
-        } catch (\Exception $e) {
-            // Log error for debugging
+        } catch (\Throwable $e) {
+            // Roll back the transaction to avoid partial state
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
 
             return $this->response('Failed to upgrade account. Please try again later.');
         }
