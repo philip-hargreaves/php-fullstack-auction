@@ -83,23 +83,23 @@ class BidRepository
 
     public function getHighestBidByAuctionId(int $auctionId): ?Bid
     {
-        $query = "SELECT * FROM bids 
+        $sql = "SELECT * FROM bids 
                 WHERE auction_id = :auction_id 
                 ORDER BY bid_amount DESC 
                 LIMIT 1";
         $params = ['auction_id' => $auctionId];
-        $row = $this->db->query($query, $params)->fetch();
+        $row = $this->db->query($sql, $params)->fetch();
 
         // hydrate will handle the empty row and return null
         return $this->hydrate($row);
     }
 
     public function getByAuctionId(int $auctionId): array{
-        $query = "SELECT * FROM bids 
+        $sql = "SELECT * FROM bids 
                 WHERE auction_id = :auction_id
                 ";
         $params = ['auction_id' => $auctionId];
-        $rows = $this->db->query($query, $params)->fetchAll();
+        $rows = $this->db->query($sql, $params)->fetchAll();
 
         // Hydrate all rows to objects
         $objects = [];

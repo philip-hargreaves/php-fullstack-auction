@@ -20,14 +20,14 @@ class UserRepository
     public function getByEmail(string $email): ?User
     {
         // *** CHECK ONE QUERY REDUNDANT DATA VS TWO QUERIES WITH NO REDUNDANT DATA ***
-        $query = "SELECT u.id, u.username, u.email, u.password, u.is_active,
+        $sql = "SELECT u.id, u.username, u.email, u.password, u.is_active,
                          r.id AS role_id, r.role_name
                   FROM users u
                   LEFT JOIN user_roles ur ON u.id = ur.user_id
                   LEFT JOIN roles r       ON ur.role_id = r.id
                   WHERE u.email = :email";
-
-        $rows = $this->db->query($query, ['email' => $email])->fetchAll();
+        $param = ['email' => $email];
+        $rows = $this->db->query($sql, $param)->fetchAll();
 
         return empty($rows) ? null : $this->hydrate($rows);
     }
@@ -35,15 +35,15 @@ class UserRepository
     // Find user by id
     public function getById(int $userId): ?User
     {
-        // *** CHECK ONE QUERY W/REDUDANT DATA VS TWO QUERIES WITH NO REDUDANT DATA ***
-        $query = "SELECT u.id, u.username, u.email, u.password, u.is_active,
+        // *** CHECK ONE QUERY REDUNDANT DATA VS TWO QUERIES WITH NO REDUNDANT DATA ***
+        $sql = "SELECT u.id, u.username, u.email, u.password, u.is_active,
                          r.id AS role_id, r.role_name
                   FROM users u
                   LEFT JOIN user_roles ur ON u.id = ur.user_id
                   LEFT JOIN roles r       ON ur.role_id = r.id
                   WHERE u.id = :id";
-
-        $rows = $this->db->query($query, ['id' => $userId])->fetchAll();
+        $param = ['id' => $userId];
+        $rows = $this->db->query($sql, $param)->fetchAll();
 
         return empty($rows) ? null : $this->hydrate($rows);
     }
@@ -51,8 +51,10 @@ class UserRepository
     // Check if user exists by email
     public function existsByEmail(string $email): bool
     {
+        $sql = 'SELECT 1 FROM users WHERE email = :email LIMIT 1';
+        $param = ['email' => $email];
         return $this->db
-                ->query('SELECT 1 FROM users WHERE email = :email LIMIT 1', ['email' => $email])
+                ->query($sql, $param)
                 ->fetchColumn() !== false;
     }
 
@@ -78,13 +80,11 @@ class UserRepository
     public function create(User $user): ?User
     {
         try {
+            $sql = 'INSERT INTO users (username, email, password, is_active)
+                    VALUES (:username, :email, :password, :is_active)';
             $params = $this->extract($user);
 
-            $this->db->query(
-                'INSERT INTO users (username, email, password, is_active)
-             VALUES (:username, :email, :password, :is_active)',
-                $params
-            );
+            $this->db->query($sql, $params);
 
             $user->setUserId((int)$this->db->connection->lastInsertId());
 

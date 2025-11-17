@@ -99,11 +99,11 @@ class BidService
         }
     }
 
-    public function getBidsForAuction($auctionId): array {
+    public function getBidsByAuctionId($auctionId): array {
         return $this->bidRepo->getByAuctionId($auctionId);
     }
 
-    public function getWinningBidForAuction($auctionId): ?Bid {
+    public function getWinningBidByAuctionId($auctionId): ?Bid {
         // Get Auction status
         $auction = $this->auctionRepo->getById($auctionId);
         $isAuctionActive = $auction->getAuctionStatus() == 'Active';

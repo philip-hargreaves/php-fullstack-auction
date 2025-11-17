@@ -1,9 +1,10 @@
 <?php
 use infrastructure\DIContainer;
 use infrastructure\Utilities;
+use infrastructure\Request;
 
 session_start();
-$auctionId = $_GET['auction_id'];
+$auctionId = Request::get('auction_id');
 
 // Dependency Injection
 $bidServ = DIContainer::get('bidServ');
@@ -13,7 +14,7 @@ $userRepo = DIContainer::get('userRepo');
 // Get Auction, Item, and Bids entities
 $auction = $auctionRepo->getById($auctionId);
 $item = $auction->getItem();
-$bids = $bidServ->getBidsForAuction($auctionId);
+$bids = $bidServ->getBidsByAuctionId($auctionId);
 
 // Variables
 $title = $item->getItemName();
@@ -78,7 +79,7 @@ if ($auctionStatus == 'Active') {
 // Session Status
 if ($_SESSION['logged_in']) { // login
     $isLoggedIn = true;
-    $user = $userRepo->findById($_SESSION['user_id']);
+    $user = $userRepo->getById($_SESSION['user_id']);
 
     //$isWatched = WatchlistRepository->getIsWatchedByUserIdAndAuctionId($_SESSION['user_id'], $auction->getAuctionId());
     $isWatched = false;

@@ -37,11 +37,12 @@ class ItemRepository
     }
 
     public function getById(int $itemId): ?Item {
-        // Query to get the record
+        // Query
         $sql = "SELECT id, seller_id, item_name, item_description, item_condition, item_status 
                 FROM items 
                 WHERE id = :item_id";
-        $row = $this->db->query($sql, ['item_id' => $itemId])->fetch();
+        $param = ['item_id' => $itemId];
+        $row = $this->db->query($sql, $param)->fetch();
 
         // Check if a record was returned
         if (empty($row)) {
