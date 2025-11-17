@@ -10,6 +10,7 @@ $auction_id = (int)Request::post('auction_id');
 $user_id = $_SESSION['user_id'] ?? null;
 $errors = [];
 
+
 // 2. RUN VALIDATION (UI & BUSINESS LOGIC)
 // A. Check if user is logged in
 if (!$user_id) {

@@ -1,9 +1,10 @@
 <?php
 use infrastructure\DIContainer;
 use infrastructure\Utilities;
+use infrastructure\Request;
 
 session_start();
-$auctionId = $_GET['auction_id'];
+$auctionId = Request::get('auction_id');
 
 // Dependency Injection
 $bidServ = DIContainer::get('bidServ');
@@ -13,10 +14,7 @@ $userRepo = DIContainer::get('userRepo');
 // Get Auction, Item, and Bids entities
 $auction = $auctionRepo->getById($auctionId);
 $item = $auction->getItem();
-$bids = []; // Get all bids from BidRepo
-
-$itemStatus = $item->getItemStatus();
-$auctionStatus = $auction->getAuctionStatus();
+$bids = $bidServ->getBidsByAuctionId($auctionId);
 
 // Variables
 $title = $item->getItemName();
@@ -26,8 +24,8 @@ $highestBid = $bidServ->getHighestBidByAuctionId($auctionId);
 $startTime = $auction->getStartDateTime();
 $endTime = $auction->getEndDateTime();
 $startingPrice = $auction->getStartingPrice();
-
 $reservePrice = $auction->getReservePrice();
+$itemCondition = $item->getItemCondition();
 $imageUrls = [
     "https://images.shopcdn.co.uk/18/c8/18c8f85f068472284acf4e1b62f8cb16/2048x2048/webp/fit?force=true&quality=80&compression=80",
     "https://images.shopcdn.co.uk/c5/f2/c5f25fda773c2c9a5c70c02003e20476/2048x2048/webp/fit?force=true&quality=80&compression=80",
@@ -45,11 +43,14 @@ $imageUrls = [
     "https://images.shopcdn.co.uk/98/22/98228847b394e80805b907878bbd8ca3/2048x2048/webp/fit?force=true&quality=80&compression=80"
 ];
 
-// Variables changes $auctionStatus
+// Variables changes with $auctionStatus
+$itemStatus = $item->getItemStatus();
+$auctionStatus = $auction->getAuctionStatus();
+$isAuctionActive = $auctionStatus == 'Active';
 $bidText = "";
 $statusText = "";
 $timeRemaining = "";
-
+$winningBid = null;
 
 // Display different data for different $auctionStatus and $itemStatus
 $now = new DateTime();
@@ -65,6 +66,7 @@ if ($auctionStatus == 'Active') {
         $statusText = "This auction ends. The item is sold";
     } else if ($itemStatus == 'Sold') {
         $statusText = "This auction ends. The item is not sold.";
+        $winningBid = $bidServ->getWinningBidForAuction($auctionId);
     } else { //$itemStatus == 'deleted'
         // Jump to 404 not found
     }
@@ -76,15 +78,13 @@ if ($auctionStatus == 'Active') {
 
 // Session Status
 if ($_SESSION['logged_in']) { // login
-
-    $hasSession = true;
+    $isLoggedIn = true;
     $user = $userRepo->getById($_SESSION['user_id']);
 
     //$isWatched = WatchlistRepository->getIsWatchedByUserIdAndAuctionId($_SESSION['user_id'], $auction->getAuctionId());
     $isWatched = false;
 } else { // logout
-    $hasSession = false;
+    $isLoggedIn = false;
 }
-
 
 require Utilities::basePath('views/auction.view.php');
