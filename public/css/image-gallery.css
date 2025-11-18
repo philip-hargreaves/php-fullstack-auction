@@ -17,24 +17,15 @@
 
 .thumbnail-viewport {
     width: 100%;
-    overflow-x: auto; /* Lets the browser handle scrolling */
-    padding: 0 35px; /* Makes space for the buttons */
-    box-sizing: border-box;
-    scroll-behavior: smooth; /* This makes all JS scrolling smooth! */
-
-    /* Hide the scrollbar */
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    overflow-x: auto;
+    padding: 0 35px;
+    scroll-behavior: smooth;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
 
-/* Hide the scrollbar for the original web browser */
 .thumbnail-viewport::-webkit-scrollbar {
     display: none;
-}
-
-#thumbnail-container {
-    /* No transitions needed here anymore */
-    /* The d-flex class is still needed */
 }
 
 .thumb-nav-btn {

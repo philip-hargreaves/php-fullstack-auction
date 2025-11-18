@@ -1,0 +1,110 @@
+/* CSS Variables for global theming */
+:root {
+    /* Background Color Aliases */
+    --alias-color-background-primary-default: #222222;
+    --alias-color-background-secondary-default: #2d2d2d;
+    --alias-color-background-tertiary-default: #404040;
+    
+    /* Text Color Aliases */
+    --alias-color-text-primary-default: #d2d2d2;
+    --alias-color-text-secondary-default: #9c9c9c;
+    
+    /* Typography */
+    --font-family: "Helvetica Neue", Arial, sans-serif;
+    --font-size-base: 16px;
+    --line-height-base: 1.5;
+}
+
+/* Base HTML */
+html {
+    background-color: var(--alias-color-background-primary-default);
+    box-sizing: border-box;
+}
+
+*, *::before, *::after {
+    box-sizing: inherit;
+}
+
+/* Body */
+body {
+    background-color: var(--alias-color-background-primary-default);
+    color: var(--alias-color-text-primary-default);
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-base);
+    margin: 0;
+    padding: 0;
+}
+
+/* Global Typography */
+h1, h2, h3, h4, h5, h6 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+h1 { font-size: 2.5rem; }
+h2 { font-size: 2rem; }
+h3 { font-size: 1.75rem; }
+h4 { font-size: 1.5rem; }
+h5 { font-size: 1.25rem; }
+h6 { font-size: 1rem; }
+
+p {
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+/* Links */
+a {
+    color: var(--alias-color-text-primary-default);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    opacity: 0.9;
+    text-decoration: underline;
+}
+
+a:focus {
+    outline: 2px solid var(--alias-color-text-primary-default);
+    outline-offset: 2px;
+}
+
+/* Lists */
+ul, ol {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    padding-left: 2rem;
+}
+
+/* Images */
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Buttons - Base styles (can be overridden by Bootstrap) */
+button {
+    font-family: inherit;
+}
+
+/* Containers inherit from body */
+.container, .container-fluid {
+    background-color: inherit;
+    color: inherit;
+}
+
+/* Footer */
+footer {
+    background-color: var(--alias-color-background-primary-default);
+    color: var(--alias-color-text-primary-default);
+}
+
+footer p {
+    color: var(--alias-color-text-secondary-default);
+}
+

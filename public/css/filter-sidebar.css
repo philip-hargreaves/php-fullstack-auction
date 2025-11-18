@@ -50,13 +50,13 @@
     font-weight: 600;
 }
 
-.accordion-button:hover,
-.checkbox-label:hover {
+.accordion-button:hover {
+    background-color: #3a3a3a;
     color: #fff;
 }
 
-.accordion-button:hover {
-    background-color: #3a3a3a;
+.checkbox-label:hover {
+    color: #fff;
 }
 
 .accordion-icon {

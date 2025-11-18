@@ -26,9 +26,12 @@ $isSeller = AuthService::hasRole('seller');
     <!-- Bootstrap and FontAwesome CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <!-- Custom CSS files -->
+    <!-- Global CSS - Site-wide styles and variables -->
+    <link rel="stylesheet" href="/css/global.css">
+    <!-- Component-specific CSS files -->
     <link rel="stylesheet" href="/css/custom.css">
     <link rel="stylesheet" href="/css/navbar.css">
+    <link rel="stylesheet" href="/css/filter-sidebar.css">
     <link rel="stylesheet" href="/css/auction-cards.css">
     <link rel="stylesheet" href="/css/image-gallery.css">
     <link rel="stylesheet" href="/css/custom.css">
@@ -84,11 +87,11 @@ $isSeller = AuthService::hasRole('seller');
                         Become a Seller
                     </button>
                 <?php endif; ?>
-                <a href="/notifications" class="nav-button notification-button" style="color: rgb(229, 229, 229) !important; text-decoration: none !important;">
+                <a href="/notifications" class="nav-button notification-button" style="color: var(--alias-color-text-primary-default) !important; text-decoration: none !important;">
                     <i class="fa fa-bell notification-icon"></i>
                 </a>
-                <a href="/account" class="nav-button" style="color: rgb(229, 229, 229) !important; text-decoration: none !important;">Account</a>
-                <a href="/logout" class="nav-button" style="color: rgb(229, 229, 229) !important; text-decoration: none !important;">Logout</a>
+                <a href="/account" class="nav-button" style="color: var(--alias-color-text-primary-default) !important; text-decoration: none !important;">Account</a>
+                <a href="/logout" class="nav-button" style="color: var(--alias-color-text-primary-default) !important; text-decoration: none !important;">Logout</a>
             <?php else: ?>
                 <button type="button" class="nav-button" data-toggle="modal" data-target="#loginModal">Log in</button>
             <?php endif; ?>
