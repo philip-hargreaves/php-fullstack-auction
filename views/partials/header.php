@@ -70,14 +70,8 @@ $isSeller = AuthService::hasRole('seller');
             <?php if ($isSeller): ?>
                 <a href="/my-listings" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/my-listings') !== false ? 'active' : '' ?>">My Listings</a>
                 <a href="/create-auction" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/create-auction') !== false ? 'active' : '' ?>">Create Auction</a>
+                <a href="/watchlist" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/watchlist') !== false ? 'active' : '' ?>">Watchlist</a>
             <?php endif; ?>
-
-      if ($isSeller || $isBuyer) { // TODO: delete isBuyer
-            <a href="/my-listings" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/my-listings') !== false ? 'active' : '' ?>">My Listings</a>
-            <a href="/create-auction" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/create-auction') !== false ? 'active' : '' ?>">Create Auction</a>
-            <?php endif; ?>
-
-            <a href="/watchlist" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/watchlist') !== false ? 'active' : '' ?>">Watchlist</a>
         </div>
         <?php endif; ?>
 
