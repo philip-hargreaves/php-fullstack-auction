@@ -65,6 +65,32 @@ require Utilities::basePath('views/partials/header.php');
                         </div>
                     </div>
 
+                    <!-- Item Status Accordion -->
+                    <div class="filter-section">
+                        <button type="button" class="accordion-button" id="statusAccordion" aria-expanded="true" aria-controls="statusContent">
+                            <span>Item status</span>
+                            <div class="accordion-icon">
+                                <svg width="16" height="16" class="icon-primary" fill-rule="evenodd" viewBox="0 0 24 24"><path d="M13.67,6.45a2.46,2.46,0,0,0-3.42,0l-8,8a1,1,0,0,0,0,1.42,1,1,0,0,0,1.41,0l8-8a.35.35,0,0,1,.58,0l8,8.1a1,1,0,1,0,1.42-1.41Z"></path></svg>
+                            </div>
+                        </button>
+                        <div id="statusContent" class="accordion-content" aria-labelledby="statusAccordion">
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input class="mer-checkbox" type="checkbox" value="active" name="item_status">
+                                    <span class="checkbox-text">Active</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input class="mer-checkbox" type="checkbox" value="completed" name="item_status">
+                                    <span class="checkbox-text">Completed</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input class="mer-checkbox" type="checkbox" value="sold" name="item_status">
+                                    <span class="checkbox-text">Sold</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Price Range Accordion -->
                     <div class="filter-section">
                         <button type="button" class="accordion-button" id="priceAccordion" aria-expanded="true" aria-controls="priceContent">
@@ -250,6 +276,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const categoryAccordion = document.getElementById('categoryAccordion');
     if (categoryAccordion) {
         categoryAccordion.addEventListener('click', function() {
+            const isExpanded = this.getAttribute('aria-expanded') === 'true';
+            this.setAttribute('aria-expanded', !isExpanded);
+        });
+    }
+
+    const statusAccordion = document.getElementById('statusAccordion');
+    if (statusAccordion) {
+        statusAccordion.addEventListener('click', function() {
             const isExpanded = this.getAttribute('aria-expanded') === 'true';
             this.setAttribute('aria-expanded', !isExpanded);
         });
