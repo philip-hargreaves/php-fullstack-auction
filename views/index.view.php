@@ -68,7 +68,7 @@ require Utilities::basePath('views/partials/header.php');
                     <div class="auction-card card h-100">
                         <div class="auction-image-container">
                             <a href="/auction?auction_id=2222">
-                                <img src="https://via.placeholder.com/300x200.png?text=<?= urlencode($auction['title']) ?>" 
+                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Crect width='300' height='200' fill='%23e0e0e0'/%3E%3C/svg%3E" 
                                      alt="<?= htmlspecialchars($auction['title']) ?>" 
                                      class="auction-image card-img-top">
                             </a>
