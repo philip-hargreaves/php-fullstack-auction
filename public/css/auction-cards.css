@@ -1,3 +1,86 @@
+/* Sort Dropdown */
+.sort-dropdown {
+    position: relative;
+}
+
+.sort-button {
+    background: none;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 4px 4px 32px;
+    cursor: default;
+    display: block;
+    position: relative;
+    color: rgb(218, 62, 80);
+    font-size: 16px;
+    font-weight: 400;
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+    line-height: 22.4px;
+    text-align: left;
+    height: 32.9924px;
+    min-width: 155.994px;
+}
+
+.sort-button:hover {
+    opacity: 0.8;
+}
+
+.sort-icon {
+    position: absolute;
+    left: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    fill: rgb(218, 62, 80);
+}
+
+.sort-text {
+    font-size: 16px;
+    display: inline-block;
+}
+
+.sort-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 4px;
+    background-color: #4a4a4a;
+    border-radius: 4px;
+    min-width: 180px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.sort-dropdown.active .sort-menu {
+    display: block;
+}
+
+.sort-menu form {
+    display: flex;
+    flex-direction: column;
+}
+
+.sort-option {
+    background: none;
+    border: none;
+    padding: 10px 16px;
+    text-align: left;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.2s;
+}
+
+.sort-option:hover {
+    background-color: #5a5a5a;
+}
+
+.sort-option.active {
+    background-color: #0066cc;
+}
+
 /* Auction Gallery Layout */
 .auction-gallery {
     margin: 0 -10px;
@@ -21,7 +104,6 @@
 .auction-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    text-decoration: none;
 }
 
 .auction-image-container {
@@ -139,12 +221,6 @@
 }
 
 /* Responsive adjustments */
-@media (max-width: 992px) {
-    .auction-gallery > div {
-        flex: 0 0 25%;
-        max-width: 25%;
-    }
-}
 
 @media (max-width: 768px) {
     .auction-gallery > div {

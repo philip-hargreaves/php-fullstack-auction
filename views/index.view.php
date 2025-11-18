@@ -10,58 +10,27 @@ require Utilities::basePath('views/partials/header.php');
  */
 ?>
 
-    <!-- Browsing -->
-    <div class="container">
-        <h2 class="my-3">Browse listings</h2>
-        <div id="searchSpecs">
-            <form method="get" action="index.php">
-                <div class="row">
-                    <div class="col-md-5 pr-0">
-                        <div class="form-group">
-                            <label for="keyword" class="sr-only">Search keyword:</label>
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                            <span class="input-group-text bg-transparent pr-0 text-muted">
-                              <i class="fa fa-search"></i>
-                            </span>
-                                </div>
-                                <input type="text" class="form-control border-left-0" id="keyword" name="keyword" placeholder="Search for anything">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3 pr-0">
-                        <div class="form-group">
-                            <label for="cat" class="sr-only">Search within:</label>
-                            <select class="form-control" id="cat" name="cat">
-                                <option selected value="all">All categories</option>
-                                <option value="fill">Fill me in</option>
-                                <option value="with">with options</option>
-                                <option value="populated">populated from a database?</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-3 pr-0">
-                        <div class="form-inline">
-                            <label class="mx-2" for="order_by">Sort by:</label>
-                            <select class="form-control" id="order_by" name="order_by">
-                                <option selected value="pricelow">Price (low to high)</option>
-                                <option value="pricehigh">Price (high to low)</option>
-                                <option value="date">Soonest expiry</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-1 px-0">
-                        <button type="submit" class="btn btn-primary">Search</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-    <!-- Browsing -->
-
-
     <!-- Listings Gallery -->
     <div class="container mt-5">
+        <div class="d-flex justify-content-end mb-3">
+            <div class="sort-dropdown">
+                <button type="button" class="sort-button" id="sortButton">
+                    <svg width="20" height="20" class="sort-icon" fill-rule="evenodd" viewBox="0 0 24 24">
+                        <path d="M7.75,5.34A1.16,1.16,0,0,0,7,5l-.1,0L6.8,5a1.24,1.24,0,0,0-.74.32L3.21,8.13a.7.7,0,0,0,0,1,.7.7,0,0,0,.5.21.67.67,0,0,0,.49-.2l2-2V18.3a.7.7,0,1,0,1.4,0V7.16l2,1.94a.7.7,0,0,0,1,0,.71.71,0,0,0,0-1Z"></path>
+                        <path d="M20.8,14.88a.7.7,0,0,0-1,0l-2,2V5.7a.7.7,0,1,0-1.4,0V16.84l-2-1.95a.7.7,0,0,0-1,1l2.83,2.76a1.28,1.28,0,0,0,.62.3.85.85,0,0,0,.22,0,.6.6,0,0,0,.24-.05,1.2,1.2,0,0,0,.61-.29l2.85-2.79A.7.7,0,0,0,20.8,14.88Z"></path>
+                    </svg>
+                    <span class="sort-text">Newest</span>
+                </button>
+                <div class="sort-menu" id="sortMenu">
+                    <form method="get" action="index.php">
+                        <button type="submit" name="order_by" value="recommended" class="sort-option">Recommended order</button>
+                        <button type="submit" name="order_by" value="date" class="sort-option active">Newest</button>
+                        <button type="submit" name="order_by" value="pricelow" class="sort-option">Lowest price first</button>
+                        <button type="submit" name="order_by" value="pricehigh" class="sort-option">Highest price first</button>
+                    </form>
+                </div>
+            </div>
+        </div>
         <div class="row auction-gallery">
             <?php foreach ($dummy_auctions as $auction): ?>
                 <div class="mb-4">
@@ -143,4 +112,48 @@ require Utilities::basePath('views/partials/header.php');
         </ul>
     </nav>
     <!-- Pagination -->
-        <?php require Utilities::basePath('views/partials/footer.php'); ?>
+            <?php require Utilities::basePath('views/partials/footer.php'); ?>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const sortButton = document.getElementById('sortButton');
+    const sortMenu = document.getElementById('sortMenu');
+    const sortDropdown = document.querySelector('.sort-dropdown');
+    const sortText = document.querySelector('.sort-text');
+    
+    // Get current sort option from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentSort = urlParams.get('order_by') || 'date';
+    
+    // Update sort text based on current selection
+    const sortLabels = {
+        'recommended': 'Recommended order',
+        'date': 'Newest',
+        'pricelow': 'Lowest price first',
+        'pricehigh': 'Highest price first'
+    };
+    
+    if (sortLabels[currentSort]) {
+        sortText.textContent = sortLabels[currentSort];
+    }
+    
+    // Mark active option
+    const activeOption = sortMenu.querySelector(`button[value="${currentSort}"]`);
+    if (activeOption) {
+        activeOption.classList.add('active');
+    }
+    
+    // Toggle dropdown
+    sortButton.addEventListener('click', function(e) {
+        e.stopPropagation();
+        sortDropdown.classList.toggle('active');
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!sortDropdown.contains(e.target)) {
+            sortDropdown.classList.remove('active');
+        }
+    });
+});
+</script>
