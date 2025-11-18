@@ -60,28 +60,46 @@ require Utilities::basePath('views/partials/header.php');
     <!-- Browsing -->
 
 
-    <!-- Listings -->
+    <!-- Listings Gallery -->
     <div class="container mt-5">
-    <ul class="list-group">
-        <?php foreach ($dummy_auctions as $auction): ?>
-            <li class="list-group-item d-flex justify-content-between">
-                <div class="p-2 mr-5">
-<!--                    <h5><a href="../listing?item_id=--><?php //echo $auction['item_id']; ?><!--">-->
-                        <h5><a href="../auction?auction_id=2222">
-                            <?php echo $auction['title']; ?>
-                        </a></h5>
-                        <?php echo $auction['description_short']; // We will create this in the controller ?>
+        <div class="row auction-gallery">
+            <?php foreach ($dummy_auctions as $auction): ?>
+                <div class="mb-4">
+                    <div class="auction-card card h-100">
+                        <div class="auction-image-container">
+                            <a href="/auction?auction_id=2222">
+                                <img src="https://via.placeholder.com/300x200.png?text=<?= urlencode($auction['title']) ?>" 
+                                     alt="<?= htmlspecialchars($auction['title']) ?>" 
+                                     class="auction-image card-img-top">
+                            </a>
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-start mb-0">
+                                <h6 class="card-title mb-0">
+                                    <a href="/auction?auction_id=2222" class="text-decoration-none">
+                                        <?= htmlspecialchars($auction['title']) ?>
+                                    </a>
+                                </h6>
+                                <div class="auction-info small text-muted">
+                                    <?= htmlspecialchars($auction['bid_text']) ?>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-end">
+                                <div class="auction-price">
+                                    <span class="price-amount">£<?= number_format($auction['current_price'], 2) ?></span>
+                                </div>
+                                <div class="auction-time">
+                                    <i class="fa fa-clock-o" aria-hidden="true"></i>
+                                    <span><?= htmlspecialchars($auction['time_remaining']) ?></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="text-center text-nowrap">
-                    <span style="font-size: 1.5em">£<?php echo number_format($auction['current_price'], 2); ?></span><br/>
-                    <?php echo $auction['bid_text']; // We will create this in the controller ?>
-                    <br/>
-                    <?php echo $auction['time_remaining']; // We will create this in the controller ?>
-                </div>
-            </li>
-        <?php endforeach; ?>
-    </ul>
-    <!-- Listings -->
+            <?php endforeach; ?>
+        </div>
+    </div>
+    <!-- Listings Gallery -->
 
     <!-- Pagination -->
     <nav aria-label="Search results pages" class="mt-5">
