@@ -75,11 +75,16 @@ require Utilities::basePath('views/partials/header.php');
                         </div>
                         <div class="card-body d-flex flex-column">
                             <div class="d-flex justify-content-between align-items-start mb-0">
-                                <h6 class="card-title mb-0">
-                                    <a href="/auction?auction_id=2222" class="text-decoration-none">
-                                        <?= htmlspecialchars($auction['title']) ?>
-                                    </a>
-                                </h6>
+                                <div>
+                                    <h6 class="card-title mb-0">
+                                        <a href="/auction?auction_id=2222" class="text-decoration-none">
+                                            <?= htmlspecialchars($auction['title']) ?>
+                                        </a>
+                                    </h6>
+                                    <?php if (isset($auction['condition'])): ?>
+                                        <div class="auction-condition"><?= htmlspecialchars($auction['condition']) ?></div>
+                                    <?php endif; ?>
+                                </div>
                                 <div class="auction-info small text-muted">
                                     <?= htmlspecialchars($auction['bid_text']) ?>
                                 </div>
