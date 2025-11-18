@@ -26,9 +26,10 @@ $isSeller = AuthService::hasRole('seller');
     <!-- Bootstrap and FontAwesome CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <!-- Custom CSS file -->
+    <!-- Custom CSS files -->
     <link rel="stylesheet" href="/css/custom.css">
     <link rel="stylesheet" href="/css/navbar.css">
+    <link rel="stylesheet" href="/css/auction-cards.css">
     <link rel="stylesheet" href="/css/image-gallery.css">
     <link rel="stylesheet" href="/css/custom.css">
     <title>My Auction Site</title>
