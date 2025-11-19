@@ -1,0 +1,125 @@
+/* Card styling */
+.container .card {
+    background-color: var(--color-background-primary);
+    border: 1px solid #3a3a3a;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.container .card-body {
+    background-color: var(--color-background-primary);
+    color: var(--color-text-primary);
+    padding: 2rem;
+}
+
+/* Heading */
+.container h2 {
+    color: var(--color-text-primary);
+}
+
+/* Form labels */
+.container .col-form-label {
+    color: var(--color-text-primary);
+    font-weight: 500;
+}
+
+/* Form controls */
+.container .form-control {
+    background-color: var(--color-background-secondary);
+    border: 1px solid #4a4a4a;
+    color: var(--color-text-primary);
+    border-radius: 4px;
+}
+
+.container .form-control:focus {
+    background-color: var(--color-background-secondary);
+    border-color: var(--color-auctivity-red);
+    color: var(--color-text-primary);
+    box-shadow: 0 0 0 0.2rem rgba(218, 62, 80, 0.25);
+}
+
+.container .form-control::placeholder {
+    color: var(--color-text-secondary);
+    opacity: 0.7;
+}
+
+/* Input group text (currency symbol) */
+.container .input-group-text {
+    background-color: var(--color-background-secondary);
+    border: 1px solid #4a4a4a;
+    color: var(--color-text-primary);
+    border-right: none;
+}
+
+.container .input-group > .form-control {
+    border-left: none;
+}
+
+.container .input-group > .form-control:focus {
+    border-left: 1px solid var(--color-auctivity-red);
+}
+
+/* Select dropdown */
+.container select.form-control {
+    background-color: var(--color-background-secondary);
+    color: var(--color-text-primary);
+}
+
+.container select.form-control option {
+    background-color: var(--color-background-primary);
+    color: var(--color-text-primary);
+}
+
+/* Textarea */
+.container textarea.form-control {
+    background-color: var(--color-background-secondary);
+    color: var(--color-text-primary);
+    resize: vertical;
+}
+
+/* Help text */
+.container .form-text.text-muted {
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+}
+
+/* Required field indicators */
+.container .text-danger {
+    color: var(--color-auctivity-red) !important;
+}
+
+/* Submit button */
+.container .btn-primary {
+    background-color: var(--color-auctivity-red);
+    border-color: var(--color-auctivity-red);
+    color: #fff;
+    font-weight: 600;
+    padding: 0.75rem;
+    margin-top: 1rem;
+    transition: background-color 0.2s, border-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.5;
+}
+
+.container .btn-primary:hover {
+    background-color: rgb(200, 50, 70);
+    border-color: rgb(200, 50, 70);
+    color: #fff;
+}
+
+.container .btn-primary:focus {
+    background-color: var(--color-auctivity-red);
+    border-color: var(--color-auctivity-red);
+    box-shadow: 0 0 0 0.2rem rgba(218, 62, 80, 0.5);
+    color: #fff;
+}
+
+.container .btn-primary:active {
+    background-color: rgb(190, 45, 65);
+    border-color: rgb(190, 45, 65);
+    color: #fff;
+}
+
