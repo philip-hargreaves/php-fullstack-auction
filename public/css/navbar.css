@@ -1,3 +1,4 @@
+/* --- Page Header Container --- */
 .page-header {
     background-color: var(--alias-color-background-primary-default);
     display: block;
@@ -49,6 +50,7 @@
     flex-shrink: 0;
 }
 
+/* --- Search Bar Elements --- */
 .search-container {
     display: flex;
     align-items: center;
@@ -96,8 +98,23 @@
     margin-left: 8px;
     width: 24px;
     height: 24px;
+    transition: opacity 0.2s;
 }
 
+.search-button:hover,
+.search-button:focus {
+    opacity: 0.7;
+    outline: none;
+}
+
+.search-icon {
+    font-size: 18px;
+    color: var(--alias-color-text-secondary-default);
+    font-weight: 250;
+}
+
+
+/* --- Nav Button (Generic, used for non-link buttons) --- */
 .nav-button {
     background: none;
     border: none;
@@ -106,12 +123,17 @@
     cursor: pointer;
     padding: 8px 12px;
     text-decoration: none;
+    transition: opacity 0.2s, background-color 0.2s;
 }
 
-.nav-button:hover {
+.nav-button:hover,
+.nav-button:focus {
     opacity: 0.7;
+    text-decoration: none;
 }
 
+
+/* --- Top Nav Link (Used for primary middle navigation) --- */
 .top-nav-link {
     color: var(--alias-color-text-primary-default);
     cursor: pointer;
@@ -124,7 +146,6 @@
     padding: 0 12px;
     text-align: center;
     text-decoration: none;
-    border-bottom: 2px solid transparent;
     border-radius: 4px;
     white-space: nowrap;
     transition: color 0.2s, border-color 0.2s, background-color 0.2s;
@@ -133,25 +154,41 @@
 }
 
 .top-nav-link:hover,
-.top-nav-link.active:hover {
-    background-color: var(--alias-color-background-secondary-default);
+.top-nav-link:focus {
+    text-decoration: none;
+    color: #cccccc;
+    background-color: rgba(255, 255, 255, 0.1);
+    outline: none;
 }
 
+/* --- Active/Entered Tab State --- */
 .top-nav-link.active {
-    border-bottom: none;
+    color: rgb(218, 62, 80);
+    text-decoration: none;
+    background-color: transparent;
 }
 
 .top-nav-link.active::after {
     content: '';
     position: absolute;
     bottom: 0;
-    left: -4px;
-    right: 0;
+    left: -6px;
+    right: -6px;
     height: 3px;
-    background-color: var(--alias-color-text-primary-default);
-    width: calc(100% + 8px);
+    background-color: rgb(218, 62, 80);
+    border-radius: 2px;
+    transition: width 0.3s ease, left 0.3s ease;
 }
 
+.top-nav-link.active:hover,
+.top-nav-link.active:focus {
+    color: rgb(218, 62, 80);
+    background-color: transparent;
+    opacity: 1;
+}
+
+
+/* --- Logo Elements --- */
 .logo-link {
     text-decoration: none;
     color: var(--alias-color-text-primary-default);
@@ -159,10 +196,13 @@
     align-items: center;
     flex-shrink: 0;
     padding-left: 20px;
+    transition: opacity 0.2s;
 }
 
+.logo-link:hover,
 .logo-link:focus {
-    outline: none;
+    text-decoration: none;
+    opacity: 0.8;
 }
 
 .logo-icon {
@@ -182,16 +222,22 @@
     color: var(--alias-color-text-primary-default);
 }
 
-.search-icon {
-    font-size: 18px;
-    color: var(--alias-color-text-secondary-default);
-    font-weight: 250;
-}
-
+/* --- Notification Button --- */
 .notification-button {
     padding: 8px;
     display: flex;
     align-items: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--alias-color-text-primary-default);
+    transition: opacity 0.2s;
+}
+
+.notification-button:hover,
+.notification-button:focus {
+    opacity: 0.7;
+    outline: none;
 }
 
 .notification-icon {

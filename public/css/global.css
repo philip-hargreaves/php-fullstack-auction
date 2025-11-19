@@ -56,22 +56,6 @@ p {
     margin-bottom: 1rem;
 }
 
-/* Links */
-a {
-    color: var(--alias-color-text-primary-default);
-    text-decoration: none;
-    transition: color 0.2s ease;
-}
-
-a:hover {
-    opacity: 0.9;
-    text-decoration: underline;
-}
-
-a:focus {
-    outline: 2px solid var(--alias-color-text-primary-default);
-    outline-offset: 2px;
-}
 
 /* Lists */
 ul, ol {
