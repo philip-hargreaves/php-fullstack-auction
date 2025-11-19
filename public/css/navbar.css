@@ -1,6 +1,6 @@
 /* --- Page Header Container --- */
 .page-header {
-    background-color: var(--alias-color-background-primary-default);
+    background-color: var(--color-background-primary);
     display: block;
     font-family: var(--font-family);
     font-size: 15px;
@@ -11,7 +11,7 @@
     top: 0;
     z-index: 1200;
     width: 100%;
-    color: var(--alias-color-text-primary-default);
+    color: var(--color-text-primary);
     border-bottom: 1px solid #3a3a3a;
 }
 
@@ -54,7 +54,7 @@
 .search-container {
     display: flex;
     align-items: center;
-    background: var(--alias-color-background-secondary-default);
+    background: var(--color-background-secondary);
     border: 1px solid #444444;
     border-radius: 4px;
     padding: 6px 12px;
@@ -77,7 +77,7 @@
     line-height: 22.4px;
     padding: 0;
     background-color: transparent;
-    color: var(--alias-color-text-primary-default);
+    color: var(--color-text-primary);
     height: 34px;
     width: 100%;
 }
@@ -89,7 +89,7 @@
 .search-button {
     background: none;
     border: none;
-    color: var(--alias-color-text-secondary-default);
+    color: var(--color-text-secondary);
     cursor: pointer;
     padding: 0;
     display: flex;
@@ -109,7 +109,7 @@
 
 .search-icon {
     font-size: 18px;
-    color: var(--alias-color-text-secondary-default);
+    color: var(--color-text-secondary);
     font-weight: 250;
 }
 
@@ -118,7 +118,7 @@
 .nav-button {
     background: none;
     border: none;
-    color: var(--alias-color-text-primary-default);
+    color: var(--color-text-primary);
     font-size: 15px;
     cursor: pointer;
     padding: 8px 12px;
@@ -135,7 +135,7 @@
 
 /* --- Top Nav Link (Used for primary middle navigation) --- */
 .top-nav-link {
-    color: var(--alias-color-text-primary-default);
+    color: var(--color-text-primary);
     cursor: pointer;
     display: inline-flex;
     align-items: center;
@@ -163,7 +163,7 @@
 
 /* --- Active/Entered Tab State --- */
 .top-nav-link.active {
-    color: rgb(218, 62, 80);
+    color: var(--color-auctivity-red);
     text-decoration: none;
     background-color: transparent;
 }
@@ -175,14 +175,14 @@
     left: -6px;
     right: -6px;
     height: 3px;
-    background-color: rgb(218, 62, 80);
+    background-color: var(--color-auctivity-red);
     border-radius: 2px;
     transition: width 0.3s ease, left 0.3s ease;
 }
 
 .top-nav-link.active:hover,
 .top-nav-link.active:focus {
-    color: rgb(218, 62, 80);
+    color: var(--color-auctivity-red);
     background-color: transparent;
     opacity: 1;
 }
@@ -191,7 +191,7 @@
 /* --- Logo Elements --- */
 .logo-link {
     text-decoration: none;
-    color: var(--alias-color-text-primary-default);
+    color: var(--color-text-primary);
     display: flex;
     align-items: center;
     flex-shrink: 0;
@@ -219,7 +219,7 @@
     font-size: 18px;
     line-height: 21px;
     text-transform: lowercase;
-    color: var(--alias-color-text-primary-default);
+    color: var(--color-text-primary);
 }
 
 /* --- Notification Button --- */
@@ -230,7 +230,7 @@
     background: none;
     border: none;
     cursor: pointer;
-    color: var(--alias-color-text-primary-default);
+    color: var(--color-text-primary);
     transition: opacity 0.2s;
 }
 

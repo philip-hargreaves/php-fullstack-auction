@@ -1,6 +1,6 @@
 /* Filter Sidebar */
 .filter-sidebar {
-    background-color: var(--alias-color-background-primary-default);
+    background-color: var(--color-background-primary);
     border-radius: 0;
     padding: 0;
     flex-shrink: 0;
@@ -26,13 +26,13 @@
 }
 
 .filter-select {
-    background-color: var(--alias-color-background-primary-default);
+    background-color: var(--color-background-primary);
 }
 
 .filter-select:focus,
 .price-input:focus {
     outline: none;
-    border-color: var(--alias-color-text-primary-default);
+    border-color: var(--color-text-primary);
 }
 
 /* Accordion */
@@ -101,7 +101,7 @@
     height: 18px;
     margin-right: 10px;
     cursor: pointer;
-    accent-color: var(--alias-color-text-primary-default);
+    accent-color: var(--color-text-primary);
 }
 
 .checkbox-text {

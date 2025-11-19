@@ -32,6 +32,7 @@ $isSeller = AuthService::hasRole('seller');
     <link rel="stylesheet" href="/css/auction-cards.css">
     <link rel="stylesheet" href="/css/image-gallery.css">
     <link rel="stylesheet" href="/css/custom.css">
+    <link rel="stylesheet" href="/css/pagination.css">
     <title>My Auction Site</title>
 </head>
 <body>
@@ -80,15 +81,15 @@ $isSeller = AuthService::hasRole('seller');
         <div class="right-section">
             <?php if ($isLoggedIn): ?>
                 <?php if (!$isSeller): ?>
-                    <button type="button" class="nav-button" data-toggle="modal" data-target="#becomeSellerModal" style="background-color: rgb(218, 62, 80); color: white; border: none; border-radius: 4px; padding: 8px 16px; font-weight: 500; transition: opacity 0.2s;">
+                    <button type="button" class="nav-button" data-toggle="modal" data-target="#becomeSellerModal" style="background-color: var(--color-auctivity-red); color: white; border: none; border-radius: 4px; padding: 8px 16px; font-weight: 500; transition: opacity 0.2s;">
                         Become a Seller
                     </button>
                 <?php endif; ?>
-                <a href="/notifications" class="nav-button notification-button" style="color: var(--alias-color-text-primary-default) !important; text-decoration: none !important;">
+                <a href="/notifications" class="nav-button notification-button" style="color: var(--color-text-primary) !important; text-decoration: none !important;">
                     <i class="fa fa-bell notification-icon"></i>
                 </a>
-                <a href="/account" class="nav-button" style="color: var(--alias-color-text-primary-default) !important; text-decoration: none !important;">Account</a>
-                <a href="/logout" class="nav-button" style="color: var(--alias-color-text-primary-default) !important; text-decoration: none !important;">Logout</a>
+                <a href="/account" class="nav-button" style="color: var(--color-text-primary) !important; text-decoration: none !important;">Account</a>
+                <a href="/logout" class="nav-button" style="color: var(--color-text-primary) !important; text-decoration: none !important;">Logout</a>
             <?php else: ?>
                 <button type="button" class="nav-button" data-toggle="modal" data-target="#loginModal">Log in</button>
             <?php endif; ?>

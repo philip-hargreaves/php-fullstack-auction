@@ -1,13 +1,16 @@
 /* CSS Variables for global theming */
 :root {
     /* Background Color Aliases */
-    --alias-color-background-primary-default: #222222;
-    --alias-color-background-secondary-default: #2d2d2d;
-    --alias-color-background-tertiary-default: #404040;
+    --color-background-primary: #222222;
+    --color-background-secondary: #2d2d2d;
+    --color-background-tertiary: #404040;
     
     /* Text Color Aliases */
-    --alias-color-text-primary-default: #d2d2d2;
-    --alias-color-text-secondary-default: #9c9c9c;
+    --color-text-primary: #d2d2d2;
+    --color-text-secondary: #9c9c9c;
+    
+    /* Brand Colors */
+    --color-auctivity-red: rgb(218, 62, 80);
     
     /* Typography */
     --font-family: "Helvetica Neue", Arial, sans-serif;
@@ -17,7 +20,7 @@
 
 /* Base HTML */
 html {
-    background-color: var(--alias-color-background-primary-default);
+    background-color: var(--color-background-primary);
     box-sizing: border-box;
 }
 
@@ -27,8 +30,8 @@ html {
 
 /* Body */
 body {
-    background-color: var(--alias-color-background-primary-default);
-    color: var(--alias-color-text-primary-default);
+    background-color: var(--color-background-primary);
+    color: var(--color-text-primary);
     font-family: var(--font-family);
     font-size: var(--font-size-base);
     line-height: var(--line-height-base);
@@ -84,11 +87,17 @@ button {
 
 /* Footer */
 footer {
-    background-color: var(--alias-color-background-primary-default);
-    color: var(--alias-color-text-primary-default);
+    background-color: var(--color-background-primary);
+    color: var(--color-text-primary);
 }
 
 footer p {
-    color: var(--alias-color-text-secondary-default);
+    color: var(--color-text-secondary);
+}
+
+/* Override Bootstrap red/danger colors with Auctivity brand red */
+:root {
+    --red: var(--color-auctivity-red);
+    --danger: var(--color-auctivity-red);
 }
 
