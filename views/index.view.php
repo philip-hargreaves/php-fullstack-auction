@@ -124,6 +124,7 @@ require Utilities::basePath('views/partials/header.php');
                             <form method="get" action="index.php">
                                 <button type="submit" name="order_by" value="recommended" class="sort-option">Recommended order</button>
                                 <button type="submit" name="order_by" value="date" class="sort-option active">Newest</button>
+                                <button type="submit" name="order_by" value="ending_soonest" class="sort-option">Ending Soonest</button>
                                 <button type="submit" name="order_by" value="pricelow" class="sort-option">Lowest price first</button>
                                 <button type="submit" name="order_by" value="pricehigh" class="sort-option">Highest price first</button>
                             </form>
@@ -263,6 +264,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const sortLabels = {
         'recommended': 'Recommended order',
         'date': 'Newest',
+        'ending_soonest': 'Ending Soonest',
         'pricelow': 'Lowest price first',
         'pricehigh': 'Highest price first'
     };
