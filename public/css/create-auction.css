@@ -1,9 +1,12 @@
-/* Card styling */
+/* Create Auction Form - Dark Theme Styling */
+
+/* Card styling for create auction form */
 .container .card {
     background-color: var(--color-background-primary);
     border: 1px solid #3a3a3a;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    color: var(--color-text-primary);
 }
 
 .container .card-body {
@@ -89,8 +92,8 @@
     color: var(--color-auctivity-red) !important;
 }
 
-/* Submit button */
-.container .btn-primary {
+/* Submit button with flex centering */
+.container .btn-primary.form-control {
     background-color: var(--color-auctivity-red);
     border-color: var(--color-auctivity-red);
     color: #fff;
@@ -104,20 +107,20 @@
     line-height: 1.5;
 }
 
-.container .btn-primary:hover {
+.container .btn-primary.form-control:hover {
     background-color: rgb(200, 50, 70);
     border-color: rgb(200, 50, 70);
     color: #fff;
 }
 
-.container .btn-primary:focus {
+.container .btn-primary.form-control:focus {
     background-color: var(--color-auctivity-red);
     border-color: var(--color-auctivity-red);
     box-shadow: 0 0 0 0.2rem rgba(218, 62, 80, 0.5);
     color: #fff;
 }
 
-.container .btn-primary:active {
+.container .btn-primary.form-control:active {
     background-color: rgb(190, 45, 65);
     border-color: rgb(190, 45, 65);
     color: #fff;

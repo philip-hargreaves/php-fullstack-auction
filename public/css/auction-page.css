@@ -1,4 +1,4 @@
-/* Auction Page - Dark Theme Styling */
+/* Auction Page - Dark Theme Styling (for viewing auction listings) */
 
 /* Override card backgrounds */
 .container .card {
@@ -9,8 +9,6 @@
 
 .container .card.bg-light {
     background-color: var(--color-background-primary) !important;
-    border: 1px solid #3a3a3a;
-    color: var(--color-text-primary);
 }
 
 /* Headings */
@@ -57,9 +55,11 @@
     opacity: 0.7;
 }
 
+
 .container .form-label {
     color: var(--color-text-primary);
 }
+
 
 /* Input group text */
 .container .input-group-text {
@@ -68,11 +68,13 @@
     color: var(--color-text-primary);
 }
 
+
 /* Buttons */
 .container .btn-primary {
     background-color: var(--color-auctivity-red);
     border-color: var(--color-auctivity-red);
     color: #fff;
+    transition: background-color 0.2s, border-color 0.2s;
 }
 
 .container .btn-primary:hover {
@@ -88,15 +90,96 @@
     color: #fff;
 }
 
+.container .btn-primary:active {
+    background-color: rgb(190, 45, 65);
+    border-color: rgb(190, 45, 65);
+    color: #fff;
+}
+
+
 .container .btn-outline-primary {
-    border-color: var(--color-auctivity-red);
-    color: var(--color-auctivity-red);
+    border-color: #3a3a3a;
+    color: var(--color-text-primary);
+    background-color: var(--color-background-secondary);
+    transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .container .btn-outline-primary:hover {
-    background-color: var(--color-auctivity-red);
-    border-color: var(--color-auctivity-red);
-    color: #fff;
+    background-color: var(--color-background-tertiary);
+    border-color: #4a4a4a;
+    color: var(--color-text-primary);
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.container .btn-outline-primary:focus {
+    background-color: var(--color-background-tertiary);
+    border-color: #4a4a4a;
+    color: var(--color-text-primary);
+    box-shadow: 0 0 0 0.2rem rgba(210, 210, 210, 0.25), 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.container .btn-outline-primary:active {
+    background-color: var(--color-background-primary);
+    transform: scale(0.98);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Image gallery navigation buttons - filled/shaded styling */
+#prev-image,
+#next-image,
+#thumb-prev,
+#thumb-next {
+    background-color: var(--color-background-secondary) !important;
+    border: 1px solid #3a3a3a !important;
+    color: var(--color-text-primary) !important;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 18px;
+    transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+#prev-image:hover,
+#next-image:hover,
+#thumb-prev:hover,
+#thumb-next:hover {
+    background-color: var(--color-background-tertiary) !important;
+    border-color: #4a4a4a !important;
+    color: var(--color-text-primary) !important;
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+#prev-image:focus,
+#next-image:focus,
+#thumb-prev:focus,
+#thumb-next:focus {
+    background-color: var(--color-background-tertiary) !important;
+    border-color: #4a4a4a !important;
+    color: var(--color-text-primary) !important;
+    box-shadow: 0 0 0 0.2rem rgba(210, 210, 210, 0.25), 0 4px 8px rgba(0, 0, 0, 0.4);
+    outline: none;
+}
+
+#prev-image:active,
+#next-image:active,
+#thumb-prev:active,
+#thumb-next:active {
+    background-color: var(--color-background-primary) !important;
+    transform: scale(0.98);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+#thumb-prev,
+#thumb-next {
+    min-width: 40px;
+    min-height: 40px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .container .btn-outline-secondary {
@@ -144,17 +227,12 @@
     background-color: var(--color-background-primary);
 }
 
-.container .table thead th {
+.container .table thead th,
+.container .table thead.thead-dark th {
     background-color: var(--color-background-secondary);
     border-color: #4a4a4a;
     color: var(--color-text-primary);
     font-weight: 600;
-}
-
-.container .table thead.thead-dark th {
-    background-color: var(--color-background-secondary) !important;
-    color: var(--color-text-primary) !important;
-    border-color: #4a4a4a;
 }
 
 .container .table td,
@@ -176,11 +254,7 @@
     color: var(--color-text-primary);
 }
 
-.container .table-success {
-    background-color: rgba(40, 167, 69, 0.2);
-    color: var(--color-text-primary);
-}
-
+.container .table-success,
 .container .table-success td,
 .container .table-success th {
     background-color: rgba(40, 167, 69, 0.2);
