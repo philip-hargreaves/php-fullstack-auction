@@ -16,9 +16,9 @@
   padding: 0.5rem 0.75rem;
   margin-left: -1px;
   line-height: 1.25;
-  color: #007bff;
-  background-color: #fff;
-  border: 1px solid #dee2e6;
+  color: var(--color-text-primary);
+  background-color: var(--color-background-secondary);
+  border: 1px solid #4a4a4a;
   text-align: center;
   min-width: 2.5rem;
   min-height: 2.5rem;
@@ -29,6 +29,7 @@
 .page-link .fa {
   display: inline-block;
   line-height: 1;
+  color: inherit;
 }
 
 .page-link .sr-only {
@@ -45,16 +46,16 @@
 
 .page-link:hover {
   z-index: 2;
-  color: #0056b3;
+  color: var(--color-text-primary);
   text-decoration: none;
-  background-color: #e9ecef;
-  border-color: #dee2e6;
+  background-color: var(--color-background-tertiary);
+  border-color: #5a5a5a;
 }
 
 .page-link:focus {
   z-index: 3;
   outline: 0;
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  box-shadow: 0 0 0 0.2rem rgba(218, 62, 80, 0.25);
 }
 
 .page-item:first-child .page-link {
@@ -71,16 +72,17 @@
 .page-item.active .page-link {
   z-index: 3;
   color: #fff;
-  background-color: #007bff;
-  border-color: #007bff;
+  background-color: var(--color-auctivity-red);
+  border-color: var(--color-auctivity-red);
 }
 
 .page-item.disabled .page-link {
-  color: #6c757d;
+  color: var(--color-text-secondary);
   pointer-events: none;
   cursor: auto;
-  background-color: #fff;
-  border-color: #dee2e6;
+  background-color: var(--color-background-secondary);
+  border-color: #4a4a4a;
+  opacity: 0.5;
 }
 
 .pagination-lg .page-link {
