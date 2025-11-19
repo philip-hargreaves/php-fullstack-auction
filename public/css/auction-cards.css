@@ -26,7 +26,7 @@
     padding: 4px 4px 4px 32px;
     cursor: default;
     position: relative;
-    color: var(--color-text-primary);
+    color: var(--color-auctivity-red);
     font-size: 16px;
     font-weight: 400;
     font-family: var(--font-family);
@@ -41,7 +41,7 @@
     left: 4px;
     top: 50%;
     transform: translateY(-50%);
-    fill: var(--color-text-primary);
+    fill: var(--color-auctivity-red);
 }
 
 .sort-text {
@@ -87,7 +87,7 @@
 }
 
 .sort-option.active {
-    background-color: var(--color-text-primary);
+    background-color: var(--color-auctivity-red);
 }
 
 /* Auction Gallery Layout */
