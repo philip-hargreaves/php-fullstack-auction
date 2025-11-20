@@ -33,6 +33,7 @@ $isSeller = AuthService::hasRole('seller');
     <link rel="stylesheet" href="/css/image-gallery.css">
     <link rel="stylesheet" href="/css/custom.css">
     <link rel="stylesheet" href="/css/pagination.css">
+    <link rel="stylesheet" href="/css/modal.css">
     <link rel="stylesheet" href="/css/create-auction.css">
     <link rel="stylesheet" href="/css/auction-page.css">
     <title>My Auction Site</title>
