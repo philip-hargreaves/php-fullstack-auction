@@ -25,6 +25,14 @@ class BidRepository
             return null;
         }
 
+        $buyer = $this->userRepo->getById($row['buyer_id']);
+        $auction = $this->auctionRepo->getById($row['auction_id']);
+
+        if ($buyer === null || $auction === null)
+        {
+            return null;
+        }
+
         // Create the object using constructor
         $object = new Bid(
             (int)$row['id'],
@@ -36,10 +44,7 @@ class BidRepository
 
         // Set relationship properties
 //        $buyer = $this->userRepo->getUserById($row['buyer_id']);
-        $buyer = $this->userRepo->getById($row['buyer_id']);
         $object->setBuyer($buyer);
-
-        $auction = $this->auctionRepo->getById($row['auction_id']);
         $object->setAuction($auction);
 
         return $object;
@@ -121,7 +126,7 @@ class BidRepository
                     WHERE buyer_id = :user_id
                     ORDER BY bid_datetime DESC";
             $params = ['user_id' => $userId];
-            $rows = $this->db->query($sql, $params)->fetchAll(PDO::FETCH_ASSOC);
+            $rows = $this->db->query($sql, $params)->fetchAll();
 
             return $this->hydrateMany($rows);
         } catch (PDOException $e) {
@@ -135,7 +140,11 @@ class BidRepository
         $bids = [];
 
         foreach ($rows as $row) {
-            $bids[] = $this->hydrate($row);
+            $bid = $this->hydrate($row);
+
+            if ($bid != null) {
+                $bids[] = $bid;
+            }
         }
         return $bids;
     }

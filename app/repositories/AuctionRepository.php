@@ -17,7 +17,7 @@ class AuctionRepository
         $this->itemRepo = $itemRepo;
     }
 
-    private function hydrate($row) : Auction {
+    private function hydrate($row) : ?Auction {
         // Create the object using constructor
         $object = new Auction(
             (int)$row['id'],
@@ -32,6 +32,12 @@ class AuctionRepository
 
         // Set relationship properties
         $item = $this->itemRepo->getById($object->getItemId());
+
+        if ($item === null)
+        {
+            return null;
+        }
+
         $object->setItem($item);
 
         return $object;
@@ -69,7 +75,7 @@ class AuctionRepository
                     ORDER BY a.start_datetime DESC";
 
             $params = ['seller_id' => $sellerId];
-            $rows = $this->db->query($sql, $params)->fetchAll(PDO::FETCH_ASSOC);
+            $rows = $this->db->query($sql, $params)->fetchAll();
 
             return $this->hydrateMany($rows);
         } catch (PDOException $e) {
@@ -77,11 +83,15 @@ class AuctionRepository
         }
     }
 
-    private function hydrateMany($rows) : array {
+    private function hydrateMany(array $rows) : array {
         $auctions = [];
 
         foreach ($rows as $row) {
-            $auctions[] = $this->hydrate($row);
+            $auction = $this->hydrate($row);
+
+            if ($auction !== null) {
+                $auctions[] = $auction;
+            }
         }
         return $auctions;
     }

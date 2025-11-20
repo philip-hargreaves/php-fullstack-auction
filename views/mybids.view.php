@@ -19,11 +19,19 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
                 </thead>
                 <tbody>
                 <?php foreach ($bids as $bid): ?>
+                    <?php
+                        $auctionObj = $bid->getAuction();
+                        $itemObj = $auctionObj ? $auctionObj->getItem() : null;
+                    ?>
                     <tr>
                         <td>
-                            <a href="/auction?auction_id=<?= htmlspecialchars($bid->getAuctionId()) ?>">
-                                <?= htmlspecialchars($bid->getAuction()->getItem()->getItemName()) ?>
-                            </a>
+                            <?php if ($auctionObj): ?>
+                                <a href="/auction?auction_id=<?= htmlspecialchars($auctionObj->getAuctionId()) ?>">
+                                    <?= htmlspecialchars($itemObj ? $itemObj->getItemName() : '[Item Deleted]') ?>
+                                </a>
+                            <?php else: ?>
+                                [Auction Deleted]
+                            <?php endif; ?>
                         </td>
                         <td>£<?= htmlspecialchars(number_format($bid->getBidAmount(), 2)) ?></td>
                         <td><?= htmlspecialchars($bid->getBidDateTime()->format('Y-m-d H:i')) ?></td>

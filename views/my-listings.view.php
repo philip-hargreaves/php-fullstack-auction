@@ -26,7 +26,11 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
                     <tr>
                         <td>
                             <a href="/auction?auction_id=<?= htmlspecialchars($auction->getAuctionId()) ?>">
-                                <?= htmlspecialchars($auction->getItem()->getItemName()) ?>
+                                <?= htmlspecialchars(
+                                        $auction->getItem()
+                                                ? $auction->getItem()->getItemName()
+                                                : "[Item Missing]"
+                                ) ?>
                             </a>
                         </td>
                         <td><?= htmlspecialchars($auction->getAuctionStatus()) ?></td>
