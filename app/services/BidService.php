@@ -118,4 +118,9 @@ class BidService
         return null;
     }
 
+    public function getBidsForUser(int $userId): array
+    {
+        return $this->bidRepo->getByUserId($userId);
+    }
+
 }

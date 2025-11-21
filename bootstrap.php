@@ -9,6 +9,7 @@ use app\repositories\UserRoleRepository;
 use app\services\BidService;
 use app\services\AuthService;
 use app\services\RegistrationService;
+use app\services\AuctionService;
 use infrastructure\Database;
 use infrastructure\DIContainer;
 use app\services\RoleService;
@@ -62,3 +63,7 @@ DIContainer::bind('roleServ', new RoleService(
     DIContainer::get('userRoleRepo'),
     DIContainer::get('db')
 ));
+
+DIContainer::bind('auctionServ', new AuctionService(
+    DIContainer::get('auctionRepo'),
+    DIContainer::get('bidServ')));

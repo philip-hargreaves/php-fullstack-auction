@@ -13,6 +13,7 @@ $router->post('/create-auction-result', 'controllers/create-auction-result.php')
 
 // GET Pages
 $router->get('/my-auctions', 'controllers/my-auctions.php');
+$router->get('/mybids', 'controllers/mybids.php');
 
 
 // Registration and authentication
@@ -26,3 +27,4 @@ $router->post('/become-seller', 'controllers/auth/become-seller.php');
 // Auction Page
 $router->post('/bid', 'controllers/auction/place-bid.php');
 $router->get('/auction', 'controllers/auction/auction.php');
+$router->get('/my-listings', 'controllers/auction/my-listings.php');
