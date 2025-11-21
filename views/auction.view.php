@@ -92,13 +92,13 @@
                 <hr class="mb-3">
 
                 <!-- Display Data Depending on Auction Status -->
-                <?php if (!$isAuctionActive) : ?>
+                <?php if (!$isAuctionActive): ?>
                     <h4 class="text-danger">Auction Ended</h4>
                     <p class="text-muted mb-0">Ended on: <?= date_format($endTime, 'j M Y,  H:i') ?></p>
-                <?php elseif ($isAuctionActive) : ?>
+                <?php else: ?>
                     <h5 class="text-primary mb-2">Time Remaining: <?= $timeRemaining->format('%ad %hh %im') ?></h5>
                     <p class="small text-muted">Ends: <?= date_format($endTime, 'j M Y,  H:i') ?></p>
-                    <?php if ($isLoggedIn): ?>
+                    <?php infrastructure\Utilities::dd($isLoggedIn); if ($isLoggedIn): ?>
                         <form method="POST" action="/bid">
                             <label for="bid" class="form-label">Place your bid (must be > £<?= number_format($highestBid, 2) ?>)</label>
                             <div class="input-group mb-3">
@@ -120,8 +120,6 @@
                             Sign In to Place Bid
                         </button>
                     <?php endif; ?>
-                <?php else : ?>
-                    <!-- Pending auction -->
                 <?php endif; ?>
             </div>
 
@@ -129,7 +127,7 @@
             <?php if ($now < $endTime): ?>
                 <div class="text-center mb-5">
                     <div id="watch_nowatch" <?php if ($isLoggedIn && $isWatched) echo('style="display: none"'); ?>>
-                        <button type="button" class="btn btn-outline-secondary" onclick="addToWatchlist()">
+                        <button type="button" class="btn btn-outline-secondary" onclick="handleWatchlistAdd()">
                             + Add to Watchlist
                         </button>
                     </div>
@@ -137,7 +135,7 @@
                         <button type="button" class="btn btn-success" disabled>
                             Watching
                         </button>
-                        <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeFromWatchlist()">
+                        <button type="button" class="btn btn-outline-danger btn-sm" onclick="handleWatchlistRemove()">
                             Remove
                         </button>
                     </div>
@@ -236,238 +234,28 @@
 
 <?php require \infrastructure\Utilities::basePath('views/partials/footer.php'); ?>
 
+<!-- Specific js operations for this view -->
 <script>
-    function addToWatchlist(button) {
+    // Watchlist Glue: check for login and then call the generic functions.
+    function handleWatchlistAdd() {
         <?php if (!$isLoggedIn): ?>
-            showLoginModal();
-            return;
+        showLoginModal();
+        return;
+        <?php else: ?>
+        // Call the generic function from view-scripts.js
+        addToWatchlist(<?php echo json_encode($auctionId); ?>);
         <?php endif; ?>
+    }
+    function handleWatchlistRemove() {
+        // Call the generic function from view-scripts.js
+        removeFromWatchlist(<?php echo json_encode($auctionId); ?>);
+    }
 
-        console.log("These print statements are helpful for debugging btw");
-
-        // This performs an asynchronous call to a PHP function using POST method.
-        // Sends item ID as an argument to that function.
-        $.ajax('watchlist_funcs.php', {
-            type: "POST",
-            data: {functionname: 'add_to_watchlist', arguments: [<?php echo($auctionId);?>]},
-
-            success:
-                function (obj, textstatus) {
-                    // Callback function for when call is successful and returns obj
-                    console.log("Success");
-                    var objT = obj.trim();
-
-                    if (objT == "success") {
-                        $("#watch_nowatch").hide();
-                        $("#watch_watching").show();
-                    } else {
-                        var mydiv = document.getElementById("watch_nowatch");
-                        mydiv.appendChild(document.createElement("br"));
-                        mydiv.appendChild(document.createTextNode("Add to watch failed. Try again later."));
-                    }
-                },
-
-            error:
-                function (obj, textstatus) {
-                    console.log("Error");
-                }
-        }); // End of AJAX call
-
-    } // End of addToWatchlist func
-
-    function removeFromWatchlist(button) {
-        // This performs an asynchronous call to a PHP function using POST method.
-        // Sends item ID as an argument to that function.
-        $.ajax('watchlist_funcs.php', {
-            type: "POST",
-            data: {functionname: 'remove_from_watchlist', arguments: [<?php echo($auctionId);?>]},
-
-            success:
-                function (obj, textstatus) {
-                    // Callback function for when call is successful and returns obj
-                    console.log("Success");
-                    var objT = obj.trim();
-
-                    if (objT == "success") {
-                        $("#watch_watching").hide();
-                        $("#watch_nowatch").show();
-                    } else {
-                        var mydiv = document.getElementById("watch_watching");
-                        mydiv.appendChild(document.createElement("br"));
-                        mydiv.appendChild(document.createTextNode("Watch removal failed. Try again later."));
-                    }
-                },
-
-            error:
-                function (obj, textstatus) {
-                    console.log("Error");
-                }
-        }); // End of AJAX call
-
-    } // End of addToWatchlist func
-</script>
-
-<script>
-    // Wait for the document to be fully loaded
+    // Gallery Glue: Wait for the document to be ready and then call the generic functions.
+    // Wait for the document to be ready
     document.addEventListener("DOMContentLoaded", function () {
-
-        // --- 1. Get all image URLs from PHP ---
-        // We pass the PHP array into a JS variable
+        // Get the image URLs from PHP
         const imageUrls = <?= json_encode($imageUrls ?? []) ?>;
-
-        // If there's 1 or 0 images, do nothing.
-        if (imageUrls.length <= 1) {
-            return;
-        }
-
-        // --- 2. Get elements from the page ---
-        let currentIndex = 0;
-        const mainImage = document.getElementById('main-image');
-        const prevButton = document.getElementById('prev-image');
-        const nextButton = document.getElementById('next-image');
-        const thumbnails = document.querySelectorAll('.gallery-thumb');
-
-        // --- 3. Create the main function to change images ---
-        function showImage(index) {
-            // Handle wrapping around (e.g., clicking next on the last image)
-            if (index >= imageUrls.length) {
-                index = 0; // Go to first image
-            } else if (index < 0) {
-                index = imageUrls.length - 1; // Go to last image
-            }
-
-            // Update the main image source
-            mainImage.src = imageUrls[index];
-            currentIndex = index;
-
-            // Update the 'active-thumb' class
-            thumbnails.forEach((thumb, i) => {
-                if (i === currentIndex) {
-                    thumb.classList.add('active-thumb');
-                } else {
-                    thumb.classList.remove('active-thumb');
-                }
-            });
-        }
-
-        // --- 4. Add event listeners ---
-
-        // Left/Right arrow clicks
-        prevButton.addEventListener('click', function () {
-            showImage(currentIndex - 1);
-        });
-
-        nextButton.addEventListener('click', function () {
-            showImage(currentIndex + 1);
-        });
-
-        // Thumbnail clicks
-        thumbnails.forEach(thumb => {
-            thumb.addEventListener('click', function () {
-                // Get the index from the 'data-index' attribute
-                const index = parseInt(this.dataset.index, 10);
-                showImage(index);
-            });
-        });
-
-    });
-</script>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-
-        const imageUrls = <?= json_encode($imageUrls ?? []) ?>;
-        if (imageUrls.length <= 1) return;
-
-        // --- 1. Main Image Gallery Logic (EXISTING) ---
-        let currentIndex = 0;
-        const mainImage = document.getElementById('main-image');
-        const prevButton = document.getElementById('prev-image');
-        const nextButton = document.getElementById('next-image');
-        const thumbnails = document.querySelectorAll('.gallery-thumb');
-
-        function showImage(index) {
-            if (index >= imageUrls.length) index = 0;
-            if (index < 0) index = imageUrls.length - 1;
-
-            mainImage.src = imageUrls[index];
-            currentIndex = index;
-
-            thumbnails.forEach((thumb, i) => {
-                thumb.classList.toggle('active-thumb', i === currentIndex);
-            });
-
-            // New function call to sync scroller
-            centerThumbnailInView(index);
-        }
-
-        prevButton.addEventListener('click', () => showImage(currentIndex - 1));
-        nextButton.addEventListener('click', () => showImage(currentIndex + 1));
-        thumbnails.forEach(thumb => {
-            thumb.addEventListener('click', () => {
-                showImage(parseInt(thumb.dataset.index, 10));
-            });
-        });
-
-
-        // --- 2. NEW Thumbnail Scroller Logic ---
-        const viewport = document.getElementById('thumbnail-viewport');
-        const thumbContainer = document.getElementById('thumbnail-container');
-        const thumbPrev = document.getElementById('thumb-prev');
-        const thumbNext = document.getElementById('thumb-next');
-
-        let scrollAmount = 0;
-        // Calculate scroll amount (width of one thumb + margin-right)
-        // 80px (width) + 8px (me-2 margin) = 88
-        const thumbScrollWidth = thumbnails[0] ? thumbnails[0].offsetWidth + 8 : 88;
-
-        function updateThumbNav() {
-            // Show/hide prev button
-            thumbPrev.style.display = 'block';
-
-            // Show/hide next button
-            const maxScroll = thumbContainer.scrollWidth - viewport.clientWidth;
-            thumbNext.style.display = 'block';
-        }
-
-        thumbPrev.addEventListener('click', () => {
-            scrollAmount -= thumbScrollWidth * 3; // Scroll by 3 images
-            if (scrollAmount < 0) scrollAmount = 0;
-            thumbContainer.style.transform = `translateX(-${scrollAmount}px)`;
-            updateThumbNav();
-        });
-
-        thumbNext.addEventListener('click', () => {
-            const maxScroll = thumbContainer.scrollWidth - viewport.clientWidth;
-            scrollAmount += thumbScrollWidth * 3; // Scroll by 3 images
-            if (scrollAmount > maxScroll) scrollAmount = maxScroll;
-            thumbContainer.style.transform = `translateX(-${scrollAmount}px)`;
-            updateThumbNav();
-        });
-
-        // This new function centers the active thumb in the scroller
-        function centerThumbnailInView(index) {
-            const activeThumb = thumbnails[index];
-            if (!activeThumb) return;
-
-            const viewportWidth = viewport.clientWidth;
-            const thumbLeft = activeThumb.offsetLeft;
-            const thumbWidth = activeThumb.offsetWidth;
-
-            // Calculate new scroll amount to center the thumb
-            let newScroll = thumbLeft - (viewportWidth / 2) + (thumbWidth / 2);
-
-            const maxScroll = thumbContainer.scrollWidth - viewportWidth;
-            if (newScroll < 0) newScroll = 0;
-            if (newScroll > maxScroll) newScroll = maxScroll;
-
-            scrollAmount = newScroll;
-            thumbContainer.style.transform = `translateX(-${scrollAmount}px)`;
-            updateThumbNav();
-        }
-
-        // Initial check
-        updateThumbNav();
-
+        initImageGallery(imageUrls);
     });
 </script>
