@@ -1,0 +1,103 @@
+/* CSS Variables for global theming */
+:root {
+    /* Background Color Aliases */
+    --color-background-primary: #222222;
+    --color-background-secondary: #2d2d2d;
+    --color-background-tertiary: #404040;
+    
+    /* Text Color Aliases */
+    --color-text-primary: #d2d2d2;
+    --color-text-secondary: #9c9c9c;
+    
+    /* Brand Colors */
+    --color-auctivity-red: rgb(218, 62, 80);
+    
+    /* Typography */
+    --font-family: "Helvetica Neue", Arial, sans-serif;
+    --font-size-base: 16px;
+    --line-height-base: 1.5;
+}
+
+/* Base HTML */
+html {
+    background-color: var(--color-background-primary);
+    box-sizing: border-box;
+}
+
+*, *::before, *::after {
+    box-sizing: inherit;
+}
+
+/* Body */
+body {
+    background-color: var(--color-background-primary);
+    color: var(--color-text-primary);
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-base);
+    margin: 0;
+    padding: 0;
+}
+
+/* Global Typography */
+h1, h2, h3, h4, h5, h6 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+h1 { font-size: 2.5rem; }
+h2 { font-size: 2rem; }
+h3 { font-size: 1.75rem; }
+h4 { font-size: 1.5rem; }
+h5 { font-size: 1.25rem; }
+h6 { font-size: 1rem; }
+
+p {
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+
+/* Lists */
+ul, ol {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    padding-left: 2rem;
+}
+
+/* Images */
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Buttons - Base styles (can be overridden by Bootstrap) */
+button {
+    font-family: inherit;
+}
+
+/* Containers inherit from body */
+.container, .container-fluid {
+    background-color: inherit;
+    color: inherit;
+}
+
+/* Footer */
+footer {
+    background-color: var(--color-background-primary);
+    color: var(--color-text-primary);
+}
+
+footer p {
+    color: var(--color-text-secondary);
+}
+
+/* Override Bootstrap red/danger colors with Auctivity brand red */
+:root {
+    --red: var(--color-auctivity-red);
+    --danger: var(--color-auctivity-red);
+}
+

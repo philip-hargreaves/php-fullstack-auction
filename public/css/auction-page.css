@@ -1,0 +1,303 @@
+/* Auction Page - Dark Theme Styling (for viewing auction listings) */
+
+/* Override card backgrounds */
+.container .card {
+    background-color: var(--color-background-primary);
+    border: 1px solid #3a3a3a;
+    color: var(--color-text-primary);
+}
+
+.container .card.bg-light {
+    background-color: var(--color-background-primary) !important;
+}
+
+/* Headings */
+.container h2,
+.container h3,
+.container h4,
+.container h5 {
+    color: var(--color-text-primary);
+}
+
+/* Text colors */
+.container .text-muted {
+    color: var(--color-text-secondary) !important;
+}
+
+.container .text-primary {
+    color: var(--color-auctivity-red) !important;
+}
+
+.container .text-success {
+    color: #28a745 !important;
+}
+
+.container .text-danger {
+    color: var(--color-auctivity-red) !important;
+}
+
+/* Form controls */
+.container .form-control {
+    background-color: var(--color-background-secondary);
+    border: 1px solid #4a4a4a;
+    color: var(--color-text-primary);
+}
+
+.container .form-control:focus {
+    background-color: var(--color-background-secondary);
+    border-color: var(--color-auctivity-red);
+    color: var(--color-text-primary);
+    box-shadow: 0 0 0 0.2rem rgba(218, 62, 80, 0.25);
+}
+
+.container .form-control::placeholder {
+    color: var(--color-text-secondary);
+    opacity: 0.7;
+}
+
+
+.container .form-label {
+    color: var(--color-text-primary);
+}
+
+
+/* Input group text */
+.container .input-group-text {
+    background-color: var(--color-background-secondary);
+    border: 1px solid #4a4a4a;
+    color: var(--color-text-primary);
+}
+
+
+/* Buttons */
+.container .btn-primary {
+    background-color: var(--color-auctivity-red);
+    border-color: var(--color-auctivity-red);
+    color: #fff;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.container .btn-primary:hover {
+    background-color: rgb(200, 50, 70);
+    border-color: rgb(200, 50, 70);
+    color: #fff;
+}
+
+.container .btn-primary:focus {
+    background-color: var(--color-auctivity-red);
+    border-color: var(--color-auctivity-red);
+    box-shadow: 0 0 0 0.2rem rgba(218, 62, 80, 0.5);
+    color: #fff;
+}
+
+.container .btn-primary:active {
+    background-color: rgb(190, 45, 65);
+    border-color: rgb(190, 45, 65);
+    color: #fff;
+}
+
+
+.container .btn-outline-primary {
+    border-color: #3a3a3a;
+    color: var(--color-text-primary);
+    background-color: var(--color-background-secondary);
+    transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.container .btn-outline-primary:hover {
+    background-color: var(--color-background-tertiary);
+    border-color: #4a4a4a;
+    color: var(--color-text-primary);
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.container .btn-outline-primary:focus {
+    background-color: var(--color-background-tertiary);
+    border-color: #4a4a4a;
+    color: var(--color-text-primary);
+    box-shadow: 0 0 0 0.2rem rgba(210, 210, 210, 0.25), 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.container .btn-outline-primary:active {
+    background-color: var(--color-background-primary);
+    transform: scale(0.98);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Image gallery navigation buttons - filled/shaded styling */
+#prev-image,
+#next-image,
+#thumb-prev,
+#thumb-next {
+    background-color: var(--color-background-secondary) !important;
+    border: 1px solid #3a3a3a !important;
+    color: var(--color-text-primary) !important;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 18px;
+    transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+#prev-image:hover,
+#next-image:hover,
+#thumb-prev:hover,
+#thumb-next:hover {
+    background-color: var(--color-background-tertiary) !important;
+    border-color: #4a4a4a !important;
+    color: var(--color-text-primary) !important;
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+#prev-image:focus,
+#next-image:focus,
+#thumb-prev:focus,
+#thumb-next:focus {
+    background-color: var(--color-background-tertiary) !important;
+    border-color: #4a4a4a !important;
+    color: var(--color-text-primary) !important;
+    box-shadow: 0 0 0 0.2rem rgba(210, 210, 210, 0.25), 0 4px 8px rgba(0, 0, 0, 0.4);
+    outline: none;
+}
+
+#prev-image:active,
+#next-image:active,
+#thumb-prev:active,
+#thumb-next:active {
+    background-color: var(--color-background-primary) !important;
+    transform: scale(0.98);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+#thumb-prev,
+#thumb-next {
+    min-width: 40px;
+    min-height: 40px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.container .btn-outline-secondary {
+    border-color: var(--color-text-secondary);
+    color: var(--color-text-secondary);
+}
+
+.container .btn-outline-secondary:hover {
+    background-color: var(--color-text-secondary);
+    border-color: var(--color-text-secondary);
+    color: var(--color-background-primary);
+}
+
+.container .btn-outline-danger {
+    border-color: var(--color-auctivity-red);
+    color: var(--color-auctivity-red);
+}
+
+.container .btn-outline-danger:hover {
+    background-color: var(--color-auctivity-red);
+    border-color: var(--color-auctivity-red);
+    color: #fff;
+}
+
+.container .btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+    color: #fff;
+}
+
+/* List group items */
+.container .list-group-item {
+    background-color: var(--color-background-primary);
+    border-color: #3a3a3a;
+    color: var(--color-text-primary);
+}
+
+.container .list-group-item strong {
+    color: var(--color-text-primary);
+}
+
+/* Tables - Bid History */
+.container .table {
+    color: var(--color-text-primary);
+    background-color: var(--color-background-primary);
+}
+
+.container .table thead th,
+.container .table thead.thead-dark th {
+    background-color: var(--color-background-secondary);
+    border-color: #4a4a4a;
+    color: var(--color-text-primary);
+    font-weight: 600;
+}
+
+.container .table td,
+.container .table th {
+    border-color: #4a4a4a;
+    color: var(--color-text-primary);
+}
+
+.container .table-striped tbody tr:nth-of-type(odd) {
+    background-color: var(--color-background-secondary);
+}
+
+.container .table-striped tbody tr:nth-of-type(even) {
+    background-color: var(--color-background-primary);
+}
+
+.container .table-hover tbody tr:hover {
+    background-color: var(--color-background-tertiary);
+    color: var(--color-text-primary);
+}
+
+.container .table-success,
+.container .table-success td,
+.container .table-success th {
+    background-color: rgba(40, 167, 69, 0.2);
+    border-color: #4a4a4a;
+    color: var(--color-text-primary);
+}
+
+/* Alerts */
+.container .alert {
+    background-color: var(--color-background-secondary);
+    border-color: #4a4a4a;
+    color: var(--color-text-primary);
+}
+
+.container .alert-info {
+    background-color: rgba(23, 162, 184, 0.2);
+    border-color: rgba(23, 162, 184, 0.5);
+    color: var(--color-text-primary);
+}
+
+/* Item description box */
+.container .itemDescription {
+    background-color: var(--color-background-primary) !important;
+    border: 1px solid #3a3a3a !important;
+    color: var(--color-text-primary) !important;
+}
+
+/* Badges */
+.container .badge {
+    color: #fff;
+}
+
+.container .badge.bg-success {
+    background-color: #28a745 !important;
+}
+
+/* Horizontal rules */
+.container hr {
+    border-color: #3a3a3a;
+}
+
+/* Image borders */
+.container .border {
+    border-color: #4a4a4a !important;
+}
+
