@@ -26,17 +26,16 @@ $isSeller = AuthService::hasRole('seller');
     <!-- Global CSS - Site-wide styles and variables -->
     <link rel="stylesheet" href="/css/global.css">
     <!-- Component-specific CSS files -->
-    <link rel="stylesheet" href="/css/custom.css">
     <link rel="stylesheet" href="/css/navbar.css">
     <link rel="stylesheet" href="/css/filter-sidebar.css">
     <link rel="stylesheet" href="/css/auction-cards.css">
     <link rel="stylesheet" href="/css/image-gallery.css">
-    <link rel="stylesheet" href="/css/custom.css">
+    <link rel="stylesheet" href="/css/bids-table.css">
     <link rel="stylesheet" href="/css/pagination.css">
     <link rel="stylesheet" href="/css/modal.css">
     <link rel="stylesheet" href="/css/create-auction.css">
     <link rel="stylesheet" href="/css/auction-page.css">
-    <title>My Auction Site</title>
+    <title>Auctivity</title>
 </head>
 <body>
 
@@ -69,7 +68,6 @@ $isSeller = AuthService::hasRole('seller');
         <div class="middle-section">
             <?php if ($isBuyer): ?>
                 <a href="/mybids" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/mybids') !== false ? 'active' : '' ?>">My Bids</a>
-                <a href="/recommendations" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/recommendations') !== false ? 'active' : '' ?>">Recommended</a>
                 <a href="/watchlist" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/watchlist') !== false ? 'active' : '' ?>">Watchlist</a>
             <?php endif; ?>
 

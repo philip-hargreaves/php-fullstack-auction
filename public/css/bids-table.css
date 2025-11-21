@@ -1,0 +1,65 @@
+/* Bids Table Styles - Used by My Bids and My Listings pages */
+
+.bids-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    font-size: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: var(--color-background-primary);
+    color: var(--color-text-primary);
+}
+
+.bids-table thead th {
+    background-color: var(--color-background-secondary);
+    color: var(--color-text-primary);
+    text-align: left;
+    padding: 1rem 1.5rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #4a4a4a;
+}
+
+.bids-table tbody tr {
+    border-bottom: 1px solid #3a3a3a;
+    background-color: var(--color-background-primary);
+}
+
+.bids-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.bids-table tbody td {
+    padding: 1rem 1.5rem;
+    color: var(--color-text-primary);
+    vertical-align: middle;
+}
+
+.bids-table tbody td a {
+    color: var(--color-auctivity-red);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.bids-table tbody td a:hover {
+    color: rgb(200, 50, 70);
+    text-decoration: underline;
+}
+
+.bids-table tbody tr:hover {
+    background-color: var(--color-background-tertiary);
+}
+
+.bids-table th.align-right,
+.bids-table td.align-right {
+    text-align: right;
+}
+
+.bids-table th.align-center,
+.bids-table td.align-center {
+    text-align: center;
+}
