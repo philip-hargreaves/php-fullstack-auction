@@ -32,6 +32,7 @@ $high_page = min($max_page, $curr_page + 2 + $high_page_boost);
 
 
 //  Get "raw" dummy data, will be replaced by db query in application layer
+$now = new DateTime();
 $raw_auctions = [
     [
         'item_id' => "87021",
@@ -39,17 +40,42 @@ $raw_auctions = [
         'description' => "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum eget rutrum ipsum. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Phasellus feugiat, ipsum vel egestas elementum, sem mi vestibulum eros, et facilisis dui nisi eget metus. In non elit felis. Ut lacus sem, pulvinar ultricies pretium sed, viverra ac sapien. Vivamus condimentum aliquam rutrum. Phasellus iaculis faucibus pellentesque. Sed sem urna, maximus vitae cursus id, malesuada nec lectus. Vestibulum scelerisque vulputate elit ut laoreet. Praesent vitae orci sed metus varius posuere sagittis non mi.",
         'current_price' => 30,
         'num_bids' => 1,
-        'end_date' => new DateTime('2020-09-16T11:00:00')
-    ],
-    [
-        'item_id' => "516",
-        'title' => "Different title",
-        'description' => "Very short description.",
-        'current_price' => 13.50,
-        'num_bids' => 3,
-        'end_date' => new DateTime('2020-11-02T00:00:00')
+        'end_date' => new DateTime('2020-09-16T11:00:00'),
+        'condition' => 'Brand new'
     ]
 ];
+
+// Generate 11 more varied dummy auctions for 4x3 gallery (12 total)
+$titles = [
+    "Vintage Camera Collection", "Gaming Laptop RTX 4090", "Antique Wooden Chair",
+    "Smartphone iPhone 15 Pro", "Designer Handbag", "Vintage Watch Collection",
+    "Electric Guitar", "Art Deco Lamp", "Leather Jacket", "Collectible Action Figures", "Rare Comic Book"
+];
+$conditions = ['Brand new', 'Like new', 'Used', 'Refurbished'];
+$prices = [25.99, 45.50, 120.00, 89.99, 199.99, 15.75, 350.00, 67.25, 180.50, 95.00, 42.30];
+$bids = [2, 5, 12, 1, 8, 3, 20, 4, 7, 6, 9];
+
+for ($i = 0; $i < 11; $i++) {
+    $daysAhead = rand(1, 30);
+    $hoursAhead = rand(0, 23);
+    $endDate = clone $now;
+    $endDate->modify("+{$daysAhead} days +{$hoursAhead} hours");
+    
+    // Some auctions should be ended
+    if ($i % 3 == 0) {
+        $endDate->modify("-5 days");
+    }
+    
+    $raw_auctions[] = [
+        'item_id' => "500" . $i,
+        'title' => $titles[$i],
+        'description' => "Description for " . $titles[$i] . ". This is a detailed product description.",
+        'current_price' => $prices[$i],
+        'num_bids' => $bids[$i],
+        'end_date' => $endDate,
+        'condition' => $conditions[$i % count($conditions)]
+    ];
+}
 $dummy_auctions = [];
 
 foreach ($raw_auctions as $auction) {
@@ -72,7 +98,7 @@ foreach ($raw_auctions as $auction) {
         $auction['time_remaining'] = 'This auction has ended';
     } else {
         $time_to_end = date_diff($now, $auction['end_date']);
-        $auction['time_remaining'] = Utilities::displayTimeRemaining($time_to_end) . ' remaining';
+        $auction['time_remaining'] = Utilities::displayTimeRemaining($time_to_end);
     }
     $dummy_auctions[] = $auction;
 }

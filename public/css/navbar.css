@@ -1,17 +1,18 @@
+/* --- Page Header Container --- */
 .page-header {
-    box-sizing: border-box;
-    background-color: rgb(34, 34, 34);
+    background-color: var(--color-background-primary);
     display: block;
-    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-family: var(--font-family);
     font-size: 15px;
     font-weight: 400;
     height: 54px;
     line-height: 21px;
     position: sticky;
-    top: 0px;
+    top: 0;
     z-index: 1200;
     width: 100%;
-    color: rgb(229, 229, 229);
+    color: var(--color-text-primary);
+    border-bottom: 1px solid #3a3a3a;
 }
 
 .navigation-top {
@@ -49,20 +50,21 @@
     flex-shrink: 0;
 }
 
+/* --- Search Bar Elements --- */
 .search-container {
     display: flex;
     align-items: center;
-    background: rgb(45, 45, 45);
-    border: 1px solid rgb(68, 68, 68);
+    background: var(--color-background-secondary);
+    border: 1px solid #444444;
     border-radius: 4px;
     padding: 6px 12px;
-    width: 520px;
-    max-width: 520px;
-    min-width: 200px;
+    width: 400px !important;
+    max-width: 400px !important;
+    min-width: 400px !important;
     height: 34px;
-    box-sizing: border-box;
-    flex-shrink: 1;
+    flex-shrink: 0 !important;
     margin: 0;
+    box-sizing: border-box;
 }
 
 .search-input {
@@ -71,25 +73,24 @@
     border: none;
     outline: none;
     font-size: 16px;
-    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-family: var(--font-family);
     font-weight: 400;
     line-height: 22.4px;
     padding: 0;
-    background-color: rgba(0, 0, 0, 0);
-    color: rgb(229, 229, 229);
+    background-color: transparent;
+    color: var(--color-text-primary);
     height: 34px;
-    box-sizing: border-box;
     width: 100%;
 }
 
 .search-input::placeholder {
-    color: rgba(229, 229, 229, 0.5);
+    color: rgba(210, 210, 210, 0.5);
 }
 
 .search-button {
     background: none;
     border: none;
-    color: rgb(180, 180, 180);
+    color: var(--color-text-secondary);
     cursor: pointer;
     padding: 0;
     display: flex;
@@ -98,36 +99,54 @@
     margin-left: 8px;
     width: 24px;
     height: 24px;
+    transition: opacity 0.2s;
 }
 
+.search-button:hover,
+.search-button:focus {
+    opacity: 0.7;
+    outline: none;
+}
+
+.search-icon {
+    font-size: 18px;
+    color: var(--color-text-secondary);
+    font-weight: 250;
+}
+
+
+/* --- Nav Button (Generic, used for non-link buttons) --- */
 .nav-button {
     background: none;
     border: none;
-    color: rgb(229, 229, 229);
+    color: var(--color-text-primary);
     font-size: 15px;
     cursor: pointer;
     padding: 8px 12px;
     text-decoration: none;
+    transition: opacity 0.2s, background-color 0.2s;
 }
 
-.nav-button:hover {
+.nav-button:hover,
+.nav-button:focus {
     opacity: 0.7;
+    text-decoration: none;
 }
 
+
+/* --- Top Nav Link (Used for primary middle navigation) --- */
 .top-nav-link {
-    box-sizing: border-box;
-    color: rgb(156, 156, 156);
+    color: var(--color-text-primary);
     cursor: pointer;
     display: inline-flex;
     align-items: center;
-    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+    font-family: var(--font-family);
     font-size: 14px;
     font-weight: 700;
     line-height: 19.6px;
     padding: 0 12px;
     text-align: center;
     text-decoration: none;
-    border-bottom: 2px solid transparent;
     border-radius: 4px;
     white-space: nowrap;
     transition: color 0.2s, border-color 0.2s, background-color 0.2s;
@@ -135,57 +154,56 @@
     height: 54px;
 }
 
-.top-nav-link:hover {
-    color: rgb(229, 229, 229);
-    background-color: rgb(45, 45, 45);
+.top-nav-link:hover,
+.top-nav-link:focus {
     text-decoration: none;
+    color: #cccccc;
+    background-color: rgba(255, 255, 255, 0.1);
+    outline: none;
 }
 
+/* --- Active/Entered Tab State --- */
 .top-nav-link.active {
-    color: rgb(218, 62, 80);
-    border-bottom: none;
+    color: var(--color-auctivity-red);
+    text-decoration: none;
+    background-color: transparent;
 }
 
 .top-nav-link.active::after {
     content: '';
     position: absolute;
     bottom: 0;
-    left: 0;
-    right: 0;
+    left: -6px;
+    right: -6px;
     height: 3px;
-    background-color: rgb(218, 62, 80);
-    width: calc(100% + 8px);
-    left: -4px;
+    background-color: var(--color-auctivity-red);
+    border-radius: 2px;
+    transition: width 0.3s ease, left 0.3s ease;
 }
 
-.top-nav-link.active:hover {
-    color: rgb(218, 62, 80);
-    background-color: rgb(45, 45, 45);
-    text-decoration: none;
+.top-nav-link.active:hover,
+.top-nav-link.active:focus {
+    color: var(--color-auctivity-red);
+    background-color: transparent;
+    opacity: 1;
 }
 
+
+/* --- Logo Elements --- */
 .logo-link {
     text-decoration: none;
-    color: rgb(229, 229, 229);
+    color: var(--color-text-primary);
     display: flex;
     align-items: center;
     flex-shrink: 0;
     padding-left: 20px;
+    transition: opacity 0.2s;
 }
 
-.logo-link:hover {
-    text-decoration: none;
-    color: rgb(229, 229, 229);
-}
-
+.logo-link:hover,
 .logo-link:focus {
-    outline: none;
     text-decoration: none;
-}
-
-.logo-link:active {
-    text-decoration: none;
-    color: rgb(229, 229, 229);
+    opacity: 0.8;
 }
 
 .logo-icon {
@@ -202,37 +220,27 @@
     font-size: 18px;
     line-height: 21px;
     text-transform: lowercase;
+    color: var(--color-text-primary);
 }
 
-.search-icon {
-    font-size: 18px;
-    color: rgb(180, 180, 180);
-    font-weight: 250;
-}
-
+/* --- Notification Button --- */
 .notification-button {
     padding: 8px;
     display: flex;
     align-items: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-primary);
+    transition: opacity 0.2s;
+}
+
+.notification-button:hover,
+.notification-button:focus {
+    opacity: 0.7;
+    outline: none;
 }
 
 .notification-icon {
     font-size: 18px;
 }
-
-.category-nav-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    height: 34px;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-}
-
-.category-nav-container::-webkit-scrollbar {
-    display: none;
-}
-
