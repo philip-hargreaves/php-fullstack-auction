@@ -1,0 +1,84 @@
+/* Pagination Styles - Extracted from bootstrap.css */
+
+.pagination {
+  display: flex;
+  padding-left: 0;
+  list-style: none;
+  border-radius: 0.25rem;
+}
+
+.page-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0.75rem;
+  margin-left: -1px;
+  line-height: 1.25;
+  color: var(--color-text-primary);
+  background-color: var(--color-background-secondary);
+  border: 1px solid #4a4a4a;
+  min-width: 2.5rem;
+  min-height: 2.5rem;
+  box-sizing: border-box;
+}
+
+.page-link i,
+.page-link .fa {
+  display: inline-block;
+  line-height: 1;
+  color: inherit;
+}
+
+.page-link .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.page-link:hover {
+  z-index: 2;
+  color: var(--color-text-primary);
+  text-decoration: none;
+  background-color: var(--color-background-tertiary);
+  border-color: #5a5a5a;
+}
+
+.page-link:focus {
+  z-index: 3;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(218, 62, 80, 0.25);
+}
+
+.page-item:first-child .page-link {
+  margin-left: 0;
+  border-top-left-radius: 0.25rem;
+  border-bottom-left-radius: 0.25rem;
+}
+
+.page-item:last-child .page-link {
+  border-top-right-radius: 0.25rem;
+  border-bottom-right-radius: 0.25rem;
+}
+
+.page-item.active .page-link {
+  z-index: 3;
+  color: #fff;
+  background-color: var(--color-auctivity-red);
+  border-color: var(--color-auctivity-red);
+}
+
+.page-item.disabled .page-link {
+  color: var(--color-text-secondary);
+  pointer-events: none;
+  cursor: auto;
+  background-color: var(--color-background-secondary);
+  border-color: #4a4a4a;
+  opacity: 0.5;
+}

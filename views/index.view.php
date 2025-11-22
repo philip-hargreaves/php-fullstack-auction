@@ -10,82 +10,205 @@ require Utilities::basePath('views/partials/header.php');
  */
 ?>
 
-    <!-- Browsing -->
-    <div class="container">
-        <h2 class="my-3">Browse listings</h2>
-        <div id="searchSpecs">
-            <form method="get" action="index.php">
-                <div class="row">
-                    <div class="col-md-5 pr-0">
-                        <div class="form-group">
-                            <label for="keyword" class="sr-only">Search keyword:</label>
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                            <span class="input-group-text bg-transparent pr-0 text-muted">
-                              <i class="fa fa-search"></i>
-                            </span>
-                                </div>
-                                <input type="text" class="form-control border-left-0" id="keyword" name="keyword" placeholder="Search for anything">
+    <!-- Main Content with Filters -->
+    <div class="container-fluid mt-5 px-4">
+        <div class="main-content-wrapper">
+            <!-- Left Sidebar Filters -->
+            <div class="filter-sidebar">
+                    <!-- Categories Accordion -->
+                    <div class="filter-section">
+                        <button type="button" class="accordion-button" id="categoryAccordion" aria-expanded="true" aria-controls="categoryContent">
+                            <span>Categories</span>
+                            <div class="accordion-icon">
+                                <svg width="16" height="16" class="icon-primary" fill-rule="evenodd" viewBox="0 0 24 24"><path d="M13.67,6.45a2.46,2.46,0,0,0-3.42,0l-8,8a1,1,0,0,0,0,1.42,1,1,0,0,0,1.41,0l8-8a.35.35,0,0,1,.58,0l8,8.1a1,1,0,1,0,1.42-1.41Z"></path></svg>
+                            </div>
+                        </button>
+                        <div id="categoryContent" class="accordion-content" aria-labelledby="categoryAccordion">
+                            <select class="filter-select" name="category">
+                                <option value="all">All</option>
+                                <option value="electronics">Electronics</option>
+                                <option value="clothing">Clothing</option>
+                                <option value="home">Home & Garden</option>
+                                <option value="sports">Sports & Outdoors</option>
+                                <option value="books">Books</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Condition Accordion -->
+                    <div class="filter-section">
+                        <button type="button" class="accordion-button" id="conditionAccordion" aria-expanded="true" aria-controls="conditionContent">
+                            <span>Product condition</span>
+                            <div class="accordion-icon">
+                                <svg width="16" height="16" class="icon-primary" fill-rule="evenodd" viewBox="0 0 24 24"><path d="M13.67,6.45a2.46,2.46,0,0,0-3.42,0l-8,8a1,1,0,0,0,0,1.42,1,1,0,0,0,1.41,0l8-8a.35.35,0,0,1,.58,0l8,8.1a1,1,0,1,0,1.42-1.41Z"></path></svg>
+                            </div>
+                        </button>
+                        <div id="conditionContent" class="accordion-content" aria-labelledby="conditionAccordion">
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input class="mer-checkbox" type="checkbox" value="new" name="item_condition_id">
+                                    <span class="checkbox-text">New</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input class="mer-checkbox" type="checkbox" value="like_new" name="item_condition_id">
+                                    <span class="checkbox-text">Like new</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input class="mer-checkbox" type="checkbox" value="refurbished" name="item_condition_id">
+                                    <span class="checkbox-text">Refurbished</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input class="mer-checkbox" type="checkbox" value="used" name="item_condition_id">
+                                    <span class="checkbox-text">Used</span>
+                                </label>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3 pr-0">
-                        <div class="form-group">
-                            <label for="cat" class="sr-only">Search within:</label>
-                            <select class="form-control" id="cat" name="cat">
-                                <option selected value="all">All categories</option>
-                                <option value="fill">Fill me in</option>
-                                <option value="with">with options</option>
-                                <option value="populated">populated from a database?</option>
-                            </select>
+
+                    <!-- Item Status Accordion -->
+                    <div class="filter-section">
+                        <button type="button" class="accordion-button" id="statusAccordion" aria-expanded="true" aria-controls="statusContent">
+                            <span>Item status</span>
+                            <div class="accordion-icon">
+                                <svg width="16" height="16" class="icon-primary" fill-rule="evenodd" viewBox="0 0 24 24"><path d="M13.67,6.45a2.46,2.46,0,0,0-3.42,0l-8,8a1,1,0,0,0,0,1.42,1,1,0,0,0,1.41,0l8-8a.35.35,0,0,1,.58,0l8,8.1a1,1,0,1,0,1.42-1.41Z"></path></svg>
+                            </div>
+                        </button>
+                        <div id="statusContent" class="accordion-content" aria-labelledby="statusAccordion">
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input class="mer-checkbox" type="checkbox" value="active" name="item_status">
+                                    <span class="checkbox-text">Active</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input class="mer-checkbox" type="checkbox" value="completed" name="item_status">
+                                    <span class="checkbox-text">Completed</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input class="mer-checkbox" type="checkbox" value="sold" name="item_status">
+                                    <span class="checkbox-text">Sold</span>
+                                </label>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-3 pr-0">
-                        <div class="form-inline">
-                            <label class="mx-2" for="order_by">Sort by:</label>
-                            <select class="form-control" id="order_by" name="order_by">
-                                <option selected value="pricelow">Price (low to high)</option>
-                                <option value="pricehigh">Price (high to low)</option>
-                                <option value="date">Soonest expiry</option>
-                            </select>
+
+                    <!-- Price Range Accordion -->
+                    <div class="filter-section">
+                        <button type="button" class="accordion-button" id="priceAccordion" aria-expanded="true" aria-controls="priceContent">
+                            <span>Price</span>
+                            <div class="accordion-icon">
+                                <svg width="16" height="16" class="icon-primary" fill-rule="evenodd" viewBox="0 0 24 24"><path d="M13.67,6.45a2.46,2.46,0,0,0-3.42,0l-8,8a1,1,0,0,0,0,1.42,1,1,0,0,0,1.41,0l8-8a.35.35,0,0,1,.58,0l8,8.1a1,1,0,1,0,1.42-1.41Z"></path></svg>
+                            </div>
+                        </button>
+                        <div id="priceContent" class="accordion-content" aria-labelledby="priceAccordion">
+                            <div class="price-range">
+                                <input type="number" class="price-input" name="min_price" placeholder="Min" min="0">
+                                <span class="price-separator">-</span>
+                                <input type="number" class="price-input" name="max_price" placeholder="Max" min="0">
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-1 px-0">
-                        <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+
+            <!-- Main Content Area -->
+            <div class="main-content-area">
+                <div class="sort-container mb-3">
+                    <div class="sort-dropdown">
+                        <button type="button" class="sort-button" id="sortButton">
+                            <svg width="20" height="20" class="sort-icon" fill-rule="evenodd" viewBox="0 0 24 24">
+                                <path d="M7.75,5.34A1.16,1.16,0,0,0,7,5l-.1,0L6.8,5a1.24,1.24,0,0,0-.74.32L3.21,8.13a.7.7,0,0,0,0,1,.7.7,0,0,0,.5.21.67.67,0,0,0,.49-.2l2-2V18.3a.7.7,0,1,0,1.4,0V7.16l2,1.94a.7.7,0,0,0,1,0,.71.71,0,0,0,0-1Z"></path>
+                                <path d="M20.8,14.88a.7.7,0,0,0-1,0l-2,2V5.7a.7.7,0,1,0-1.4,0V16.84l-2-1.95a.7.7,0,0,0-1,1l2.83,2.76a1.28,1.28,0,0,0,.62.3.85.85,0,0,0,.22,0,.6.6,0,0,0,.24-.05,1.2,1.2,0,0,0,.61-.29l2.85-2.79A.7.7,0,0,0,20.8,14.88Z"></path>
+                            </svg>
+                            <span class="sort-text">Newest</span>
+                        </button>
+                        <div class="sort-menu" id="sortMenu">
+                            <form method="get" action="index.php">
+                                <button type="submit" name="order_by" value="recommended" class="sort-option">Recommended order</button>
+                                <button type="submit" name="order_by" value="date" class="sort-option active">Newest</button>
+                                <button type="submit" name="order_by" value="ending_soonest" class="sort-option">Ending Soonest</button>
+                                <button type="submit" name="order_by" value="pricelow" class="sort-option">Lowest price first</button>
+                                <button type="submit" name="order_by" value="pricehigh" class="sort-option">Highest price first</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
-            </form>
-        </div>
-    </div>
-    <!-- Browsing -->
-
-
-    <!-- Listings -->
-    <div class="container mt-5">
-    <ul class="list-group">
-        <?php foreach ($dummy_auctions as $auction): ?>
-            <li class="list-group-item d-flex justify-content-between">
-                <div class="p-2 mr-5">
-<!--                    <h5><a href="../listing?item_id=--><?php //echo $auction['item_id']; ?><!--">-->
-                        <h5><a href="../auction?auction_id=2222">
-                            <?php echo $auction['title']; ?>
-                        </a></h5>
-                        <?php echo $auction['description_short']; // We will create this in the controller ?>
+                <div class="auction-gallery">
+            <?php foreach ($dummy_auctions as $auction): 
+                // Generate appropriate image URL based on title keywords
+                $title = strtolower($auction['title']);
+                $imageUrl = '';
+                
+                // Map titles to specific Unsplash photo IDs that match item types
+                // Using Unsplash image IDs for category-specific photos
+                if (stripos($title, 'camera') !== false) {
+                    $imageUrl = "https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=300&h=300&fit=crop";
+                } elseif (stripos($title, 'laptop') !== false || stripos($title, 'gaming') !== false) {
+                    $imageUrl = "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=300&h=300&fit=crop";
+                } elseif (stripos($title, 'chair') !== false || stripos($title, 'antique') !== false) {
+                    $imageUrl = "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=300&h=300&fit=crop";
+                } elseif (stripos($title, 'iphone') !== false || stripos($title, 'smartphone') !== false) {
+                    $imageUrl = "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=300&h=300&fit=crop";
+                } elseif (stripos($title, 'handbag') !== false || stripos($title, 'designer') !== false) {
+                    $imageUrl = "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=300&h=300&fit=crop";
+                } elseif (stripos($title, 'watch') !== false) {
+                    $imageUrl = "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300&h=300&fit=crop";
+                } elseif (stripos($title, 'guitar') !== false) {
+                    $imageUrl = "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300&h=300&fit=crop";
+                } elseif (stripos($title, 'lamp') !== false || stripos($title, 'art deco') !== false) {
+                    $imageUrl = "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=300&h=300&fit=crop";
+                } elseif (stripos($title, 'jacket') !== false || stripos($title, 'leather') !== false) {
+                    $imageUrl = "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=300&h=300&fit=crop";
+                } elseif (stripos($title, 'action figure') !== false || stripos($title, 'collectible') !== false) {
+                    // Toy/action figure image from a reliable source
+                    $imageUrl = "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=300&h=300&fit=crop";
+                } elseif (stripos($title, 'comic') !== false) {
+                    $imageUrl = "https://images.unsplash.com/photo-1532012197267-da84d127e765?w=300&h=300&fit=crop";
+                } else {
+                    // Default: used item placeholder
+                    $imageUrl = "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=300&h=300&fit=crop";
+                }
+            ?>
+                    <div class="auction-card card h-100">
+                        <div class="auction-image-container">
+                            <a href="/auction?auction_id=2222">
+                                <img src="<?= htmlspecialchars($imageUrl) ?>" 
+                                     alt="<?= htmlspecialchars($auction['title']) ?>" 
+                                     class="auction-image card-img-top">
+                            </a>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-0">
+                                <div>
+                                    <h6 class="card-title mb-0">
+                                        <a href="/auction?auction_id=2222" class="text-decoration-none">
+                                            <?= htmlspecialchars($auction['title']) ?>
+                                        </a>
+                                    </h6>
+                                    <?php if (isset($auction['condition'])): ?>
+                                        <div class="auction-condition"><?= htmlspecialchars($auction['condition']) ?></div>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="auction-info">
+                                    <?= htmlspecialchars($auction['bid_text']) ?>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-end">
+                                <div class="auction-price">
+                                    <span class="price-amount">£<?= number_format($auction['current_price'], 2) ?></span>
+                                </div>
+                                <div class="auction-time">
+                                    <i class="fa fa-clock-o" aria-hidden="true"></i>
+                                    <span><?= htmlspecialchars($auction['time_remaining']) ?></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            <?php endforeach; ?>
                 </div>
-                <div class="text-center text-nowrap">
-                    <span style="font-size: 1.5em">£<?php echo number_format($auction['current_price'], 2); ?></span><br/>
-                    <?php echo $auction['bid_text']; // We will create this in the controller ?>
-                    <br/>
-                    <?php echo $auction['time_remaining']; // We will create this in the controller ?>
-                </div>
-            </li>
-        <?php endforeach; ?>
-    </ul>
-    <!-- Listings -->
-
-    <!-- Pagination -->
-    <nav aria-label="Search results pages" class="mt-5">
-        <ul class="pagination justify-content-center">
+                
+                <!-- Pagination -->
+                <div class="pagination-container mt-5">
+        <nav aria-label="Search results pages">
+            <ul class="pagination justify-content-center">
             <!-- Previous button -->
             <?php if ($curr_page != 1) : ?>
                 <li class="page-item">
@@ -117,7 +240,89 @@ require Utilities::basePath('views/partials/header.php');
                     </a>
                 </li>
             <?php endif; ?>
-        </ul>
-    </nav>
+            </ul>
+        </nav>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Pagination -->
-        <?php require Utilities::basePath('views/partials/footer.php'); ?>
+            <?php require Utilities::basePath('views/partials/footer.php'); ?>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const sortButton = document.getElementById('sortButton');
+    const sortMenu = document.getElementById('sortMenu');
+    const sortDropdown = document.querySelector('.sort-dropdown');
+    const sortText = document.querySelector('.sort-text');
+    
+    // Get current sort option from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentSort = urlParams.get('order_by') || 'date';
+    
+    // Update sort text based on current selection
+    const sortLabels = {
+        'recommended': 'Recommended order',
+        'date': 'Newest',
+        'ending_soonest': 'Ending Soonest',
+        'pricelow': 'Lowest price first',
+        'pricehigh': 'Highest price first'
+    };
+    
+    if (sortLabels[currentSort]) {
+        sortText.textContent = sortLabels[currentSort];
+    }
+    
+    // Mark active option
+    const activeOption = sortMenu.querySelector(`button[value="${currentSort}"]`);
+    if (activeOption) {
+        activeOption.classList.add('active');
+    }
+    
+    // Toggle dropdown
+    sortButton.addEventListener('click', function(e) {
+        e.stopPropagation();
+        sortDropdown.classList.toggle('active');
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!sortDropdown.contains(e.target)) {
+            sortDropdown.classList.remove('active');
+        }
+    });
+
+    // Accordion functionality
+    const conditionAccordion = document.getElementById('conditionAccordion');
+    if (conditionAccordion) {
+        conditionAccordion.addEventListener('click', function() {
+            const isExpanded = this.getAttribute('aria-expanded') === 'true';
+            this.setAttribute('aria-expanded', !isExpanded);
+        });
+    }
+
+    const priceAccordion = document.getElementById('priceAccordion');
+    if (priceAccordion) {
+        priceAccordion.addEventListener('click', function() {
+            const isExpanded = this.getAttribute('aria-expanded') === 'true';
+            this.setAttribute('aria-expanded', !isExpanded);
+        });
+    }
+
+    const categoryAccordion = document.getElementById('categoryAccordion');
+    if (categoryAccordion) {
+        categoryAccordion.addEventListener('click', function() {
+            const isExpanded = this.getAttribute('aria-expanded') === 'true';
+            this.setAttribute('aria-expanded', !isExpanded);
+        });
+    }
+
+    const statusAccordion = document.getElementById('statusAccordion');
+    if (statusAccordion) {
+        statusAccordion.addEventListener('click', function() {
+            const isExpanded = this.getAttribute('aria-expanded') === 'true';
+            this.setAttribute('aria-expanded', !isExpanded);
+        });
+    }
+});
+</script>
