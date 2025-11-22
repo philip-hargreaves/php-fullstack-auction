@@ -30,72 +30,112 @@ class BidService
         }
     }
 
-    public function validateBidAmount(int $auctionId, float $bidAmount): bool {
-        $highestBidAmount = $this->getHighestBidByAuctionId($auctionId);
-        if ($bidAmount < $highestBidAmount) {
-            return false;
-        } else {
-            return true;
+    public function validate(array $input): array {
+        $auction = $this->auctionRepo->getById($input['auction_id']);
+        $bidAmount = $input['bid_amount'];
+
+        // Check if $auction exists
+        if (is_null($auction)) {
+            return Utilities::creationResult('Auction not found.', false, null);
         }
+
+        // Check if $auction is active
+        if (!$auction->isAuctionActive()) {
+            return Utilities::creationResult('This auction is not currently active.', false, null);
+        }
+
+        // Check $bidAmount Required
+        if (!isset($bidAmount) || $bidAmount === ''){
+            return Utilities::creationResult('Bid amount is required.', false, null);
+        }
+
+        // Check $bidAmount Type (HTML: type="number")
+        if (!is_numeric($bidAmount)){
+            return Utilities::creationResult('Bid must be a valid number.', false, null);
+        }
+
+        // Check $bidAmount Precision
+        if (!preg_match('/^\d+(\.\d{1,2})?$/', $bidAmount)){
+            return Utilities::creationResult('Bid amount can only have up to 2 decimal places.', false, null);
+        }
+
+        // Check $bidAmount Reasonable Maximum
+        if ($bidAmount > 1000000000) {
+            return Utilities::creationResult('Bid amount is too high.', false, null);
+        }
+
+        // Check if the bid is high enough
+        $highestBidAmount = $this->getHighestBidByAuctionId($input['auction_id']);
+        if ($bidAmount < $highestBidAmount + 0.01) {
+            return Utilities::creationResult('Bid must be at least' . number_format($highestBidAmount, 2), false, null);
+        }
+
+        return Utilities::creationResult('', true, null);
+    }
+
+    private function createBid(array $input): array {
+        // Create object
+        $bid = new Bid(
+            0, // 0 for a new bid
+            $input['user_id'],
+            $input['auction_id'],
+            $input['bid_amount'],
+            new DateTime()
+        );
+
+        // Execute bid insertion
+        $bid = $this->bidRepo->create($bid);
+
+        // Insertion failed
+        if (is_null($bid)) {
+            return Utilities::creationResult('Failed to create bid.', false, null);
+        }
+
+        return Utilities::creationResult('', true, null);
     }
 
     public function placeBid(array $input): array {
-        $auctionId = (int)$input['auctionId'];
-        $bidAmount = (float)trim($input['bidAmount']);
-        $buyerId = (int)$input['buyerId'];
-        $errors = [];
+        // Get the DB connection
+        $pdo = $this->db->connection;
 
-        // --- START THE TRANSACTION ---
+        // --- Start Transaction ---
+        // Wrap validation + creation in a transaction so the highest bid won't be updated before creating
         try {
-            Utilities::beginTransaction($this->db->connection);
+            Utilities::beginTransaction($pdo);
 
-            // Business Logic Validation
-            $auction = $this->auctionRepo->getById($input['auctionId']);
-            if (is_null($auction)) { // Check if auction exists
-                $errors[] = 'Auction not found.';
-            } else {
-                // Check if auction is active
-                if (!$auction->isAuctionActive()) {
-                    $errors[] = 'This auction is not currently active.';
-                }
-                // Check if the bid is high enough
-                if (!$this->validateBidAmount($auction->getAuctionId(), $input['bidAmount'])) {
-                    $errors[] = 'Your bid must be higher than the current highest bid.';
-                }
+            // Fixed datatype
+            $input['auction_id'] = (int)$input['auction_id'];
+            $input['bid_amount'] = (float)trim($input['bid_amount']);
+            $input['user_id'] = (int)$input['user_id'];
+
+            // Validate input
+            $validation_result = $this->validate($input);
+
+            // Validation Fail -> Abort transaction
+            if (!$validation_result['success']) {
+                $pdo->rollBack();
+                return $validation_result;
             }
 
-            // Fail Validation
-            if (!empty($errors)) {
-                $this->db->connection->rollBack(); // Abort transaction
-                return $errors;
+            // Validation Pass -> Create Bid
+            $creation_result = $this->createBid($input);
+
+            // Insertion Failed
+            if (!$creation_result['success']) {
+                $pdo->rollBack();
+                return $creation_result;
             }
 
-            // Pass Validation -> Create Bid
-            $bid = new Bid(
-                0, // 0 for a new bid
-                $buyerId,
-                $auctionId,
-                $bidAmount,
-                new DateTime()
-            );
-
-            // Execute bid insertion
-            $success = $this->bidRepo->create($bid);
-
-            // Check if insertion succeed
-            if (!$success) {
-                $this->db->connection->rollBack();
-                return ['Failed to create bid.'];
-            }
-
-            // The check and the insert were successful. Make it permanent.
-            $this->db->connection->commit();
-            return $errors;
+            // Insertion Succeed -> Commit Transaction
+            $pdo->commit();
+            return Utilities::creationResult('Bid successfully placed!', true, null);
 
         } catch (PDOException $e) {
-            $this->db->connection->rollBack();
-            // error_log($e->getMessage());
-            return $errors;
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+
+            throw $e;
         }
     }
 

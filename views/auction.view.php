@@ -26,7 +26,9 @@
 
 <?php require \infrastructure\Utilities::basePath('views/partials/header.php'); ?>
 
+
 <div class="container my-4" >
+    <!-- Image Gallery + Auction Information -->
     <div class="row">
         <!-- Image Gallery -->
         <div class="col mx-auto" style="max-width: 600px;">
@@ -70,7 +72,6 @@
                     <!-- Scroll Right Button -->
                     <button class="btn btn-outline-primary" id="thumb-next" style="height: 40px; width: 40px; flex-shrink: 0;">&rarr;</button>
                 </div>
-
             <?php endif; ?>
         </div>
 
@@ -88,17 +89,32 @@
                 <?php if ($now < $endTime && $highestBid < $reservePrice): ?>
                     <p class="text-danger small mb-1"><?=$statusText ?></p>
                 <?php endif; ?>
-
                 <hr class="mb-3">
-
                 <!-- Display Data Depending on Auction Status -->
                 <?php if (!$isAuctionActive) : ?>
                     <h4 class="text-danger">Auction Ended</h4>
                     <p class="text-muted mb-0">Ended on: <?= date_format($endTime, 'j M Y,  H:i') ?></p>
-                <?php elseif ($isAuctionActive) : ?>
+                <?php else : ?>
                     <h5 class="text-primary mb-2">Time Remaining: <?= $timeRemaining->format('%ad %hh %im') ?></h5>
                     <p class="small text-muted">Ends: <?= date_format($endTime, 'j M Y,  H:i') ?></p>
                     <?php if ($isLoggedIn): ?>
+                        <!-- Flash errors -->
+                        <?php if (!empty($_SESSION['place_bid_error'])): ?>
+                            <div class="alert alert-danger">
+                                <?php echo htmlspecialchars($_SESSION['place_bid_error']); ?>
+                            </div>
+                            <?php unset($_SESSION['place_bid_error']); ?>
+                        <?php endif; ?>
+
+                        <!-- Flash success -->
+                        <?php if (!empty($_SESSION['place_bid_success'])): ?>
+                            <div class="alert alert-success">
+                                <?php echo htmlspecialchars($_SESSION['place_bid_success']); ?>
+                            </div>
+                            <?php unset($_SESSION['place_bid_success']); ?>
+                        <?php endif; ?>
+
+                        <!-- Place Bid Form -->
                         <form method="POST" action="/bid">
                             <label for="bid" class="form-label">Place your bid (must be > £<?= number_format($highestBid, 2) ?>)</label>
                             <div class="input-group mb-3">
@@ -120,8 +136,6 @@
                             Sign In to Place Bid
                         </button>
                     <?php endif; ?>
-                <?php else : ?>
-                    <!-- Pending auction -->
                 <?php endif; ?>
             </div>
 
@@ -145,15 +159,14 @@
             <?php endif; ?>
         </div>
     </div>
-
     <hr class="my-5">
 
+    <!-- Item Information + Bid History -->
     <div class="row">
+        <!-- Item Information Table -->
         <div class="col">
-            <!-- Item Information Table -->
             <h3 class="mb-3">Item Details</h3>
             <div class="card mb-5">
-
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item"><strong>Seller:</strong> <?= htmlspecialchars($sellerName) ?></li>
                     <li class="list-group-item"><strong>Status:</strong> <?= htmlspecialchars($itemStatus) ?></li>
@@ -162,8 +175,9 @@
                 </ul>
             </div>
         </div>
+
+        <!-- Bid History Table -->
         <div class="col">
-            <!-- Bid History Table -->
             <h3 class="mb-3" >Bid History</h3>
             <div class="card mb-5" >
                 <?php if (empty($bids)): ?>
@@ -173,10 +187,6 @@
                         </div>
                     </div>
                 <?php else: ?>
-                    <!--
-                      We use <table class="table mb-0"> to make it
-                      fit perfectly inside the card with no bottom margin.
-                    -->
                     <table class="table table-striped table-hover mb-0" >
                         <thead class="thead-dark">
                         <tr>
@@ -208,7 +218,6 @@
                                         <span class="badge bg-success">Winner</span>
                                     <?php endif; ?>
                                 </td>
-
                                 <!-- Bid Amount Formatting -->
                                 <td>
                                     £<?= number_format($bid->getBidAmount(), 2) ?>
@@ -221,9 +230,9 @@
             </div>
         </div>
     </div>
-
     <hr class="my-4">
 
+    <!-- Item Description -->
     <div class="row">
         <div class="col-12">
             <h3 class="mb-3">Item Description</h3>
