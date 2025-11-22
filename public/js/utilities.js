@@ -176,3 +176,29 @@ function initImageGallery(imageUrls) {
     // Initial check
     updateThumbNav();
 }
+
+
+// Automatically fades out bootstrap alerts after 3 seconds
+function autoDismissAlerts() {
+    // Select all alert elements
+    const alerts = document.querySelectorAll('.alert');
+
+    alerts.forEach(function(alert) {
+        // check if we already attached a timer to avoid double-fading
+        if(alert.dataset.autosave === "true") return;
+
+        alert.dataset.autosave = "true"; // mark as processing
+
+        // Wait 3 seconds (3000ms)
+        setTimeout(function() {
+            // Add a fade-out transition
+            alert.style.transition = "opacity 0.5s ease";
+            alert.style.opacity = "0";
+
+            // After the fade (0.5s), remove it from the DOM entirely
+            setTimeout(function() {
+                alert.remove();
+            }, 500);
+        }, 3000);
+    });
+}

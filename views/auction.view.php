@@ -97,22 +97,6 @@
                     <h5 class="text-primary mb-2">Time Remaining: <?= $timeRemaining->format('%ad %hh %im') ?></h5>
                     <p class="small text-muted">Ends: <?= date_format($endTime, 'j M Y,  H:i') ?></p>
                     <?php if ($isLoggedIn): ?>
-                        <!-- Flash errors -->
-                        <?php if (!empty($_SESSION['place_bid_error'])): ?>
-                            <div class="alert alert-danger">
-                                <?php echo htmlspecialchars($_SESSION['place_bid_error']); ?>
-                            </div>
-                            <?php unset($_SESSION['place_bid_error']); ?>
-                        <?php endif; ?>
-
-                        <!-- Flash success -->
-                        <?php if (!empty($_SESSION['place_bid_success'])): ?>
-                            <div class="alert alert-success">
-                                <?php echo htmlspecialchars($_SESSION['place_bid_success']); ?>
-                            </div>
-                            <?php unset($_SESSION['place_bid_success']); ?>
-                        <?php endif; ?>
-
                         <!-- Place Bid Form -->
                         <form method="POST" action="/bid">
                             <label for="bid" class="form-label">Place your bid (must be > £<?= number_format($highestBid, 2) ?>)</label>
@@ -130,6 +114,25 @@
                             <input type="hidden" name="auction_id" value="<?= $auctionId ?>">
                             <button type="submit" class="btn btn-primary btn-lg w-100">Place Bid</button>
                         </form>
+
+                        <!-- Flash errors -->
+                        <?php if (!empty($_SESSION['place_bid_error'])): ?>
+                            <div class="alert alert-danger shadow-sm" role="alert">
+                                <i class="fa fa-exclamation-circle"></i>
+                                <?php echo htmlspecialchars($_SESSION['place_bid_error']); ?>
+                            </div>
+                            <?php unset($_SESSION['place_bid_error']); ?>
+                        <?php endif; ?>
+
+                        <!-- Flash success -->
+                        <?php if (!empty($_SESSION['place_bid_success'])): ?>
+                            <div class="alert alert-success shadow-sm" role="alert">
+                                <i class="fa fa-check-circle"> </i>
+                                <?php echo htmlspecialchars($_SESSION['place_bid_success']); ?>
+                            </div>
+                            <?php unset($_SESSION['place_bid_success']); ?>
+                        <?php endif; ?>
+
                     <?php else: ?>
                         <button type="button" class="btn btn-primary btn-lg w-100" onclick="showLoginModal()">
                             Sign In to Place Bid
@@ -247,25 +250,33 @@
 
 <script>
     // Watchlist Glue: check for login and then call the generic functions.
-    function handleWatchlistAdd() {
-        <?php if (!$isLoggedIn): ?>
-        showLoginModal();
-        return;
-        <?php else: ?>
-        // Call the generic function from view-scripts.js
-        addToWatchlist(<?php echo json_encode($auctionId); ?>);
-        <?php endif; ?>
-    }
-    function handleWatchlistRemove() {
-        // Call the generic function from view-scripts.js
-        removeFromWatchlist(<?php echo json_encode($auctionId); ?>);
-    }
+    //function handleWatchlistAdd() {
+    //    <?php //if (!$isLoggedIn): ?>
+    //    showLoginModal();
+    //    return;
+    //    <?php //else: ?>
+    //    // Call the generic function from view-scripts.js
+    //    addToWatchlist(<?php //echo json_encode($auctionId); ?>//);
+    //    <?php //endif; ?>
+    //}
+    //function handleWatchlistRemove() {
+    //    // Call the generic function from view-scripts.js
+    //    removeFromWatchlist(<?php //echo json_encode($auctionId); ?>//);
+    //}
 
-    // Gallery Glue: Wait for the document to be ready and then call the generic functions.
-    // Wait for the document to be ready
     document.addEventListener("DOMContentLoaded", function () {
-        // Get the image URLs from PHP
+        // 1. Run Alerts FIRST (So they work even if the gallery fails)
+        if (typeof autoDismissAlerts === 'function') {
+            autoDismissAlerts();
+        } else {
+            console.error("autoDismissAlerts is not loaded. Check utilities.js linkage.");
+        }
+
+        // 2. Then run the Gallery
         const imageUrls = <?= json_encode($imageUrls ?? []) ?>;
-        initImageGallery(imageUrls);
+        // Check if the function exists before running to prevent crashes
+        if (typeof initImageGallery === 'function') {
+            initImageGallery(imageUrls);
+        }
     });
 </script>
