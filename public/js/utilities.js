@@ -1,5 +1,4 @@
 
-
 // Watchlist Functions
 function addToWatchlist(auctionId) {
     // This performs an asynchronous call to a PHP function using POST method.
@@ -64,8 +63,8 @@ function removeFromWatchlist(auctionId) {
 
 // Image Gallery & Scroller Functions
 function initImageGallery(imageUrls) {
+    // Initialization: Hide nav buttons if there's only one image
     if (!imageUrls || imageUrls.length <= 1) {
-        // Hide nav buttons if there's only one image
         const navElements = ['prev-image', 'next-image', 'thumbnail-viewport', 'thumb-prev', 'thumb-next'];
         navElements.forEach(id => {
             const el = document.getElementById(id);
@@ -81,12 +80,12 @@ function initImageGallery(imageUrls) {
     const nextButton = document.getElementById('next-image');
     const thumbnails = document.querySelectorAll('.gallery-thumb');
 
-    // Check if essential elements exist
+    // Check if gallery elements exist
     if (!mainImage || !prevButton || !nextButton || thumbnails.length === 0) {
         console.warn("Image gallery main elements not found. Gallery may not function.");
-        // Don't return, scroller might still work
     }
 
+    // Define child function
     function showImage(index) {
         if (index >= imageUrls.length) index = 0;
         if (index < 0) index = imageUrls.length - 1;
@@ -154,7 +153,6 @@ function initImageGallery(imageUrls) {
         updateThumbNav();
     });
 
-    // This new function centers the active thumb in the scroller
     function centerThumbnailInView(index) {
         const activeThumb = thumbnails[index];
         if (!activeThumb) return;
