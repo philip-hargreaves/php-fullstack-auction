@@ -28,9 +28,9 @@
 
 <div class="container my-4" >
     <!-- Image Gallery + Auction Information -->
-    <div class="row">
+    <div class="row justify-content-center">
         <!-- Image Gallery -->
-        <div class="col mx-auto" style="max-width: 600px;">
+        <div class="col-12 col-md-7 mx-auto mb-4" style="max-width: 600px;">
             <!-- Define the First Image -->
             <?php $firstImage = $imageUrls[0] ?? 'https://via.placeholder.com/600x400.png?text=No+Image'; ?>
 
@@ -75,7 +75,7 @@
         </div>
 
         <!-- Auction Information -->
-        <div class="col-md-5">
+        <div class="col-12 col-md-5 mx-auto">
             <!-- Auction Title / Item Name -->
             <h2 class="mb-3"><?= htmlspecialchars($title) ?></h2>
             <!-- Auction Content -->
@@ -189,6 +189,7 @@
                         </div>
                     </div>
                 <?php else: ?>
+                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
                     <table class="table table-striped table-hover mb-0" >
                         <thead class="thead-dark">
                         <tr>
@@ -229,6 +230,7 @@
                         <?php endforeach; ?>
                         </tbody>
                     </table>
+                </div>
                 <?php endif; ?>
             </div>
         </div>
