@@ -1,7 +1,6 @@
 
-// --------------------------------------------
-// Watchlist Function
-// --------------------------------------------
+
+// Watchlist Functions
 function addToWatchlist(auctionId) {
     // This performs an asynchronous call to a PHP function using POST method.
     // Sends item ID as an argument to that function.
@@ -63,9 +62,7 @@ function removeFromWatchlist(auctionId) {
 }
 
 
-// --------------------------------------------
-// Image Gallery & Scroller Function
-// --------------------------------------------
+// Image Gallery & Scroller Functions
 function initImageGallery(imageUrls) {
     if (!imageUrls || imageUrls.length <= 1) {
         // Hide nav buttons if there's only one image
