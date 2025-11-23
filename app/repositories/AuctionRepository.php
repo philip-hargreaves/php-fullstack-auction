@@ -82,6 +82,23 @@ class AuctionRepository
         }
     }
 
+    public function getWatchedAuctionsByUserId(int $userId): array
+    {
+        try {
+            $sql = "SELECT a.* from auctions a
+                   JOIN WatchList w ON a.id = w.auctionID
+                   WHERE w.userID = :user_id
+                   ORDER BY w.watched_at DESC";
+
+            $parms = ['user_id' => $userId];
+            $rows = $this->db->query($sql, $parms)->fetchAll();
+
+            return $this->hydrateMany($rows);
+        } catch (PDOException $e) {
+            return [];
+        }
+    }
+
     private function hydrateMany(array $rows) : array {
         $auctions = [];
 
