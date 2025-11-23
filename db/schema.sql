@@ -65,3 +65,12 @@ ALTER TABLE `auctions`
 ADD CONSTRAINT `fk_winning_bid`
 FOREIGN KEY (`winning_bid_id`) REFERENCES `bids`(`id`)
 ON DELETE SET NULL; -- If a winning bid is deleted, set the FK to NULL
+
+CREATE TABLE WatchList (
+  userID INT NOT NULL,
+  auctionID INT NOT NULL,
+  watched_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (userID, auctionID),
+  FOREIGN KEY (userID) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (auctionID) REFERENCES auctions(id) ON DELETE CASCADE
+);

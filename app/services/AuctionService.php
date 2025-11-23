@@ -27,5 +27,10 @@ class AuctionService
 
         return $auctions;
     }
+
+    public function getWatchedList (int $userId): array
+    {
+        return $this->auctionRepo->getWatchedAuctionsByUserId($userId);
+    }
 }
 

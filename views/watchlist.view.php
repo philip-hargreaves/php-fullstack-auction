@@ -1,0 +1,51 @@
+<?php
+require \infrastructure\Utilities::basePath('views/partials/header.php');
+?>
+
+    <div class="container watchlist-page">
+        <h2 class="my-3">My Watchlist</h2>
+
+        <?php if (empty($auctions)): ?>
+            <p>You are not currently watching any auctions.</p>
+            <a href="/browse" class="btn btn-primary mt-2">Browse listings</a>
+        <?php else: ?>
+            <table class="bids-table">
+                <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Current Price</th>
+                    <th>End Date</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <?php foreach ($auctions as $auction): ?>
+                    <?php $itemObj = $auction->getItem(); ?>
+                    <tr>
+                        <td>
+                            <?php if ($itemObj): ?>
+                                <a href="/auction?auction_id=<?= htmlspecialchars($auction->getAuctionId()) ?>">
+                                    <?= htmlspecialchars($itemObj->getItemName()) ?>
+                                </a>
+                            <?php else: ?>
+                                [Item Deleted]
+                            <?php endif; ?>
+                        </td>
+
+                        <td>£<?= htmlspecialchars(number_format($auction->getCurrentPrice() ?? $auction->getStartingPrice(), 2)) ?></td>
+
+                        <td><?= htmlspecialchars($auction->getEndDateTime()->format('Y-m-d H:i')) ?></td>
+                        <td>
+                            <a href="/watchlist/remove?id=<?= $auction->getAuctionId() ?>" class="text-danger">Remove</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        <?php endif; ?>
+
+    </div>
+
+<?php
+require \infrastructure\Utilities::basePath('views/partials/footer.php');
+?>
