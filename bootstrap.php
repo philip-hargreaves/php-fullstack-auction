@@ -1,5 +1,6 @@
 <?php
 
+use app\repositories\ImageRepository;
 use app\repositories\UserRepository;
 use app\repositories\RoleRepository;
 use app\repositories\ItemRepository;
@@ -12,9 +13,11 @@ use app\services\AuthService;
 use app\services\RegistrationService;
 use app\services\AuctionService;
 use app\services\WatchlistService;
+use app\services\UploadImageService;
 use infrastructure\Database;
 use infrastructure\DIContainer;
 use app\services\RoleService;
+use app\services\CreateItemService;
 
 // --- Build all objects and bind them to the App Container ---
 // Bind the Database first (it has no dependencies)
@@ -46,6 +49,19 @@ DIContainer::bind('bidRepo', new BidRepository(
     DIContainer::get('db'),
     DIContainer::get('userRepo'),
     DIContainer::get('auctionRepo')));
+
+DIContainer::bind('imageRepo', new ImageRepository(
+    DIContainer::get('db')
+));
+
+DIContainer::bind('createItemService', new CreateItemService(
+    DIContainer::get('db'),
+    DIContainer::get('itemRepo')
+));
+
+DIContainer::bind('uploadImageService', new UploadImageService(
+    DIContainer::get('imageRepo'),
+));
 
 // Bind Services (they depend on repositories)
 DIContainer::bind('bidServ', new BidService(

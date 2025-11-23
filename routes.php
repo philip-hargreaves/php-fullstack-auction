@@ -8,8 +8,9 @@
 $router->get('/', 'controllers/index.php');
 
 // Create Auction Page (GET displays the form, POST submits the data)
-$router->get('/create-auction', 'controllers/create-auction.php');
-$router->post('/create-auction-result', 'controllers/create-auction-result.php');
+$router->get('/create-auction', 'controllers/create_auction/create-auction-form.php');
+$router->post('/create-auction', 'controllers/create_auction/create-auction-controller.php');
+$router->get('/auction', 'controllers/auction.php');
 
 // GET Pages
 $router->get('/my-auctions', 'controllers/my-auctions.php');

@@ -58,5 +58,34 @@ class ItemRepository
         }
     }
 
+    //inserts item data into the database and returns the auto-incremented item ID.
+    public function insertItemData(Item $item) : ?int
+    {
+        $sellerID = $item -> getSellerId();
+        $itemName = $item -> getItemName();
+        $itemDescription = $item -> getItemDescription();
+        $itemCondition = $item -> getItemCondition();
+        $itemStatus = $item -> getItemStatus();
 
+        $stmt = $this -> db -> connection -> prepare(
+            "INSERT INTO items (seller_id, item_name, item_description, item_condition,
+                      item_status)
+                VALUES (:sellerID, :itemName, :itemDescription, :itemCondition,
+                        :itemStatus)"
+        ); //item id not inserted since it is autoincremented.
+
+        $stmt -> execute(
+            [
+                ':sellerID' => $sellerID,
+                ':itemName' => $itemName,
+                ':itemDescription' => $itemDescription,
+                ':itemCondition' => $itemCondition,
+                ':itemStatus' => $itemStatus
+            ]
+        );
+
+        $itemID = $this->db->connection->lastInsertId();
+
+        return $itemID;
+    }
 }

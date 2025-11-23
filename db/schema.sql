@@ -60,6 +60,13 @@ CREATE TABLE `bids` (
   FOREIGN KEY (`auction_id`) REFERENCES `auctions`(`id`)
 );
 
+CREATE TABLE `images` (
+    image_id INT AUTO_INCREMENT PRIMARY KEY,
+    auction_id INT NOT NULL,
+    image_url VARCHAR(255) NOT NULL,
+    FOREIGN KEY (auction_id) REFERENCES `auctions` (id) ON DELETE CASCADE
+);
+
 -- ALTER statement to add the foreign key *after* bids table exists
 ALTER TABLE `auctions`
 ADD CONSTRAINT `fk_winning_bid`

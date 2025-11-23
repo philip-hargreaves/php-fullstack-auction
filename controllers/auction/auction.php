@@ -13,12 +13,15 @@ $bidServ = DIContainer::get('bidServ');
 $auctionRepo = DIContainer::get('auctionRepo');
 $userRepo = DIContainer::get('userRepo');
 $watchlistServ = DIContainer::get('watchlistServ');
+$imageRepo = DIContainer::get('imageRepo');
 
 // Get Auction, Item, and Bids entities
 $auction = $auctionRepo->getById($auctionId);
 $item = $auction->getItem();
 $bids = $bidServ->getBidsByAuctionId($auctionId);
 
+//Get auction images
+$imageArray = $imageRepo->getImagesByAuctionId($auctionId);
 
 // Variables
 $title = $item->getItemName();
@@ -30,23 +33,11 @@ $endTime = $auction->getEndDateTime();
 $startingPrice = $auction->getStartingPrice();
 $reservePrice = $auction->getReservePrice();
 $itemCondition = $item->getItemCondition();
-$imageUrls = [
-    "https://images.shopcdn.co.uk/18/c8/18c8f85f068472284acf4e1b62f8cb16/2048x2048/webp/fit?force=true&quality=80&compression=80",
-    "https://images.shopcdn.co.uk/c5/f2/c5f25fda773c2c9a5c70c02003e20476/2048x2048/webp/fit?force=true&quality=80&compression=80",
-    "https://images.shopcdn.co.uk/0c/e5/0ce54e93035868ae48dfc06cddbf8ffb/2048x2048/webp/fit?force=true&quality=80&compression=80",
-    "https://images.shopcdn.co.uk/68/ff/68ff78a99e31988e04a6119a22bc28be/2048x2048/webp/fit?force=true&quality=80&compression=80",
-    "https://images.shopcdn.co.uk/98/22/98228847b394e80805b907878bbd8ca3/2048x2048/webp/fit?force=true&quality=80&compression=80",
-    "https://images.shopcdn.co.uk/18/c8/18c8f85f068472284acf4e1b62f8cb16/2048x2048/webp/fit?force=true&quality=80&compression=80",
-    "https://images.shopcdn.co.uk/c5/f2/c5f25fda773c2c9a5c70c02003e20476/2048x2048/webp/fit?force=true&quality=80&compression=80",
-    "https://images.shopcdn.co.uk/0c/e5/0ce54e93035868ae48dfc06cddbf8ffb/2048x2048/webp/fit?force=true&quality=80&compression=80",
-    "https://images.shopcdn.co.uk/68/ff/68ff78a99e31988e04a6119a22bc28be/2048x2048/webp/fit?force=true&quality=80&compression=80",
-    "https://images.shopcdn.co.uk/98/22/98228847b394e80805b907878bbd8ca3/2048x2048/webp/fit?force=true&quality=80&compression=80",
-    "https://images.shopcdn.co.uk/c5/f2/c5f25fda773c2c9a5c70c02003e20476/2048x2048/webp/fit?force=true&quality=80&compression=80",
-    "https://images.shopcdn.co.uk/0c/e5/0ce54e93035868ae48dfc06cddbf8ffb/2048x2048/webp/fit?force=true&quality=80&compression=80",
-    "https://images.shopcdn.co.uk/68/ff/68ff78a99e31988e04a6119a22bc28be/2048x2048/webp/fit?force=true&quality=80&compression=80",
-    "https://images.shopcdn.co.uk/98/22/98228847b394e80805b907878bbd8ca3/2048x2048/webp/fit?force=true&quality=80&compression=80"
-];
-$currencyText = '£';
+$imageUrls = [];
+foreach ($imageArray as $image)
+{
+    $imageUrls[] = '/' . $image-> getImageURL();
+}
 
 // Variables changes with $auctionStatus
 $itemStatus = $item->getItemStatus();

@@ -167,6 +167,14 @@ $isSeller = AuthService::hasRole('seller');
     <?php unset($_SESSION['upgrade_error']); ?>
 <?php endif; ?>
 
+<!-- Display auction creation success message -->
+<?php if (isset($_SESSION['create_auction_success'])): ?>
+    <div class = "alert alert-success">
+        <?= htmlspecialchars($_SESSION['create_auction_success']); ?>
+    </div>
+    <?php unset($_SESSION['create_auction_success']); ?>
+<?php endif; ?>
+
 <!-- Login modal -->
 <div class="modal fade" id="loginModal">
     <div class="modal-dialog modal-dialog-centered"> <div class="modal-content">

@@ -112,4 +112,35 @@ class AuctionRepository
         }
         return $auctions;
     }
+
+    //insert auction data into database. Retrieves the auto-incremented auction ID
+    public function insertAuctionData(Auction $auction) : int
+    {
+        #sql language
+        $stmt = $this -> db -> connection -> prepare(
+            "INSERT INTO auctions (item_id, winning_bid_id, start_datetime, end_datetime, 
+                      starting_price, reserve_price, auction_status)
+                VALUES (:item_id, :winning_bid_id, :start_datetime, 
+                        :end_datetime, :starting_price, :reserve_price, :auction_status)"
+        );
+
+        $stmt -> execute(
+            [
+                //':auction_id' => $auction->getAuctionID(),
+                ':item_id' => $auction->getItemId(), //use ItemRepo to get itemID?
+                ':winning_bid_id' => $auction->getWinningBidID(), //start with null
+                ':start_datetime' => $auction->getStartDateTime()->format('Y-m-d H:i:s'),
+                ':end_datetime' => $auction->getEndDateTime()->format('Y-m-d H:i:s'),
+                ':starting_price' => $auction->getStartingPrice(),
+                ':reserve_price' => $auction->getReservePrice(),
+                ':auction_status' => $auction->getAuctionStatus()
+            ]
+        );
+
+        $auctionID = $this->db->connection->lastInsertId();
+
+        return $auctionID;
+    }
+
+
 }
