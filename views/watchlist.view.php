@@ -36,7 +36,13 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
 
                         <td><?= htmlspecialchars($auction->getEndDateTime()->format('Y-m-d H:i')) ?></td>
                         <td>
-                            <a href="/watchlist/remove?id=<?= $auction->getAuctionId() ?>" class="text-danger">Remove</a>
+                            <form method="POST" action="/watchlist/remove">
+                                <input type="hidden" name="auction_id" value="<?= htmlspecialchars($auction->getAuctionId()) ?>">
+
+                                <input type="hidden" name="redirect_to" value="/watchlist">
+
+                                <button type="submit" class="btn btn-link text-danger p-0" style="text-decoration: none;">Remove</button>
+                            </form>
                         </td>
                     </tr>
                 <?php endforeach; ?>

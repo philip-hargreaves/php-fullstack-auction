@@ -94,7 +94,7 @@
                 <?php if (!$isAuctionActive) : ?>
                     <h4 class="text-danger">Auction Ended</h4>
                     <p class="text-muted mb-0">Ended on: <?= date_format($endTime, 'j M Y,  H:i') ?></p>
-                <?php else : ?>
+                <?php elseif ($isAuctionActive) : ?>
                     <h5 class="text-primary mb-2">Time Remaining: <?= $timeRemaining->format('%ad %hh %im') ?></h5>
                     <p class="small text-muted">Ends: <?= date_format($endTime, 'j M Y,  H:i') ?></p>
                     <?php if ($isLoggedIn): ?>
@@ -140,25 +140,40 @@
                             Sign In to Place Bid
                         </button>
                     <?php endif; ?>
+                <?php else : ?>
+                    <!-- Pending auction -->
                 <?php endif; ?>
             </div>
 
             <!-- Add to Watchlist Button -->
             <?php if ($now < $endTime): ?>
                 <div class="text-center mb-5">
-                    <div id="watch_nowatch" <?php if ($isLoggedIn && $isWatched) echo('style="display: none"'); ?>>
-                        <button type="button" class="btn btn-outline-secondary" onclick="addToWatchlist()">
-                            + Add to Watchlist
+
+                    <?php
+                    if ($isLoggedIn):
+                        ?>
+                        <?php if ($isWatched): ?>
+                        <form method="POST" action="/watchlist/remove" class="d-inline">
+                            <input type="hidden" name="auction_id" value="<?= htmlspecialchars($auctionId) ?>">
+
+                            <button type="button" class="btn btn-sm btn-success me-2" disabled>Watching</button>
+
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Remove from Watchlist</button>
+                        </form>
+                    <?php else: ?>
+                        <form method="POST" action="/watchlist/add" class="d-inline">
+                            <input type="hidden" name="auction_id" value="<?= htmlspecialchars($auctionId) ?>">
+                            <button type="submit" class="btn btn-outline-secondary">
+                                + Add to Watchlist
+                            </button>
+                        </form>
+                    <?php endif; ?>
+
+                    <?php else: ?>
+                        <button type="button" class="btn btn-outline-secondary" onclick="showLoginModal()">
+                            Sign In to Watch
                         </button>
-                    </div>
-                    <div id="watch_watching" <?php if (!$isLoggedIn || !$isWatched) echo('style="display: none"'); ?>>
-                        <button type="button" class="btn btn-success" disabled>
-                            Watching
-                        </button>
-                        <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeFromWatchlist()">
-                            Remove
-                        </button>
-                    </div>
+                    <?php endif; ?>
                 </div>
             <?php endif; ?>
         </div>

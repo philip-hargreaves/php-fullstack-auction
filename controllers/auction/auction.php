@@ -2,6 +2,7 @@
 use infrastructure\DIContainer;
 use infrastructure\Utilities;
 use infrastructure\Request;
+use app\services\AuctionService;
 
 session_start();
 $auctionId = Request::get('auction_id');
@@ -79,14 +80,17 @@ if ($auctionStatus == 'Active') {
 }
 
 // Session Status
-if ($_SESSION['logged_in']) { // login
-    $isLoggedIn = true;
+$auctionServ = DIContainer::get('auctionServ');
+
+if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
+    $hasSession = true;
     $user = $userRepo->getById($_SESSION['user_id']);
 
-    //$isWatched = WatchlistRepository->getIsWatchedByUserIdAndAuctionId($_SESSION['user_id'], $auction->getAuctionId());
+    $isWatched = $auctionServ->isWatching($user->getUserId(), $auctionId);
+
+} else {
+    $hasSession = false;
     $isWatched = false;
-} else { // logout
-    $isLoggedIn = false;
 }
 
 require Utilities::basePath('views/auction.view.php');

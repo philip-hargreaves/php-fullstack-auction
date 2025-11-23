@@ -125,6 +125,26 @@ $isSeller = AuthService::hasRole('seller');
     <?php unset($_SESSION['login_success']); ?>
 <?php endif; ?>
 
+<?php if (isset($_SESSION['error_message'])): ?>
+    <div class="alert alert-danger alert-dismissible fade show mx-2 mt-2" role="alert">
+        <?php echo htmlspecialchars($_SESSION['error_message']); ?>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <?php unset($_SESSION['error_message']); ?>
+<?php endif; ?>
+
+<?php if (isset($_SESSION['success_message'])): ?>
+    <div class="alert alert-success alert-dismissible fade show mx-2 mt-2" role="alert">
+        <?php echo htmlspecialchars($_SESSION['success_message']); ?>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <?php unset($_SESSION['success_message']); ?>
+<?php endif; ?>
+
 <!-- Display upgrade to seller success message -->
 <?php if (isset($_SESSION['upgrade_success'])): ?>
     <div class="alert alert-success alert-dismissible fade show mx-2 mt-2" role="alert">
