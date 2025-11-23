@@ -85,13 +85,15 @@ class AuctionRepository
     public function getWatchedAuctionsByUserId(int $userId): array
     {
         try {
-            $sql = "SELECT a.* from auctions a
-                   JOIN WatchList w ON a.id = w.auctionID
-                   WHERE w.userID = :user_id
-                   ORDER BY w.watched_at DESC";
+            $sql = "SELECT a.* FROM auctions a
+                    WHERE a.id IN (
+                        SELECT auction_id FROM watchlist WHERE user_id = :user_id
+                    )
+                    ORDER BY a.start_datetime DESC";
 
-            $parms = ['user_id' => $userId];
-            $rows = $this->db->query($sql, $parms)->fetchAll();
+            $params = ['user_id' => $userId];
+
+            $rows = $this->db->query($sql, $params)->fetchAll();
 
             return $this->hydrateMany($rows);
         } catch (PDOException $e) {
