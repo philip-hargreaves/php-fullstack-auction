@@ -1,0 +1,23 @@
+/* Force specific colors for dark mode visibility */
+.alert-danger {
+    background-color: #dc3545 !important; /* Bright Red */
+    color: white !important;
+    border: 1px solid #ff6b6b;
+}
+
+.alert-success {
+    background-color: #28a745 !important; /* Bright Green */
+    color: white !important;
+    border: 1px solid #5dd675;
+}
+
+/* Optional: Make it float over the content so it doesn't push the form down */
+.flash-container {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    width: 90%; /* or specific width like 300px */
+    text-align: center;
+}
