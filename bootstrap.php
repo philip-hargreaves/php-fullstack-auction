@@ -46,6 +46,7 @@ DIContainer::bind('bidRepo', new BidRepository(
 DIContainer::bind('bidServ', new BidService(
     DIContainer::get('bidRepo'),
     DIContainer::get('auctionRepo'),
+    DIContainer::get('userRepo'),
     DIContainer::get('db')));
 
 DIContainer::bind('authServ', new AuthService(

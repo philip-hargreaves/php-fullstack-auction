@@ -5,7 +5,7 @@ use infrastructure\Request;
 
 session_start();
 
-// Get and sanitise registration form data
+// Get and sanitise bid form data
 $input = [
     'bid_amount'           => Request::post('bid_amount', ''),
     'auction_id'           => Request::post('auction_id', ''),
@@ -34,7 +34,7 @@ try {
 
 
 } catch (Exception $e) {
-    $_SESSION['place_bid_message'] = ['An unexpected error occurred: ' . $e->getMessage()];
+    $_SESSION['place_bid_error'] = ['An unexpected error occurred: ' . $e->getMessage()];
     header($auction_page);
     exit();
 }

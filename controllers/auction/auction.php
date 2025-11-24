@@ -42,6 +42,7 @@ $imageUrls = [
     "https://images.shopcdn.co.uk/68/ff/68ff78a99e31988e04a6119a22bc28be/2048x2048/webp/fit?force=true&quality=80&compression=80",
     "https://images.shopcdn.co.uk/98/22/98228847b394e80805b907878bbd8ca3/2048x2048/webp/fit?force=true&quality=80&compression=80"
 ];
+$currencyText = '£';
 
 // Variables changes with $auctionStatus
 $itemStatus = $item->getItemStatus();

@@ -1,7 +1,9 @@
 <?php
 namespace app\services;
 use app\models\Bid;
+use app\models\Role;
 use app\repositories\AuctionRepository;
+use app\repositories\UserRepository;
 use infrastructure\Database;
 use app\repositories\BidRepository;
 use DateTime;
@@ -13,11 +15,13 @@ class BidService
 {
     private BidRepository $bidRepo;
     private AuctionRepository $auctionRepo;
+    private UserRepository $userRepo;
     private Database $db;
 
-    public function __construct(BidRepository $bidRepo, AuctionRepository $auctionRepo, Database $db) {
+    public function __construct(BidRepository $bidRepo, AuctionRepository $auctionRepo, UserRepository $userRepo, Database $db) {
         $this->bidRepo = $bidRepo;
         $this->auctionRepo = $auctionRepo;
+        $this->userRepo = $userRepo;
         $this->db = $db;
     }
 
@@ -33,6 +37,7 @@ class BidService
     public function validate(array $input): array {
         $auction = $this->auctionRepo->getById($input['auction_id']);
         $bidAmount = $input['bid_amount'];
+        $user_id = $input['user_id'];
 
         // Check if $auction exists
         if (is_null($auction)) {
@@ -42,6 +47,26 @@ class BidService
         // Check if $auction is active
         if (!$auction->isAuctionActive()) {
             return Utilities::creationResult('This auction is not currently active.', false, null);
+        }
+
+        // Check if $buyer exist
+        if (is_null($user_id)) {
+            return Utilities::creationResult('Buyer not found.', false, null);
+        }
+        $user = $this->userRepo->getById($user_id);
+        if (is_null($user)) {
+            return Utilities::creationResult('Buyer not found.', false, null);
+        }
+
+        // Check if $buyer is a buyer
+        $isBuyer = false;
+        foreach ($user->getRoles() as $role) {
+            if ($role->getName() == 'buyer') {
+                $isBuyer = true;
+            }
+        }
+        if (!$isBuyer) {
+            return Utilities::creationResult('Current user is not a buyer.', false, null);
         }
 
         // Check $bidAmount Required
@@ -91,7 +116,7 @@ class BidService
             return Utilities::creationResult('Failed to create bid.', false, null);
         }
 
-        return Utilities::creationResult('', true, null);
+        return Utilities::creationResult('', true, $bid);
     }
 
     public function placeBid(array $input): array {

@@ -21,6 +21,7 @@
  * @var $bids array
  * @var $winningBid
  * @var $itemCondition string
+ * @var $currencyText string
  */
 ?>
 
@@ -97,11 +98,12 @@
                     <h5 class="text-primary mb-2">Time Remaining: <?= $timeRemaining->format('%ad %hh %im') ?></h5>
                     <p class="small text-muted">Ends: <?= date_format($endTime, 'j M Y,  H:i') ?></p>
                     <?php if ($isLoggedIn): ?>
+
                         <!-- Place Bid Form -->
                         <form method="POST" action="/bid">
                             <label for="bid" class="form-label">Place your bid (must be > £<?= number_format($highestBid, 2) ?>)</label>
                             <div class="input-group mb-3">
-                                <span class="input-group-text">£</span>
+                                <span class="input-group-text"><?= $currencyText ?></span>
                                 <input type="number"
                                        class="form-control form-control-lg"
                                        id="bid"
@@ -280,5 +282,26 @@
         if (typeof initImageGallery === 'function') {
             initImageGallery(imageUrls);
         }
+
+        // 3. Inspect bid form input
+        const bidInput = document.getElementById('bid');
+        const currency = '<?= $currencyText ?>';
+        // Listen for the invalid event
+        bidInput.addEventListener('invalid', function() {
+            // Reset current message
+            this.setCustomValidity('');
+            if (this.validity.rangeUnderflow) { // Bid is too low
+                this.setCustomValidity(`Bid amount must be greater than or equal to ${currency}${this.min}.`);
+            } else if (this.validity.stepMismatch) { // Too many decimal places
+                this.setCustomValidity(`Please enter an amount with up to two decimal places.`);
+            } else if (this.validity.valueMissing) { // Field is empty
+                this.setCustomValidity('Please enter a bid amount.');
+            }
+        });
+        // Listen for input
+        bidInput.addEventListener('input', function() {
+            // Clear the error message immediately so the form becomes valid again as the user types.
+            this.setCustomValidity('');
+        });
     });
 </script>
