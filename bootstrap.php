@@ -6,11 +6,12 @@ use app\repositories\ItemRepository;
 use app\repositories\AuctionRepository;
 use app\repositories\BidRepository;
 use app\repositories\UserRoleRepository;
-use app\repositories\UserWatchlistRepository;
+use app\repositories\WatchlistRepository;
 use app\services\BidService;
 use app\services\AuthService;
 use app\services\RegistrationService;
 use app\services\AuctionService;
+use app\services\WatchlistService;
 use infrastructure\Database;
 use infrastructure\DIContainer;
 use app\services\RoleService;
@@ -34,7 +35,7 @@ DIContainer::bind('itemRepo', new ItemRepository(
     DIContainer::get('db'),
     DIContainer::get('userRepo')));
 
-DIContainer::bind('userWatchlistRepo', new UserWatchlistRepository(
+DIContainer::bind('watchlistRepo', new WatchlistRepository(
     DIContainer::get('db')));
 
 DIContainer::bind('auctionRepo', new AuctionRepository(
@@ -62,6 +63,12 @@ DIContainer::bind('registrationServ', new RegistrationService(
     DIContainer::get('roleRepo'),
     DIContainer::get('db')));
 
+DIContainer::bind('watchlistServ', new WatchlistService(
+    DIContainer::get('watchlistRepo'),
+    DIContainer::get('auctionRepo'),
+    DIContainer::get('bidServ')
+));
+
 DIContainer::bind('roleServ', new RoleService(
     DIContainer::get('userRepo'),
     DIContainer::get('roleRepo'),
@@ -70,5 +77,4 @@ DIContainer::bind('roleServ', new RoleService(
 
 DIContainer::bind('auctionServ', new AuctionService(
     DIContainer::get('auctionRepo'),
-    DIContainer::get('bidServ'),
-    DIContainer::get('userWatchlistRepo')));
+    DIContainer::get('bidServ')));

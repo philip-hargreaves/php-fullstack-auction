@@ -86,10 +86,9 @@ class AuctionRepository
     {
         try {
             $sql = "SELECT a.* FROM auctions a
-                    WHERE a.id IN (
-                        SELECT auction_id FROM watchlist WHERE user_id = :user_id
-                    )
-                    ORDER BY a.start_datetime DESC";
+                    INNER JOIN watchlist w ON a.id = w.auction_id
+                    WHERE w.user_id = :user_id
+                    ORDER BY w.watched_datetime DESC";
 
             $params = ['user_id' => $userId];
 

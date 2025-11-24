@@ -1,21 +1,30 @@
 <?php
-use app\services\AuctionService;
+use app\services\WatchlistService;
 use app\services\AuthService;
 use infrastructure\DIContainer;
 use infrastructure\Request;
 use infrastructure\Utilities;
 
-$userId = (int)AuthService::getUserId();
-$auctionId = (int)Request::post('auction_id');
+session_start();
 
-if ($userId === null || empty($auctionId))
+if (!Request::isPost()) {
+    header('Location: /');
+    exit;
+}
+
+$userId = AuthService::getUserId();
+$auctionId = Request::post('auction_id');
+
+if ($userId === null || $userId <= 0 || empty($auctionId))
 {
     header('Location: /');
     exit();
 }
 
-$auctionServ = DIContainer::get('auctionServ');
-$success = $auctionServ->addToWatchlist($userId, $auctionId);
+$auctionId = (int)$auctionId;
+
+$watchlistServ = DIContainer::get('watchlistServ');
+$success = $watchlistServ->addAuctionToWatchlist($userId, $auctionId);
 
 if ($success) {
     $_SESSION['success_message'] = 'Auction added to your Watchlist!';
