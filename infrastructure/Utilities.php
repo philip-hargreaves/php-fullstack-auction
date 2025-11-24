@@ -24,7 +24,6 @@ class Utilities
         die();
     }
 
-
     // Formats a DateInterval object into a human-readable time remaining string
     public static function displayTimeRemaining(DateInterval $interval): string
     {
@@ -47,5 +46,14 @@ class Utilities
         if (!$pdo->inTransaction()) {
             $pdo->beginTransaction();
         }
+    }
+
+    public static function creationResult(string $message, bool $success, $createdObject): array
+    {
+        return [
+            'success' => $success,
+            'message'  => $message,
+            'object'    => $createdObject,
+        ];
     }
 }

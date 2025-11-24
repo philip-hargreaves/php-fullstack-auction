@@ -103,17 +103,18 @@ class BidRepository
         return $this->hydrate($row);
     }
 
-    public function getByAuctionId(int $auctionId): array{
+    public function getByAuctionId(int $auctionId): array {
         $sql = "SELECT * FROM bids 
-                WHERE auction_id = :auction_id
-                ";
+            WHERE auction_id = :auction_id
+            ORDER BY bid_datetime DESC"; // sort by date descending
+
         $params = ['auction_id' => $auctionId];
         $rows = $this->db->query($sql, $params)->fetchAll();
 
         // Hydrate all rows to objects
         $objects = [];
         foreach ($rows as $row) {
-            $objects[] =  $this->hydrate($row);
+            $objects[] = $this->hydrate($row);
         }
 
         return $objects;
