@@ -33,7 +33,14 @@ class AuctionService
 
     public function getWatchedList (int $userId): array
     {
-        return $this->auctionRepo->getWatchedAuctionsByUserId($userId);
+        $auctions = $this->auctionRepo->getWatchedAuctionsByUserId($userId);
+
+        foreach ($auctions as $auction) {
+            $highestBid = $this->bidServ->getHighestBidByAuctionId($auction->getAuctionId());
+            $currentPrice = $highestBid > 0 ? $highestBid : $auction->getStartingPrice();
+            $auction->setCurrentPrice($currentPrice);
+        }
+        return $auctions;
     }
 
     public function addToWatchlist(int $auctionId, int $userId): bool
