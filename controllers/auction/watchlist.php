@@ -1,8 +1,10 @@
 <?php
-use app\services\AuctionService;
+use app\services\WatchlistService;
 use app\services\AuthService;
 use infrastructure\DIContainer;
 use infrastructure\Utilities;
+
+session_start();
 
 $userId = AuthService::getUserId();
 
@@ -12,8 +14,8 @@ if ($userId === null)
     exit;
 }
 
-$auctionServ = DIContainer::get('auctionServ');
+$watchlistServ = DIContainer::get('watchlistServ');
 
-$auctions = $auctionServ->getWatchedList($userId);
+$auctions = $watchlistServ->getWatchList($userId);
 
 require Utilities::basePath('views/watchlist.view.php');

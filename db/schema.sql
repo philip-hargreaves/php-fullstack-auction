@@ -60,10 +60,16 @@ CREATE TABLE `bids` (
   FOREIGN KEY (`auction_id`) REFERENCES `auctions`(`id`)
 );
 
+-- ALTER statement to add the foreign key *after* bids table exists
+ALTER TABLE `auctions`
+ADD CONSTRAINT `fk_winning_bid`
+FOREIGN KEY (`winning_bid_id`) REFERENCES `bids`(`id`)
+ON DELETE SET NULL; -- If a winning bid is deleted, set the FK to NULL
+
 CREATE TABLE watchlist (
   user_id INT NOT NULL,
   auction_id INT NOT NULL,
-  watched_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  watched_datetime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (user_id, auction_id),
   CONSTRAINT FK_Watchlist_User FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   CONSTRAINT FK_Watchlist_Auction FOREIGN KEY (auction_id) REFERENCES auctions(id) ON DELETE CASCADE
