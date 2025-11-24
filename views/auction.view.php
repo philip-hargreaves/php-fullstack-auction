@@ -218,7 +218,18 @@
                                 </td>
                                 <!-- Bidder Name Formatting -->
                                 <td>
-                                    <?= htmlspecialchars($bid->getBuyer()->getUsername()) ?>
+                                    <?php
+                                    // Semi-anonymise bidder names
+                                    $username = $bid->getBuyer()->getUsername();
+                                    $len = strlen($username);
+                                    if ($len > 4) {
+                                        $maskedName = substr($username, 0, 2) . '***' . substr($username, -2);
+                                    } else {
+                                        // Fallback for short names
+                                        $maskedName = substr($username, 0, 1) . '***' . substr($username, -1);
+                                    }
+                                    ?>
+                                    <?= htmlspecialchars($maskedName) ?>
                                     <?php if ($isWinningBid): ?>
                                         <span class="badge bg-success">Winner</span>
                                     <?php endif; ?>

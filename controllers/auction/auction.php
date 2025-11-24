@@ -16,6 +16,7 @@ $auction = $auctionRepo->getById($auctionId);
 $item = $auction->getItem();
 $bids = $bidServ->getBidsByAuctionId($auctionId);
 
+
 // Variables
 $title = $item->getItemName();
 $sellerName = $item->getSeller()->getUsername();
