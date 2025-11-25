@@ -57,11 +57,11 @@ class ItemRepository
     private function extract(Item $item) : array
     {
         $row = [];
-        $row['sellerId'] = $item -> getSellerId();
-        $row['itemName'] = $item -> getItemName();
-        $row['itemDescription'] = $item -> getItemDescription();
-        $row['itemCondition'] = $item -> getItemCondition();
-        $row['itemStatus'] = $item -> getItemStatus();
+        $row['seller_id'] = $item -> getSellerId();
+        $row['item_name'] = $item -> getItemName();
+        $row['item_description'] = $item -> getItemDescription();
+        $row['item_condition'] = $item -> getItemCondition();
+        $row['item_status'] = $item -> getItemStatus();
 
         return $row;
     }
@@ -70,10 +70,10 @@ class ItemRepository
     {
         try {
             $params = $this->extract($item);
-            $sql = "INSERT INTO items (seller_id, item_name, item_description, item_condition,
-                      item_status)
-                VALUES (:sellerId, :itemName, :itemDescription, :itemCondition,
-                      :itemStatus)";
+            $sql = "INSERT INTO items (seller_id, item_name, item_description, 
+                        item_condition, item_status)
+                    VALUES (:seller_id, :item_name, :item_description, 
+                        :item_condition, :item_status)";
             $result = $this->db->query($sql, $params);
 
             $id = (int)$this->db->connection->lastInsertId();

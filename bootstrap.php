@@ -1,6 +1,6 @@
 <?php
 
-use app\repositories\ImageRepository;
+use app\repositories\ItemImageRepository;
 use app\repositories\UserRepository;
 use app\repositories\RoleRepository;
 use app\repositories\ItemRepository;
@@ -51,7 +51,7 @@ DIContainer::bind('bidRepo', new BidRepository(
     DIContainer::get('userRepo'),
     DIContainer::get('auctionRepo')));
 
-DIContainer::bind('imageRepo', new ImageRepository(
+DIContainer::bind('imageRepo', new ItemImageRepository(
     DIContainer::get('db')
 ));
 

@@ -6,7 +6,7 @@ use app\models\ItemImage;
 use DateTime;
 use PDOException;
 
-class ImageRepository
+class ItemImageRepository
 {
     private Database $db;
 

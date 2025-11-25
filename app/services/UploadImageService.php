@@ -3,12 +3,12 @@
 namespace app\services;
 
 use app\models\ItemImage;
-use app\repositories\ImageRepository;
+use app\repositories\ItemImageRepository;
 
 class UploadImageService
 {
     public function __construct(
-        private ImageRepository $imageRepo,
+        private ItemImageRepository $imageRepo,
     )
     {
 
