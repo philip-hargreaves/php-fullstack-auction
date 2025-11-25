@@ -18,8 +18,11 @@ class ItemRepository
         $this->userRepo = $userRepo;
     }
 
-    private function hydrate($row) : Item {
-        // Create the object using constructor
+    private function hydrate($row): ?Item {
+        if (empty($row)) {
+            return null;
+        }
+
         $object = new Item(
             (int)$row['id'],
             (int)$row['seller_id'],
@@ -37,23 +40,16 @@ class ItemRepository
     }
 
     public function getById(int $itemId): ?Item {
-        // Query
-        $sql = "SELECT id, seller_id, item_name, item_description, item_condition, item_status 
+        try {
+            $sql = "SELECT id, seller_id, item_name, item_description, item_condition, item_status 
                 FROM items 
                 WHERE id = :item_id";
-        $param = ['item_id' => $itemId];
-        $row = $this->db->query($sql, $param)->fetch();
+            $param = ['item_id' => $itemId];
+            $row = $this->db->query($sql, $param)->fetch();
 
-        // Check if a record was returned
-        if (empty($row)) {
-            return null;
-        }
-
-        // Create object with $row
-        try {
             return $this->hydrate($row);
         } catch (PDOException $e) {
-            // Log the error $e->getMessage()
+            // TODO: add logging
             return null;
         }
     }
@@ -61,7 +57,6 @@ class ItemRepository
     private function extract(Item $item) : array
     {
         $row = [];
-
         $row['sellerId'] = $item -> getSellerId();
         $row['itemName'] = $item -> getItemName();
         $row['itemDescription'] = $item -> getItemDescription();
@@ -73,24 +68,19 @@ class ItemRepository
 
     public function create(Item $item) : ?Item
     {
-        $params = $this->extract($item);
-
-        $sql = "INSERT INTO items (seller_id, item_name, item_description, item_condition,
+        try {
+            $params = $this->extract($item);
+            $sql = "INSERT INTO items (seller_id, item_name, item_description, item_condition,
                       item_status)
                 VALUES (:sellerId, :itemName, :itemDescription, :itemCondition,
-                        :itemStatus)";
+                      :itemStatus)";
+            $result = $this->db->query($sql, $params);
 
-        $result = $this->db->query($sql, $params);
-
-        // Check if the insert was successful.
-        if ($result)
-        {
             $id = (int)$this->db->connection->lastInsertId();
             $item->setItemId($id);
             return $item;
-        }
-        else
-        {
+        } catch (PDOException $e) {
+            // TODO: add logging
             return null;
         }
     }

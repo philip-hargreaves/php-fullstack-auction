@@ -60,11 +60,13 @@ CREATE TABLE `bids` (
   FOREIGN KEY (`auction_id`) REFERENCES `auctions`(`id`)
 );
 
-CREATE TABLE `images` (
-    image_id INT AUTO_INCREMENT PRIMARY KEY,
-    auction_id INT NOT NULL,
-    image_url VARCHAR(255) NOT NULL,
-    FOREIGN KEY (auction_id) REFERENCES `auctions` (id) ON DELETE CASCADE
+CREATE TABLE item_images (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    item_id INT NOT NULL,
+    image_url VARCHAR(1024) NOT NULL,
+    is_main TINYINT(1) NOT NULL DEFAULT 0,
+    upload_datetime DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE
 );
 
 -- ALTER statement to add the foreign key *after* bids table exists

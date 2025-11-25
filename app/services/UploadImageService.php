@@ -2,7 +2,7 @@
 
 namespace app\services;
 
-use app\models\Image;
+use app\models\ItemImage;
 use app\repositories\ImageRepository;
 
 class UploadImageService
@@ -19,7 +19,7 @@ class UploadImageService
         foreach ($uploadedImageURLs as $singleImageURL)
         {
             //creates new Image data type
-            $image = new Image(0, $auctionID, $singleImageURL);
+            $image = new ItemImage(0, $auctionID, $singleImageURL);
 
             //insert image details into the database.
             $this -> imageRepo -> create($image);

@@ -2,6 +2,7 @@
 namespace app\repositories;
 use app\models\Role;
 use infrastructure\Database;
+use PDOException;
 
 
 class RoleRepository
@@ -19,86 +20,109 @@ class RoleRepository
 
     public function getById(int $id): ?Role
     {
-        // Check cache first for $id
-        if (isset($this->cacheById[$id])) {
-            return $this->cacheById[$id];
+        try {
+            // Check cache first for $id
+            if (isset($this->cacheById[$id])) {
+                return $this->cacheById[$id];
+            }
+
+            // Not in cache, so fetch from DB
+            $sql = 'SELECT id, role_name FROM roles WHERE id = :id';
+            $param = ['id' => $id];
+            $row = $this->db->query($sql, $param)->fetch();
+
+            return $row ? $this->hydrate($row) : null;
+        } catch (PDOException $e) {
+            // TODO: add logging
+            return null;
         }
-
-        // Not in cache, so fetch from DB
-        $sql = 'SELECT id, role_name FROM roles WHERE id = :id';
-        $param = ['id' => $id];
-        $row = $this->db->query($sql, $param)->fetch();
-
-        return $row ? $this->hydrate($row) : null;
     }
 
     public function getByIds(array $ids): array
     {
-        // No ids
-        if (empty($ids)) {
+        try {
+            if (empty($ids)) {
+                return [];
+            }
+
+            $placeholders = [];
+            $params = [];
+
+            // Build one named placeholder per role ID
+            foreach ($ids as $index => $id) {
+                $param = ':id_' . $index;
+                $placeholders[] = $param;
+                $params[$param] = $id;
+            }
+
+            // Join the named placeholders into the IN clause, e.g. id IN (:id_0, :id_1)
+            $sql = 'SELECT id, role_name FROM roles WHERE id IN (' . implode(', ', $placeholders) . ')';
+            $rows = $this->db->query($sql, $params)->fetchAll();
+
+            return $this->hydrateMany($rows);
+        } catch (PDOException $e) {
+            // TODO: add logging
             return [];
         }
-
-        $placeholders = [];
-        $params = [];
-
-        // Build one named placeholder per role ID
-        foreach ($ids as $index => $id) {
-            $param = ':id_' . $index;
-            $placeholders[] = $param;
-            $params[$param] = $id;
-        }
-
-        // Join the named placeholders into the IN clause, e.g. id IN (:id_0, :id_1)
-        $sql = 'SELECT id, role_name FROM roles WHERE id IN (' . implode(', ', $placeholders) . ')';
-        $rows = $this->db->query($sql, $params)->fetchAll();
-
-        return $this->hydrateMany($rows);
     }
 
     public function getByName(string $name): ?Role
     {
-        // Normalise name to reduce errors when calling etc
-        $key = strtolower($name);
+        try {
+            // Normalise name to reduce errors when calling etc
+            $key = strtolower($name);
 
-        if (isset($this->cacheByName[$key])) {
-            return $this->cacheByName[$key];
+            if (isset($this->cacheByName[$key])) {
+                return $this->cacheByName[$key];
+            }
+
+            $sql = 'SELECT id, role_name FROM roles WHERE role_name = :name';
+            $param = ['name' => $name];
+
+            $row = $this->db
+                ->query($sql, $param)
+                ->fetch();
+
+            return $row ? $this->hydrate($row) : null;
+        } catch (PDOException $e) {
+            // TODO: add logging
+            return null;
         }
-
-        $sql = 'SELECT id, role_name FROM roles WHERE role_name = :name';
-        $param = ['name' => $name];
-
-        $row = $this->db
-            ->query($sql, $param)
-            ->fetch();
-
-        return $row ? $this->hydrate($row) : null;
     }
 
     public function getByNames(array $names): array
     {
-        if (empty($names)) {
+        try {
+            if (empty($names)) {
+                return [];
+            }
+
+            $placeholders = [];
+            $params = [];
+
+            foreach ($names as $index => $name) {
+                $param = ':name_' . $index;
+                $placeholders[] = $param;
+                $params[$param] = strtolower($name);
+            }
+
+            $sql = 'SELECT id, role_name FROM roles WHERE role_name IN (' . implode(', ', $placeholders) . ')';
+            $rows = $this->db->query($sql, $params)->fetchAll();
+
+            return $this->hydrateMany($rows);
+        } catch (PDOException $e) {
+            // TODO: add logging
             return [];
         }
-
-        $placeholders = [];
-        $params = [];
-
-        foreach ($names as $index => $name) {
-            $param = ':name_' . $index;
-            $placeholders[] = $param;
-            $params[$param] = strtolower($name);
-        }
-
-        $sql = 'SELECT id, role_name FROM roles WHERE role_name IN (' . implode(', ', $placeholders) . ')';
-        $rows = $this->db->query($sql, $params)->fetchAll();
-
-        return $this->hydrateMany($rows);
     }
 
     // Helper to build or fetch a single Role instance
-    private function hydrate(array $row): Role
+    private function hydrate(array $row): ?Role
     {
+        if (empty($row)) {
+            return null;
+        }
+
         $id = (int)$row['id'];
 
         if (isset($this->cacheById[$id])) {
