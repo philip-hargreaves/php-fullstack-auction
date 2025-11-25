@@ -15,12 +15,9 @@ class WatchlistRepository
 
     public function addAuction(int $userId, int $auctionId): bool
     {
-        // Due to a persistent database structural misalignment, the physical column order
-        // of the 'watchlist' table is reversed from its logical definition.
-        // We must swap the placeholders here to ensure the data lands in the correct column.
         try {
             $sql = 'INSERT IGNORE INTO watchlist (user_id, auction_id, watched_datetime) 
-                    VALUES (:auction_id, :user_id, NOW())';
+                    VALUES (:user_id, :auction_id, NOW())';
 
             $params = [
                 'user_id' => $userId,

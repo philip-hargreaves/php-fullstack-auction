@@ -32,7 +32,7 @@ class WatchlistService
         return $auctions;
     }
 
-    public function addAuctionToWatchlist(int $auctionId, int $userId): bool
+    public function addAuctionToWatchlist(int $userId, int $auctionId): bool
     {
         return $this->watchlistRepo->addAuction($userId, $auctionId);
     }
