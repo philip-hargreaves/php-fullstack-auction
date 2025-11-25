@@ -65,3 +65,12 @@ ALTER TABLE `auctions`
 ADD CONSTRAINT `fk_winning_bid`
 FOREIGN KEY (`winning_bid_id`) REFERENCES `bids`(`id`)
 ON DELETE SET NULL; -- If a winning bid is deleted, set the FK to NULL
+
+CREATE TABLE watchlist (
+  user_id INT NOT NULL,
+  auction_id INT NOT NULL,
+  watched_datetime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (user_id, auction_id),
+  CONSTRAINT FK_Watchlist_User FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  CONSTRAINT FK_Watchlist_Auction FOREIGN KEY (auction_id) REFERENCES auctions(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
