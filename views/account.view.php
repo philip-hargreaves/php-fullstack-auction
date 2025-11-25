@@ -20,7 +20,7 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
             </div>
         <?php endif; ?>
 
-        <div class="card p-4">
+        <div class="card p-4 mb-4">
             <h3>Edit Account Details</h3>
             <form method="POST" action="/account/update">
 
@@ -29,12 +29,42 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
                     <input type="text" class="form-control" name="username" value="<?= htmlspecialchars($user->getUsername()) ?>" required>
                 </div>
 
-                <div class="form-group mb-3">
-                    <label for="email">Email address</label>
-                    <input type="email" class="form-control" name="email" value="<?= htmlspecialchars($user->getEmail()) ?>" required>
+                <div class="form-group mb-4">
+                    <label for="email">Email Address</label>
+                    <input type="email" class="form-control" name="email" value="<?= htmlspecialchars($user->getEmail()) ?>" readonly disabled>
+                    <small class="form-text text-muted">Email address cannot be changed for security reasons.</small>
                 </div>
 
-                <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
+                <button type="submit" class="btn btn-primary mt-3">Update Username</button>
+            </form>
+        </div>
+
+        <div class="card p-4 mb-4">
+            <h3 class="mb-4">Change Password</h3>
+
+            <form method="POST" action="/account/change-password">
+
+                <div class="form-group mb-3">
+                    <label for="current_password_display">Current Password</label>
+                    <input type="text" class="form-control" id="current_password_display" value="**********" readonly disabled>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="current_password">Verify Current Password</label>
+                    <input type="password" class="form-control" id="current_password" name="current_password" required>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="new_password">New Password</label>
+                    <input type="password" class="form-control" id="new_password" name="new_password" required>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label for="confirm_password">Confirm New Password</label>
+                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                </div>
+
+                <button type="submit" class="btn btn-danger w-100">Change Password</button>
             </form>
         </div>
 
