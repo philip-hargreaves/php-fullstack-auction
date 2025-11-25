@@ -56,7 +56,7 @@ DIContainer::bind('imageRepo', new ImageRepository(
 ));
 
 DIContainer::bind('createItemService', new CreateItemService(
-    DIContainer::get('db'),
+    //DIContainer::get('db'),
     DIContainer::get('itemRepo')
 ));
 
