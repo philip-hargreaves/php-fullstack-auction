@@ -72,7 +72,6 @@ $isSeller = AuthService::hasRole('seller');
         <div class="middle-section">
             <?php if ($isBuyer): ?>
                 <a href="/mybids" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/mybids') !== false ? 'active' : '' ?>">My Bids</a>
-                <a href="/recommendations" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/recommendations') !== false ? 'active' : '' ?>">Recommended</a>
                 <a href="/watchlist" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/watchlist') !== false ? 'active' : '' ?>">Watchlist</a>
             <?php endif; ?>
 
