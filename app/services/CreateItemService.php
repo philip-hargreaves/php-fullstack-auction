@@ -9,7 +9,7 @@ use app\models\Item;
 class CreateItemService
 {
     public function __construct(
-        private Database $db,
+        //private Database $db,
         private ItemRepository $itemRepo,
     )
     {
