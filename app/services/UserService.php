@@ -1,5 +1,8 @@
 <?php
+
 namespace app\services;
+
+use app\repositories\UserRepository;
 use app\models\User;
 use app\repositories\UserRepository;
 use app\repositories\RoleRepository;
@@ -27,6 +30,22 @@ class UserService
         $this->db                 = $db;
     }
 
+    public function getUserAccount(int $userId): ?User
+    {
+        return $this->userRepo->getById($userId);
+    }
+
+    public function updateAccount(int $userId, array $data): array
+    {
+        $errors = $this->validateAccountUpdate($userId, $data);
+        if (!empty($errors)) {
+            return ['success' => false, 'errors' => $errors];
+        }
+
+        $success = $this->userRepo->updateAccount($userId, $data);
+
+        return ['success' => $success, 'errors' => []];
+    }
 
     // Register a new user
     public function register(array $input): array
@@ -48,7 +67,7 @@ class UserService
             // Assign the buyer role to the user
             $user = $this->createUser($input);
             $this->userRoleRepository->assignRole($user->getUserId(), $buyerRole);
-            
+
             // Commit the transaction
             $pdo->commit();
 

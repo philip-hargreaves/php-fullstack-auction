@@ -156,6 +156,27 @@ class UserRepository
         }
     }
 
+    public function updateAccount(int $userId, array $data): bool
+    {
+        try {
+            $sql = "UPDATE users 
+                    SET username = :username, email = :email 
+                    WHERE id = :id";
+            $params = [
+                'username' => $data['username'],
+                'email' => $data['email'],
+                'id' => $userId
+            ];
+
+            $stmt = $this->db->query($sql, $params);
+
+            return $stmt->rowCount() > 0;
+
+        } catch (PDOException $e) {
+            return false;
+        }
+    }
+
     public function getByIds(array $ids): array
     {
         if (empty($ids)) return [];
