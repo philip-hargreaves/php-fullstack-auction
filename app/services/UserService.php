@@ -131,6 +131,39 @@ class UserService
         } elseif (!preg_match('/[0-9]/', $password)) {
             $errors['password'] = 'Password must contain at least one number.';
         }
+        return $errors;
+    }
+
+    public function changePassword(int $userId, array $data): array
+    {
+        $user = $this->userRepo->getById($userId);
+
+        $errors = $this->validatePasswordChange($user, $data);
+        if (!empty($errors)) {
+            return ['success' => false, 'errors' => $errors];
+        }
+
+        if (!$user->verifyPassword($data['current_password'])) {
+            return ['success' => false, 'errors' => ['Current password is incorrect.']];
+        }
+
+        $newPasswordHash = password_hash($data['new_password'], PASSWORD_DEFAULT);
+
+        $success = $this->userRepo->updatePassword($userId, $newPasswordHash);
+
+        if ($success) {
+            return ['success' => true, 'message' => 'Password updated.', 'errors' => []];
+        } else {
+            return ['success' => false, 'message' => 'Database update failed.', 'errors' => []];
+        }
+    }
+
+    private function validatePasswordChange(?User $user, array $data): array
+    {
+        $errors = [];
+        $current = $data['current_password'] ?? '';
+        $new = $data['new_password'] ?? '';
+        $confirm = $data['confirm_password'] ?? '';
 
         // Password confirmation
         if ($password !== '') {
@@ -138,7 +171,20 @@ class UserService
                 $errors['password_confirmation'] = 'Passwords do not match.';
             }
         }
+        if ($user === null) {
+            $errors[] = 'User account not found.';
+            return $errors;
+        }
 
+        if (empty($current)) {
+            $errors[] = 'Current password is required.';
+        }
+
+        if (empty($new)) {
+            $errors[] = 'New password is required.';
+        } elseif ($new !== $confirm) {
+            $errors[] = 'New password and confirmation do not match.';
+        }
         return $errors;
     }
 
