@@ -17,6 +17,9 @@ $roleNames = AuthService::getRoleNames();
 $isBuyer = AuthService::hasRole('buyer');
 $isSeller = AuthService::hasRole('seller');
 ?>
+
+<!doctype html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -76,6 +79,7 @@ $isSeller = AuthService::hasRole('seller');
                 <a href="/my-listings" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/my-listings') !== false ? 'active' : '' ?>">My Listings</a>
                 <a href="/create-auction" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/create-auction') !== false ? 'active' : '' ?>">Create Auction</a>
             <?php endif; ?>
+
         </div>
         <?php endif; ?>
 
@@ -119,6 +123,26 @@ $isSeller = AuthService::hasRole('seller');
         </button>
     </div>
     <?php unset($_SESSION['login_success']); ?>
+<?php endif; ?>
+
+<?php if (isset($_SESSION['error_message'])): ?>
+    <div class="alert alert-danger alert-dismissible fade show mx-2 mt-2" role="alert">
+        <?php echo htmlspecialchars($_SESSION['error_message']); ?>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <?php unset($_SESSION['error_message']); ?>
+<?php endif; ?>
+
+<?php if (isset($_SESSION['success_message'])): ?>
+    <div class="alert alert-success alert-dismissible fade show mx-2 mt-2" role="alert">
+        <?php echo htmlspecialchars($_SESSION['success_message']); ?>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <?php unset($_SESSION['success_message']); ?>
 <?php endif; ?>
 
 <!-- Display upgrade to seller success message -->

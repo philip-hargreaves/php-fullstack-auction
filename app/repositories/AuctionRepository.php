@@ -4,7 +4,6 @@ namespace app\repositories;
 use infrastructure\Database;
 use app\models\Auction;
 use app\repositories\ItemRepository;
-use PDO;
 use PDOException;
 
 class AuctionRepository
@@ -75,6 +74,24 @@ class AuctionRepository
                     ORDER BY a.start_datetime DESC";
 
             $params = ['seller_id' => $sellerId];
+            $rows = $this->db->query($sql, $params)->fetchAll();
+
+            return $this->hydrateMany($rows);
+        } catch (PDOException $e) {
+            return [];
+        }
+    }
+
+    public function getWatchedAuctionsByUserId(int $userId): array
+    {
+        try {
+            $sql = "SELECT a.* FROM auctions a
+                    INNER JOIN watchlist w ON a.id = w.auction_id
+                    WHERE w.user_id = :user_id
+                    ORDER BY w.watched_datetime DESC";
+
+            $params = ['user_id' => $userId];
+
             $rows = $this->db->query($sql, $params)->fetchAll();
 
             return $this->hydrateMany($rows);
