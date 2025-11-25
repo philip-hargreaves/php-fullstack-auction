@@ -10,6 +10,7 @@ use app\repositories\UserRoleRepository;
 use app\repositories\WatchlistRepository;
 use app\services\BidService;
 use app\services\AuthService;
+use app\services\CreateAuctionService;
 use app\services\RegistrationService;
 use app\services\AuctionService;
 use app\services\WatchlistService;
@@ -94,3 +95,10 @@ DIContainer::bind('roleServ', new RoleService(
 DIContainer::bind('auctionServ', new AuctionService(
     DIContainer::get('auctionRepo'),
     DIContainer::get('bidServ')));
+
+DIContainer ::bind('createAuctionService', new CreateAuctionService(
+    DIContainer::get('db'),
+    DIContainer::get('auctionRepo'),
+    DIContainer::get('createItemService'),
+    DIContainer::get('uploadImageService'),
+));

@@ -58,34 +58,40 @@ class ItemRepository
         }
     }
 
-    //inserts item data into the database and returns the auto-incremented item ID.
-    public function insertItemData(Item $item) : ?int
+    private function extract(Item $item) : array
     {
-        $sellerID = $item -> getSellerId();
-        $itemName = $item -> getItemName();
-        $itemDescription = $item -> getItemDescription();
-        $itemCondition = $item -> getItemCondition();
-        $itemStatus = $item -> getItemStatus();
+        $row = [];
 
-        $stmt = $this -> db -> connection -> prepare(
-            "INSERT INTO items (seller_id, item_name, item_description, item_condition,
+        $row['sellerId'] = $item -> getSellerId();
+        $row['itemName'] = $item -> getItemName();
+        $row['itemDescription'] = $item -> getItemDescription();
+        $row['itemCondition'] = $item -> getItemCondition();
+        $row['itemStatus'] = $item -> getItemStatus();
+
+        return $row;
+    }
+
+    public function create(Item $item) : ?Item
+    {
+        $params = $this->extract($item);
+
+        $sql = "INSERT INTO items (seller_id, item_name, item_description, item_condition,
                       item_status)
-                VALUES (:sellerID, :itemName, :itemDescription, :itemCondition,
-                        :itemStatus)"
-        ); //item id not inserted since it is autoincremented.
+                VALUES (:sellerId, :itemName, :itemDescription, :itemCondition,
+                        :itemStatus)";
 
-        $stmt -> execute(
-            [
-                ':sellerID' => $sellerID,
-                ':itemName' => $itemName,
-                ':itemDescription' => $itemDescription,
-                ':itemCondition' => $itemCondition,
-                ':itemStatus' => $itemStatus
-            ]
-        );
+        $result = $this->db->query($sql, $params);
 
-        $itemID = $this->db->connection->lastInsertId();
-
-        return $itemID;
+        // Check if the insert was successful.
+        if ($result)
+        {
+            $id = (int)$this->db->connection->lastInsertId();
+            $item->setItemId($id);
+            return $item;
+        }
+        else
+        {
+            return null;
+        }
     }
 }

@@ -22,7 +22,7 @@ class UploadImageService
             $image = new Image(0, $auctionID, $singleImageURL);
 
             //insert image details into the database.
-            $this -> imageRepo -> insertImageURLs($image);
+            $this -> imageRepo -> create($image);
         }
     }
 }

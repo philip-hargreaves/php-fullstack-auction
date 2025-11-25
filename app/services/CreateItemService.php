@@ -16,7 +16,7 @@ class CreateItemService
 
     }
 
-    public function createItem($packagedItemData)
+    public function createItem($packagedItemData) : array
     {
         $itemCreationResults = [];
 
@@ -46,6 +46,7 @@ class CreateItemService
         $userID = $_SESSION['user_id'];
 
         //create new item data type. The item ID is initialised as 0. auto-incremented item ID will be retrieved.
+        //use hydrate here instead?
         $newItem = new Item
         (
             0,
@@ -56,11 +57,7 @@ class CreateItemService
             $validPackagedItemData['itemStatus']
         );
 
-        //insert the item details into the database and retrieve the auto-incremented item ID.
-        $newItemID = $this -> itemRepo -> insertItemData($newItem);
-
-        //assign the item ID to the item data type that was just created
-        $newItem -> setItemId($newItemID);
+        $newItem = $this -> itemRepo -> create($newItem);
 
         //put the item into the item creation results. At this point, array for error should be empty.
         $itemCreationResults['newItem'] = $newItem;

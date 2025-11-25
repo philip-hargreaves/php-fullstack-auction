@@ -1,7 +1,6 @@
 <?php
 use infrastructure\Utilities;
 use infrastructure\DIContainer;
-use app\services\CreateAuctionService;
 use infrastructure\Request;
 
 session_start();
@@ -12,6 +11,7 @@ $userRepo = DIContainer::get('userRepo');
 $itemRepo = DIContainer::get('itemRepo');
 $auctionRepo = DIContainer::get('auctionRepo');
 $createItemService = DIContainer::get('createItemService');
+$createAuctionService = DIContainer::get('createAuctionService');
 
 //upload image service
 $uploadImageService = DIContainer::get('uploadImageService');
@@ -36,7 +36,7 @@ $uploadDir = Utilities::basePath('public/image_storage') . '/';
 $uploadedImages = $_FILES['images'] ?? null;
 
 //stores image urls
-$imageURLs = [];
+$imageUrls = [];
 
 $imagePathMap = [];
 
@@ -46,8 +46,8 @@ foreach ($uploadedImages['tmp_name'] as $index => $tmpPath)
     //generates unique ID, concatenate with basename to make 'URL'
     $filename = uniqid() . '-' . basename($uploadedImages['name'][$index]);
     $targetPath = $uploadDir . $filename;
-    $imageURL = 'image_storage/' . $filename;
-    $imageURLs[] = $imageURL;
+    $imageUrl = 'image_storage/' . $filename;
+    $imageUrls[] = $imageUrl;
 
     $imagePathMap[] = [
         'tmp_path' => $tmpPath,
@@ -64,27 +64,17 @@ $packagedData = [
     'auctionReservePrice'=> $auctionReservePrice,
     'auctionStartDate'   => $auctionStartDate,
     'auctionEndDate'     => $auctionEndDate,
-    'imageURLs'         => $imageURLs,
+    'imageUrls'         => $imageUrls,
 ];
-
-//CreateAuctionService here? probably make into DI container?
-$auctionService = new CreateAuctionService(
-    $db,
-    $itemRepo,
-    $auctionRepo,
-    $createItemService,
-    $uploadImageService,
-    $packagedData
-);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST')
 {
     //creates the auction
-    $newAuction = $auctionService->createAuction();
+    $newAuction = $createAuctionService->createAuction($packagedData);
 
 
     //retrieves auction ID to be passed to auction.view
-    $currentAuctionID = $newAuction -> getAuctionID();
+    $currentAuctionID = $newAuction -> getAuctionId();
 
     //'upload' images only after auction successfully created
     foreach ($imagePathMap as $imagePath)

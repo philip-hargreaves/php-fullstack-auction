@@ -5,28 +5,36 @@ namespace app\models;
 class Image
 {
     //properties
-    private int $imageID;
+    private int $imageId;
     private int $auctionId;
-    private string $imageURL;
+    private string $imageUrl;
 
     //constructors
-    public function __construct(int $imageID, int $auctionId, string $imageURL){
-        $this->imageID = $imageID;
+    public function __construct(int $imageID, int $auctionId, string $imageUrl)
+    {
+        $this->imageId = $imageID;
         $this->auctionId = $auctionId;
-        $this->imageURL = $imageURL;
+        $this->imageUrl = $imageUrl;
     }
 
-    public function getImageID(): int
+    //GETTERS
+    public function getImageId(): int
     {
-        return $this->imageID;
+        return $this->imageId;
     }
 
     public function getImageURL(): string
     {
-        return $this->imageURL;
+        return $this->imageUrl;
     }
     public function getAuctionID(): int
     {
         return $this -> auctionId;
+    }
+
+    //SETTERS
+    public function setImageId($imageId) :void
+    {
+        $this -> imageId = $imageId;
     }
 }

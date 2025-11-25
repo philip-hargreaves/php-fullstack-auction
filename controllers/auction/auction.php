@@ -21,7 +21,7 @@ $item = $auction->getItem();
 $bids = $bidServ->getBidsByAuctionId($auctionId);
 
 //Get auction images
-$imageArray = $imageRepo->getImagesByAuctionId($auctionId);
+$imageArray = $imageRepo->getImageByAuctionId($auctionId);
 
 // Variables
 $title = $item->getItemName();

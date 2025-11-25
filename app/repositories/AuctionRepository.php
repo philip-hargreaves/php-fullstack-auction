@@ -113,34 +113,41 @@ class AuctionRepository
         return $auctions;
     }
 
-    //insert auction data into database. Retrieves the auto-incremented auction ID
-    public function insertAuctionData(Auction $auction) : int
+    private function extract(Auction $auction) : array
     {
-        #sql language
-        $stmt = $this -> db -> connection -> prepare(
-            "INSERT INTO auctions (item_id, winning_bid_id, start_datetime, end_datetime, 
-                      starting_price, reserve_price, auction_status)
-                VALUES (:item_id, :winning_bid_id, :start_datetime, 
-                        :end_datetime, :starting_price, :reserve_price, :auction_status)"
-        );
+        $row = [];
 
-        $stmt -> execute(
-            [
-                //':auction_id' => $auction->getAuctionID(),
-                ':item_id' => $auction->getItemId(), //use ItemRepo to get itemID?
-                ':winning_bid_id' => $auction->getWinningBidID(), //start with null
-                ':start_datetime' => $auction->getStartDateTime()->format('Y-m-d H:i:s'),
-                ':end_datetime' => $auction->getEndDateTime()->format('Y-m-d H:i:s'),
-                ':starting_price' => $auction->getStartingPrice(),
-                ':reserve_price' => $auction->getReservePrice(),
-                ':auction_status' => $auction->getAuctionStatus()
-            ]
-        );
+        $row['item_id']= $auction ->getItemId(); //use ItemRepo to get itemID?
+        $row['winning_bid_id'] = $auction -> getWinningBidID(); //start with null
+        $row['start_datetime'] = $auction ->getStartDateTime()->format('Y-m-d H:i:s');
+        $row['end_datetime'] = $auction ->getEndDateTime()->format('Y-m-d H:i:s');
+        $row['starting_price'] = $auction ->getStartingPrice();
+        $row['reserve_price'] = $auction ->getReservePrice();
+        $row['auction_status'] = $auction->getAuctionStatus();
 
-        $auctionID = $this->db->connection->lastInsertId();
-
-        return $auctionID;
+        return $row;
     }
 
+    public function create(Auction $auction) : ?Auction
+    {
+        $params = $this->extract($auction);
 
+        $sql = "INSERT INTO auctions (item_id, winning_bid_id, start_datetime, end_datetime,
+                      starting_price, reserve_price, auction_status)
+                VALUES (:item_id, :winning_bid_id, :start_datetime,
+                        :end_datetime, :starting_price, :reserve_price, :auction_status)";
+
+        $result = $this->db->query($sql, $params);
+
+        // Check if the insert was successful.
+        if ($result) {
+            $id = (int)$this->db->connection->lastInsertId();
+            $auction->setAuctionId($id);
+            return $auction;
+        }
+        else
+        {
+            return null;
+        }
+    }
 }

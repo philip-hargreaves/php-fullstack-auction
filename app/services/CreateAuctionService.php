@@ -13,25 +13,23 @@ class CreateAuctionService
 
     public function __construct(
         private Database $db,
-        private ItemRepository $itemRepo,
         private AuctionRepository $auctionRepo,
         private CreateItemService $createItemService,
         private UploadImageService $uploadImageService,
-        private array $packagedData
     )
     {}
 
-    public function createAuction() : Auction
+    public function createAuction($packagedData) : Auction
     {
         $pdo = $this->db->connection;
 
         Utilities::beginTransaction($pdo);
 
         //calls function to create item first. If there are error, the errors are returned here and handled
-        $itemCreationResults = $this -> createItemService-> createItem($this -> packagedData);
+        $itemCreationResults = $this -> createItemService-> createItem($packagedData);
 
         //validates user input for auction details.
-        $auctionInputValidationResult = $this->validateInput($this -> packagedData);
+        $auctionInputValidationResult = $this->validateInput($packagedData);
 
         //the input errors for both items and auctions are handled here together, so they all show up on the create auction form
         if (!empty($auctionInputValidationResult['exception']) || !empty($itemCreationResults['errors']))
@@ -41,7 +39,7 @@ class CreateAuctionService
 
             //returns the error and old inputs back to the form
             $_SESSION['errors'] = $errors;
-            $_SESSION['old'] = $this -> packagedData;
+            $_SESSION['old'] = $packagedData;
             header("Location: /create-auction");
             exit;
         }
@@ -67,16 +65,13 @@ class CreateAuctionService
         );
 
         //insert auction details into the database and retrieve auto-incremented auction ID
-        $newInsertedAuctionID = $this->auctionRepo->insertAuctionData($newAuction);
-
-        //assigns the auto-incremented auction ID back to the auction data type.
-        $newAuction -> setAuctionId($newInsertedAuctionID);
+        $newAuction = $this->auctionRepo->create($newAuction);
 
         //get uploaded image URLs.
-        $uploadedImagesURLs = $this -> packagedData['imageURLs'];
+        $uploadedImagesUrls = $packagedData['imageUrls'];
 
         //insert image URLs into the database and the auction ID it is associated with
-        $this -> uploadImageService -> uploadAuctionImage($newInsertedAuctionID, $uploadedImagesURLs);
+        $this -> uploadImageService -> uploadAuctionImage($newAuction -> getAuctionID(), $uploadedImagesUrls);
 
         $pdo->commit();
 

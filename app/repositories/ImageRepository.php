@@ -3,6 +3,7 @@
 namespace app\repositories;
 use infrastructure\Database;
 use app\models\Image;
+use PDOException;
 
 class ImageRepository
 {
@@ -14,57 +15,64 @@ class ImageRepository
     }
 
     //Converts retrieved image data into image data type. Not sure if this is what hydrate meant.
-    private function imageHydrate($retrievedImageInfo)
+    private function imageHydrate($row) : Image
     {
-        $image = new Image(
-            $retrievedImageInfo['image_id'],
-            $retrievedImageInfo['auction_id'],
-            $retrievedImageInfo['image_url']
+        // Create the object using constructor
+        $object = new Image(
+            (int)$row['image_id'],
+            (int)$row['auction_id'],
+            (string)$row['image_url'],
         );
 
-        return $image;
+        return $object;
     }
 
     //insert image URLs into the database.
-    public function insertImageURLs(Image $image)
+
+    private function extract(Image $image)
     {
-        //$imageID = $image -> getImageID();
-        $auctionId = $image -> getAuctionID();
-        $imageURL = $image -> getImageURL();
+        $row = [];
 
-        $stmt = $this -> db -> connection -> prepare(
-            "INSERT INTO images (auction_id, image_url)
-                VALUES (:auction_id, :image_url)"
-        );
+        //$row['image_id'] = $image -> getImageId();
+        $row['auction_id'] = $image -> getAuctionId();
+        $row['image_url'] = $image -> getImageUrl();
 
-        $stmt -> execute(
-            [
-                ':auction_id' => $auctionId,
-                ':image_url' => $imageURL
-            ]
-        );
+        return $row;
     }
 
-    public function getImagesByAuctionID($auctionID) : array
+    public function create(Image $image)
     {
-        $stmt = $this -> db -> connection -> prepare(
-            "SELECT * FROM images WHERE auction_id = :auction_id"
-        );
+        $params = $this->extract($image);
 
-        $stmt -> execute(
-            [
-                ':auction_id' => $auctionID
-            ]
-        );
+        $sql = "INSERT INTO images (auction_id, image_url)
+                VALUES (:auction_id, :image_url)";
 
-        //return the array of just image urls?
-        $retrievedImageInfo = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $result = $this->db->query($sql, $params);
+
+        // Check if the insert was successful.
+        if ($result)
+        {
+            $id = (int)$this->db->connection->lastInsertId();
+            $image->setImageId($id);
+            return $image;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    public function getImageByAuctionId($auctionId) : array
+    {
+        $sql = "SELECT * FROM images WHERE auction_id = :auction_id";
+        $param = ['auction_id' => $auctionId];
+        $rows = $this->db->query($sql, $param)->fetchAll();
 
         $images = [];
 
-        foreach ($retrievedImageInfo as $imageInfo)
+        foreach($rows as $row)
         {
-            $image = $this->imageHydrate($imageInfo);
+            $image = $this->imageHydrate($row);
             $images[] = $image;
         }
 
