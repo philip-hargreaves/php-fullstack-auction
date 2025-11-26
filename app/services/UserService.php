@@ -182,9 +182,26 @@ class UserService
 
         if (empty($new)) {
             $errors[] = 'New password is required.';
-        } elseif ($new !== $confirm) {
+        } elseif (strlen($new) < 8) {
+            $errors[] = 'New password must be at least 8 characters long.';
+        } elseif (strlen($new) > 72) {
+            $errors[] = 'New password must not exceed 72 characters.';
+        } else {
+            if (!preg_match('/[A-Z]/', $new)) {
+                $errors[] = 'New password must contain at least one uppercase letter.';
+            }
+            if (!preg_match('/[a-z]/', $new)) {
+                $errors[] = 'New password must contain at least one lowercase letter.';
+            }
+            if (!preg_match('/[0-9]/', $new)) {
+                $errors[] = 'New password must contain at least one number.';
+            }
+        }
+
+        if ($new !== $confirm) {
             $errors[] = 'New password and confirmation do not match.';
         }
+
         return $errors;
     }
 
