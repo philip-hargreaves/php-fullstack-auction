@@ -7,7 +7,7 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
 
         <?php if (empty($auctions)): ?>
             <p>You are not currently watching any auctions.</p>
-            <a href="/browse" class="btn btn-primary mt-2">Browse listings</a>
+            <a href="/" class="btn btn-primary mt-2">Browse listings</a>
         <?php else: ?>
             <table class="bids-table">
                 <thead>
