@@ -26,10 +26,10 @@ class RoleRepository
                 return $this->cacheById[$id];
             }
 
-            // Not in cache, so fetch from DB
-            $sql = 'SELECT id, role_name FROM roles WHERE id = :id';
-            $param = ['id' => $id];
-            $row = $this->db->query($sql, $param)->fetch();
+        // Not in cache, so fetch from DB
+        $sql = 'SELECT id, role_name FROM roles WHERE id = :id';
+        $params = ['id' => $id];
+        $row = $this->db->query($sql, $params)->fetch();
 
             return $row ? $this->hydrate($row) : null;
         } catch (PDOException $e) {

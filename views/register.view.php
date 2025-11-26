@@ -11,9 +11,15 @@ require Utilities::basePath('views/partials/header.php');
     <?php if (!empty($_SESSION['registration_errors'])): ?>
         <div class="alert alert-danger">
             <ul class="mb-0">
-                <?php foreach ($_SESSION['registration_errors'] as $error): ?>
-                    <li><?php echo htmlspecialchars($error); ?></li>
-                <?php endforeach; ?>
+                <?php
+                foreach ($_SESSION['registration_errors'] as $field => $error):
+                    if (is_numeric($field)) {
+                        echo '<li>' . htmlspecialchars($error) . '</li>';
+                    } else {
+                        echo '<li><strong>' . htmlspecialchars(ucfirst(str_replace('_', ' ', $field))) . ':</strong> ' . htmlspecialchars($error) . '</li>';
+                    }
+                endforeach;
+                ?>
             </ul>
         </div>
         <?php unset($_SESSION['registration_errors']); ?>
@@ -34,15 +40,18 @@ require Utilities::basePath('views/partials/header.php');
             <label for="username" class="col-sm-2 col-form-label text-right">Username</label>
             <div class="col-sm-10">
                 <input
-                    type="text"
-                    class="form-control"
-                    id="username"
-                    name="username"
-                    placeholder="Choose a username"
-                    value="<?php echo htmlspecialchars($_SESSION['old_registration_username'] ?? ''); ?>"
-                    required
+                        type="text"
+                        class="form-control"
+                        id="username"
+                        name="username"
+                        placeholder="Choose a username"
+                        value="<?php echo htmlspecialchars($_SESSION['old_registration_username'] ?? ''); ?>"
+                        minlength="8"
+                        maxlength="25"
+                        pattern="[a-zA-Z0-9_-]+"
+                        required
                 >
-                <small class="form-text text-muted"><span class="text-danger">*</span> Required.</small>
+                <small class="form-text text-muted">Required. 8-25 characters, letters, numbers, underscores, hyphens only.</small>
             </div>
         </div>
 
@@ -51,15 +60,16 @@ require Utilities::basePath('views/partials/header.php');
             <label for="email" class="col-sm-2 col-form-label text-right">Email</label>
             <div class="col-sm-10">
                 <input
-                    type="email"
-                    class="form-control"
-                    id="email"
-                    name="email"
-                    placeholder="john@example.com"
-                    value="<?php echo htmlspecialchars($_SESSION['old_registration_email'] ?? ''); ?>"
-                    required
+                        type="email"
+                        class="form-control"
+                        id="email"
+                        name="email"
+                        placeholder="john@example.com"
+                        value="<?php echo htmlspecialchars($_SESSION['old_registration_email'] ?? ''); ?>"
+                        maxlength="100"
+                        required
                 >
-                <small class="form-text text-muted"><span class="text-danger">*</span> Required.</small>
+                <small class="form-text text-muted">Required. Valid email address.</small>
             </div>
         </div>
 
@@ -68,14 +78,17 @@ require Utilities::basePath('views/partials/header.php');
             <label for="password" class="col-sm-2 col-form-label text-right">Password</label>
             <div class="col-sm-10">
                 <input
-                    type="password"
-                    class="form-control"
-                    id="password"
-                    name="password"
-                    placeholder="Password"
-                    required
+                        type="password"
+                        class="form-control"
+                        id="password"
+                        name="password"
+                        placeholder="Password"
+                        minlength="8"
+                        maxlength="72"
+                        autocomplete="new-password"
+                        required
                 >
-                <small class="form-text text-muted"><span class="text-danger">*</span> Required.</small>
+                <small class="form-text text-muted">Required. Min 8 characters, must include uppercase, lowercase, and number.</small>
             </div>
         </div>
 
@@ -84,14 +97,15 @@ require Utilities::basePath('views/partials/header.php');
             <label for="password_confirmation" class="col-sm-2 col-form-label text-right">Repeat password</label>
             <div class="col-sm-10">
                 <input
-                    type="password"
-                    class="form-control"
-                    id="password_confirmation"
-                    name="password_confirmation"
-                    placeholder="Enter password again"
-                    required
+                        type="password"
+                        class="form-control"
+                        id="password_confirmation"
+                        name="password_confirmation"
+                        placeholder="Enter password again"
+                        autocomplete="new-password"
+                        required
                 >
-                <small class="form-text text-muted"><span class="text-danger">*</span> Required.</small>
+                <small class="form-text text-muted">Required. Must match password.</small>
             </div>
         </div>
 

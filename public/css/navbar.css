@@ -115,7 +115,7 @@
 }
 
 
-/* --- Nav Button (Generic, used for non-link buttons) --- */
+/* --- Nav Button --- */
 .nav-button {
     background: none;
     border: none;
@@ -133,8 +133,7 @@
     text-decoration: none;
 }
 
-
-/* --- Top Nav Link (Used for primary middle navigation) --- */
+/* --- Top Nav Link  --- */
 .top-nav-link {
     color: var(--color-text-primary);
     cursor: pointer;
