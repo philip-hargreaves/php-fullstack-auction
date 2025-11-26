@@ -118,6 +118,4 @@ class AuthService {
         $roleNames = self::getRoleNames();
         return in_array($roleName, $roleNames, true);
     }
-
-
 }

@@ -14,7 +14,7 @@ class UploadImageService
 
     }
 
-    public function uploadAuctionImage($auctionID, $uploadedImageURLs)
+    public function uploadAuctionImage($auctionID, $uploadedImageURLs): array
     {
         foreach ($uploadedImageURLs as $singleImageURL)
         {

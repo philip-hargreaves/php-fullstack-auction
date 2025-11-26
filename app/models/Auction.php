@@ -9,7 +9,7 @@ class Auction
     // 1. PROPERTIES
     private int $auctionId;
     private int $itemId;
-    private ?int $winningBidId; // This is nullable
+    private ?int $winningBidId = null;
     private DateTime $startDateTime;
     private DateTime $endDateTime;
     private float $startingPrice; // decimal(10,2)

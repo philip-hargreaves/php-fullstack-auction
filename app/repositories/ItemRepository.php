@@ -54,8 +54,7 @@ class ItemRepository
         }
     }
 
-    private function extract(Item $item) : array
-    {
+    private function extract(Item $item): array {
         $row = [];
         $row['seller_id'] = $item -> getSellerId();
         $row['item_name'] = $item -> getItemName();
@@ -66,8 +65,7 @@ class ItemRepository
         return $row;
     }
 
-    public function create(Item $item) : ?Item
-    {
+    public function create(Item $item): ?Item {
         try {
             $params = $this->extract($item);
             $sql = "INSERT INTO items (seller_id, item_name, item_description, 

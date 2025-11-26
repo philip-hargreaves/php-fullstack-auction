@@ -30,7 +30,7 @@ CREATE TABLE `items` (
   `item_name` VARCHAR(100) NOT NULL,
   `item_description` TEXT NULL,
   `item_condition` ENUM('New', 'Like New', 'Used') NULL,
-  `item_status` ENUM('Available', 'InAuction', 'Sold', 'Deleted') NOT NULL DEFAULT 'Available',
+#   `item_status` ENUM('Available', 'InAuction', 'Sold', 'Deleted') NOT NULL DEFAULT 'Available',
   FOREIGN KEY (`seller_id`) REFERENCES `users`(`id`)
   -- `category_id` INT NULL,
   -- Assuming a FOREIGN KEY (category_id) REFERENCES categories(id)
@@ -44,7 +44,8 @@ CREATE TABLE `auctions` (
   `end_datetime` DATETIME NOT NULL,
   `starting_price` DECIMAL(10, 2) NOT NULL,
   `reserve_price` DECIMAL(10, 2) NULL,
-  `auction_status` ENUM('Pending', 'Active', 'Finished') NOT NULL DEFAULT 'Pending',
+  `auction_status` ENUM('Scheduled', 'Active', 'Sold', 'Unsold', 'Deleted') NOT NULL DEFAULT 'Scheduled',
+#   `auction_status` ENUM('Pending', 'Active', 'Finished') NOT NULL DEFAULT 'Pending',
   FOREIGN KEY (`item_id`) REFERENCES `items`(`id`),
   CONSTRAINT `chk_auction_times` CHECK (`end_datetime` > `start_datetime`)
   -- `payment_deadline` DATETIME NULL,

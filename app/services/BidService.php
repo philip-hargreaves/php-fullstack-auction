@@ -1,7 +1,6 @@
 <?php
 namespace app\services;
 use app\models\Bid;
-use app\models\Role;
 use app\repositories\AuctionRepository;
 use app\repositories\UserRepository;
 use infrastructure\Database;
@@ -37,7 +36,7 @@ class BidService
     public function validate(array $input): array {
         $auction = $this->auctionRepo->getById($input['auction_id']);
         $bidAmount = $input['bid_amount'];
-        $user_id = $input['user_id'];
+        $userId = $input['user_id'];
 
         // Check if $auction exists
         if (is_null($auction)) {
@@ -50,10 +49,10 @@ class BidService
         }
 
         // Check if $buyer exist
-        if (is_null($user_id)) {
+        if (is_null($userId)) {
             return Utilities::creationResult('Buyer not found.', false, null);
         }
-        $user = $this->userRepo->getById($user_id);
+        $user = $this->userRepo->getById($userId);
         if (is_null($user)) {
             return Utilities::creationResult('Buyer not found.', false, null);
         }
@@ -116,7 +115,7 @@ class BidService
             return Utilities::creationResult('Failed to create bid.', false, null);
         }
 
-        return Utilities::creationResult('', true, $bid);
+        return Utilities::creationResult('Bid successfully placed!', true, $bid);
     }
 
     public function placeBid(array $input): array {
@@ -134,32 +133,31 @@ class BidService
             $input['user_id'] = (int)$input['user_id'];
 
             // Validate input
-            $validation_result = $this->validate($input);
+            $validationResult = $this->validate($input);
 
             // Validation Fail -> Abort transaction
-            if (!$validation_result['success']) {
+            if (!$validationResult['success']) {
                 $pdo->rollBack();
-                return $validation_result;
+                return $validationResult;
             }
 
             // Validation Pass -> Create Bid
-            $creation_result = $this->createBid($input);
+            $creationResult = $this->createBid($input);
 
             // Insertion Failed
-            if (!$creation_result['success']) {
+            if (!$creationResult['success']) {
                 $pdo->rollBack();
-                return $creation_result;
+                return $creationResult;
             }
 
             // Insertion Succeed -> Commit Transaction
             $pdo->commit();
-            return Utilities::creationResult('Bid successfully placed!', true, null);
+            return $creationResult;
 
         } catch (PDOException $e) {
             if ($pdo->inTransaction()) {
                 $pdo->rollBack();
             }
-
             throw $e;
         }
     }

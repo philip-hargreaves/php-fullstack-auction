@@ -20,7 +20,7 @@ class WatchlistService
         $this->bidServ = $bidServ;
     }
 
-    public function getWatchList (int $userId): array
+    public function getWatchList(int $userId): array
     {
         $auctions = $this->auctionRepo->getWatchedAuctionsByUserId($userId);
 
