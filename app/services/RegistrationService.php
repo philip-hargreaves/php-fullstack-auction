@@ -31,7 +31,6 @@ class RegistrationService
     // Register a new user
     public function register(array $input): array
     {
-        // Validate input and uniqueness rules, return errors if any
         $errors = $this->validate($input);
         if (!empty($errors)) {
             return $this->fail($errors);
@@ -40,17 +39,14 @@ class RegistrationService
         // Each user starts as a buyer by default
         $buyerRole = $this->roleRepository->getByName('buyer');
 
-        // Get the DB connection
         $pdo = $this->db->connection;
 
         try {
             // Wrap creation + role assignment in a transaction so they succeed or fail together
             Utilities::beginTransaction($pdo);
 
-            // Create the user
-            $user = $this->createUser($input);
-
             // Assign the buyer role to the user
+            $user = $this->createUser($input);
             $this->userRoleRepository->assignRole($user->getUserId(), $buyerRole);
             
             // Commit the transaction
@@ -71,7 +67,7 @@ class RegistrationService
         }
     }
 
-    // Validate form fields and uniqueness constraints
+    // Validate form fields
     private function validate(array $input): array
     {
         $username = trim($input['username'] ?? '');
@@ -81,28 +77,48 @@ class RegistrationService
 
         $errors = [];
 
+        // Username validation
         if ($username === '') {
-            $errors[] = 'Username is required.';
+            $errors['username'] = 'Username is required.';
+        } elseif (strlen($username) < 8) {
+            $errors['username'] = 'Username must be at least 8 characters long.';
+        } elseif (strlen($username) > 25) {
+            $errors['username'] = 'Username must not exceed 25 characters.';
+        } elseif (!preg_match('/^[a-zA-Z0-9_-]+$/', $username)) {
+            $errors['username'] = 'Username can only contain letters, numbers, underscores, and hyphens.';
+        } elseif ($this->userRepository->existsByUsername($username)) {
+            $errors['username'] = 'Username already exists.';
         }
 
+        // Email validation
         if ($email === '') {
-            $errors[] = 'Email is required.';
+            $errors['email'] = 'Email is required.';
         } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $errors[] = 'Please enter a valid email address.';
+            $errors['email'] = 'Please enter a valid email address.';
+        } elseif (strlen($email) > 100) {
+            $errors['email'] = 'Email must not exceed 100 characters.';
+        } elseif ($this->userRepository->existsByEmail($email)) {
+            $errors['email'] = 'Email already exists.';
         }
 
+        // Password validation
         if ($password === '') {
-            $errors[] = 'Password is required.';
-        } elseif ($password !== $confirm) {
-            $errors[] = 'Passwords do not match.';
+            $errors['password'] = 'Password is required.';
+        } elseif (strlen($password) < 8) {
+            $errors['password'] = 'Password must be at least 8 characters long.';
+        } elseif (strlen($password) > 72) {
+            $errors['password'] = 'Password must not exceed 72 characters.';
+        } elseif (!preg_match('/[A-Z]/', $password)) {
+            $errors['password'] = 'Password must contain at least one uppercase letter.';
+        } elseif (!preg_match('/[a-z]/', $password)) {
+            $errors['password'] = 'Password must contain at least one lowercase letter.';
+        } elseif (!preg_match('/[0-9]/', $password)) {
+            $errors['password'] = 'Password must contain at least one number.';
         }
 
-        if ($username !== '' && $this->userRepository->existsByUsername($username)) {
-            $errors[] = 'Username already exists.';
-        }
-        
-        if ($email !== '' && $this->userRepository->existsByEmail($email)) {
-            $errors[] = 'Email already exists.';
+        // Password confirmation
+        if ($password !== '' && $password !== $confirm) {
+            $errors['password_confirmation'] = 'Passwords do not match.';
         }
 
         return $errors;
