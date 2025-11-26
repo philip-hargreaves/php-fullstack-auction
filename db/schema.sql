@@ -69,7 +69,7 @@ CREATE TABLE auctions (
     end_datetime DATETIME NOT NULL,
     starting_price DECIMAL(10, 2) NOT NULL,
     reserve_price DECIMAL(10, 2) NULL,
-    auction_status ENUM('Pending', 'Active', 'Finished') NOT NULL DEFAULT 'Pending',
+    auction_status ENUM('Scheduled', 'Active', 'Sold', 'Unsold', 'Deleted') NOT NULL DEFAULT 'Scheduled',
     FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE,
     CONSTRAINT chk_auction_times CHECK (end_datetime > start_datetime)
     -- payment_deadline DATETIME NULL,
