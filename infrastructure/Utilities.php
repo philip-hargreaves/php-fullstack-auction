@@ -48,12 +48,19 @@ class Utilities
         }
     }
 
-    public static function creationResult(string $message, bool $success, $createdObject): array
+    public static function creationResult(string $message, bool $success, $createdObject, array $errors = []): array
     {
-        return [
+        $result = [
             'success' => $success,
             'message'  => $message,
             'object'    => $createdObject,
         ];
+
+        // Optional: Include field-specific validation errors in the response (example: registration form)
+        if (!empty($errors)) {
+            $result['errors'] = $errors;
+        }
+
+        return $result;
     }
 }

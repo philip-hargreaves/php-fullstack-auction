@@ -33,7 +33,7 @@ class RegistrationService
     {
         $errors = $this->validate($input);
         if (!empty($errors)) {
-            return $this->fail($errors);
+            return Utilities::creationResult('Validation failed', false, null, $errors);
         }
 
         // Each user starts as a buyer by default
@@ -52,11 +52,8 @@ class RegistrationService
             // Commit the transaction
             $pdo->commit();
 
-            return [
-                'success' => true,
-                'errors'  => [],
-                'user'    => $user,
-            ];
+            return Utilities::creationResult('User registered successfully', true, $user);
+
         } catch (\Throwable $e) {
             // Any exception should roll back the transaction to avoid partial state
             if ($pdo->inTransaction()) {
@@ -141,16 +138,6 @@ class RegistrationService
         }
 
         return $savedUser;
-    }
-
-    // Return a failure response
-    private function fail(array $errors): array
-    {
-        return [
-            'success' => false,
-            'errors'  => $errors,
-            'user'    => null,
-        ];
     }
 
 }
