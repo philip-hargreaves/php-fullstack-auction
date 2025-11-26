@@ -49,7 +49,6 @@ $imageUrls = [
 $currencyText = '£';
 
 // Variables changes with $auctionStatus
-$itemStatus = $item->getItemStatus();
 $auctionStatus = $auction->getAuctionStatus();
 $isAuctionActive = $auctionStatus == 'Active';
 $bidText = "";
@@ -63,19 +62,20 @@ if ($auctionStatus == 'Active') {
     $bidText = "Current Bid";
     $statusText = "Reserve price not yet met.";
     $timeRemaining = $now->diff($endTime);
-} else if ($auctionStatus == 'Finished') {
+} else if ($auctionStatus == 'Sold' || $auctionStatus == 'Unsold' || $auctionStatus == 'Deleted') {
+
     $bidText = "Final Bid";
     $timeRemaining = $now->diff($now);
     // Display auction result
-    if ($itemStatus == 'Available') {
+    if ($auctionStatus == 'Sold') {
         $statusText = "This auction ends. The item is sold";
-    } else if ($itemStatus == 'Sold') {
+    } else if ($auctionStatus == 'Unsold') {
         $statusText = "This auction ends. The item is not sold.";
         $winningBid = $bidServ->getWinningBidForAuction($auctionId);
-    } else { //$itemStatus == 'deleted'
+    } else { //$auctionStatus == 'Deleted'
         // Jump to 404 not found
     }
-} else { //$auctionStatus == 'Pending'
+} else { //$auctionStatus == 'Scheduled'
     $bidText = "Current Bid";
     $statusText = "This auction hasn't start yet.";
     $timeRemaining = $now->diff($endTime);
