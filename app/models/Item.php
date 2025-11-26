@@ -10,7 +10,6 @@ class Item
     private string $itemName;
     private string $itemDescription;
     private string $itemCondition; // enum('new','like new','used')
-    private string $itemStatus;    // enum('available','in_auction','sold','deleted')
 
     // 2. RELATIONSHIP PROPERTIES
     private ?User $seller = null;
@@ -23,15 +22,13 @@ class Item
         int $sellerId,
         string $itemName,
         string $itemDescription,
-        string $itemCondition,
-        string $itemStatus
+        string $itemCondition
     ) {
         $this->itemId = $itemId;
         $this->sellerId = $sellerId;
         $this->itemName = $itemName;
         $this->itemDescription = $itemDescription;
         $this->itemCondition = $itemCondition;
-        $this->itemStatus = $itemStatus;
     }
 
     // 4. GETTERS
@@ -61,11 +58,6 @@ class Item
         return $this->itemCondition;
     }
 
-    public function getItemStatus(): string
-    {
-        return $this->itemStatus;
-    }
-
     // 5. SETTERS (Only for data that can change)
 
     public function setItemName(string $itemName): void
@@ -82,12 +74,6 @@ class Item
     {
         // Add Validation ('new', 'like new', 'used')
         $this->itemCondition = $itemCondition;
-    }
-
-    public function setItemStatus(string $itemStatus): void
-    {
-        // Add Validation ('available', 'in_auction', 'sold')
-        $this->itemStatus = $itemStatus;
     }
 
     public function setItemId(int $itemId): void

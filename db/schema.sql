@@ -47,9 +47,8 @@ CREATE TABLE items (
     item_name VARCHAR(100) NOT NULL,
     item_description TEXT NULL,
     item_condition ENUM('New', 'Like New', 'Used') NULL,
-    item_status ENUM('Available', 'InAuction', 'Sold', 'Deleted') NOT NULL DEFAULT 'Available',
-    FOREIGN KEY (seller_id) REFERENCES users(id) ON DELETE SET NULL,  -- unsure
-    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL -- unsure
+    FOREIGN KEY (seller_id) REFERENCES users(id) ON DELETE SET NULL,
+    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL -- change to set default category
 );
 
 CREATE TABLE item_images (
