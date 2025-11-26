@@ -37,6 +37,7 @@ try {
 
     // To get here, registration failed, so redirect back to the registration page with errors
     $_SESSION['registration_errors'] = $result['errors'];
+    // Keep old data for user to edit
     $_SESSION['old_registration_username'] = $input['username'];
     $_SESSION['old_registration_email']    = $input['email'];
     header('Location: /register');
