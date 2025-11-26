@@ -10,15 +10,13 @@ class AuthService {
         $this->userRepository = $userRepository;
     }
 
-    public function attemptLogin(string $email, string $password): bool
+    public function attemptLogin(string $emailOrUsername, string $password): bool
     {
-        // Make sure that the PHP session is active
         self::ensureSessionStarted();
 
-        // Fetch user by email, including all associated Role objects.
-        $user = $this->userRepository->getByEmail($email);
+        // Fetch user by email OR username, including all associated Role objects.
+        $user = $this->userRepository->getByEmailOrUsername($emailOrUsername);
         if ($user === null || !$user->isActive()) {
-            // User not found or deactivated
             return false;
         }
 
@@ -33,6 +31,7 @@ class AuthService {
         // Store the login details in the session.
         $_SESSION['user_id']    = $user->getUserId();
         $_SESSION['email']      = $user->getEmail();
+        $_SESSION['username']   = $user->getUsername();
         $_SESSION['logged_in']  = true;
         $_SESSION['role_names'] = $roleNames;
 
