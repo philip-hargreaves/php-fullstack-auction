@@ -34,7 +34,7 @@ class ItemImageRepository
     private function extract(ItemImage $itemImage): array {
         $row = [];
 
-        if ($itemImage->getImageId() != 0 && $itemImage->getItemId() != null) {
+        if ($itemImage->getImageId() != 0 && $itemImage->getImageId() != null) {
             $row['id'] = $itemImage->getImageId();
         }
         $row['item_id'] = $itemImage->getItemId();
@@ -64,7 +64,6 @@ class ItemImageRepository
                 return null;
             }
         } catch (PDOException $e) {
-            Utilities::dd($e);
             // TODO: add logging
             return null;
         }
@@ -127,12 +126,12 @@ class ItemImageRepository
 
             // Single Main Image Logic: if this image is being set to Main (1), un-set all others for this item.
             if ($param['is_main'] === 1) {
-                $sqlReset = "UPDATE images SET is_main = 0 WHERE item_id = :item_id AND id != :id";
+                $sqlReset = "UPDATE item_images SET is_main = 0 WHERE item_id = :item_id AND id != :id";
                 $this->db->query($sqlReset, $param);
             }
 
             // Update
-            $sql = "UPDATE images
+            $sql = "UPDATE item_images
                     SET item_id = :item_id, image_url = :image_url, is_main = :is_main, uploaded_datetime = :uploaded_datetime
                     WHERE id = :id";
             $this->db->query($sql, $param);

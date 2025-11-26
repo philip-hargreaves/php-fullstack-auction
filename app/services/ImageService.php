@@ -25,20 +25,20 @@ class ImageService
 
         // Validate Item ID
         if (!filter_var($item->getItemId(), FILTER_VALIDATE_INT)) {
-            return Utilities::creationResult('Failed to create an auction.', false, null);
+            return Utilities::creationResult("Failed to create an auction.", false, null);
         }
 
         // Check if item exists
         if (is_null($this->itemRepo->getById($item->getItemId()))) {
-            return Utilities::creationResult('Failed to create an auction.', false, null);
+            return Utilities::creationResult("Failed to create an auction.", false, null);
         }
 
         // Check the image count (1 <= count <= 10)
         if (count($inputs) < 1) {
-            return Utilities::creationResult('Please upload at least 1 image.', false, null);
+            return Utilities::creationResult("Please upload at least 1 image.", false, null);
         }
         if (count ($inputs) > 10) {
-            return Utilities::creationResult('Please upload no more than than 10 image.', false, null);
+            return Utilities::creationResult("Please upload no more than than 10 image.", false, null);
         }
 
         $itemImages = [];
@@ -48,7 +48,7 @@ class ImageService
         foreach ($inputs as $index => $rawInput)
         {
             // Validates input for auction, and fix data type
-            $validationResult = $this->validateAndFixItemImageInput($rawInput);
+            $validationResult = $this->validateAndFixItemImageInput($rawInput, "Image {$index}");
 
             // If validation fails, skip this specific image
             if ($validationResult['success'] === false) {
@@ -86,25 +86,25 @@ class ImageService
             $firstImage = $itemImages[0];
 
             // Update is_main in db
-            $firstImage->setMain(true);
+            $firstImage->setIsMain(true);
             $this->itemImageRepo->update($firstImage);
         }
 
-        return Utilities::creationResult('Item images successfully created.', true, $itemImages);
+        return Utilities::creationResult("Item images successfully created.", true, $itemImages);
     }
 
-    private function validateAndFixItemImageInput(array $input) : array
+    private function validateAndFixItemImageInput(array $input, string $imageName) : array
     {
         // Validate Image URL
         $url = isset($input['image_url']) ? trim($input['image_url']) : '';
 
         if ($url === '') {
-            return Utilities::creationResult('Uploaded image does not have a valid url.', false, null);
+            return Utilities::creationResult("{$imageName} does not have a valid url.", false, null);
         }
 
         // DB Limit check (VARCHAR 1024)
         if (strlen($url) > 1024) {
-            return Utilities::creationResult('The url of the Uploaded image is too long.', false, null);
+            return Utilities::creationResult("The url of {$imageName} is too long.", false, null);
         }
         $input['image_url'] = $url;
 

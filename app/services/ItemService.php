@@ -47,25 +47,25 @@ class ItemService
 
         // Insertion Failed -> Return failed result to the transaction in createAuction()
         if (is_null($item)) {
-            return Utilities::creationResult('Failed to create an auction.', false, null);
+            return Utilities::creationResult("Failed to create an auction.", false, null);
         }
 
         // Insertion Succeed
-        return Utilities::creationResult('Item successfully created!', true, $item);
+        return Utilities::creationResult("Item successfully created!", true, $item);
     }
 
     private function validateAndFixType(array $input) : array
     {
         // Validate Seller ID
         if (!isset($input['seller_id']) || !filter_var($input['seller_id'], FILTER_VALIDATE_INT)) {
-            return Utilities::creationResult('Failed to create an auction.', false, null);
+            return Utilities::creationResult("Failed to create an auction.", false, null);
         }
         $input['seller_id'] = (int)$input['seller_id'];
 
         // Check if $seller exists
         $seller = $this->userRepo->getById($input['seller_id']);
         if (is_null($seller)) {
-            return Utilities::creationResult('Please login to create an auction.', false, null);
+            return Utilities::creationResult("Please login to create an auction.", false, null);
         }
 
         // Check if seller has a seller role
@@ -76,36 +76,36 @@ class ItemService
             }
         }
         if (!$isSeller) {
-            return Utilities::creationResult('Please upgrade to seller to create an auction.', false, null);
+            return Utilities::creationResult("Please upgrade to seller to create an auction.", false, null);
         }
 
         // TODO: Validate Category ID
 //        if (!isset($input['category_id']) || !filter_var($input['category_id'], FILTER_VALIDATE_INT)) {
-//            return Utilities::creationResult('Invalid category ID.', false, null);
+//            return Utilities::creationResult("Invalid category ID.", false, null);
 //        }
 //        $input['category_id'] = (int)$input['category_id'];
 
         // TODO: Check if $category exists
 //        $category = $this->categoryRepo->getById($input['category_id']);
 //        if (is_null($category)) {
-//            return Utilities::creationResult('Category not found.', false, null);
+//            return Utilities::creationResult("Category not found.", false, null);
 //        }
 
         // Validate Item Name
         $itemName = isset($input['item_name']) ? trim($input['item_name']) : '';
         if ($itemName === '') {
-            return Utilities::creationResult('Item Name is required.', false, null);
+            return Utilities::creationResult("Item Name is required.", false, null);
         }
         // Business Logic: Check Item Name max length (based on VARCHAR(100) from SQL)
         if (strlen($itemName) > 100) {
-            return Utilities::creationResult('Item Name is too long (max 100 characters).', false, null);
+            return Utilities::creationResult("Item Name is too long (max 100 characters).", false, null);
         }
         $input['item_name'] = $itemName;
 
         // Validate Item Description
         $itemDescription = isset($input['item_description']) ? trim($input['item_description']) : '';
         if ($itemDescription === '') {
-            return Utilities::creationResult('Item Description is required.', false, null);
+            return Utilities::creationResult("Item Description is required.", false, null);
         }
         $input['item_description'] = $itemDescription;
 
@@ -113,7 +113,7 @@ class ItemService
         $itemCondition = isset($input['item_condition']) ? trim($input['item_condition']) : '';
         $validConditions = ['New', 'Like New', 'Used'];
         if ($itemCondition === '' || !in_array($itemCondition, $validConditions)) {
-            return Utilities::creationResult('Please select a valid item condition.', false, null);
+            return Utilities::creationResult("Please select a valid item condition.", false, null);
         }
         $input['item_condition'] = $itemCondition;
 

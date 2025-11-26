@@ -84,7 +84,7 @@ class AuctionService
             // Insertion Failed -> Roll Back
             if (is_null($auction)) {
                 $pdo->rollBack();
-                return Utilities::creationResult('Failed to create an auction.', false, null);
+                return Utilities::creationResult("Failed to create an auction.", false, null);
             }
 
             // Upload image
@@ -96,7 +96,7 @@ class AuctionService
 
             // Insertion Succeed -> Commit Transaction
             $pdo->commit();
-            return Utilities::creationResult('Auction created successfully!', true, $auction);
+            return Utilities::creationResult("Auction created successfully!", true, $auction);
 
         } catch (PDOException $e) {
             if ($pdo->inTransaction()) {
@@ -111,19 +111,19 @@ class AuctionService
         // Validate Starting Price
         $startPriceString = isset($input['starting_price']) ? trim($input['starting_price']) : '';
         if ($startPriceString === '') {
-            return Utilities::creationResult('Starting price is required.', false, null);
+            return Utilities::creationResult("Starting price is required.", false, null);
         }
 
         // Check Starting Price format (numeric, max 2 decimals)
         if (!preg_match('/^\d+(\.\d{1,2})?$/', $startPriceString)){
-            return Utilities::creationResult('Starting price must be a valid number (max 2 decimal places).', false, null);
+            return Utilities::creationResult("Starting price must be a valid number (max 2 decimal places).", false, null);
         }
         
         $input['starting_price'] = (float)$startPriceString;
 
         // Business Logic: Start > 0
         if ($input['starting_price'] <= 0) {
-            return Utilities::creationResult('Starting price must be greater than 0.', false, null);
+            return Utilities::creationResult("Starting price must be greater than 0.", false, null);
         }
 
         // Validate Reserve Price
@@ -135,20 +135,20 @@ class AuctionService
         } else {
             // Check Reserve Price format (numeric, max 2 decimals)
             if (!preg_match('/^\d+(\.\d{1,2})?$/', $reservePriceString)){
-                return Utilities::creationResult('Reserve price must be a valid number (max 2 decimal places).', false, null);
+                return Utilities::creationResult("Reserve price must be a valid number (max 2 decimal places).", false, null);
             }
 
             $input['reserve_price'] = (float)$reservePriceString;
 
             // Business Logic: Reserve >= Start
             if ($input['reserve_price'] < $input['starting_price']) {
-                return Utilities::creationResult('Reserve price cannot be lower than the starting price.', false, null);
+                return Utilities::creationResult("Reserve price cannot be lower than the starting price.", false, null);
             }
         }
 
         // Validate Start Date
         if (empty($input['start_datetime'])) {
-            return Utilities::creationResult('Auction start date is required.', false, null);
+            return Utilities::creationResult("Auction start date is required.", false, null);
         }
         
         // Validate Start Date in DateTime format
@@ -158,15 +158,15 @@ class AuctionService
 
             // Check if start date is in the past
             if ($startDate < $now) {
-                return Utilities::creationResult('Auction start date cannot be in the past.', false, null);
+                return Utilities::creationResult("Auction start date cannot be in the past.", false, null);
             }
         } catch (Exception $e) {
-            return Utilities::creationResult('Invalid start date format.', false, null);
+            return Utilities::creationResult("Invalid start date format.", false, null);
         }
 
         // Validate End Date
         if (empty($input['end_datetime'])) {
-            return Utilities::creationResult('Auction end date is required.', false, null);
+            return Utilities::creationResult("Auction end date is required.", false, null);
         }
 
         // Validate End Date in DateTime format
@@ -175,17 +175,17 @@ class AuctionService
 
             // Check Sequence: End > Start
             if ($endDate <= $startDate) {
-                return Utilities::creationResult('End date must be after the start date.', false, null);
+                return Utilities::creationResult("End date must be after the start date.", false, null);
             }
 
             // Business Logic: Check Duration (At least 24 hours)
             $interval = $startDate->diff($endDate);
             $totalHours = ($interval->days * 24) + $interval->h + ($interval->i / 60);
             if ($totalHours < 24) {
-                return Utilities::creationResult('Auction duration must be at least 48 hours.', false, null);
+                return Utilities::creationResult("Auction duration must be at least 24 hours.", false, null);
             }
         } catch (Exception $e) {
-            return Utilities::creationResult('Invalid end date format.', false, null);
+            return Utilities::creationResult("Invalid end date format.", false, null);
         }
 
         // Format dates to string for DB storage consistency

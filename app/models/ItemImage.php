@@ -60,26 +60,26 @@ class ItemImage
     // SETTERS
     public function setImageId($imageId): void
     {
-        $this -> imageId = $imageId;
+        $this->imageId = $imageId;
     }
 
     public function setItemId($itemId): void
     {
-        $this -> itemId = $itemId;
+        $this->itemId = $itemId;
     }
 
     public function setImageUrl($imageUrl): void
     {
-        $this -> imageUrl = $imageUrl;
+        $this->imageUrl = $imageUrl;
     }
 
     public function setIsMain($isMain): void
     {
-        $this -> isMain = $isMain;
+        $this->isMain = $isMain;
     }
 
     public function setUploadDatetime(DateTime $uploadDatetime): void
     {
-        $this -> uploadDateTime = $uploadDatetime;
+        $this->uploadedDatetime = $uploadDatetime;
     }
 }

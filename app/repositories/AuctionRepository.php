@@ -24,11 +24,11 @@ class AuctionRepository
         $object = new Auction(
             (int)$row['id'],
             (int)$row['item_id'],
-            ($row['winning_bid_id'] ? (int)$row['winning_bid_id'] : null),
+            $row['winning_bid_id'] ? (int)$row['winning_bid_id'] : null,
             $row['start_datetime'],
             $row['end_datetime'],
             (float)$row['starting_price'],
-            (float)$row['reserve_price'] ? (int)$row['reserve_price'] : null,
+            $row['reserve_price'] ? (float)$row['reserve_price'] : null,
             $row['auction_status']
         );
 
@@ -117,7 +117,7 @@ class AuctionRepository
             $row['id'] = $auction->getAuctionId();
         }
         $row['item_id']= $auction->getItemId();
-        $row['winning_bid_id'] = $auction->getWinningBidID(); //start with null
+        $row['winning_bid_id'] = $auction->getWinningBidId(); //start with null
         $row['start_datetime'] = $auction->getStartDateTime()->format('Y-m-d H:i:s');
         $row['end_datetime'] = $auction->getEndDateTime()->format('Y-m-d H:i:s');
         $row['starting_price'] = $auction->getStartingPrice();
