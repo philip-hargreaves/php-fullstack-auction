@@ -12,11 +12,6 @@ $router->get('/create-auction', 'controllers/create_auction/create-auction-form.
 $router->post('/create-auction', 'controllers/create_auction/create-auction-controller.php');
 $router->get('/auction', 'controllers/auction.php');
 
-// GET Pages
-$router->get('/my-auctions', 'controllers/my-auctions.php');
-$router->get('/mybids', 'controllers/mybids.php');
-
-
 // Registration and authentication
 $router->get('/register', 'controllers/auth/register.php');
 $router->post('/register', 'controllers/auth/register.store.php');
@@ -27,8 +22,11 @@ $router->post('/become-seller', 'controllers/auth/become-seller.php');
 
 // Auction Page
 $router->post('/bid', 'controllers/auction/place-bid.php');
+$router->get('/auction', 'controllers/auction/auction.php');
 $router->post('/watchlist/add', 'controllers/auction/watchlist-add.php');
 $router->post('/watchlist/remove', 'controllers/auction/watchlist-remove.php');
-$router->get('/auction', 'controllers/auction/auction.php');
+
+// My-xxx Page
 $router->get('/my-listings', 'controllers/auction/my-listings.php');
+$router->get('/mybids', 'controllers/mybids.php');
 $router->get('/watchlist', 'controllers/auction/watchlist.php');
