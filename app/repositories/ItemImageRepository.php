@@ -33,6 +33,9 @@ class ItemImageRepository
     private function extract(ItemImage $itemImage): array {
         $row = [];
 
+        if ($itemImage->getImageId() != 0 || $itemImage->getItemId() != null) {
+            $row['id'] = $itemImage->getImageId();
+        }
         $row['item_id'] = $itemImage->getItemId();
         $row['image_url'] = $itemImage->getImageUrl();
         $row['is_main'] = $itemImage->isMain() ? 1 : 0;
@@ -102,5 +105,44 @@ class ItemImageRepository
             }
         }
         return $objects;
+    }
+
+    public function update(ItemImage $itemImage): bool
+    {
+        try {
+            $pdo = $this->db->connection;
+            $inTransaction = false;
+            // If this function is called in a transaction, then don't start one
+            if (!$pdo->inTransaction()) {
+                $pdo->beginTransaction();
+            } else {
+                $inTransaction = true;
+            }
+
+            // Convert object to array
+            $param = $this->extract($itemImage);
+
+            // Single Main Image Logic: if this image is being set to Main (1), un-set all others for this item.
+            if ($param['is_main'] === 1) {
+                $sqlReset = "UPDATE images SET is_main = 0 WHERE item_id = :item_id AND id != :id";
+                $this->db->query($sqlReset, $param);
+            }
+
+            // Update
+            $sql = "UPDATE images
+                    SET item_id = :item_id, image_url = :image_url, is_main = :is_main, uploaded_datetime = :uploaded_datetime
+                    WHERE id = :id";
+            $this->db->query($sql, $param);
+
+            $this->db->connection->commit();
+            return true;
+
+        } catch (PDOException $e) {
+            if (!$inTransaction && $pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            // TODO: Add logging here
+            return false;
+        }
     }
 }

@@ -14,7 +14,7 @@ use app\services\AuctionService;
 use app\services\RegistrationService;
 use app\services\AuctionService;
 use app\services\WatchlistService;
-use app\services\UploadImageService;
+use app\services\ImageService;
 use infrastructure\Database;
 use infrastructure\DIContainer;
 use app\services\RoleService;
@@ -60,7 +60,7 @@ DIContainer::bind('createItemService', new ItemService(
     DIContainer::get('itemRepo')
 ));
 
-DIContainer::bind('uploadImageService', new UploadImageService(
+DIContainer::bind('uploadImageService', new ImageService(
     DIContainer::get('imageRepo'),
 ));
 

@@ -15,12 +15,12 @@ class AuctionService
     private Database $db;
     private AuctionRepository $auctionRepo;
     private ItemService $createItemService;
-    private UploadImageService $uploadImageService;
+    private ImageService $uploadImageService;
     private ItemRepository $itemRepo;
     private BidService $bidService;
 
-    public function __construct(Database $db, AuctionRepository $auctionRepo, ItemService $createItemService,
-                                UploadImageService $uploadImageService, ItemRepository $itemRepo, BidService $bidServ) {
+    public function __construct(Database     $db, AuctionRepository $auctionRepo, ItemService $createItemService,
+                                ImageService $uploadImageService, ItemRepository $itemRepo, BidService $bidServ) {
         $this->db = $db;
         $this->auctionRepo = $auctionRepo;
         $this->createItemService = $createItemService;
@@ -41,7 +41,7 @@ class AuctionService
         return $auctions;
     }
 
-    public function createAuction(array $auctionInput, array $itemInput, array $imageInput): array {
+    public function createAuction(array $auctionInput, array $itemInput, array $imageInputs): array { // $imageInputs is an array with multiple $imageInput
         $pdo = $this->db->connection;
 
         // --- Start Transaction ---
@@ -52,7 +52,7 @@ class AuctionService
             // Create Item
             $createItemResult = $this->createItemService->createItem($itemInput);
             if (!$createItemResult['success']) {
-                return Utilities::creationResult('Failed to create auction.', false, null);
+                return Utilities::creationResult('Failed to create auction.' . $createItemResult['message'], false, null);
             }
             $item = $createItemResult['object'];
 
@@ -88,10 +88,10 @@ class AuctionService
             }
 
             // Upload image
-            $uploadImageResult = $this->uploadImageService->uploadAuctionImage($auction->getId(), $imageInput);
+            $uploadImageResult = $this->uploadImageService->uploadItemImages($item->getId(), $imageInputs);
             if (!$uploadImageResult['success']) {
                 $pdo->rollBack();
-                return Utilities::creationResult('Failed to create auction.', false, null);
+                return Utilities::creationResult('Failed to create an auction.' . $uploadImageResult['message'], false, null);
             }
 
             // Insertion Succeed -> Commit Transaction
