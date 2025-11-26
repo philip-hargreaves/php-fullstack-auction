@@ -10,7 +10,7 @@ use app\repositories\UserRoleRepository;
 use app\repositories\WatchlistRepository;
 use app\services\BidService;
 use app\services\AuthService;
-use app\services\CreateAuctionService;
+use app\services\AuctionService;
 use app\services\RegistrationService;
 use app\services\AuctionService;
 use app\services\WatchlistService;
@@ -18,7 +18,7 @@ use app\services\UploadImageService;
 use infrastructure\Database;
 use infrastructure\DIContainer;
 use app\services\RoleService;
-use app\services\CreateItemService;
+use app\services\ItemService;
 
 // --- Build all objects and bind them to the App Container ---
 // Bind the Database first (it has no dependencies)
@@ -55,7 +55,7 @@ DIContainer::bind('imageRepo', new ItemImageRepository(
     DIContainer::get('db')
 ));
 
-DIContainer::bind('createItemService', new CreateItemService(
+DIContainer::bind('createItemService', new ItemService(
     //DIContainer::get('db'),
     DIContainer::get('itemRepo')
 ));
@@ -96,7 +96,7 @@ DIContainer::bind('auctionServ', new AuctionService(
     DIContainer::get('auctionRepo'),
     DIContainer::get('bidServ')));
 
-DIContainer ::bind('createAuctionService', new CreateAuctionService(
+DIContainer ::bind('createAuctionService', new AuctionService(
     DIContainer::get('db'),
     DIContainer::get('auctionRepo'),
     DIContainer::get('createItemService'),

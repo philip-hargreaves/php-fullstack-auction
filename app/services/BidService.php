@@ -33,10 +33,13 @@ class BidService
         }
     }
 
-    public function validate(array $input): array {
+    public function validateAndFixType(array $input): array {
+        // Check if auction_id is a valid ID
+        if (!filter_var($input['auction_id'], FILTER_VALIDATE_INT)) {
+            return Utilities::creationResult('Invalid auction ID.', false, null);
+        }
+        $input['auction_id'] = (int)$input['auction_id'];
         $auction = $this->auctionRepo->getById($input['auction_id']);
-        $bidAmount = $input['bid_amount'];
-        $userId = $input['user_id'];
 
         // Check if $auction exists
         if (is_null($auction)) {
@@ -47,6 +50,12 @@ class BidService
         if (!$auction->isAuctionActive()) {
             return Utilities::creationResult('This auction is not currently active.', false, null);
         }
+
+        // Check if user_id is a valid ID
+        if (!filter_var($input['user_id'], FILTER_VALIDATE_INT)) {
+            return Utilities::creationResult('Invalid user ID.', false, null);
+        }
+        $userId = $input['user_id'];
 
         // Check if $buyer exist
         if (is_null($userId)) {
@@ -68,20 +77,25 @@ class BidService
             return Utilities::creationResult('Current user is not a buyer.', false, null);
         }
 
+        $bidString = $input['bid_amount'];
+
         // Check $bidAmount Required
-        if (!isset($bidAmount) || $bidAmount === ''){
+        if (!isset($bidString) || $bidString === ''){
             return Utilities::creationResult('Bid amount is required.', false, null);
         }
 
         // Check $bidAmount Type (HTML: type="number")
-        if (!is_numeric($bidAmount)){
+        if (!is_numeric($bidString)){
             return Utilities::creationResult('Bid must be a valid number.', false, null);
         }
 
         // Check $bidAmount Precision
-        if (!preg_match('/^\d+(\.\d{1,2})?$/', $bidAmount)){
+        if (!preg_match('/^\d+(\.\d{1,2})?$/', $bidString)){
             return Utilities::creationResult('Bid amount can only have up to 2 decimal places.', false, null);
         }
+
+        $input['bid_amount'] = (float)trim($input['bid_amount']);
+        $bidAmount = $input['bid_amount'];
 
         // Check $bidAmount Reasonable Maximum
         if ($bidAmount > 1000000000) {
@@ -94,7 +108,7 @@ class BidService
             return Utilities::creationResult('Bid must be at least' . number_format($highestBidAmount, 2), false, null);
         }
 
-        return Utilities::creationResult('', true, null);
+        return Utilities::creationResult('', true, $input);
     }
 
     private function createBid(array $input): array {
@@ -127,13 +141,9 @@ class BidService
         try {
             Utilities::beginTransaction($pdo);
 
-            // Fixed datatype
-            $input['auction_id'] = (int)$input['auction_id'];
-            $input['bid_amount'] = (float)trim($input['bid_amount']);
-            $input['user_id'] = (int)$input['user_id'];
-
             // Validate input
-            $validationResult = $this->validate($input);
+            $validationResult = $this->validateAndFixType($input);
+            $input = $validationResult['object'];
 
             // Validation Fail -> Abort transaction
             if (!$validationResult['success']) {
