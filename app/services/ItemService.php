@@ -39,7 +39,6 @@ class ItemService
             $input['item_name'],
             $input['item_description'],
             $input['item_condition'],
-            'Scheduled'
         );
 
         // Execute insertion

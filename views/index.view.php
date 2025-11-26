@@ -76,15 +76,15 @@ require Utilities::basePath('views/partials/header.php');
                         <div id="statusContent" class="accordion-content" aria-labelledby="statusAccordion">
                             <div class="checkbox-group">
                                 <label class="checkbox-label">
-                                    <input class="mer-checkbox" type="checkbox" value="active" name="item_status">
+                                    <input class="mer-checkbox" type="checkbox" value="active" name="auction_status">
                                     <span class="checkbox-text">Active</span>
                                 </label>
                                 <label class="checkbox-label">
-                                    <input class="mer-checkbox" type="checkbox" value="completed" name="item_status">
+                                    <input class="mer-checkbox" type="checkbox" value="completed" name="auction_status">
                                     <span class="checkbox-text">Completed</span>
                                 </label>
                                 <label class="checkbox-label">
-                                    <input class="mer-checkbox" type="checkbox" value="sold" name="item_status">
+                                    <input class="mer-checkbox" type="checkbox" value="sold" name="auction_status">
                                     <span class="checkbox-text">Sold</span>
                                 </label>
                             </div>

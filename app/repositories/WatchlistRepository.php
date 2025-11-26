@@ -16,7 +16,7 @@ class WatchlistRepository
     public function addAuction(int $userId, int $auctionId): bool
     {
         try {
-            $sql = 'INSERT IGNORE INTO watchlist (user_id, auction_id, watched_datetime) 
+            $sql = 'INSERT IGNORE INTO watchlists (user_id, auction_id, watched_datetime) 
                     VALUES (:user_id, :auction_id, NOW())';
 
             $params = [
@@ -35,7 +35,7 @@ class WatchlistRepository
     public function removeAuction(int $userId, int $auctionId): bool
     {
         try {
-            $sql = 'DELETE FROM watchlist 
+            $sql = 'DELETE FROM watchlists 
                     WHERE user_id = :user_id AND auction_id = :auction_id';
 
             $params = [
@@ -54,7 +54,7 @@ class WatchlistRepository
     public function isWatched(int $userId, int $auctionId): bool
     {
         try {
-            $sql = 'SELECT 1 FROM watchlist WHERE user_id = :user_id AND auction_id = :auction_id LIMIT 1';
+            $sql = 'SELECT 1 FROM watchlists WHERE user_id = :user_id AND auction_id = :auction_id LIMIT 1';
             $params = ['user_id' => $userId, 'auction_id' => $auctionId];
 
             $row = $this->db->query($sql, $params)->fetch();

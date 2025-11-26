@@ -11,7 +11,7 @@
  * @var $reservePrice float
  * @var $highestBid float
  * @var $isAuctionActive bool
- * @var $itemStatus string
+ * @var $auctionStatus string
  * @var $timeRemaining DateInterval
  * @var $isLoggedIn bool
  * @var $isWatched bool
@@ -188,7 +188,7 @@
             <div class="card mb-5">
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item"><strong>Seller:</strong> <?= htmlspecialchars($sellerName) ?></li>
-                    <li class="list-group-item"><strong>Status:</strong> <?= htmlspecialchars($itemStatus) ?></li>
+                    <li class="list-group-item"><strong>Status:</strong> <?= htmlspecialchars($auctionStatus) ?></li>
                     <li class="list-group-item"><strong>Condition:</strong> <?= htmlspecialchars($itemCondition) ?></li>
                     <li class="list-group-item"><strong>Category:</strong> <?= htmlspecialchars($itemCondition) ?></li>
                 </ul>
