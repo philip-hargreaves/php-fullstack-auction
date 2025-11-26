@@ -69,7 +69,7 @@ class AuctionService
             $auctionInput = $validationResult['object']; // The fixed-type inputs are stored in $validationResult['object']
             $auction = new Auction(
                 0,
-                $item->getId(),
+                $item->getItemId(),
                 null,
                 $auctionInput['start_datetime'],
                 $auctionInput['end_datetime'],
@@ -88,7 +88,7 @@ class AuctionService
             }
 
             // Upload image
-            $uploadImageResult = $this->imageService->uploadItemImages($item->getId(), $imageInputs);
+            $uploadImageResult = $this->imageService->uploadItemImages($item->getItemId(), $imageInputs);
             if (!$uploadImageResult['success']) {
                 $pdo->rollBack();
                 return Utilities::creationResult('Failed to create an auction.' . $uploadImageResult['message'], false, null);

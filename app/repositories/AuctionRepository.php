@@ -113,6 +113,9 @@ class AuctionRepository
     private function extract(Auction $auction) : array
     {
         $row = [];
+        if ($auction->getAuctionId() != 0 && $auction->getAuctionId() != null) {
+            $row['id'] = $auction->getAuctionId();
+        }
         $row['item_id']= $auction->getItemId();
         $row['winning_bid_id'] = $auction->getWinningBidID(); //start with null
         $row['start_datetime'] = $auction->getStartDateTime()->format('Y-m-d H:i:s');

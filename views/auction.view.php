@@ -33,7 +33,7 @@
         <!-- Image Gallery -->
         <div class="col-12 col-md-7 mx-auto mb-4" style="max-width: 600px;">
             <!-- Define the First Image -->
-            <?php $firstImage = $imageUrls[0] ?? 'https://via.placeholder.com/600x400.png?text=No+Image'; ?>
+            <?php $firstImage = $imageUrls[0] ?? \infrastructure\Utilities::basePath('infrastructure/resources/images/default_item_image.jpg');?>
 
             <!-- Main Image Gallery -->
             <div id="image-gallery" class="gallery-container mb-2"> <!-- Reduced margin -->

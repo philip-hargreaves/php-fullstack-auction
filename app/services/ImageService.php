@@ -67,7 +67,8 @@ class ImageService
             );
 
             // Execute insertion
-            $this->itemImageRepo->create($itemImage);
+            $itemImage = $this->itemImageRepo->create($itemImage);
+
             $itemImages[] = $itemImage;
         }
 
@@ -80,7 +81,7 @@ class ImageService
             $this->itemImageRepo->update($firstImage);
         }
 
-        return Utilities::creationResult('Item images successfully created.', false, $itemImages);
+        return Utilities::creationResult('Item images successfully created.', true, $itemImages);
     }
 
     private function validateAndFixItemImageInput(array $input) : array
@@ -93,9 +94,9 @@ class ImageService
         }
 
         // Security: Validate it looks like a URL
-        if (!filter_var($url, FILTER_VALIDATE_URL)) {
-            return Utilities::creationResult('Invalid image URL format.', false, null);
-        }
+//        if (!filter_var($url, FILTER_VALIDATE_URL)) {
+//            return Utilities::creationResult('Invalid image URL format.', false, null);
+//        }
 
         // Optional: Check if it starts with http/https to prevent javascript: vectors
 //        if (!preg_match('/^https?:\/\//', $url)) {

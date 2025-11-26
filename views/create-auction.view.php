@@ -3,24 +3,32 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
 ?>
 
     <div class="container">
-
         <!-- logging errors and returning old input-->
         <?php
-        $exception = $_SESSION['errors'] ?? [];
-        $old = $_SESSION['old'] ?? [];
-
-        unset($_SESSION['errors'], $_SESSION['old']); // so errors only show once
+        $oldInput = $_SESSION['create_auction_old_input'] ?? [];
         ?>
 
         <!-- Create auction form -->
         <div style="max-width: 800px; margin: 10px auto">
             <h2 class="my-3">Create new auction</h2>
+
+            <!-- Flash errors -->
+            <?php if (!empty($_SESSION['create_auction_error'])): ?>
+                <div class="alert alert-danger shadow-sm" role="alert">
+                    <i class="fa fa-exclamation-circle"></i>
+                    <?php echo $_SESSION['create_auction_error']; ?>
+                </div>
+                <?php unset($_SESSION['create_auction_error']);
+                    unset($_SESSION['create_auction_old_input']);
+                ?>
+            <?php endif; ?>
+
             <div class="card">
 
                 <div class="card-body">
                     <!-- Note: This form does not do any dynamic / client-side /
                     JavaScript-based validation of data. -->
-                    <form method="POST" action="/create-auction" enctype="multipart/form-data">
+                    <form method="POST" id="create-auction-form" action="/create-auction" enctype="multipart/form-data">
 
                         <!-- item name-->
                         <div class="form-group row">
@@ -30,7 +38,7 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
                                        class="form-control"
                                        id="item_name"
                                        name = "item_name"
-                                       value="<?= htmlspecialchars($old['itemName'] ?? '') ?>">
+                                       value="<?= htmlspecialchars($oldInput['item_name'] ?? '') ?>">
                                 <small id="titleHelp" class="form-text text-muted"><span class="text-danger">* Required.</span> The name of the item you're selling, which will display in listings.</small>
                             </div>
                         </div>
@@ -49,7 +57,7 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
                                        class="form-control"
                                        id="item_description"
                                        name = "item_description"
-                                       value="<?= htmlspecialchars($old['itemDescription'] ?? '') ?>">
+                                       value="<?= htmlspecialchars($oldInput['item_description'] ?? '') ?>">
                                 <small id="titleHelp" class="form-text text-muted"><span class="text-danger">* Required.</span> A brief description of the item you're selling, which will display in listings.</small>
                             </div>
                         </div>
@@ -95,7 +103,7 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
                                             class="form-control"
                                             id="starting_price"
                                             name = "starting_price"
-                                            value="<?= htmlspecialchars($old['auctionStartPrice'] ?? '') ?>">
+                                            value="<?= htmlspecialchars($oldInput['starting_price'] ?? '') ?>">
                                 </div>
                                 <small id="startBidHelp" class="form-text text-muted"><span class="text-danger">* Required.</span> Initial bid amount.</small>
                             </div>
@@ -120,7 +128,7 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
                                             class="form-control"
                                             id="reserve_price"
                                             name="reserve_price"
-                                            value="<?= htmlspecialchars($old['auctionReservePrice'] ?? '') ?>">
+                                            value="<?= htmlspecialchars($oldInput['reserve_price'] ?? '') ?>">
                                 </div>
                                 <small id="reservePriceHelp" class="form-text text-muted">Optional. Auctions that end below this price will not go through. This value is not displayed in the auction listing.</small>
                             </div>
@@ -175,7 +183,7 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
                             <div class="col-sm-10">
                                 <input type="file" 
                                        id="image_uploader" 
-                                       class="form-control" 
+                                       class="form-control"
                                        multiple accept="image/*">
 
                                 <small class="form-text text-muted">
@@ -188,7 +196,7 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
                             </div>
                         </div>
 
-                        <button type="submit" class="btn btn-primary form-control">Create Auction</button>
+                        <button type="button" id="btn-create-auction" class="btn btn-primary form-control">Create Auction</button>
                     </form>
                 </div>
             </div>
@@ -199,10 +207,24 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // 1. Run Alerts FIRST (So they work even if the gallery fails)
+    if (typeof autoDismissAlerts === 'function') {
+        autoDismissAlerts();
+    } else {
+        console.error("autoDismissAlerts is not loaded. Check utilities.js linkage.");
+    }
+
+    const submitBtn = document.getElementById('btn-create-auction');
     const uploader = document.getElementById('image_uploader');
     const container = document.getElementById('image-preview-container');
-    const form = document.querySelector('form'); // Your main form
+    const form = document.getElementById('create-auction-form');
     const hiddenContainer = document.getElementById('hidden-inputs-container');
+
+    // ERROR CHECK: Verify elements exist
+    if (!submitBtn || !form || !hiddenContainer) {
+        console.error("Critical Error: Missing HTML elements.");
+        return;
+    }
 
     // 1. Handle File Selection
     uploader.addEventListener('change', function(e) {
@@ -229,7 +251,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // EXECUTE FETCH (AJAX)
         // You need a PHP route that accepts this file, uploads to S3/Cloudinary,
         // and returns JSON: { "url": "https://cloud.com/img123.jpg" }
-        fetch('/ajax/upload-image', {
+        fetch('ajax/upload-image.php', {
             method: 'POST',
             body: formData
         })
@@ -239,12 +261,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Update the card with the real image
                 updateCardWithImage(card, data.url);
             } else {
-                alert('Upload failed');
+                // alert('Upload failed');
                 card.remove();
+
             }
         })
         .catch(error => {
-            console.error('Error:', error);
             alert('Error uploading image');
             card.remove();
         });
@@ -289,46 +311,48 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // 4. Intercept Form Submit to Generate Hidden Inputs
-    form.addEventListener('submit', function(e) {
+    // LISTENER: We listen for the CLICK on the button
+    submitBtn.addEventListener('click', function(e) {
+
+        console.log("1. Button Clicked");
+
         // Clear previous hidden inputs
         hiddenContainer.innerHTML = '';
 
         const cards = container.querySelectorAll('.img-card');
 
+        // Validation
         if (cards.length === 0) {
-            e.preventDefault();
             alert('Please upload at least one image.');
-            return;
+            return; // STOP. The form will not submit.
         }
 
-        // Loop through visual cards and create hidden inputs
+        // Loop and create inputs
         cards.forEach((card, index) => {
             const url = card.dataset.url;
             if(!url) return;
 
-            // First item (index 0) is Main
-            const isMain = (index === 0) ? '1' : '0';
-
-            // Create Input: Image URL
-            // name="images[0][image_url]"
+            // 1. Image URL Input
             const inputUrl = document.createElement('input');
             inputUrl.type = 'hidden';
-            inputUrl.name = `images[${index}][image_url]`;
+            inputUrl.name = `uploaded_images[${index}][image_url]`;
             inputUrl.value = url;
+            hiddenContainer.appendChild(inputUrl);
 
-            // Create Input: Is Main
-            // name="images[0][is_main]"
+            // 2. Is Main Input
             const inputMain = document.createElement('input');
             inputMain.type = 'hidden';
             inputMain.name = `uploaded_images[${index}][is_main]`;
-            inputMain.value = isMain;
-
-            hiddenContainer.appendChild(inputUrl);
+            inputMain.value = (index === 0) ? '1' : '0';
             hiddenContainer.appendChild(inputMain);
         });
 
-        // The form will now submit normally with the hidden inputs
+        // Debug: Log the HTML string, NOT the element (fixes the empty log issue)
+        console.log("2. Inputs generated:", hiddenContainer.innerHTML);
+
+        // FINAL STEP: Submit the form manually
+        console.log("3. Submitting form...");
+        form.submit();
     });
 });
 </script>

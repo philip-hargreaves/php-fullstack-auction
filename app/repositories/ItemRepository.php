@@ -3,6 +3,7 @@ namespace app\repositories;
 
 use app\models\Item;
 use infrastructure\Database;
+use infrastructure\Utilities;
 use PDO;
 use PDOException;
 
@@ -30,7 +31,8 @@ class ItemRepository
         );
 
         // Set relationship properties
-        $seller = $this->userRepo->getById($row['seller_id']);
+        $seller = $this->userRepo->getById($object->getSellerId());
+
         $object->setSeller($seller);
 
         return $object;

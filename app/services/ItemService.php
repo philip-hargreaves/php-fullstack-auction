@@ -27,7 +27,8 @@ class ItemService
 
         // Validation Fail -> Return failed result to the transaction in createAuction()
         if (!$validationResult['success']) {
-            return Utilities::creationResult('Failed to create an item.', false, null);
+
+            return Utilities::creationResult('Failed to create an item.' . $validationResult['message'], false, null);
         }
 
         // Validation Pass -> Create Auction object

@@ -4,6 +4,7 @@ namespace app\repositories;
 use infrastructure\Database;
 use app\models\ItemImage;
 use DateTime;
+use infrastructure\Utilities;
 use PDOException;
 
 class ItemImageRepository
@@ -21,11 +22,11 @@ class ItemImageRepository
         }
 
         $object = new ItemImage(
-            (int)$row['image_id'],
-            (int)$row['auction_id'],
+            (int)$row['id'],
+            (int)$row['item_id'],
             (string)$row['image_url'],
             (bool)$row['is_main'],
-            $row['upload_datetime']
+            $row['uploaded_datetime']
         );
         return $object;
     }
@@ -33,13 +34,13 @@ class ItemImageRepository
     private function extract(ItemImage $itemImage): array {
         $row = [];
 
-        if ($itemImage->getImageId() != 0 || $itemImage->getItemId() != null) {
+        if ($itemImage->getImageId() != 0 && $itemImage->getItemId() != null) {
             $row['id'] = $itemImage->getImageId();
         }
         $row['item_id'] = $itemImage->getItemId();
         $row['image_url'] = $itemImage->getImageUrl();
         $row['is_main'] = $itemImage->isMain() ? 1 : 0;
-        $row['uploaded_datetime'] = $itemImage->getUploadDatetime()->format('Y-m-d H:i:s');
+        $row['uploaded_datetime'] = $itemImage->getUploadedDatetime()->format('Y-m-d H:i:s');
 
         return $row;
     }
@@ -48,20 +49,22 @@ class ItemImageRepository
     {
         try{
             $params = $this->extract($itemImage);
-            $sql = "INSERT INTO images (item_id, image_url, is_main, upload_datetime)
-                VALUES (:auction_id, :image_url, :is_main, :upload_datetime)";
-
+            $sql = "INSERT INTO item_images (item_id, image_url, is_main, uploaded_datetime)
+                VALUES (:item_id, :image_url, :is_main, :uploaded_datetime)";
             $result = $this->db->query($sql, $params);
+
 
             // Check if the insert was successful.
             if ($result) {
                 $id = (int)$this->db->connection->lastInsertId();
                 $itemImage->setImageId($id);
+
                 return $itemImage;
             } else {
                 return null;
             }
         } catch (PDOException $e) {
+            Utilities::dd($e);
             // TODO: add logging
             return null;
         }
@@ -70,7 +73,7 @@ class ItemImageRepository
     public function getByItemId($itemId) : array
     {
         try {
-            $sql = "SELECT * FROM images WHERE item_id = :item_id";
+            $sql = "SELECT * FROM item_images WHERE item_id = :item_id";
             $param = ['item_id' => $itemId];
             $rows = $this->db->query($sql, $param)->fetchAll();
 

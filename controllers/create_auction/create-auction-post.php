@@ -16,8 +16,8 @@ if (!Request::isPost()) {
 // 2. Call $AuctionService->createAuction($itemInput, $auctionInput, $imageInputs)
 
 // Dependency injection
-$auctionService = DIContainer::get('AuctionService');
-$authService = DIContainer::get('authService');
+$auctionService = DIContainer::get('auctionServ');
+$authService = DIContainer::get('authServ');
 
 try {
     // $itemInput should offer: seller_id, item_name, item_description, item_condition
@@ -37,7 +37,7 @@ try {
     ];
 
     // $imageInputs should offer: an array of multiple [image_url, is_main]
-    $imageInputs = Request::post('uploaded_images');
+    $imageInputs = Request::postRaw('uploaded_images');
 
     // Create auction
     $result = $auctionService->createAuction($itemInput, $auctionInput, $imageInputs);
@@ -45,16 +45,18 @@ try {
     // Save Result Message
     if (!$result['success']) {
         $_SESSION['create_auction_error'] = $result['message'];
+        $_SESSION['create_auction_old_input'] = $_POST;
+
+        header("Location: /create-auction");
+        exit();
     } else {
         $_SESSION['create_auction_success'] = $result['message'];
         // Redirect to auction page
-        $createdAuctionID = $result['object']->getId();
+        $createdAuctionID = $result['object']->getAuctionId();
         header("Location: /auction?auction_id=" . $createdAuctionID);
+        exit();
     }
-    exit();
-
 } catch (Exception $e) {
     // Show generic error to user (optionally log $e for diagnostics)
     $_SESSION['create_auction_error'] = ['Fail to create an auction. Please try again.'];
-    exit;
 }

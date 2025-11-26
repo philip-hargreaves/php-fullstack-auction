@@ -11,7 +11,7 @@ class ItemImage
     private int $itemId;
     private string $imageUrl;
     private bool $isMain;
-    private DateTime $uploadDatetime;
+    private DateTime $uploadedDatetime;
 
     // RELATIONSHIP PROPERTIES
 
@@ -21,14 +21,14 @@ class ItemImage
         int $itemId,
         string $imageUrl,
         int|bool $isMain,
-        string|DateTime $uploadDatetime
+        string|DateTime $uploadedDatetime
     )
     {
         $this->imageId = $imageId;
         $this->itemId = $itemId;
         $this->imageUrl = $imageUrl;
         $this->isMain = $isMain;
-        $this->uploadDatetime = $uploadDatetime;
+        $this->uploadedDatetime = is_string($uploadedDatetime) ? new DateTime($uploadedDatetime) : $uploadedDatetime;
     }
 
     // GETTERS
@@ -52,9 +52,9 @@ class ItemImage
         return $this->isMain;
     }
 
-    public function getUploadDatetime(): DateTime
+    public function getUploadedDatetime(): DateTime
     {
-        return $this->uploadDatetime;
+        return $this->uploadedDatetime;
     }
 
     // SETTERS

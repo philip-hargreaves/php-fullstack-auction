@@ -2,6 +2,7 @@
 namespace app\repositories;
 use app\models\User;
 use infrastructure\Database;
+use infrastructure\Utilities;
 use PDOException;
 
 // Data access for user
@@ -96,7 +97,7 @@ class UserRepository
 
     private function hydrate(array $rows): ?User
     {
-        if (empty($row)) {
+        if (empty($rows)) {
             return null;
         }
         $user = new User(

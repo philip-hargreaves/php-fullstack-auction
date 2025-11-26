@@ -13,15 +13,15 @@ $bidServ = DIContainer::get('bidServ');
 $auctionRepo = DIContainer::get('auctionRepo');
 $userRepo = DIContainer::get('userRepo');
 $watchlistServ = DIContainer::get('watchlistServ');
-$imageRepo = DIContainer::get('imageRepo');
+$itemImageRepo = DIContainer::get('itemImageRepo');
 
 // Get Auction, Item, and Bids entities
 $auction = $auctionRepo->getById($auctionId);
 $item = $auction->getItem();
 $bids = $bidServ->getBidsByAuctionId($auctionId);
 
-//Get auction images
-$imageArray = $imageRepo->getImageByAuctionId($auctionId);
+//Get item images
+$imageArray = $itemImageRepo->getByItemId($item->getItemId());
 
 // Variables
 $title = $item->getItemName();
@@ -34,10 +34,13 @@ $startingPrice = $auction->getStartingPrice();
 $reservePrice = $auction->getReservePrice();
 $itemCondition = $item->getItemCondition();
 $imageUrls = [];
+
 foreach ($imageArray as $image)
 {
-    $imageUrls[] = '/' . $image-> getImageURL();
+    $imageUrls[] = $image->getImageUrl();
 }
+
+$currencyText = '£';
 
 // Variables changes with $auctionStatus
 $auctionStatus = $auction->getAuctionStatus();

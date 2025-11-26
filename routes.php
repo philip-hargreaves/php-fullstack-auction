@@ -27,10 +27,10 @@ $router->post('/watchlist/add', 'controllers/auction/watchlist-add.php');
 $router->post('/watchlist/remove', 'controllers/auction/watchlist-remove.php');
 
 // My-listings Page
-$router->get('/my-listings', 'controllers/auction/my-listings.php');
+$router->get('/my-listings', 'controllers/my-listings.php');
 
 // My-Bids Page
 $router->get('/my-bids', 'controllers/my-bids.php');
 
 // Watchlist Page
-$router->get('/watchlist', 'controllers/auction/watchlist.php');
+$router->get('/watchlist', 'controllers/watchlist.php');
