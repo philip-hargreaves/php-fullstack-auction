@@ -51,9 +51,7 @@ require Utilities::basePath('views/partials/header.php');
                         pattern="[a-zA-Z0-9_-]+"
                         required
                 >
-                <small class="form-text text-muted">
-                    <span class="text-danger">*</span> Required. 8-25 characters.
-                </small>
+                <small class="form-text text-muted">Required. 8-25 characters, letters, numbers, underscores, hyphens only.</small>
             </div>
         </div>
 
@@ -71,7 +69,7 @@ require Utilities::basePath('views/partials/header.php');
                         maxlength="100"
                         required
                 >
-                <small class="form-text text-muted"><span class="text-danger">*</span> Required.</small>
+                <small class="form-text text-muted">Required. Valid email address.</small>
             </div>
         </div>
 
@@ -87,11 +85,10 @@ require Utilities::basePath('views/partials/header.php');
                         placeholder="Password"
                         minlength="8"
                         maxlength="72"
+                        autocomplete="new-password"
                         required
                 >
-                <small class="form-text text-muted">
-                    <span class="text-danger">*</span> Required. Minimum 8 characters.
-                </small>
+                <small class="form-text text-muted">Required. Min 8 characters, must include uppercase, lowercase, and number.</small>
             </div>
         </div>
 
@@ -105,9 +102,10 @@ require Utilities::basePath('views/partials/header.php');
                         id="password_confirmation"
                         name="password_confirmation"
                         placeholder="Enter password again"
+                        autocomplete="new-password"
                         required
                 >
-                <small class="form-text text-muted"><span class="text-danger">*</span> Required.</small>
+                <small class="form-text text-muted">Required. Must match password.</small>
             </div>
         </div>
 
@@ -122,42 +120,6 @@ require Utilities::basePath('views/partials/header.php');
         Already have an account? <a href="" data-toggle="modal" data-target="#loginModal">Login</a>
     </div>
 </div>
-
-    <!-- JS Validation-->
-    <script>
-        // password confirmation check
-        document.getElementById('password_confirmation').addEventListener('input', function() {
-            const password = document.getElementById('password').value.trim();
-            const confirmation = this.value.trim();
-
-            if (confirmation === '') {
-                this.setCustomValidity('');
-            } else if (password !== confirmation) {
-                this.setCustomValidity('Passwords do not match.');
-            } else {
-                this.setCustomValidity('');
-            }
-        });
-
-        // Re-check when password changes
-        document.getElementById('password').addEventListener('input', function() {
-            const confirmation = document.getElementById('password_confirmation');
-            if (confirmation.value.trim()) {
-                confirmation.dispatchEvent(new Event('input', { bubbles: true }));
-            }
-        });
-
-        document.querySelector('form[action="/register"]').addEventListener('submit', function(e) {
-            const password = document.getElementById('password').value.trim();
-            const confirmation = document.getElementById('password_confirmation').value.trim();
-            if (password !== confirmation) {
-                e.preventDefault();
-                document.getElementById('password_confirmation').setCustomValidity('Passwords do not match.');
-                document.getElementById('password_confirmation').reportValidity();
-                return false;
-            }
-        });
-    </script>
 
 <?php
 unset($_SESSION['old_registration_username'], $_SESSION['old_registration_email']);
