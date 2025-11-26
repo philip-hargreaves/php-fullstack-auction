@@ -17,13 +17,12 @@ INSERT IGNORE INTO user_roles (user_id, role_id) VALUES
     (102, 2);  -- jane is a seller
 
 -- Insert items (if they don't exist)
-INSERT IGNORE INTO items (id, seller_id, item_name, item_description, item_condition, item_status) VALUES
+INSERT IGNORE INTO items (id, seller_id, item_name, item_description, item_condition) VALUES
     (1111,
      101,
      'Dell S2725HS 27"" LED Monitor',
      'With clear FHD resolution, high 100Hz refresh rate, integrated dual 5W speakers and subtle texture on the back inspired by Japanese sand raking, any activity becomes an immersive experience. Enjoy more detailed sound with spacious audio featuring greater output power, deeper frequency response and more decibel range than the previous generation.',
-     'New',
-     'Available');
+     'New');
 
 -- Insert auction (if they don't exist)
 INSERT IGNORE INTO auctions (id, item_id, start_datetime, end_datetime, starting_price, reserve_price, auction_status) VALUES

@@ -25,8 +25,7 @@ class ItemRepository
             (int)$row['seller_id'],
             (string)$row['item_name'],
             (string)$row['item_description'],
-            (string)$row['item_condition'],
-            (string)$row['item_status']
+            (string)$row['item_condition']
         );
 
         // Set relationship properties
@@ -38,7 +37,7 @@ class ItemRepository
 
     public function getById(int $itemId): ?Item {
         // Query
-        $sql = "SELECT id, seller_id, item_name, item_description, item_condition, item_status 
+        $sql = "SELECT id, seller_id, item_name, item_description, item_condition 
                 FROM items 
                 WHERE id = :item_id";
         $params = ['item_id' => $itemId];
