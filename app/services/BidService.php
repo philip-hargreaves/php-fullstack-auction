@@ -175,7 +175,7 @@ class BidService
         if ($isAuctionActive) {
             // Get Item Status
             $item = $auction->getItem();
-            $isItemSold = $item->getItemStatus() == 'Sold';
+            $isItemSold = $auction->getAuctionStatus() == 'Sold';
             if ($isItemSold) {
                 return $this->bidRepo->getById($auction->getWinningBidID());
             }
