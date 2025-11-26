@@ -26,6 +26,7 @@ $isSeller = AuthService::hasRole('seller');
     <!-- Bootstrap and FontAwesome CSS -->
     <link rel="stylesheet" href="/css/bootstrap.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- <link rel="stylesheet" href="/css/font-awesome.min.css"> -->
     <!-- Global CSS - Site-wide styles and variables -->
     <link rel="stylesheet" href="/css/global.css">
     <!-- Component-specific CSS files -->
@@ -39,6 +40,7 @@ $isSeller = AuthService::hasRole('seller');
     <link rel="stylesheet" href="/css/create-auction.css">
     <link rel="stylesheet" href="/css/auction-page.css">
     <link rel="stylesheet" href="/css/alert.css">
+    <link rel="stylesheet" href="/css/uploaded-images.css">
     <title>Auctivity</title>
 </head>
 <body>
@@ -71,7 +73,7 @@ $isSeller = AuthService::hasRole('seller');
         <?php if ($isLoggedIn): ?>
         <div class="middle-section">
             <?php if ($isBuyer): ?>
-                <a href="/mybids" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/mybids') !== false ? 'active' : '' ?>">My Bids</a>
+                <a href="/my-bids" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/my-bids') !== false ? 'active' : '' ?>">My Bids</a>
                 <a href="/watchlist" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/watchlist') !== false ? 'active' : '' ?>">Watchlist</a>
             <?php endif; ?>
 
@@ -167,6 +169,14 @@ $isSeller = AuthService::hasRole('seller');
         </button>
     </div>
     <?php unset($_SESSION['upgrade_error']); ?>
+<?php endif; ?>
+
+<!-- Display auction creation success message -->
+<?php if (isset($_SESSION['create_auction_success'])): ?>
+    <div class = "alert alert-success">
+        <?= htmlspecialchars($_SESSION['create_auction_success']); ?>
+    </div>
+    <?php unset($_SESSION['create_auction_success']); ?>
 <?php endif; ?>
 
 <!-- Login modal -->

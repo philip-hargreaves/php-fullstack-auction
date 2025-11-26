@@ -13,7 +13,9 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 <script src="/js/bootstrap.bundle.min.js"></script>
-<script src="/js/utilities.js"></script>
+<!-- add time to trick the cache that this is a new file, to get the updated version -->
+<script src="/js/utilities.js?v=<?php echo time(); ?>"></script>
+
 
 <!-- Auto-dismiss alerts after 3 seconds -->
 <script>

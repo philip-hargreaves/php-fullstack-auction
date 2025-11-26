@@ -14,11 +14,15 @@ class UserRoleRepository
     // Currently to be used for registration and "become a seller button"
     public function assignRole(int $userId, Role $role): void
     {
-        $sql = 'INSERT IGNORE INTO user_roles (user_id, role_id) VALUES (:user_id, :role_id)';
-        $params = ['user_id' => $userId, 'role_id' => $role->getId()];
+        try {
+            $sql = 'INSERT IGNORE INTO user_roles (user_id, role_id) VALUES (:user_id, :role_id)';
+            $param = ['user_id' => $userId, 'role_id' => $role->getId()];
 
-        // Uses INSERT IGNORE so repeated assignments do not throw duplicate-key errors
-        $this->db->query($sql, $params);
+            // Uses INSERT IGNORE so repeated assignments do not throw duplicate-key errors
+            $this->db->query($sql, $param);
+        } catch (PDOException $e) {
+            // TODO: add logging
+        }
     }
 
     // Revoke the given role from user

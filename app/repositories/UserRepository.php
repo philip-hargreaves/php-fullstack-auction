@@ -2,6 +2,7 @@
 namespace app\repositories;
 use app\models\User;
 use infrastructure\Database;
+use infrastructure\Utilities;
 use PDOException;
 
 // Data access for user
@@ -99,7 +100,6 @@ class UserRepository
             $sql = 'INSERT INTO users (username, email, password, is_active)
                     VALUES (:username, :email, :password, :is_active)';
             $params = $this->extract($user);
-
             $this->db->query($sql, $params);
 
             $user->setUserId((int)$this->db->connection->lastInsertId());
@@ -111,8 +111,11 @@ class UserRepository
         }
     }
 
-    private function hydrate(array $rows): User
+    private function hydrate(array $rows): ?User
     {
+        if (empty($rows)) {
+            return null;
+        }
         $user = new User(
             (int)$rows[0]['id'],
             $rows[0]['username'],
