@@ -95,7 +95,8 @@ class RegistrationService
         } elseif (strlen($email) > 100) {
             $errors['email'] = 'Email must not exceed 100 characters.';
         } elseif ($this->userRepository->existsByEmail($email)) {
-            $errors['email'] = 'Emaigit s
+            $errors['email'] = 'Email already exists.';
+        }
 
         // Password validation
         if ($password === '') {
