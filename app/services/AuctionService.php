@@ -2,7 +2,6 @@
 
 namespace app\services;
 use app\repositories\AuctionRepository;
-use app\repositories\ItemRepository;
 use infrastructure\Database;
 use app\models\Auction;
 use DateTime;
@@ -31,7 +30,7 @@ class AuctionService
         $auctions = $this->auctionRepo->getBySellerId($sellerId);
 
         foreach ($auctions as $auction) {
-            $highestBid = $this->bidService->getHighestBidByAuctionId($auction->getAuctionId());
+            $highestBid = $this->bidService->getHighestBidAmountByAuctionId($auction->getAuctionId());
             $currentPrice = $highestBid > 0 ? $highestBid : $auction->getStartingPrice();
             $auction->setCurrentPrice($currentPrice);
         }

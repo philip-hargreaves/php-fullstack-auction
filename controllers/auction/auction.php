@@ -19,6 +19,8 @@ $itemImageRepo = DIContainer::get('itemImageRepo');
 $auction = $auctionRepo->getById($auctionId);
 $item = $auction->getItem();
 $bids = $bidServ->getBidsByAuctionId($auctionId);
+// Keep only the first 15 elements (0 to 15)
+$bids = array_slice($bids, 0, 15);
 
 //Get item images
 $imageArray = $itemImageRepo->getByItemId($item->getItemId());
@@ -28,6 +30,7 @@ $title = $item->getItemName();
 $sellerName = $item->getSeller()->getUsername();
 $description = $item->getItemDescription();
 $highestBid = $bidServ->getHighestBidByAuctionId($auctionId);
+$highestBidAmount = $bidServ->getHighestBidAmountByAuctionId($auctionId);
 $startTime = $auction->getStartDateTime();
 $endTime = $auction->getEndDateTime();
 $startingPrice = $auction->getStartingPrice();
@@ -43,36 +46,39 @@ foreach ($imageArray as $image)
 $currencyText = '£';
 
 // Variables changes with $auctionStatus
+// auctionStatus ENUM: 'Scheduled', 'Active', 'Sold', 'Unsold', 'Deleted'
 $auctionStatus = $auction->getAuctionStatus();
 $isAuctionActive = $auctionStatus == 'Active';
 $bidText = "";
 $statusText = "";
 $timeRemaining = "";
-$winningBid = null;
+$winningBid = $bidServ->getHighestBidAmountByAuctionId($auctionId);
+
 
 // Display different data for different $auctionStatus and $itemStatus
 $now = new DateTime();
-if ($auctionStatus == 'Active') {
-    $bidText = "Current Bid";
-    $statusText = "Reserve price not yet met.";
+if ($auctionStatus == 'Scheduled') {
+    $statusText = "Upcoming Auction";
+    $statusTextSmall = "This auction has not started yet.";
+    $timeText = "Starting In: ";
+    $timeRemaining = $endTime->diff($now);
+} else if ($auctionStatus == 'Active') {
+    $bidText = "Current Bid: ";
+    $statusText = "Auction Active";
+    $statusTextSmall = "Reserve price not yet met.";
+    $timeText = "Time Remaining: ";
     $timeRemaining = $now->diff($endTime);
-} else if ($auctionStatus == 'Sold' || $auctionStatus == 'Unsold' || $auctionStatus == 'Deleted') {
-
+} else if ($auctionStatus == 'Sold') {
+    $bidText = "Winning Bid: ";
+    $statusText = "Auction Passed";
+    $statusTextSmall = "The item is sold.";
+} else if ($auctionStatus == 'Unsold') {
     $bidText = "Final Bid";
-    $timeRemaining = $now->diff($now);
-    // Display auction result
-    if ($auctionStatus == 'Sold') {
-        $statusText = "This auction ends. The item is sold";
-    } else if ($auctionStatus == 'Unsold') {
-        $statusText = "This auction ends. The item is not sold.";
-        $winningBid = $bidServ->getWinningBidForAuction($auctionId);
-    } else { //$auctionStatus == 'Deleted'
-        // Jump to 404 not found
-    }
-} else { //$auctionStatus == 'Scheduled'
-    $bidText = "Current Bid";
-    $statusText = "This auction hasn't start yet.";
-    $timeRemaining = $now->diff($endTime);
+    $statusText = "Item Unsold";
+    $statusTextSmall = "Auction ended without a winner.";
+} else if ($auctionStatus == 'Deleted') {
+    $statusText = "Auction Deleted";
+    $statusTextSmall = "This item is deleted by the seller.";
 }
 
 // Session Status

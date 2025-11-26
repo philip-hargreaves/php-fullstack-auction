@@ -7,17 +7,21 @@ use app\models\ItemImage;
 use app\repositories\ItemImageRepository;
 use app\repositories\ItemRepository;
 use DateTime;
+use infrastructure\Database;
 use infrastructure\Utilities;
+use PDOException;
 
 // ImageService provides services for all image related models (ItemImage, ProfileImage etc.)
 class ImageService
 {
     private ItemImageRepository $itemImageRepo;
     private ItemRepository $itemRepo;
+    private Database $db;
 
-    public function __construct(ItemImageRepository $itemImageRepo, ItemRepository $itemRepo) {
+    public function __construct(ItemImageRepository $itemImageRepo, ItemRepository $itemRepo, Database $db) {
         $this->itemImageRepo = $itemImageRepo;
         $this->itemRepo = $itemRepo;
+        $this->db = $db;
     }
 
     public function uploadItemImages(Item $item, array $inputs): array {
@@ -38,7 +42,7 @@ class ImageService
             return Utilities::creationResult("Please upload at least 1 image.", false, null);
         }
         if (count ($inputs) > 10) {
-            return Utilities::creationResult("Please upload no more than than 10 image.", false, null);
+            return Utilities::creationResult("Please upload no more than 10 image.", false, null);
         }
 
         $itemImages = [];
@@ -113,5 +117,42 @@ class ImageService
 
         // Success
         return Utilities::creationResult('', true, $input);
+    }
+
+    public function updateImage(ItemImage $image): bool
+    {
+        $pdo = $this->db->connection;
+        $startedTransaction = false;
+
+        try {
+            // Check if we are already inside a transaction
+            if (!$pdo->inTransaction()) {
+                $pdo->beginTransaction();
+                $startedTransaction = true;
+            }
+
+            // Business Logic: Only one main image allowed
+            if ($image->isMain()) {
+                $this->itemImageRepo->resetMainImageFlags($image->getItemId(), $image->id);
+            }
+
+            // Perform the Update
+            $this->itemImageRepo->update($image);
+
+            // Only commit if this function started the transaction.
+            if ($startedTransaction) {
+                $pdo->commit();
+            }
+
+            return true;
+
+        } catch (PDOException $e) {
+            // Only rollback if this function started the transaction.
+            if ($startedTransaction) {
+                $pdo->rollBack();
+            }
+
+            return false;
+        }
     }
 }

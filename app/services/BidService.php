@@ -24,13 +24,17 @@ class BidService
         $this->db = $db;
     }
 
-    public function getHighestBidByAuctionId($auctionId): float {
+    public function getHighestBidAmountByAuctionId($auctionId): float {
         $highestBid = $this->bidRepo->getHighestBidByAuctionId($auctionId);
         if(is_null($highestBid)) {
             return 0;
         }else{
             return $highestBid->getBidAmount();
         }
+    }
+
+    public function getHighestBidByAuctionId($auctionId): ?Bid {
+        return $this->bidRepo->getHighestBidByAuctionId($auctionId);
     }
 
     public function validateAndFixType(array $input): array {
@@ -103,7 +107,7 @@ class BidService
         }
 
         // Check if the bid is high enough
-        $highestBidAmount = $this->getHighestBidByAuctionId($input['auction_id']);
+        $highestBidAmount = $this->getHighestBidAmountByAuctionId($input['auction_id']);
         if ($bidAmount < $highestBidAmount + 0.01) {
             return Utilities::creationResult('Bid must be at least' . number_format($highestBidAmount, 2), false, null);
         }

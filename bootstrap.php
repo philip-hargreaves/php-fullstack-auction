@@ -61,8 +61,8 @@ DIContainer::bind('itemServ', new ItemService(
 
 DIContainer::bind('imageServ', new ImageService(
     DIContainer::get('itemImageRepo'),
-    DIContainer::get('itemRepo')
-));
+    DIContainer::get('itemRepo'),
+    DIContainer::get('db')));
 
 // Bind Services (they depend on repositories)
 DIContainer::bind('bidServ', new BidService(

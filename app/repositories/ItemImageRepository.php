@@ -109,42 +109,22 @@ class ItemImageRepository
         return $objects;
     }
 
+    // Repository
+    public function resetMainImageFlags(int $itemId, int $excludeImageId): void
+    {
+        // Just does the "reset" work
+        $sql = "UPDATE item_images SET is_main = 0 WHERE item_id = :item_id AND id != :id";
+        $this->db->query($sql, ['item_id' => $itemId, 'id' => $excludeImageId]);
+    }
+
     public function update(ItemImage $itemImage): bool
     {
-        try {
-            $pdo = $this->db->connection;
-            $inTransaction = false;
-            // If this function is called in a transaction, then don't start one
-            if (!$pdo->inTransaction()) {
-                $pdo->beginTransaction();
-            } else {
-                $inTransaction = true;
-            }
+        // Just does the "update" work
+        $param = $this->extract($itemImage);
+        $sql = "UPDATE item_images
+            SET item_id = :item_id, image_url = :image_url, is_main = :is_main, uploaded_datetime = :uploaded_datetime
+            WHERE id = :id";
 
-            // Convert object to array
-            $param = $this->extract($itemImage);
-
-            // Single Main Image Logic: if this image is being set to Main (1), un-set all others for this item.
-            if ($param['is_main'] === 1) {
-                $sqlReset = "UPDATE item_images SET is_main = 0 WHERE item_id = :item_id AND id != :id";
-                $this->db->query($sqlReset, $param);
-            }
-
-            // Update
-            $sql = "UPDATE item_images
-                    SET item_id = :item_id, image_url = :image_url, is_main = :is_main, uploaded_datetime = :uploaded_datetime
-                    WHERE id = :id";
-            $this->db->query($sql, $param);
-
-            $this->db->connection->commit();
-            return true;
-
-        } catch (PDOException $e) {
-            if (!$inTransaction && $pdo->inTransaction()) {
-                $pdo->rollBack();
-            }
-            // TODO: Add logging here
-            return false;
-        }
+        return $this->db->query($sql, $param);
     }
 }
