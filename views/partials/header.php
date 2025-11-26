@@ -176,8 +176,8 @@ $isSeller = AuthService::hasRole('seller');
             <div class="modal-body">
                 <form method="POST" action="/login">
                     <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
+                        <label for="email_or_username">Email or Username</label>
+                        <input type="text" class="form-control" id="email_or_username" name="email_or_username" placeholder="Email or username" required>
                     </div>
                     <div class="form-group">
                         <label for="password">Password</label>

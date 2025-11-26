@@ -11,9 +11,15 @@ require Utilities::basePath('views/partials/header.php');
     <?php if (!empty($_SESSION['registration_errors'])): ?>
         <div class="alert alert-danger">
             <ul class="mb-0">
-                <?php foreach ($_SESSION['registration_errors'] as $error): ?>
-                    <li><?php echo htmlspecialchars($error); ?></li>
-                <?php endforeach; ?>
+                <?php
+                foreach ($_SESSION['registration_errors'] as $field => $error):
+                    if (is_numeric($field)) {
+                        echo '<li>' . htmlspecialchars($error) . '</li>';
+                    } else {
+                        echo '<li><strong>' . htmlspecialchars(ucfirst(str_replace('_', ' ', $field))) . ':</strong> ' . htmlspecialchars($error) . '</li>';
+                    }
+                endforeach;
+                ?>
             </ul>
         </div>
         <?php unset($_SESSION['registration_errors']); ?>
@@ -34,15 +40,20 @@ require Utilities::basePath('views/partials/header.php');
             <label for="username" class="col-sm-2 col-form-label text-right">Username</label>
             <div class="col-sm-10">
                 <input
-                    type="text"
-                    class="form-control"
-                    id="username"
-                    name="username"
-                    placeholder="Choose a username"
-                    value="<?php echo htmlspecialchars($_SESSION['old_registration_username'] ?? ''); ?>"
-                    required
+                        type="text"
+                        class="form-control"
+                        id="username"
+                        name="username"
+                        placeholder="Choose a username"
+                        value="<?php echo htmlspecialchars($_SESSION['old_registration_username'] ?? ''); ?>"
+                        minlength="8"
+                        maxlength="25"
+                        pattern="[a-zA-Z0-9_-]+"
+                        required
                 >
-                <small class="form-text text-muted"><span class="text-danger">*</span> Required.</small>
+                <small class="form-text text-muted">
+                    <span class="text-danger">*</span> Required. 8-25 characters. Letters, numbers, underscores, and hyphens only.
+                </small>
             </div>
         </div>
 
@@ -51,13 +62,14 @@ require Utilities::basePath('views/partials/header.php');
             <label for="email" class="col-sm-2 col-form-label text-right">Email</label>
             <div class="col-sm-10">
                 <input
-                    type="email"
-                    class="form-control"
-                    id="email"
-                    name="email"
-                    placeholder="john@example.com"
-                    value="<?php echo htmlspecialchars($_SESSION['old_registration_email'] ?? ''); ?>"
-                    required
+                        type="email"
+                        class="form-control"
+                        id="email"
+                        name="email"
+                        placeholder="john@example.com"
+                        value="<?php echo htmlspecialchars($_SESSION['old_registration_email'] ?? ''); ?>"
+                        maxlength="100"
+                        required
                 >
                 <small class="form-text text-muted"><span class="text-danger">*</span> Required.</small>
             </div>
@@ -68,14 +80,18 @@ require Utilities::basePath('views/partials/header.php');
             <label for="password" class="col-sm-2 col-form-label text-right">Password</label>
             <div class="col-sm-10">
                 <input
-                    type="password"
-                    class="form-control"
-                    id="password"
-                    name="password"
-                    placeholder="Password"
-                    required
+                        type="password"
+                        class="form-control"
+                        id="password"
+                        name="password"
+                        placeholder="Password"
+                        minlength="8"
+                        maxlength="72"
+                        required
                 >
-                <small class="form-text text-muted"><span class="text-danger">*</span> Required.</small>
+                <small class="form-text text-muted">
+                    <span class="text-danger">*</span> Required. Minimum 8 characters. Must include uppercase, lowercase, and number.
+                </small>
             </div>
         </div>
 
@@ -84,12 +100,12 @@ require Utilities::basePath('views/partials/header.php');
             <label for="password_confirmation" class="col-sm-2 col-form-label text-right">Repeat password</label>
             <div class="col-sm-10">
                 <input
-                    type="password"
-                    class="form-control"
-                    id="password_confirmation"
-                    name="password_confirmation"
-                    placeholder="Enter password again"
-                    required
+                        type="password"
+                        class="form-control"
+                        id="password_confirmation"
+                        name="password_confirmation"
+                        placeholder="Enter password again"
+                        required
                 >
                 <small class="form-text text-muted"><span class="text-danger">*</span> Required.</small>
             </div>
@@ -106,6 +122,28 @@ require Utilities::basePath('views/partials/header.php');
         Already have an account? <a href="" data-toggle="modal" data-target="#loginModal">Login</a>
     </div>
 </div>
+
+    <script>
+        // password confirmation check
+        document.getElementById('password_confirmation').addEventListener('input', function() {
+            const password = document.getElementById('password').value;
+            const confirmation = this.value;
+
+            if (confirmation && password !== confirmation) {
+                this.setCustomValidity('Passwords do not match.');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+
+        // Re-check when password changes
+        document.getElementById('password').addEventListener('input', function() {
+            const confirmation = document.getElementById('password_confirmation');
+            if (confirmation.value) {
+                confirmation.dispatchEvent(new Event('input'));
+            }
+        });
+    </script>
 
 <?php
 unset($_SESSION['old_registration_username'], $_SESSION['old_registration_email']);
