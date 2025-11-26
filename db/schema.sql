@@ -85,6 +85,7 @@ CREATE TABLE bids (
     FOREIGN KEY (auction_id) REFERENCES auctions(id) ON DELETE CASCADE
 );
 
+-- still needed here? or delete?
 CREATE TABLE `images` (
     image_id INT AUTO_INCREMENT PRIMARY KEY,
     auction_id INT NOT NULL,
