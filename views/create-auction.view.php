@@ -24,48 +24,47 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
 
                         <!-- item name-->
                         <div class="form-group row">
-                            <label for="itemName" class="col-sm-2 col-form-label text-right">Item Name</label>
+                            <label for="item_name" class="col-sm-2 col-form-label text-right">Item Name</label>
                             <div class="col-sm-10">
                                 <input type="text"
                                        class="form-control"
-                                       id="itemName"
-                                       name = "itemName"
+                                       id="item_name"
+                                       name = "item_name"
                                        value="<?= htmlspecialchars($old['itemName'] ?? '') ?>">
                                 <small id="titleHelp" class="form-text text-muted"><span class="text-danger">* Required.</span> The name of the item you're selling, which will display in listings.</small>
                             </div>
                         </div>
                         <!-- item name error -->
-                        <?php if (!empty($exception['itemName'])): ?>
+                        <?php if (!empty($exception['item_name'])): ?>
                             <div class = "text-danger">
-                                <?= $exception['itemName'] ?>
+                                <?= $exception['item_name'] ?>
                             </div>
                         <?php endif ?>
 
-
                         <!-- item description -->
                         <div class="form-group row">
-                            <label for="itemDescription" class="col-sm-2 col-form-label text-right">Item Description</label>
+                            <label for="item_description" class="col-sm-2 col-form-label text-right">Item Description</label>
                             <div class="col-sm-10">
                                 <input type="text"
                                        class="form-control"
-                                       id="itemDescription"
-                                       name = "itemDescription"
+                                       id="item_description"
+                                       name = "item_description"
                                        value="<?= htmlspecialchars($old['itemDescription'] ?? '') ?>">
                                 <small id="titleHelp" class="form-text text-muted"><span class="text-danger">* Required.</span> A brief description of the item you're selling, which will display in listings.</small>
                             </div>
                         </div>
                         <!-- item description error handling -->
-                        <?php if (!empty($exception['itemDescription'])): ?>
+                        <?php if (!empty($exception['item_description'])): ?>
                             <div class = "text-danger">
-                                <?= $exception['itemDescription'] ?>
+                                <?= $exception['item_description'] ?>
                             </div>
                         <?php endif ?>
 
                         <!-- item condition -->
                         <div class="form-group row">
-                            <label for="itemCondition" class="col-sm-2 col-form-label text-right">Item Condition</label>
+                            <label for="item_condition" class="col-sm-2 col-form-label text-right">Item Condition</label>
                             <div class="col-sm-10">
-                                <select class="form-control" id="itemCondition" name="itemCondition">
+                                <select class="form-control" id="item_condition" name="item_condition">
                                     <option value="">Select Condition</option>
                                     <option value="New">New</option>
                                     <option value="Like New">Like New</option>
@@ -75,17 +74,17 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
                             </div>
                         </div>
                         <!-- item condition error handling -->
-                        <?php if (!empty($exception['itemCondition'])): ?>
+                        <?php if (!empty($exception['item_condition'])): ?>
                             <div class = "text-danger">
-                                <?= $exception['itemCondition'] ?>
+                                <?= $exception['item_condition'] ?>
                             </div>
                         <?php endif ?>
 
-                        <!-- need item category? can have drop-down list -->
+                        <!-- add item category -->
 
-                        <!-- auctionStartPrice -->
+                        <!-- starting price -->
                         <div class="form-group row">
-                            <label for="auctionStartPrice" class="col-sm-2 col-form-label text-right">Starting price</label>
+                            <label for="starting_price" class="col-sm-2 col-form-label text-right">Starting price</label>
                             <div class="col-sm-10">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
@@ -94,23 +93,23 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
                                     <input
                                             type="number"
                                             class="form-control"
-                                            id="auctionStartPrice"
-                                            name = "auctionStartPrice"
+                                            id="starting_price"
+                                            name = "starting_price"
                                             value="<?= htmlspecialchars($old['auctionStartPrice'] ?? '') ?>">
                                 </div>
                                 <small id="startBidHelp" class="form-text text-muted"><span class="text-danger">* Required.</span> Initial bid amount.</small>
                             </div>
                         </div>
-                        <!-- auction start price error handling -->
-                        <?php if (!empty($exception['auctionStartPrice'])): ?>
+                        <!-- starting price error handling -->
+                        <?php if (!empty($exception['starting_price'])): ?>
                             <div class = "text-danger">
-                                <?= $exception['auctionStartPrice'] ?>
+                                <?= $exception['starting_price'] ?>
                             </div>
                         <?php endif ?>
 
-                        <!-- auctionReservePrice -->
+                        <!-- reserve price -->
                         <div class="form-group row">
-                            <label for="auctionReservePrice" class="col-sm-2 col-form-label text-right">Reserve price</label>
+                            <label for="reserve_price" class="col-sm-2 col-form-label text-right">Reserve price</label>
                             <div class="col-sm-10">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
@@ -119,67 +118,73 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
                                     <input
                                             type="number"
                                             class="form-control"
-                                            id="auctionReservePrice"
-                                            name="auctionReservePrice"
+                                            id="reserve_price"
+                                            name="reserve_price"
                                             value="<?= htmlspecialchars($old['auctionReservePrice'] ?? '') ?>">
                                 </div>
                                 <small id="reservePriceHelp" class="form-text text-muted">Optional. Auctions that end below this price will not go through. This value is not displayed in the auction listing.</small>
                             </div>
                         </div>
                         <!-- auction reserve price error handling -->
-                        <?php if (!empty($exception['auctionReservePrice'])): ?>
+                        <?php if (!empty($exception['reserve_price'])): ?>
                             <div class = "text-danger">
-                                <?= $exception['auctionReservePrice'] ?>
+                                <?= $exception['reserve_price'] ?>
                             </div>
                         <?php endif ?>
 
-                        <!-- need to have constraint: start date cannot be before today -->
+                        <!-- start datetime -->
                         <div class="form-group row">
-                            <label for="auctionStartDate" class="col-sm-2 col-form-label text-right">Start date</label>
+                            <label for="start_datetime" class="col-sm-2 col-form-label text-right">Start date</label>
                             <div class="col-sm-10">
-                                <input
-                                        type="datetime-local"
+                                <input  type="datetime-local"
                                         class="form-control"
-                                        id="auctionStartDate"
-                                        name="auctionStartDate"
-                                >
+                                        id="start_datetime"
+                                        name="start_datetime" >
                                 <small class="form-text text-muted"><span class="text-danger">* Required.</span> Start date for the auction.</small>
                             </div>
                         </div>
-                        <!-- auction start date error handling -->
-                        <?php if (!empty($exception['auctionStartDate'])): ?>
+                        <!-- start datetime error handling -->
+                        <?php if (!empty($exception['start_datetime'])): ?>
                             <div class = "text-danger">
-                                <?= $exception['auctionStartDate'] ?>
+                                <?= $exception['start_datetime'] ?>
                             </div>
                         <?php endif ?>
 
-                        <!-- auctionEndDate -->
+                        <!-- end datetime -->
                         <div class="form-group row">
-                            <label for="auctionEndDate" class="col-sm-2 col-form-label text-right">End date</label>
+                            <label for="end_datetime" class="col-sm-2 col-form-label text-right">End date</label>
                             <div class="col-sm-10">
                                 <input
                                         type="datetime-local"
                                         class="form-control"
-                                        id="auctionEndDate"
-                                        name="auctionEndDate">
+                                        id="end_datetime"
+                                        name="end_datetime">
                                 <small id="endDateHelp" class="form-text text-muted"><span class="text-danger">* Required.</span> Day for the auction to end.</small>
                             </div>
                         </div>
-                        <!-- auction end date error handling -->
-                        <?php if (!empty($exception['auctionEndDate'])): ?>
+                        <!-- end datetime error handling -->
+                        <?php if (!empty($exception['end_datetime'])): ?>
                             <div class = "text-danger">
-                                <?= $exception['auctionEndDate'] ?>
+                                <?= $exception['end_datetime'] ?>
                             </div>
                         <?php endif ?>
 
                         <!-- image upload -->
                         <div class="form-group row">
-                            <label for="images" class="col-sm-2 col-form-label text-right">Item Images</label>
+                            <label class="col-sm-2 col-form-label text-right">Item Images</label>
                             <div class="col-sm-10">
-                                <input type="file" id="images" name="images[]" class="form-control" multiple required>
+                                <input type="file" 
+                                       id="image_uploader" 
+                                       class="form-control" 
+                                       multiple accept="image/*">
+
                                 <small class="form-text text-muted">
-                                    <span class="text-danger">* Required.</span> Upload one or more images of your item, showing different angles.
+                                    <span class="text-danger">* Required.</span>
+                                    Select images. The <strong>first image</strong> in the list below will be the Main Image.
+                                    Use arrows to reorder.
                                 </small>
+                                <div id="image-preview-container"></div>
+                                <div id="hidden-inputs-container"></div>
                             </div>
                         </div>
 
@@ -190,4 +195,140 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
         </div>
     </div>
 
-<?php require \infrastructure\Utilities::basePath('views/partials/footer.php');
+<?php require infrastructure\Utilities::basePath('views/partials/footer.php'); ?>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const uploader = document.getElementById('image_uploader');
+    const container = document.getElementById('image-preview-container');
+    const form = document.querySelector('form'); // Your main form
+    const hiddenContainer = document.getElementById('hidden-inputs-container');
+
+    // 1. Handle File Selection
+    uploader.addEventListener('change', function(e) {
+        const files = Array.from(e.target.files);
+
+        files.forEach(file => {
+            uploadFileToCloud(file);
+        });
+
+        // Clear input so user can select same file again if needed
+        uploader.value = '';
+    });
+
+    // 2. Upload Logic (Simulated)
+    function uploadFileToCloud(file) {
+        // Create a placeholder card while uploading
+        const card = createCard(null, true);
+        container.appendChild(card);
+
+        // PREPARE FORM DATA
+        const formData = new FormData();
+        formData.append('file', file);
+
+        // EXECUTE FETCH (AJAX)
+        // You need a PHP route that accepts this file, uploads to S3/Cloudinary,
+        // and returns JSON: { "url": "https://cloud.com/img123.jpg" }
+        fetch('/ajax/upload-image', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.url) {
+                // Update the card with the real image
+                updateCardWithImage(card, data.url);
+            } else {
+                alert('Upload failed');
+                card.remove();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error uploading image');
+            card.remove();
+        });
+    }
+
+    // 3. Create Visual Elements
+    function createCard(url, isLoading = false) {
+        const div = document.createElement('div');
+        div.className = 'img-card';
+
+        if (isLoading) {
+            div.innerHTML = '<div class="p-4">Uploading...</div>';
+            return div;
+        }
+    }
+
+    function updateCardWithImage(card, url) {
+        card.dataset.url = url; // Store URL in data attribute for later
+        card.innerHTML = `
+            <div class="main-badge">MAIN</div>
+            <img src="${url}" alt="Preview">
+            <div class="img-actions">
+                <button type="button" class="btn btn-secondary btn-xs btn-move-left">&lt;</button>
+                <button type="button" class="btn btn-danger btn-xs btn-remove">X</button>
+                <button type="button" class="btn btn-secondary btn-xs btn-move-right">&gt;</button>
+            </div>
+        `;
+
+        // Add Event Listeners for buttons inside this card
+        card.querySelector('.btn-remove').addEventListener('click', () => card.remove());
+
+        card.querySelector('.btn-move-left').addEventListener('click', () => {
+            if (card.previousElementSibling) {
+                container.insertBefore(card, card.previousElementSibling);
+            }
+        });
+
+        card.querySelector('.btn-move-right').addEventListener('click', () => {
+            if (card.nextElementSibling) {
+                container.insertBefore(card.nextElementSibling, card);
+            }
+        });
+    }
+
+    // 4. Intercept Form Submit to Generate Hidden Inputs
+    form.addEventListener('submit', function(e) {
+        // Clear previous hidden inputs
+        hiddenContainer.innerHTML = '';
+
+        const cards = container.querySelectorAll('.img-card');
+
+        if (cards.length === 0) {
+            e.preventDefault();
+            alert('Please upload at least one image.');
+            return;
+        }
+
+        // Loop through visual cards and create hidden inputs
+        cards.forEach((card, index) => {
+            const url = card.dataset.url;
+            if(!url) return;
+
+            // First item (index 0) is Main
+            const isMain = (index === 0) ? '1' : '0';
+
+            // Create Input: Image URL
+            // name="images[0][image_url]"
+            const inputUrl = document.createElement('input');
+            inputUrl.type = 'hidden';
+            inputUrl.name = `images[${index}][image_url]`;
+            inputUrl.value = url;
+
+            // Create Input: Is Main
+            // name="images[0][is_main]"
+            const inputMain = document.createElement('input');
+            inputMain.type = 'hidden';
+            inputMain.name = `uploaded_images[${index}][is_main]`;
+            inputMain.value = isMain;
+
+            hiddenContainer.appendChild(inputUrl);
+            hiddenContainer.appendChild(inputMain);
+        });
+
+        // The form will now submit normally with the hidden inputs
+    });
+});
+</script>

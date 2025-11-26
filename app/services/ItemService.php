@@ -18,8 +18,10 @@ class ItemService
         $this->userRepo = $userRepo;
     }
 
-    public function createItem($input) : array
+    public function createItem(array $input) : array
     {
+        // $input offers: seller_id, item_name, item_description, item_condition
+
         // Validates user input for Item, and fix data type
         $validationResult = $this->validateAndFixType($input);
 
@@ -37,7 +39,7 @@ class ItemService
             $input['item_name'],
             $input['item_description'],
             $input['item_condition'],
-            $input['item_status'],
+            'Scheduled'
         );
 
         // Execute insertion

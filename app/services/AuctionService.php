@@ -14,19 +14,17 @@ class AuctionService
 {
     private Database $db;
     private AuctionRepository $auctionRepo;
-    private ItemService $createItemService;
-    private ImageService $uploadImageService;
-    private ItemRepository $itemRepo;
+    private ItemService $itemService;
+    private ImageService $imageService;
     private BidService $bidService;
 
-    public function __construct(Database     $db, AuctionRepository $auctionRepo, ItemService $createItemService,
-                                ImageService $uploadImageService, ItemRepository $itemRepo, BidService $bidServ) {
+    public function __construct(Database     $db, AuctionRepository $auctionRepo, ItemService $itemService,
+                                ImageService $imageService, BidService $bidService) {
         $this->db = $db;
         $this->auctionRepo = $auctionRepo;
-        $this->createItemService = $createItemService;
-        $this->uploadImageService = $uploadImageService;
-        $this->itemRepo = $itemRepo;
-        $this->bidService = $bidServ;
+        $this->itemService = $itemService;
+        $this->imageService = $imageService;
+        $this->bidService = $bidService;
     }
 
     public function getByUserId(int $sellerId): array {
@@ -41,7 +39,9 @@ class AuctionService
         return $auctions;
     }
 
-    public function createAuction(array $auctionInput, array $itemInput, array $imageInputs): array { // $imageInputs is an array with multiple $imageInput
+    public function createAuction(array $itemInput, array $auctionInput, array $imageInputs): array { // $imageInputs is an array with multiple $imageInput
+        // $auctionInput offers: start_datetime, end_datetime, starting_price, reserve_price
+
         $pdo = $this->db->connection;
 
         // --- Start Transaction ---
@@ -50,7 +50,7 @@ class AuctionService
             Utilities::beginTransaction($pdo);
 
             // Create Item
-            $createItemResult = $this->createItemService->createItem($itemInput);
+            $createItemResult = $this->itemService->createItem($itemInput);
             if (!$createItemResult['success']) {
                 return Utilities::creationResult('Failed to create auction.' . $createItemResult['message'], false, null);
             }
@@ -69,7 +69,7 @@ class AuctionService
             $auctionInput = $validationResult['object']; // The fixed-type inputs are stored in $validationResult['object']
             $auction = new Auction(
                 0,
-                $auctionInput['item_id'],
+                $item->getId(),
                 null,
                 $auctionInput['start_datetime'],
                 $auctionInput['end_datetime'],
@@ -88,7 +88,7 @@ class AuctionService
             }
 
             // Upload image
-            $uploadImageResult = $this->uploadImageService->uploadItemImages($item->getId(), $imageInputs);
+            $uploadImageResult = $this->imageService->uploadItemImages($item->getId(), $imageInputs);
             if (!$uploadImageResult['success']) {
                 $pdo->rollBack();
                 return Utilities::creationResult('Failed to create an auction.' . $uploadImageResult['message'], false, null);
@@ -96,7 +96,7 @@ class AuctionService
 
             // Insertion Succeed -> Commit Transaction
             $pdo->commit();
-            return Utilities::creationResult('Auction successfully created!', true, $auction);
+            return Utilities::creationResult('Auction created successfully!', true, $auction);
 
         } catch (PDOException $e) {
             if ($pdo->inTransaction()) {
@@ -108,19 +108,6 @@ class AuctionService
 
     private function validateAndFixType(array $input) : array
     {
-        // Validate Item ID
-        if (!isset($input['item_id']) || !filter_var($input['item_id'], FILTER_VALIDATE_INT)) {
-            return Utilities::creationResult('Invalid item ID.', false, null);
-        }
-        
-        $input['item_id'] = (int)$input['item_id'];
-
-        // Check if $item exists
-        $item = $this->itemRepo->getById($input['item_id']);
-        if (is_null($item)) {
-            return Utilities::creationResult('Item not found.', false, null);
-        }
-
         // Validate Starting Price
         $startPriceString = isset($input['starting_price']) ? trim($input['starting_price']) : '';
         if ($startPriceString === '') {

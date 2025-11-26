@@ -19,8 +19,9 @@ class ImageService
         $this->itemRepo = $itemRepo;
     }
 
-    public function uploadItemImages(int $itemId, array $inputs): array
-    {
+    public function uploadItemImages(int $itemId, array $inputs): array {
+        // $inputs offer: an array of multiple [image_url, is_main]
+
         // Validate Item ID once for efficiency
         if (!filter_var($itemId, FILTER_VALIDATE_INT)) {
             return Utilities::creationResult('Invalid item ID for image.', false, null);

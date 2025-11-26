@@ -101,12 +101,12 @@
 
                         <!-- Place Bid Form -->
                         <form method="POST" action="/bid">
-                            <label for="bid" class="form-label">Place your bid (must be > £<?= number_format($highestBid, 2) ?>)</label>
+                            <label for="bid_amount" class="form-label">Place your bid (must be > £<?= number_format($highestBid, 2) ?>)</label>
                             <div class="input-group mb-3">
                                 <span class="input-group-text"><?= $currencyText ?></span>
                                 <input type="number"
                                        class="form-control form-control-lg"
-                                       id="bid"
+                                       id="bid_amount"
                                        name="bid_amount"
                                        placeholder="<?= number_format($highestBid + 1, 2) ?>"
                                        step="0.01"
@@ -310,7 +310,7 @@
         }
 
         // 3. Inspect bid form input
-        const bidInput = document.getElementById('bid');
+        const bidInput = document.getElementById('bid_amount');
         const currency = '<?= $currencyText ?>';
         // Listen for the invalid event
         bidInput.addEventListener('invalid', function() {

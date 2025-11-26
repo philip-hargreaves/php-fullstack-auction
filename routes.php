@@ -3,14 +3,15 @@
  * @var $router
 */
 
+// View POST data to controller
+// View GET data from controller
 
 // Index Page
 $router->get('/', 'controllers/index.php');
 
-// Create Auction Page (GET displays the form, POST submits the data)
-$router->get('/create-auction', 'controllers/create_auction/create-auction-form.php');
-$router->post('/create-auction', 'controllers/create_auction/create-auction-controller.php');
-$router->get('/auction', 'controllers/auction.php');
+// Create Auction Page
+$router->get('/create-auction', 'controllers/create_auction/create-auction-get.php');
+$router->post('/create-auction', 'controllers/create_auction/create-auction-post.php');
 
 // Registration and authentication
 $router->get('/register', 'controllers/auth/register.php');
@@ -18,7 +19,6 @@ $router->post('/register', 'controllers/auth/register.store.php');
 $router->post('/login', 'controllers/auth/authenticate.php');
 $router->get('/logout', 'controllers/auth/logout.php');
 $router->post('/become-seller', 'controllers/auth/become-seller.php');
-
 
 // Auction Page
 $router->post('/bid', 'controllers/auction/place-bid.php');

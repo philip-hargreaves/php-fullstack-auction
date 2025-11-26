@@ -39,6 +39,7 @@ $isSeller = AuthService::hasRole('seller');
     <link rel="stylesheet" href="/css/create-auction.css">
     <link rel="stylesheet" href="/css/auction-page.css">
     <link rel="stylesheet" href="/css/alert.css">
+    <link rel="stylesheet" href="/css/uploaded-images.css">
     <title>Auctivity</title>
 </head>
 <body>
