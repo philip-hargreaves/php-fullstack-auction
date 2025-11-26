@@ -35,7 +35,7 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
                         <input type="email" class="form-control" name="email" value="<?= htmlspecialchars($user->getEmail()) ?>" readonly disabled>
                         <small class="form-text text-muted">Email address cannot be changed for security reasons.</small>
                     </div>
-                    <button type="submit" class="btn btn-primary mt-3">Update Username</button>
+                    <button type="submit" class="btn btn-danger mt-3 w-100">Update Username</button>
                 </form>
             </div>
 
@@ -95,13 +95,25 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
                     <?php endforeach; ?>
                     </tbody>
                 </table>
+
+            <?php else: ?>
+                <?php if ($isOwnProfile): ?>
+
+                    <div class="text-center py-5 border border-secondary rounded" style="background-color: rgba(255, 255, 255, 0.05);">
+                        <h5 class="text-white-50 mb-4">You currently have no active auctions running.</h5>
+                        <a href="/create-auction" class="btn btn-danger btn-lg px-4">
+                            <i class="fa fa-plus mr-2"></i> Create Your First Auction
+                        </a>
+                    </div>
+
             <?php else: ?>
                 <div class="alert alert-info">
                     This user currently has no active auctions.
                 </div>
             <?php endif; ?>
-        <?php endif; ?>
 
+            <?php endif; ?>
+        <?php endif; ?>
     </div>
 
 <?php
