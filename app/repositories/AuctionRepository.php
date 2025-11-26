@@ -86,7 +86,7 @@ class AuctionRepository
     {
         try {
             $sql = "SELECT a.* FROM auctions a
-                    INNER JOIN watchlist w ON a.id = w.auction_id
+                    INNER JOIN watchlists w ON a.id = w.auction_id
                     WHERE w.user_id = :user_id
                     ORDER BY w.watched_datetime DESC";
 
