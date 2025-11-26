@@ -57,6 +57,9 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
                 <div class="form-group mb-3">
                     <label for="new_password">New Password</label>
                     <input type="password" class="form-control" id="new_password" name="new_password" required>
+                    <small class="form-text text-muted">
+                        Must be 8-72 characters long, contain uppercase, lowercase letters and numbers.
+                    </small>
                 </div>
 
                 <div class="form-group mb-4">
