@@ -8,6 +8,7 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
 
         <?php if (empty($bids)): ?>
             <p>You have not placed any bids yet.</p>
+            <a href="/" class="btn btn-primary mt-2">Browse listings</a>
         <?php else: ?>
             <table class="bids-table">
                 <thead>
