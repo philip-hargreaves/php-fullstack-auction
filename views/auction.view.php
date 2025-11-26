@@ -200,6 +200,24 @@ use infrastructure\DIContainer;
 
     <!-- Item Information + Bid History -->
     <div class="row">
+        <!-- Item Information Table -->
+        <div class="col">
+            <h3 class="mb-3">Item Details</h3>
+            <div class="card mb-5">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <strong>Seller:</strong>
+                        <a href="/account?user_id=<?= htmlspecialchars($auction->getItem()->getSellerId()) ?>">
+                            <?= htmlspecialchars($sellerName) ?>
+                        </a>
+                    </li>
+                    <li class="list-group-item"><strong>Status:</strong> <?= htmlspecialchars($itemStatus) ?></li>
+                    <li class="list-group-item"><strong>Condition:</strong> <?= htmlspecialchars($itemCondition) ?></li>
+                    <li class="list-group-item"><strong>Category:</strong> <?= htmlspecialchars($itemCondition) ?></li>
+                </ul>
+            </div>
+        </div>
+
         <!-- Bid History Table -->
         <div class="col-7">
             <h3 class="mb-3" >Bid History</h3>
