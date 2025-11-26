@@ -32,6 +32,22 @@ class UserRepository
         return empty($rows) ? null : $this->hydrate($rows);
     }
 
+    // Find user by email OR username
+    public function getByEmailOrUsername(string $emailOrUsername): ?User
+    {
+        // *** CHECK ONE QUERY REDUNDANT DATA VS TWO QUERIES WITH NO REDUNDANT DATA ***
+        $sql = "SELECT u.id, u.username, u.email, u.password, u.is_active,
+                     r.id AS role_id, r.role_name
+              FROM users u
+              LEFT JOIN user_roles ur ON u.id = ur.user_id
+              LEFT JOIN roles r       ON ur.role_id = r.id
+              WHERE u.email = :emailOrUsername OR u.username = :emailOrUsername";
+        $param = ['emailOrUsername' => $emailOrUsername];
+        $rows = $this->db->query($sql, $param)->fetchAll();
+
+        return empty($rows) ? null : $this->hydrate($rows);
+    }
+
     // Find user by id
     public function getById(int $userId): ?User
     {
