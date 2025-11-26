@@ -11,13 +11,13 @@ if ($userId === null || !Request::isPost()) {
     exit;
 }
 
-// 2. 獲取服務和輸入數據
 $userService = DIContainer::get('userService');
 $username = Request::post('username');
-$email = Request::post('email');
-$password = Request::postRaw('password');
+//$email = Request::post('email'); If user can change their email
 
-$data = ['username' => $username, 'email' => $email];
+$currentUser = $userService->getUserAccount($userId);
+$currentEmail = $currentUser->getEmail();
+$data = ['username' => $username, 'email' => $currentEmail];
 $result = $userService->updateAccount($userId, $data);
 
 if ($result['success']) {
