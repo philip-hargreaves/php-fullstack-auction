@@ -14,4 +14,4 @@ $userId = (int)$_SESSION['user_id'];
 
 $bids = $bidServ->getBidsForUser($userId);
 
-require Utilities::basePath('views/mybids.view.php');
+require Utilities::basePath('views/my-bids.view.php');

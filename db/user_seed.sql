@@ -34,3 +34,9 @@ INSERT IGNORE INTO auctions (id, item_id, start_datetime, end_datetime, starting
      180.00,
      'Active');
 
+-- Insert item image (if they don't exist)
+INSERT IGNORE INTO item_images (id, item_id, image_url, is_main, uploaded_datetime) VALUES
+    (1, 1111, 'https://images.shopcdn.co.uk/18/c8/18c8f85f068472284acf4e1b62f8cb16/2048x2048/webp/fit?force=true&quality=80&compression=80',
+        1, '2025-08-10 23:59:59'),
+    (2, 1111, 'https://images.shopcdn.co.uk/c5/f2/c5f25fda773c2c9a5c70c02003e20476/2048x2048/webp/fit?force=true&quality=80&compression=80',
+        0, '2025-08-10 23:59:59');

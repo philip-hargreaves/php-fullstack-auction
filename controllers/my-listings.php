@@ -29,6 +29,6 @@ if (!AuthService::hasRole("seller"))
 }
 
 $auctionServ = DIContainer::get('auctionServ');
-$auctions = $auctionServ->getAuctionsForSeller($userId);
+$auctions = $auctionServ->getByUserId($userId);
 
 require Utilities::basePath('views/my-listings.view.php');

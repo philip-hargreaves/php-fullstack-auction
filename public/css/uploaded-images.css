@@ -1,0 +1,48 @@
+/* Simple styling for the image preview area */
+#image-preview-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+.img-card {
+    width: 150px;
+    border: 1px solid #ddd;
+    padding: 5px;
+    border-radius: 5px;
+    position: relative;
+    background: #fff;
+    text-align: center;
+}
+.img-card img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    margin-bottom: 5px;
+}
+.img-actions {
+    display: flex;
+    justify-content: space-between;
+}
+.btn-xs {
+    padding: 2px 5px;
+    font-size: 12px;
+}
+.main-badge {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: #28a745;
+    color: white;
+    font-size: 10px;
+    padding: 2px 5px;
+    display: none; /* Shown via JS for the first item */
+}
+/* Show badge on the first child */
+#image-preview-container .img-card:first-child .main-badge {
+    display: block;
+}
+#image-preview-container .img-card:first-child {
+    border-color: #28a745;
+    box-shadow: 0 0 5px rgba(40, 167, 69, 0.5);
+}

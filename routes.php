@@ -3,18 +3,15 @@
  * @var $router
 */
 
+// View POST data to controller
+// View GET data from controller
 
 // Index Page
 $router->get('/', 'controllers/index.php');
 
-// Create Auction Page (GET displays the form, POST submits the data)
-$router->get('/create-auction', 'controllers/create-auction.php');
-$router->post('/create-auction-result', 'controllers/create-auction-result.php');
-
-// GET Pages
-$router->get('/my-auctions', 'controllers/my-auctions.php');
-$router->get('/mybids', 'controllers/mybids.php');
-
+// Create Auction Page
+$router->get('/create-auction', 'controllers/create_auction/create-auction-get.php');
+$router->post('/create-auction', 'controllers/create_auction/create-auction-post.php');
 
 // Registration and authentication
 $router->get('/register', 'controllers/auth/register.php');
@@ -23,11 +20,17 @@ $router->post('/login', 'controllers/auth/authenticate.php');
 $router->get('/logout', 'controllers/auth/logout.php');
 $router->post('/become-seller', 'controllers/auth/become-seller.php');
 
-
 // Auction Page
 $router->post('/bid', 'controllers/auction/place-bid.php');
+$router->get('/auction', 'controllers/auction/auction.php');
 $router->post('/watchlist/add', 'controllers/auction/watchlist-add.php');
 $router->post('/watchlist/remove', 'controllers/auction/watchlist-remove.php');
-$router->get('/auction', 'controllers/auction/auction.php');
-$router->get('/my-listings', 'controllers/auction/my-listings.php');
-$router->get('/watchlist', 'controllers/auction/watchlist.php');
+
+// My-listings Page
+$router->get('/my-listings', 'controllers/my-listings.php');
+
+// My-Bids Page
+$router->get('/my-bids', 'controllers/my-bids.php');
+
+// Watchlist Page
+$router->get('/watchlist', 'controllers/watchlist.php');

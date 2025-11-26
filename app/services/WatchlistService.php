@@ -20,12 +20,12 @@ class WatchlistService
         $this->bidServ = $bidServ;
     }
 
-    public function getWatchList (int $userId): array
+    public function getWatchList(int $userId): array
     {
         $auctions = $this->auctionRepo->getWatchedAuctionsByUserId($userId);
 
         foreach ($auctions as $auction) {
-            $highestBid = $this->bidServ->getHighestBidByAuctionId($auction->getAuctionId());
+            $highestBid = $this->bidServ->getHighestBidAmountByAuctionId($auction->getAuctionId());
             $currentPrice = $highestBid > 0 ? $highestBid : $auction->getStartingPrice();
             $auction->setCurrentPrice($currentPrice);
         }
