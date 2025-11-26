@@ -52,7 +52,7 @@ require Utilities::basePath('views/partials/header.php');
                         required
                 >
                 <small class="form-text text-muted">
-                    <span class="text-danger">*</span> Required. 8-25 characters. Letters, numbers, underscores, and hyphens only.
+                    <span class="text-danger">*</span> Required. 8-25 characters.
                 </small>
             </div>
         </div>
@@ -90,7 +90,7 @@ require Utilities::basePath('views/partials/header.php');
                         required
                 >
                 <small class="form-text text-muted">
-                    <span class="text-danger">*</span> Required. Minimum 8 characters. Must include uppercase, lowercase, and number.
+                    <span class="text-danger">*</span> Required. Minimum 8 characters.
                 </small>
             </div>
         </div>
@@ -123,13 +123,16 @@ require Utilities::basePath('views/partials/header.php');
     </div>
 </div>
 
+    <!-- JS Validation-->
     <script>
         // password confirmation check
         document.getElementById('password_confirmation').addEventListener('input', function() {
-            const password = document.getElementById('password').value;
-            const confirmation = this.value;
+            const password = document.getElementById('password').value.trim();
+            const confirmation = this.value.trim();
 
-            if (confirmation && password !== confirmation) {
+            if (confirmation === '') {
+                this.setCustomValidity('');
+            } else if (password !== confirmation) {
                 this.setCustomValidity('Passwords do not match.');
             } else {
                 this.setCustomValidity('');
@@ -139,8 +142,19 @@ require Utilities::basePath('views/partials/header.php');
         // Re-check when password changes
         document.getElementById('password').addEventListener('input', function() {
             const confirmation = document.getElementById('password_confirmation');
-            if (confirmation.value) {
-                confirmation.dispatchEvent(new Event('input'));
+            if (confirmation.value.trim()) {
+                confirmation.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+        });
+
+        document.querySelector('form[action="/register"]').addEventListener('submit', function(e) {
+            const password = document.getElementById('password').value.trim();
+            const confirmation = document.getElementById('password_confirmation').value.trim();
+            if (password !== confirmation) {
+                e.preventDefault();
+                document.getElementById('password_confirmation').setCustomValidity('Passwords do not match.');
+                document.getElementById('password_confirmation').reportValidity();
+                return false;
             }
         });
     </script>
