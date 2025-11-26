@@ -97,9 +97,9 @@ $isSeller = AuthService::hasRole('seller');
                 <a href="/account" class="nav-button" style="color: var(--color-text-primary) !important; text-decoration: none !important;">Account</a>
                 <a href="/logout" class="nav-button" style="color: var(--color-text-primary) !important; text-decoration: none !important;">Logout</a>
             <?php else: ?>
-                <a href="/register" class="nav-button" style="color: var(--color-text-primary) !important; text-decoration: none !important; padding-right: 4px;">Register</a>
+                <button type="button" class="nav-button" onclick="window.location.href='/register'" style="padding-right: 4px; color: var(--color-text-secondary) !important;">Register</button>
                 <span style="color: var(--color-text-secondary); margin: 0;">or</span>
-                <button type="button" class="nav-button" data-toggle="modal" data-target="#loginModal" style="padding-left: 4px;">Log in</button>
+                <button type="button" class="nav-button" data-toggle="modal" data-target="#loginModal" style="padding-left: 4px; color: var(--color-text-secondary) !important;">Log in</button>
             <?php endif; ?>
         </div>
     </div>
