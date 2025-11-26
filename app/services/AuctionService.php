@@ -52,7 +52,7 @@ class AuctionService
             // Create Item
             $createItemResult = $this->itemService->createItem($itemInput);
             if (!$createItemResult['success']) {
-                return Utilities::creationResult('Failed to create auction.' . $createItemResult['message'], false, null);
+                return Utilities::creationResult($createItemResult['message'], false, null);
             }
             $item = $createItemResult['object'];
 
@@ -88,10 +88,10 @@ class AuctionService
             }
 
             // Upload image
-            $uploadImageResult = $this->imageService->uploadItemImages($item->getItemId(), $imageInputs);
+            $uploadImageResult = $this->imageService->uploadItemImages($item, $imageInputs);
             if (!$uploadImageResult['success']) {
                 $pdo->rollBack();
-                return Utilities::creationResult('Failed to create an auction.' . $uploadImageResult['message'], false, null);
+                return Utilities::creationResult($uploadImageResult['message'], false, null);
             }
 
             // Insertion Succeed -> Commit Transaction
@@ -128,22 +128,24 @@ class AuctionService
 
         // Validate Reserve Price
         $reservePriceString = isset($input['reserve_price']) ? trim($input['reserve_price']) : '';
+
+        // If Reserve Price is not entered
         if ($reservePriceString === '') {
-            return Utilities::creationResult('Reserve price is required.', false, null);
+            $input['reserve_price'] = null;
+        } else {
+            // Check Reserve Price format (numeric, max 2 decimals)
+            if (!preg_match('/^\d+(\.\d{1,2})?$/', $reservePriceString)){
+                return Utilities::creationResult('Reserve price must be a valid number (max 2 decimal places).', false, null);
+            }
+
+            $input['reserve_price'] = (float)$reservePriceString;
+
+            // Business Logic: Reserve >= Start
+            if ($input['reserve_price'] < $input['starting_price']) {
+                return Utilities::creationResult('Reserve price cannot be lower than the starting price.', false, null);
+            }
         }
 
-        // Check Reserve Price format (numeric, max 2 decimals)
-        if (!preg_match('/^\d+(\.\d{1,2})?$/', $reservePriceString)){
-            return Utilities::creationResult('Reserve price must be a valid number (max 2 decimal places).', false, null);
-        }
-
-        $input['reserve_price'] = (float)$reservePriceString;
-
-        // Business Logic: Reserve >= Start
-        if ($input['reserve_price'] < $input['starting_price']) {
-            return Utilities::creationResult('Reserve price cannot be lower than the starting price.', false, null);
-        }
-        
         // Validate Start Date
         if (empty($input['start_datetime'])) {
             return Utilities::creationResult('Auction start date is required.', false, null);
@@ -176,10 +178,10 @@ class AuctionService
                 return Utilities::creationResult('End date must be after the start date.', false, null);
             }
 
-            // Business Logic: Check Duration (At least 48 hours)
+            // Business Logic: Check Duration (At least 24 hours)
             $interval = $startDate->diff($endDate);
             $totalHours = ($interval->days * 24) + $interval->h + ($interval->i / 60);
-            if ($totalHours < 48) {
+            if ($totalHours < 24) {
                 return Utilities::creationResult('Auction duration must be at least 48 hours.', false, null);
             }
         } catch (Exception $e) {

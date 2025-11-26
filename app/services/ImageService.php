@@ -2,6 +2,7 @@
 
 namespace app\services;
 
+use app\models\Item;
 use app\models\ItemImage;
 use app\repositories\ItemImageRepository;
 use app\repositories\ItemRepository;
@@ -19,17 +20,25 @@ class ImageService
         $this->itemRepo = $itemRepo;
     }
 
-    public function uploadItemImages(int $itemId, array $inputs): array {
+    public function uploadItemImages(Item $item, array $inputs): array {
         // $inputs offer: an array of multiple [image_url, is_main]
 
-        // Validate Item ID once for efficiency
-        if (!filter_var($itemId, FILTER_VALIDATE_INT)) {
-            return Utilities::creationResult('Invalid item ID for image.', false, null);
+        // Validate Item ID
+        if (!filter_var($item->getItemId(), FILTER_VALIDATE_INT)) {
+            return Utilities::creationResult('Failed to create an auction.', false, null);
         }
 
         // Check if item exists
-        if (is_null($this->itemRepo->getById($itemId))) {
-            return Utilities::creationResult('Item of image does not exist.', false, null);
+        if (is_null($this->itemRepo->getById($item->getItemId()))) {
+            return Utilities::creationResult('Failed to create an auction.', false, null);
+        }
+
+        // Check the image count (1 <= count <= 10)
+        if (count($inputs) < 1) {
+            return Utilities::creationResult('Please upload at least 1 image.', false, null);
+        }
+        if (count ($inputs) > 10) {
+            return Utilities::creationResult('Please upload no more than than 10 image.', false, null);
         }
 
         $itemImages = [];
@@ -60,7 +69,7 @@ class ImageService
             // Create Object
             $itemImage = new ItemImage(
                 0,
-                $itemId,
+                $item->getItemId(),
                 $cleanInput['image_url'],
                 $cleanInput['is_main'],
                 new DateTime()
@@ -90,22 +99,12 @@ class ImageService
         $url = isset($input['image_url']) ? trim($input['image_url']) : '';
 
         if ($url === '') {
-            return Utilities::creationResult('Image URL is required.', false, null);
+            return Utilities::creationResult('Uploaded image does not have a valid url.', false, null);
         }
-
-        // Security: Validate it looks like a URL
-//        if (!filter_var($url, FILTER_VALIDATE_URL)) {
-//            return Utilities::creationResult('Invalid image URL format.', false, null);
-//        }
-
-        // Optional: Check if it starts with http/https to prevent javascript: vectors
-//        if (!preg_match('/^https?:\/\//', $url)) {
-//            return Utilities::creationResult('Image URL must start with http:// or https://', false, null);
-//        }
 
         // DB Limit check (VARCHAR 1024)
         if (strlen($url) > 1024) {
-            return Utilities::creationResult('Image URL is too long.', false, null);
+            return Utilities::creationResult('The url of the Uploaded image is too long.', false, null);
         }
         $input['image_url'] = $url;
 

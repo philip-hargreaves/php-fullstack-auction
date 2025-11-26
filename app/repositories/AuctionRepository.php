@@ -28,7 +28,7 @@ class AuctionRepository
             $row['start_datetime'],
             $row['end_datetime'],
             (float)$row['starting_price'],
-            (float)$row['reserve_price'],
+            (float)$row['reserve_price'] ? (int)$row['reserve_price'] : null,
             $row['auction_status']
         );
 

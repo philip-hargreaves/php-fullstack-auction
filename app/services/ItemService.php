@@ -28,7 +28,7 @@ class ItemService
         // Validation Fail -> Return failed result to the transaction in createAuction()
         if (!$validationResult['success']) {
 
-            return Utilities::creationResult('Failed to create an item.' . $validationResult['message'], false, null);
+            return Utilities::creationResult($validationResult['message'], false, null);
         }
 
         // Validation Pass -> Create Auction object
@@ -47,7 +47,7 @@ class ItemService
 
         // Insertion Failed -> Return failed result to the transaction in createAuction()
         if (is_null($item)) {
-            return Utilities::creationResult('Failed to create an item.', false, null);
+            return Utilities::creationResult('Failed to create an auction.', false, null);
         }
 
         // Insertion Succeed
@@ -58,14 +58,25 @@ class ItemService
     {
         // Validate Seller ID
         if (!isset($input['seller_id']) || !filter_var($input['seller_id'], FILTER_VALIDATE_INT)) {
-            return Utilities::creationResult('Invalid seller ID.', false, null);
+            return Utilities::creationResult('Failed to create an auction.', false, null);
         }
         $input['seller_id'] = (int)$input['seller_id'];
 
         // Check if $seller exists
         $seller = $this->userRepo->getById($input['seller_id']);
         if (is_null($seller)) {
-            return Utilities::creationResult('Seller not found.', false, null);
+            return Utilities::creationResult('Please login to create an auction.', false, null);
+        }
+
+        // Check if seller has a seller role
+        $isSeller = false;
+        foreach ($seller->getRoles() as $role) {
+            if ($role->getName() == 'seller') {
+                $isSeller = true;
+            }
+        }
+        if (!$isSeller) {
+            return Utilities::creationResult('Please upgrade to seller to create an auction.', false, null);
         }
 
         // TODO: Validate Category ID
@@ -102,7 +113,7 @@ class ItemService
         $itemCondition = isset($input['item_condition']) ? trim($input['item_condition']) : '';
         $validConditions = ['New', 'Like New', 'Used'];
         if ($itemCondition === '' || !in_array($itemCondition, $validConditions)) {
-            return Utilities::creationResult('Please select a valid item condition (New, Like New, Used).', false, null);
+            return Utilities::creationResult('Please select a valid item condition.', false, null);
         }
         $input['item_condition'] = $itemCondition;
 

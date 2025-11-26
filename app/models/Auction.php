@@ -13,7 +13,7 @@ class Auction
     private DateTime $startDateTime;
     private DateTime $endDateTime;
     private float $startingPrice; // decimal(10,2)
-    private float $reservePrice;  // decimal(10,2)
+    private ?float $reservePrice = null;  // decimal(10,2)
     private string $auctionStatus; // enum('Scheduled', 'Active', 'Sold', 'Unsold', 'Deleted')
 
     // 2. RELATIONSHIP PROPERTIES
@@ -30,7 +30,7 @@ class Auction
         string|DateTime $startDateTime, // Accept string from DB
         string|DateTime $endDateTime,   // Accept string from DB
         float $startingPrice,
-        float $reservePrice,
+        ?float $reservePrice,
         string $auctionStatus
     ) {
         $this->auctionId = $auctionId;
@@ -92,7 +92,7 @@ class Auction
         return $this->startingPrice;
     }
 
-    public function getReservePrice(): float
+    public function getReservePrice(): ?float
     {
         return $this->reservePrice;
     }
