@@ -15,10 +15,10 @@ class UserRoleRepository
     public function assignRole(int $userId, Role $role): void
     {
         $sql = 'INSERT IGNORE INTO user_roles (user_id, role_id) VALUES (:user_id, :role_id)';
-        $param = ['user_id' => $userId, 'role_id' => $role->getId()];
+        $params = ['user_id' => $userId, 'role_id' => $role->getId()];
 
         // Uses INSERT IGNORE so repeated assignments do not throw duplicate-key errors
-        $this->db->query($sql, $param);
+        $this->db->query($sql, $params);
     }
 
     // Revoke the given role from user

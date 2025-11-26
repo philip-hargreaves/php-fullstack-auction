@@ -26,8 +26,8 @@ class RoleRepository
 
         // Not in cache, so fetch from DB
         $sql = 'SELECT id, role_name FROM roles WHERE id = :id';
-        $param = ['id' => $id];
-        $row = $this->db->query($sql, $param)->fetch();
+        $params = ['id' => $id];
+        $row = $this->db->query($sql, $params)->fetch();
 
         return $row ? $this->hydrate($row) : null;
     }
@@ -66,10 +66,10 @@ class RoleRepository
         }
 
         $sql = 'SELECT id, role_name FROM roles WHERE role_name = :name';
-        $param = ['name' => $name];
+        $params = ['name' => $name];
 
         $row = $this->db
-            ->query($sql, $param)
+            ->query($sql, $params)
             ->fetch();
 
         return $row ? $this->hydrate($row) : null;

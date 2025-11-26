@@ -26,8 +26,8 @@ class UserRepository
                   LEFT JOIN user_roles ur ON u.id = ur.user_id
                   LEFT JOIN roles r       ON ur.role_id = r.id
                   WHERE u.email = :email";
-        $param = ['email' => $email];
-        $rows = $this->db->query($sql, $param)->fetchAll();
+        $params = ['email' => $email];
+        $rows = $this->db->query($sql, $params)->fetchAll();
 
         return empty($rows) ? null : $this->hydrate($rows);
     }
@@ -42,8 +42,8 @@ class UserRepository
               LEFT JOIN user_roles ur ON u.id = ur.user_id
               LEFT JOIN roles r       ON ur.role_id = r.id
               WHERE u.email = :emailOrUsername OR u.username = :emailOrUsername";
-        $param = ['emailOrUsername' => $emailOrUsername];
-        $rows = $this->db->query($sql, $param)->fetchAll();
+        $params = ['emailOrUsername' => $emailOrUsername];
+        $rows = $this->db->query($sql, $params)->fetchAll();
 
         return empty($rows) ? null : $this->hydrate($rows);
     }
@@ -58,8 +58,8 @@ class UserRepository
                   LEFT JOIN user_roles ur ON u.id = ur.user_id
                   LEFT JOIN roles r       ON ur.role_id = r.id
                   WHERE u.id = :id";
-        $param = ['id' => $userId];
-        $rows = $this->db->query($sql, $param)->fetchAll();
+        $params = ['id' => $userId];
+        $rows = $this->db->query($sql, $params)->fetchAll();
 
         return empty($rows) ? null : $this->hydrate($rows);
     }
@@ -68,9 +68,9 @@ class UserRepository
     public function existsByEmail(string $email): bool
     {
         $sql = 'SELECT 1 FROM users WHERE email = :email LIMIT 1';
-        $param = ['email' => $email];
+        $params = ['email' => $email];
         return $this->db
-                ->query($sql, $param)
+                ->query($sql, $params)
                 ->fetchColumn() !== false;
     }
 
