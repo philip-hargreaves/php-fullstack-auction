@@ -12,35 +12,34 @@ if (!Request::isPost()) {
 }
 
 // Get and sanitise form data
-$email = Request::post('email', '');
+$emailOrUsername = trim(Request::post('email_or_username', ''));
 $password = Request::postRaw('password', ''); // Raw password for password_verify()
 
 
-// Validate both email and password are present
-if (empty($email) || empty($password)) {
-    $_SESSION['login_error'] = 'Email and password are required';
+// Validate both email/username and password are present
+if (empty($emailOrUsername) || empty($password)) {
+    $_SESSION['login_error'] = 'Email/username and password are required';
     header('Location: /');
     exit;
 }
 
 try {
-    // Dependencies (Database → RoleRepository → UserRepository → AuthService)
+    // Dependencies
     $authService = DIContainer::get('authServ');
 
     // Attempt login via Authservice
-    if ($authService->attemptLogin($email, $password)) {
+    if ($authService->attemptLogin($emailOrUsername, $password)) {
         $_SESSION['login_success'] = 'Login successful!';
         header('Location: /');
         exit;
     }
 
     // Fall-through means login failed
-    $_SESSION['login_error'] = 'Invalid email or password';
+    $_SESSION['login_error'] = 'Invalid email/username or password';
     header('Location: /');
     exit;
 
 } catch (Exception $e) {
-    //  Show generic error to user
     $_SESSION['login_error'] = 'An error occurred. Please try again.';
     header('Location: /');
     exit;
