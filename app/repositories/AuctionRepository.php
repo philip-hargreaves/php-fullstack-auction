@@ -48,8 +48,8 @@ class AuctionRepository
         $sql = "SELECT id, item_id, winning_bid_id, start_datetime, end_datetime, starting_price, reserve_price, auction_status 
                  FROM auctions
                  WHERE id = :auction_id";
-        $param = ['auction_id' => $auctionId];
-        $row = $this->db->query($sql, $param)->fetch();
+        $params = ['auction_id' => $auctionId];
+        $row = $this->db->query($sql, $params)->fetch();
 
         // Check if a record was returned
         if (empty($row)) {

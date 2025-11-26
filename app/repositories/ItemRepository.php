@@ -41,8 +41,8 @@ class ItemRepository
         $sql = "SELECT id, seller_id, item_name, item_description, item_condition, item_status 
                 FROM items 
                 WHERE id = :item_id";
-        $param = ['item_id' => $itemId];
-        $row = $this->db->query($sql, $param)->fetch();
+        $params = ['item_id' => $itemId];
+        $row = $this->db->query($sql, $params)->fetch();
 
         // Check if a record was returned
         if (empty($row)) {
