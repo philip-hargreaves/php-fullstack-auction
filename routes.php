@@ -26,7 +26,11 @@ $router->get('/auction', 'controllers/auction/auction.php');
 $router->post('/watchlist/add', 'controllers/auction/watchlist-add.php');
 $router->post('/watchlist/remove', 'controllers/auction/watchlist-remove.php');
 
-// My-xxx Page
+// My-listings Page
 $router->get('/my-listings', 'controllers/auction/my-listings.php');
-$router->get('/mybids', 'controllers/mybids.php');
+
+// My-Bids Page
+$router->get('/my-bids', 'controllers/my-bids.php');
+
+// Watchlist Page
 $router->get('/watchlist', 'controllers/auction/watchlist.php');

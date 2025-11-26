@@ -71,7 +71,7 @@ $isSeller = AuthService::hasRole('seller');
         <?php if ($isLoggedIn): ?>
         <div class="middle-section">
             <?php if ($isBuyer): ?>
-                <a href="/mybids" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/mybids') !== false ? 'active' : '' ?>">My Bids</a>
+                <a href="/my-bids" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/my-bids') !== false ? 'active' : '' ?>">My Bids</a>
                 <a href="/watchlist" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/watchlist') !== false ? 'active' : '' ?>">Watchlist</a>
             <?php endif; ?>
 
