@@ -21,9 +21,9 @@ class Rating
 
     public function __construct(
         int $ratingId,
-        int $auctionId, //FK
-        int $raterId, //FK
-        int $ratedId, //FK
+        int $auctionId,
+        int $raterId,
+        int $ratedId,
         int $ratingValue,
         string $comment,
         DateTime $ratingDateTime
