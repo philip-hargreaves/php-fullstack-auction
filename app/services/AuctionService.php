@@ -204,7 +204,7 @@ class AuctionService
             $now = new DateTime();
 
             // Check if start date is in the past (Allowing a 1 hr small buffer)
-            if ($startDate < $now->add(DateInterval::createFromDateString('1 day'))) {
+            if ($startDate < $now->add(DateInterval::createFromDateString('1 hour'))) {
                  return Utilities::creationResult("Auction start date cannot be in the past.", false, null);
             }
         } catch (Exception $e) {
