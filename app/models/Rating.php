@@ -6,55 +6,56 @@ use DateTime;
 
 class Rating
 {
+    // PROPERTIES
     private int $ratingId;
-    private int $auctionId;
-    private int $raterId;
-    private int $ratedId;
+    private ?int $auctionId;
+    private ?int $raterId;
+    private ?int $ratedId;
     private int $ratingValue;
-    private string $comment;
-    private DateTime $ratingDateTime;
+    private string $ratingComment;
+    private DateTime $ratingDatetime;
 
-    //RELATIONSHIP PROPERTIES
-    private Auction $auction;
+    // RELATIONSHIP PROPERTIES
+    private ?User $rater;
+    private ?User $rated;
 
-    private User $user;
-
+    // CONSTRUCTOR
     public function __construct(
         int $ratingId,
-        int $auctionId,
-        int $raterId,
-        int $ratedId,
+        ?int $auctionId,
+        ?int $raterId,
+        ?int $ratedId,
         int $ratingValue,
         string $comment,
-        DateTime $ratingDateTime
-    )
-    {
+        string|DateTime $ratingDatetime
+    ) {
         $this->ratingId = $ratingId;
         $this->auctionId = $auctionId;
         $this->raterId = $raterId;
         $this->ratedId = $ratedId;
         $this->ratingValue = $ratingValue;
-        $this->comment = $comment;
-        $this->ratingDateTime = $ratingDateTime;
+        $this->ratingComment = $comment;
+        $this->ratingDatetime = is_string($ratingDatetime) ? new DateTime($ratingDatetime) : $ratingDatetime;
+
     }
 
-    //GETTER
+    // GETTER
     public function getRatingId(): int
     {
         return $this->ratingId;
     }
 
-    public function getAuctionId(): int
+    public function getAuctionId(): ?int
     {
         return $this->auctionId;
     }
 
-    public function getRaterId(): int
+    public function getRaterId(): ?int
     {
         return $this->raterId;
     }
 
-    public function getRatedId(): int
+    public function getRatedId(): ?int
     {
         return $this->ratedId;
     }
@@ -64,14 +65,14 @@ class Rating
         return $this->ratingValue;
     }
 
-    public function getComment(): string
+    public function getRatingComment(): string
     {
-        return $this->comment;
+        return $this->ratingComment;
     }
 
-    public function getRatingDateTime(): DateTime
+    public function getRatingDatetime(): DateTime
     {
-        return $this->ratingDateTime;
+        return $this->ratingDatetime;
     }
 
     // SETTERS
@@ -85,42 +86,39 @@ class Rating
         $this->ratedId = $ratedId;
     }
 
-    //is this needed?
+    public function setRaterId(int $raterId): void {
+        $this->raterId = $raterId;
+    }
+
     public function setRatingValue(int $ratingValue): void
     {
         $this->ratingValue = $ratingValue;
     }
 
-    //needed?
-    public function setComment(string $comment): void
+    public function setRatingComment(string $ratingComment): void
     {
-        $this->comment = $comment;
+        $this->ratingComment = $ratingComment;
     }
 
-    public function setRatingDateTime(DateTime $ratingDateTime): void
+    public function setRatingDatetime(DateTime $ratingDatetime): void
     {
-        $this->ratingDateTime = $ratingDateTime;
+        $this->ratingDatetime = $ratingDatetime;
     }
 
-    //RELATIONSHIP GETTERS/SETTERS
-
-    public function getAuction(): ?Auction
-    {
-        return $this->auction;
+    // RELATIONSHIP GETTERS/SETTERS
+    public function getRater(): ?User {
+        return $this->rater;
     }
 
-    public function setAuction(Auction $auction): void
-    {
-        $this->auction = $auction;
+    public function setRater(User $rater): void {
+        $this->rater = $rater;
     }
 
-    public function getUser(): ?User
-    {
-        return $this->user;
+    public function getRated(): ?User {
+        return $this->rated;
     }
 
-    public function setUser(User $user): void
-    {
-        $this->user = $user;
+    public function setRated(User $rated): void {
+        $this->rated = $rated;
     }
 }

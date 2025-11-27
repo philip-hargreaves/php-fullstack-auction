@@ -6,31 +6,29 @@ use DateTime;
 
 class Auction
 {
-    // 1. PROPERTIES
+    // PROPERTIES
     private int $auctionId;
     private int $itemId;
-    private ?int $winningBidId; // This is nullable
-    private DateTime $startDateTime;
-    private DateTime $endDateTime;
-    private float $startingPrice; // decimal(10,2)
-    private float $reservePrice;  // decimal(10,2)
+    private ?int $winningBidId;
+    private DateTime $startDatetime;
+    private DateTime $endDatetime;
+    private float $startingPrice;
+    private ?float $reservePrice;
     private string $auctionStatus; // enum('Scheduled', 'Active', 'Sold', 'Unsold', 'Deleted')
 
-    // 2. RELATIONSHIP PROPERTIES
-    private ?Item $item = null;
+    // RELATIONSHIP PROPERTIES
+    private Item $item;
     private ?float $currentPrice = null;
-//    private ?Bid $winningBid = null;
-//    private array $bids = [];
 
-    // 3. CONSTRUCTOR
+    // CONSTRUCTOR
     public function __construct(
         int $auctionId,
         int $itemId,
         ?int $winningBidId,
-        string|DateTime $startDateTime, // Accept string from DB
-        string|DateTime $endDateTime,   // Accept string from DB
+        string|DateTime $startDatetime, // Accept string from DB
+        string|DateTime $endDatetime,   // Accept string from DB
         float $startingPrice,
-        float $reservePrice,
+        ?float $reservePrice,
         string $auctionStatus
     ) {
         $this->auctionId = $auctionId;
@@ -41,27 +39,24 @@ class Auction
         $this->auctionStatus = $auctionStatus;
 
         // Handle string-to-DateTime conversion from database
-        $this->startDateTime = is_string($startDateTime) ? new DateTime($startDateTime) : $startDateTime;
-        $this->endDateTime = is_string($endDateTime) ? new DateTime($endDateTime) : $endDateTime;
+        $this->startDatetime = is_string($startDatetime) ? new DateTime($startDatetime) : $startDatetime;
+        $this->endDatetime = is_string($endDatetime) ? new DateTime($endDatetime) : $endDatetime;
     }
 
-    // 4. BUSINESS LOGIC
-
+    // BUSINESS LOGIC
     public function isAuctionActive(): bool
     {
         $now = new DateTime();
         return ($this->auctionStatus === 'Active') &&
-            ($now > $this->startDateTime) &&
-            ($now < $this->endDateTime);
+            ($now > $this->startDatetime) &&
+            ($now < $this->endDatetime);
     }
 
-    public function hasReserveBeenMet(float $currentHighestBid): bool
-    {
-        return $currentHighestBid >= $this->reservePrice;
+    public function hasReservePriceBeenSet(): bool {
+        return $this->reservePrice !== null;
     }
 
-    // 5. GETTERS
-
+    // GETTERS
     public function getAuctionId(): int
     {
         return $this->auctionId;
@@ -77,14 +72,14 @@ class Auction
         return $this->winningBidId;
     }
 
-    public function getStartDateTime(): DateTime
+    public function getStartDatetime(): DateTime
     {
-        return $this->startDateTime;
+        return $this->startDatetime;
     }
 
-    public function getEndDateTime(): DateTime
+    public function getEndDatetime(): DateTime
     {
-        return $this->endDateTime;
+        return $this->endDatetime;
     }
 
     public function getStartingPrice(): float
@@ -92,7 +87,7 @@ class Auction
         return $this->startingPrice;
     }
 
-    public function getReservePrice(): float
+    public function getReservePrice(): ?float
     {
         return $this->reservePrice;
     }
@@ -102,7 +97,7 @@ class Auction
         return $this->auctionStatus;
     }
 
-    // 6. SETTERS
+    // SETTERS
     public function setAuctionId(int $auctionId): void
     {
         $this->auctionId = $auctionId;
@@ -113,12 +108,32 @@ class Auction
         $this->auctionStatus = $auctionStatus;
     }
 
-    public function setWinningBidId(?int $winningBidId): void
+    public function setWinningBidId(int $winningBidId): void
     {
         $this->winningBidId = $winningBidId;
     }
 
-    // 7. RELATIONSHIP GETTERS/SETTERS
+    public function setReservePrice(float $reservePrice): void {
+        $this->reservePrice = $reservePrice;
+    }
+
+    public function setStartDatetime(DateTime $startDatetime): void {
+        $this->startDatetime = $startDatetime;
+    }
+
+    public function setEndDatetime(DateTime $endDatetime): void {
+        $this->endDatetime = $endDatetime;
+    }
+
+    public function setStartingPrice(float $startingPrice): void {
+        $this->startingPrice = $startingPrice;
+    }
+
+    public function setItemId(int $itemId): void {
+        $this->itemId = $itemId;
+    }
+
+    // RELATIONSHIP GETTERS/SETTERS
 
     public function setItem(Item $item): void
     {

@@ -13,15 +13,13 @@ class Address
     // RELATIONSHIP PROPERTIES
     private ?User $user = null;
 
-
     public function __construct(
         int $addressId,
         int $userId,
         string $address,
         int $isDefault,
         int $isDeleted
-    )
-    {
+    ) {
         $this->addressId = $addressId;
         $this->userId = $userId;
         $this->address = $address;
@@ -56,13 +54,22 @@ class Address
         return $this->isDeleted;
     }
 
-    //need set address as well?
+    //SETTER
     public function setAddressId(int $addressId): void
     {
         $this->addressId = $addressId;
     }
 
-    //SETTER
+    public function setUserId(int $userId): void
+    {
+        $this->userId = $userId;
+    }
+
+    public function setAddress(int $address): void
+    {
+        $this->address = $address;
+    }
+
     public function setIsDefault(int $isDefault): void
     {
         $this-> isDefault = $isDefault;
@@ -74,13 +81,13 @@ class Address
     }
 
     //RELATIONSHIP GETTERS/SETTERS
-    public function setUser(User $user) : void
+    public function setUser(User $user): void
     {
-        $this-> user = $user;
+        $this->user = $user;
     }
 
-    public function getUser(): ? User
+    public function getUser(): ?User
     {
-        return $this-> user;
+        return $this->user;
     }
 }

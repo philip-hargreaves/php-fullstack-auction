@@ -7,53 +7,61 @@ use DateTime;
 class Conversation
 {
     private int $conversationId;
-    private int $auctionId;
-    private DateTime $startedDateTime;
+    private ?int $auctionId;
+    private DateTime $startedDatetime;
 
-    //RELATIONSHIP PROPERTIES
-    private Auction $auction;
+    // RELATIONSHIP PROPERTIES
+    private array $users;
 
+    // CONSTRUCTOR
     public function __construct(
-        int $conversationId,
-        int $auctionId,
-        DateTime $startedDateTime,
-    )
-    {
+        int      $conversationId,
+        ?int      $auctionId,
+        string|DateTime $startedDatetime,
+    ) {
         $this->conversationId = $conversationId;
         $this->auctionId = $auctionId;
-        $this->startedDateTime = $startedDateTime;
+        $this->startedDatetime = is_string($startedDatetime) ? new DateTime($startedDatetime) : $startedDatetime;
     }
 
-    //GETTERS
+    // GETTERS
     public function getConversationId(): int
     {
         return $this->conversationId;
     }
 
-    public function getAuctionId(): int
+    public function getAuctionId(): ?int
     {
         return $this->auctionId;
     }
 
-    public function getStartedDateTime(): DateTime
+    public function getStartedDatetime(): DateTime
     {
-        return $this->startedDateTime;
+        return $this->startedDatetime;
     }
 
-    //SETTERS
+    // SETTERS
     public function setConversationId(int $conversationId): void
     {
         $this->conversationId = $conversationId;
     }
 
-    //RELATIONSHIP GETTER/SETTER
-    public function setAuction(Auction $auction): void
-    {
-        $this-> auction = $auction;
+    public function setAuctionId(int $auctionId): void {
+        $this->auctionId = $auctionId;
     }
 
-    public function getAuction(): Auction
+    public function setStartedDatetime(DateTime $startedDatetime): void {
+        $this->startedDatetime = $startedDatetime;
+    }
+
+    // RELATIONSHIP GETTER/SETTER
+    public function setUsers(array $users): void
     {
-        return $this->auction;
+        $this->users = $users;
+    }
+
+    public function getUsers(): array
+    {
+        return $this->users;
     }
 }

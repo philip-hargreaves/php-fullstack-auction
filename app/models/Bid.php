@@ -6,45 +6,45 @@ use DateTime;
 
 class Bid
 {
-    // 1. PROPERTIES
+    // PROPERTIES
     private int $bidId;
-    private int $buyerId;
-    private int $auctionId;
-    private float $bidAmount; // decimal(10,2)
-    private DateTime $bidDateTime;
+    private ?int $buyerId;
+    private ?int $auctionId;
+    private float $bidAmount;
+    private DateTime $bidDatetime;
 
-    // 2. RELATIONSHIP PROPERTIES
+    // RELATIONSHIP PROPERTIES
     private ?User $buyer = null;
     private ?Auction $auction = null;
 
-    // 3. CONSTRUCTOR
+    // CONSTRUCTOR
     public function __construct(
         int $bidId,
-        int $buyerId,
-        int $auctionId,
+        ?int $buyerId,
+        ?int $auctionId,
         float $bidAmount,
-        string|DateTime $bidDateTime
+        string|DateTime $bidDatetime
     ) {
         $this->bidId = $bidId;
         $this->buyerId = $buyerId;
         $this->auctionId = $auctionId;
         $this->bidAmount = $bidAmount;
-        $this->bidDateTime = is_string($bidDateTime) ? new DateTime($bidDateTime) : $bidDateTime;
+        $this->bidDatetime = is_string($bidDatetime) ? new DateTime($bidDatetime) : $bidDatetime;
     }
 
-    // 4. GETTERS (No Setters - A bid is a record and should not be changed)
+    // GETTERS
 
     public function getBidId(): int
     {
         return $this->bidId;
     }
 
-    public function getBuyerId(): int
+    public function getBuyerId(): ?int
     {
         return $this->buyerId;
     }
 
-    public function getAuctionId(): int
+    public function getAuctionId(): ?int
     {
         return $this->auctionId;
     }
@@ -54,18 +54,34 @@ class Bid
         return $this->bidAmount;
     }
 
-    public function getBidDateTime(): DateTime
+    public function getBidDatetime(): DateTime
     {
-        return $this->bidDateTime;
+        return $this->bidDatetime;
     }
 
-    // 5. SETTER
+    // SETTER
     public function setBidId(int $bidId): void
     {
         $this->bidId = $bidId;
     }
 
-    // 6. RELATIONSHIP GETTERS/SETTERS
+    public function setBuyerId(int $buyerId): void {
+        $this->buyerId = $buyerId;
+    }
+
+    public function setAuctionId(int $auctionId): void {
+        $this->auctionId = $auctionId;
+    }
+
+    public function setBidAmount(float $bidAmount): void {
+        $this->bidAmount = $bidAmount;
+    }
+
+    public function setBidDatetime(DateTime $bidDatetime): void {
+        $this->bidDatetime = $bidDatetime;
+    }
+
+    // RELATIONSHIP GETTERS/SETTERS
 
     public function setBuyer(User $buyer): void
     {

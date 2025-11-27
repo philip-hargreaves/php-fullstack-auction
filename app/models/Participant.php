@@ -4,20 +4,16 @@ namespace app\models;
 
 class Participant
 {
+    // PROPERTIES
     private int $participantId;
     private int $conversationId;
     private int $userId;
 
-    //RELATIONSHIP PROPERTIES
-    private Conversation $conversation;
-
-    private User $user;
-
+    // CONSTRUCTOR
     public function __construct(
         int $participantId,
         int $conversationId,
         int $userId,
-
     )
     {
         $this->participantId = $participantId;
@@ -25,7 +21,7 @@ class Participant
         $this->userId = $userId;
     }
 
-    //GETTER
+    // GETTER
     public function getParticipantId(): int
     {
         return $this->participantId;
@@ -46,24 +42,11 @@ class Participant
         $this->conversationId = $conversationId;
     }
 
-    // RELATIONSHIP GETTERS/SETTERS
-    public function setConversation(Conversation $conversation): void
-    {
-        $this->conversation = $conversation;
+    public function setUserId(int $userId): void {
+        $this->userId = $userId;
     }
 
-    public function getConversation(): Conversation
-    {
-        return $this->conversation;
-    }
-
-    public function getUser(): User
-    {
-        return $this->user;
-    }
-
-    public function setUser(User $user): void
-    {
-        $this->user = $user;
+    public function setParticipantId(int $participantId): void {
+        $this->participantId = $participantId;
     }
 }

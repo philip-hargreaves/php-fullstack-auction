@@ -9,25 +9,23 @@ class Message
     private int $messageId;
     private int $participantId;
     private string $messageContent;
-    private DateTime $sentDateTime;
+    private DateTime $sentDatetime;
 
     //RELATIONSHIP PROPERTIES
-    private Participant $participant;
 
     public function __construct(
-        int $messageId,
-        int $participantId,
-        string $messageContent,
-        DateTime $sentDateTime,
+        int      $messageId,
+        int      $participantId,
+        string   $messageContent,
+        string|DateTime $sentDatetime,
     )
     {
         $this->messageId = $messageId;
         $this->participantId = $participantId;
         $this->messageContent = $messageContent;
-        $this->sentDateTime = $sentDateTime;
-    }
+        $this->sentDatetime = is_string($sentDatetime) ? new DateTime($sentDatetime) : $sentDatetime;    }
 
-    //GETTER
+    // GETTER
     public function getMessageId(): int
     {
         return $this->messageId;
@@ -43,20 +41,27 @@ class Message
         return $this->messageContent;
     }
 
-    //SETTER
+    public function getSentDatetime(): DateTime {
+        return $this->sentDatetime;
+    }
+
+    // SETTER
     public function setMessageId(int $messageId): void
     {
         $this->messageId = $messageId;
     }
 
-    //RELATIONSHIP GETTER/SETTER
-    public function getParticipant(): Participant
-    {
-        return $this->participant;
+    public function setParticipantId(int $participantId): void {
+        $this->participantId = $participantId;
     }
 
-    public function setParticipant(Participant $participant): void
-    {
-        $this->participant = $participant;
+    public function setMessageContent(string $messageContent): void {
+        $this->messageContent = $messageContent;
     }
+
+    public function setSentDatetime(DateTime $sentDatetime): void {
+        $this->sentDatetime = $sentDatetime;
+    }
+
+    // RELATIONSHIP GETTER/SETTER
 }
