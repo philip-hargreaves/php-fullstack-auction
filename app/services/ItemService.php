@@ -37,6 +37,7 @@ class ItemService
         (
             0,
             $input['seller_id'],
+            $input['category_id'],
             $input['item_name'],
             $input['item_description'],
             $input['item_condition'],

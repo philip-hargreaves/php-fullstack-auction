@@ -36,26 +36,27 @@ CREATE TABLE addresses (
 CREATE TABLE categories (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
-    parent_category_id INT,
-    FOREIGN KEY (parent_category_id) REFERENCES categories(id) ON DELETE CASCADE
+    parent_category_id INT NULL,
+    FOREIGN KEY (parent_category_id) REFERENCES categories(id) ON DELETE SET NULL
+    -- ON DELETE Restrict for parent_category_id
 );
 
 CREATE TABLE items (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    seller_id INT NULL,  -- set NULL, because ON DELETE SET NULL -- unsure
-    category_id INT NULL,  -- set NULL, because ON DELETE SET NULL -- unsure
+    seller_id INT NULL,
+    category_id INT NULL,
     item_name VARCHAR(100) NOT NULL,
     item_description TEXT NULL,
     item_condition ENUM('New', 'Like New', 'Used') NULL,
     FOREIGN KEY (seller_id) REFERENCES users(id) ON DELETE SET NULL,
-    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL -- change to set default category
+    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL
+   -- ON DELETE Restrict for category_id
 );
 
 CREATE TABLE item_images (
     id INT AUTO_INCREMENT PRIMARY KEY,
     item_id INT NOT NULL,
     image_url VARCHAR(1024) NOT NULL,
-    -- `alt_text` VARCHAR(150),
     is_main TINYINT(1) NOT NULL DEFAULT 0,
     uploaded_datetime DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE
@@ -69,20 +70,20 @@ CREATE TABLE auctions (
     end_datetime DATETIME NOT NULL,
     starting_price DECIMAL(10, 2) NOT NULL,
     reserve_price DECIMAL(10, 2) NULL,
-    auction_status ENUM('Scheduled', 'Active', 'Sold', 'Unsold', 'Deleted') NOT NULL DEFAULT 'Scheduled',
+    auction_status ENUM('Scheduled', 'Active', 'Sold', 'Unsold', 'Canceled') NOT NULL DEFAULT 'Scheduled',
+    is_deleted TINYINT(1) NOT NULL DEFAULT 0,
     FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE,
     CONSTRAINT chk_auction_times CHECK (end_datetime > start_datetime)
-    -- payment_deadline DATETIME NULL,
 );
 
 CREATE TABLE bids (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    buyer_id INT NULL,  -- set NULL, because ON DELETE SET NULL -- unsure
-    auction_id INT NOT NULL,
+    buyer_id INT NULL,
+    auction_id INT NULL,
     bid_amount DECIMAL(10, 2) NOT NULL,
     bid_datetime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (buyer_id) REFERENCES users(id) ON DELETE SET NULL,  -- unsure
-    FOREIGN KEY (auction_id) REFERENCES auctions(id) ON DELETE CASCADE
+    FOREIGN KEY (buyer_id) REFERENCES users(id) ON DELETE SET NULL,
+    FOREIGN KEY (auction_id) REFERENCES auctions(id) ON DELETE SET NULL
 );
 
 -- ALTER statement to add the foreign key *after* bids table exists
@@ -101,32 +102,32 @@ CREATE TABLE watchlists (
 
 CREATE TABLE orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    auction_id INT NOT NULL UNIQUE,
-    address_id INT NULL,  -- set NULL, because ON DELETE SET NULL -- unsure
+    auction_id INT NULL UNIQUE,
+    address_id INT NULL,
     order_datetime DATETIME DEFAULT CURRENT_TIMESTAMP,
     order_status  ENUM('Pending', 'IsConfirmed', 'Canceled', 'Shipped', 'Completed') NOT NULL DEFAULT 'Pending', -- unsure
-    FOREIGN KEY (auction_id) REFERENCES auctions(id) ON DELETE CASCADE,
-    FOREIGN KEY (address_id) REFERENCES addresses(id) ON DELETE SET NULL  -- unsure
+    FOREIGN KEY (auction_id) REFERENCES auctions(id) ON DELETE SET NULL,
+    FOREIGN KEY (address_id) REFERENCES addresses(id) ON DELETE SET NULL
 );
 
 CREATE TABLE ratings (
     id INT AUTO_INCREMENT PRIMARY KEY,
     auction_id INT NULL,
-    rater_id INT NULL, -- set NULL, because ON DELETE SET NULL -- unsure
-    rated_id INT NOT NULL,
+    rater_id INT NULL,
+    rated_id INT NULL,
     rating_value TINYINT UNSIGNED NOT NULL CHECK (rating_value BETWEEN 1 AND 5),
     rating_comment TEXT,
     rating_datetime DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (auction_id) REFERENCES auctions(id) ON DELETE CASCADE, -- unsure
-    FOREIGN KEY (rater_id) REFERENCES users(id) ON DELETE SET NULL, -- unsure
-    FOREIGN KEY (rated_id) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY (auction_id) REFERENCES auctions(id) ON DELETE SET NULL,
+    FOREIGN KEY (rater_id) REFERENCES users(id) ON DELETE SET NULL,
+    FOREIGN KEY (rated_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
 CREATE TABLE conversations (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    auction_id INT NULL, -- set NULL, because ON DELETE SET NULL -- unsure
+    auction_id INT NULL,
     started_datetime DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (auction_id) REFERENCES auctions(id) ON DELETE SET NULL  -- unsure
+    FOREIGN KEY (auction_id) REFERENCES auctions(id) ON DELETE SET NULL
 );
 
 CREATE TABLE participants (
@@ -139,8 +140,8 @@ CREATE TABLE participants (
 
 CREATE TABLE messages (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    participant_id INT NOT NULL,
+    participant_id INT NULL,
     message_content TEXT NOT NULL,
     sent_datetime DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (participant_id) REFERENCES participants(id) ON DELETE CASCADE
+    FOREIGN KEY (participant_id) REFERENCES participants(id) ON DELETE SET NULL
 );

@@ -25,6 +25,7 @@ class ItemRepository
         $object = new Item(
             (int)$row['id'],
             (int)$row['seller_id'],
+            (int)$row['category_id'],
             (string)$row['item_name'],
             (string)$row['item_description'],
             (string)$row['item_condition']
@@ -41,7 +42,7 @@ class ItemRepository
     public function getById(int $itemId): ?Item {
         try {
             // Query
-            $sql = "SELECT id, seller_id, item_name, item_description, item_condition 
+            $sql = "SELECT id, seller_id, category_id, item_name, item_description, item_condition 
                     FROM items 
                     WHERE id = :item_id";
             $param = ['item_id' => $itemId];
@@ -56,10 +57,11 @@ class ItemRepository
 
     private function extract(Item $item): array {
         $row = [];
-        $row['seller_id'] = $item -> getSellerId();
-        $row['item_name'] = $item -> getItemName();
-        $row['item_description'] = $item -> getItemDescription();
-        $row['item_condition'] = $item -> getItemCondition();
+        $row['seller_id'] = $item->getSellerId();
+        $row['category_id'] = $item->getCategoryId();
+        $row['item_name'] = $item->getItemName();
+        $row['item_description'] = $item->getItemDescription();
+        $row['item_condition'] = $item->getItemCondition();
         return $row;
     }
 
@@ -67,9 +69,9 @@ class ItemRepository
         try {
             $params = $this->extract($item);
             $sql = "INSERT INTO items (seller_id, item_name, item_description, 
-                        item_condition)
+                        item_condition, category_id)
                     VALUES (:seller_id, :item_name, :item_description, 
-                        :item_condition)";
+                        :item_condition, :category_id)";
             $result = $this->db->query($sql, $params);
 
             $id = (int)$this->db->connection->lastInsertId();
