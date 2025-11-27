@@ -5,7 +5,7 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
     <div class="container my-bids-page">
         <h2 class="my-3">My Bids</h2>
 
-        <?php if (empty($bids)): ?>
+        <?php if (empty($uniqueBids)): ?>
             <p>You have not placed any bids yet.</p>
             <a href="/" class="btn btn-primary mt-2">Browse listings</a>
         <?php else: ?>
@@ -13,18 +13,18 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
                 <thead>
                 <tr>
                     <th>Item</th>
-                    <th>My Bid</th>
-                    <th>Current Highest</th>
-                    <th>End Date</th>
+                    <th>My Max Bid</th> <th>Current Highest</th>
+                    <th>Remaining Time</th>
                     <th>Status</th>
                 </tr>
                 </thead>
 
                 <tbody>
-                <?php foreach ($bids as $bid): ?>
+                <?php foreach ($uniqueBids as $bid): ?>
                     <?php
                     $auctionObj = $bid->getAuction();
                     $itemObj = $auctionObj ? $auctionObj->getItem() : null;
+                    $auctionId = $bid->getAuctionId();
 
                     if (!$auctionObj) {
                         echo "<tr><td colspan='5'>[Auction Deleted]</td></tr>";
@@ -34,27 +34,22 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
                     $myBidAmount = $bid->getBidAmount();
                     $currentPrice = $auctionObj->getCurrentPrice() ?? $auctionObj->getStartingPrice();
                     $auctionStatus = $auctionObj->getAuctionStatus();
-
                     $isWinning = $myBidAmount >= $currentPrice;
 
                     $statusBadge = '';
-
                     if ($auctionStatus == 'Active') {
-                        if ($isWinning) {
-                            $statusBadge = '<span class="badge bg-success">Winning</span>';
-                        } else {
-                            $statusBadge = '<span class="badge bg-danger">Outbid</span>';
-                        }
+                        $statusBadge = $isWinning
+                                ? '<span class="badge bg-success">Winning</span>'
+                                : '<span class="badge bg-danger">Outbid</span>';
                     } elseif ($auctionStatus == 'Sold') {
-                        if ($isWinning) {
-                            $statusBadge = '<span class="badge bg-success">Won</span>';
-                        } else {
-                            $statusBadge = '<span class="badge bg-secondary">Lost</span>';
-                        }
+                        $statusBadge = $isWinning
+                                ? '<span class="badge bg-success">Won</span>'
+                                : '<span class="badge bg-secondary">Lost</span>';
                     } else {
-                        // Other status (Scheduled, Deleted, Unsold)
                         $statusBadge = '<span class="badge bg-secondary">' . htmlspecialchars($auctionStatus) . '</span>';
                     }
+
+                    $historyCount = isset($groupedBids[$auctionId]) ? count($groupedBids[$auctionId]) : 0;
                     ?>
                     <tr>
                         <td>
@@ -63,7 +58,21 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
                             </a>
                         </td>
 
-                        <td class="font-weight-bold">£<?= htmlspecialchars(number_format($myBidAmount, 2)) ?></td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <span class="font-weight-bold mr-2">
+                                    £<?= htmlspecialchars(number_format($myBidAmount, 2)) ?>
+                                </span>
+
+                                <?php if ($historyCount > 1): ?>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-2"
+                                            style="font-size: 0.75rem;"
+                                            data-toggle="modal" data-target="#historyModal-<?= $auctionId ?>">
+                                        History (<?= $historyCount ?>)
+                                    </button>
+                                <?php endif; ?>
+                            </div>
+                        </td>
 
                         <td>£<?= htmlspecialchars(number_format($currentPrice, 2)) ?></td>
 
@@ -86,6 +95,45 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
             </table>
         <?php endif; ?>
 
+        <?php if (!empty($groupedBids)): ?>
+            <?php foreach ($groupedBids as $auctionId => $bids): ?>
+                <?php if (count($bids) > 1): ?>
+                    <div class="modal fade" id="historyModal-<?= $auctionId ?>" tabindex="-1">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">
+                                        Bid History: <?= htmlspecialchars($bids[0]->getAuction()->getItem()->getItemName()) ?>
+                                    </h5>
+                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                </div>
+                                <div class="modal-body">
+                                    <table class="table table-sm table-hover">
+                                        <thead>
+                                        <tr>
+                                            <th>Your Bid</th>
+                                            <th>Time Placed</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <?php foreach ($bids as $historyBid): ?>
+                                            <tr>
+                                                <td class="font-weight-bold">£<?= number_format($historyBid->getBidAmount(), 2) ?></td>
+                                                <td><?= $historyBid->getBidDatetime()->format('j M Y, H:i:s') ?></td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <?php endif; ?>
+            <?php endforeach; ?>
+        <?php endif; ?>
     </div>
 
 <?php

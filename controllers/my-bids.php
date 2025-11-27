@@ -14,5 +14,9 @@ $userId = (int)$_SESSION['user_id'];
 
 $bids = $bidServ->getBidsForUser($userId);
 $bidServ->fillAuctionsInBids($bids);
+$data = $bidServ->getBidsForUserDashboard($userId);
+
+$uniqueBids = $data['unique'];
+$groupedBids = $data['grouped'];
 
 require Utilities::basePath('views/my-bids.view.php');
