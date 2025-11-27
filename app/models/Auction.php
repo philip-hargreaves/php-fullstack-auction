@@ -16,7 +16,7 @@ class Auction
     private DateTime $startDatetime;
     private DateTime $endDatetime;
     private float $startingPrice;
-    private float $reservcePrice;
+    private float $reservePrice;
     private string $auctionStatus; // enum('Scheduled', 'Active', 'Finished')
 
     // RELATIONSHIP PROPERTIES
@@ -42,7 +42,7 @@ class Auction
         $this->auctionDescription = $auctionDescription;
         $this->auctionCondition = $auctionCondition;
         $this->startingPrice = $startingPrice;
-        $this->reservcePrice = $reservePrice;
+        $this->reservePrice = $reservePrice;
         $this->auctionStatus = $auctionStatus;
         $this->categoryId = $categoryId;
         $this->winningBidId = $winningBidId;
@@ -108,7 +108,7 @@ class Auction
     }
 
     public function getReservePrice(): ?float {
-        return $this->reservcePrice;
+        return $this->reservePrice;
     }
 
     public function getAuctionStatus(): string
