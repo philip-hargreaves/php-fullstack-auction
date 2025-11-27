@@ -185,7 +185,22 @@ class BidService
 
     public function getBidsForUser(int $userId): array
     {
-        return $this->bidRepo->getByUserId($userId);
+        $bids = $this->bidRepo->getByUserId($userId);
+
+        foreach ($bids as $bid)
+        {
+            $auction = $bid->getAuction();
+
+            if ($auction === null) {
+                continue;
+            }
+
+            $highestBid = $this->getHighestBidByAuctionId($auction->getAuctionId());
+            $currentPrice = $highestBid > 0 ? $highestBid : $auction->getStartingPrice();
+            $auction->setCurrentPrice($currentPrice);
+        }
+
+        return $bids;
     }
 
     public function countBidsByAuctionId(int $auctionId): int
