@@ -4,6 +4,7 @@ namespace app\repositories;
 use infrastructure\Database;
 use app\models\Auction;
 use app\repositories\ItemRepository;
+use infrastructure\Utilities;
 use PDOException;
 
 class AuctionRepository
@@ -20,25 +21,28 @@ class AuctionRepository
         if (empty($row)) {
             return null;
         }
-        // Create the object using constructor
+
+        // Create the object using constructor matching the new Model signature
         $object = new Auction(
-            (int)$row['id'],
             (int)$row['item_id'],
-            $row['winning_bid_id'] ? (int)$row['winning_bid_id'] : null,
+            $row['auction_description'],
+            $row['auction_condition'],
             $row['start_datetime'],
             $row['end_datetime'],
             (float)$row['starting_price'],
+            $row['auction_status'],
             $row['reserve_price'] ? (float)$row['reserve_price'] : null,
-            $row['auction_status']
+            $row['category_id'] ? (int)$row['category_id'] : null,
+            $row['winning_bid_id'] ? (int)$row['winning_bid_id'] : null,
+            (int)$row['id']
         );
 
         // Set relationship properties
         $item = $this->itemRepo->getById($object->getItemId());
 
-        if ($item === null) {
-            return null;
+        if ($item !== null) {
+            $object->setItem($item);
         }
-        $object->setItem($item);
 
         return $object;
     }
@@ -46,9 +50,8 @@ class AuctionRepository
     public function getById(int $auctionId): ?Auction
     {
         try {
-            $sql = "SELECT id, item_id, winning_bid_id, start_datetime, 
-                        end_datetime, starting_price, reserve_price, auction_status 
-                    FROM auctions WHERE id = :auction_id";
+            // Updated columns to match new schema
+            $sql = "SELECT * FROM auctions WHERE id = :auction_id";
             $param = ['auction_id' => $auctionId];
             $row = $this->db->query($sql, $param)->fetch();
 
@@ -66,6 +69,7 @@ class AuctionRepository
     public function getBySellerId(int $sellerId): array
     {
         try {
+            // JOIN relies on the items table having the seller_id
             $sql = "SELECT a.* FROM auctions a
                     JOIN items i ON a.item_id = i.id
                     WHERE i.seller_id = :seller_id
@@ -116,8 +120,13 @@ class AuctionRepository
         if ($auction->getAuctionId() != 0 && $auction->getAuctionId() != null) {
             $row['id'] = $auction->getAuctionId();
         }
-        $row['item_id']= $auction->getItemId();
-        $row['winning_bid_id'] = $auction->getWinningBidId(); //start with null
+        $row['item_id'] = $auction->getItemId();
+        $row['category_id'] = $auction->getCategoryId();
+        $row['winning_bid_id'] = $auction->getWinningBidId();
+
+        $row['auction_description'] = $auction->getAuctionDescription();
+        $row['auction_condition'] = $auction->getAuctionCondition();
+
         $row['start_datetime'] = $auction->getStartDateTime()->format('Y-m-d H:i:s');
         $row['end_datetime'] = $auction->getEndDateTime()->format('Y-m-d H:i:s');
         $row['starting_price'] = $auction->getStartingPrice();
@@ -131,10 +140,18 @@ class AuctionRepository
     {
         try {
             $params = $this->extract($auction);
-            $sql = "INSERT INTO auctions (item_id, winning_bid_id, start_datetime, end_datetime,
-                        starting_price, reserve_price, auction_status)
-                    VALUES (:item_id, :winning_bid_id, :start_datetime, :end_datetime, 
-                        :starting_price, :reserve_price, :auction_status)";
+
+            $sql = "INSERT INTO auctions (
+                        item_id, category_id, winning_bid_id, 
+                        auction_description, auction_condition,
+                        start_datetime, end_datetime, starting_price, reserve_price, auction_status
+                    )
+                    VALUES (
+                        :item_id, :category_id, :winning_bid_id, 
+                        :auction_description, :auction_condition,
+                        :start_datetime, :end_datetime, :starting_price, :reserve_price, :auction_status
+                    )";
+
             $result = $this->db->query($sql, $params);
 
             // Check if the insert was successful.
@@ -149,6 +166,5 @@ class AuctionRepository
             // TODO: add logging
             return null;
         }
-
     }
 }
