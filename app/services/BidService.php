@@ -183,6 +183,53 @@ class BidService
         return $this->bidRepo->getByAuctionId($auctionId);
     }
 
+    public function getWinningBidByAuctionId($auctionId): ?Bid {
+        // Get Auction status
+        $auction = $this->auctionRepo->getById($auctionId);
+        $isAuctionActive = $auction->getAuctionStatus() == 'Active';
+        if ($isAuctionActive) {
+            // Get Item Status
+            $item = $auction->getItem();
+            $isItemSold = $auction->getAuctionStatus() == 'Sold';
+            if ($isItemSold) {
+                return $this->bidRepo->getById($auction->getWinningBidID());
+            }
+        }
+        return null;
+    }
+
+    public function getBidsForUserDashboard(int $userId): array
+    {
+        $allBids = $this->bidRepo->getByUserId($userId);
+
+        $uniqueBids = [];
+        $groupedBids = [];
+
+        foreach ($allBids as $bid) {
+            $auctionId = $bid->getAuctionId();
+
+            $groupedBids[$auctionId][] = $bid;
+
+            if (!isset($uniqueBids[$auctionId]) ||
+                $bid->getBidAmount() > $uniqueBids[$auctionId]->getBidAmount()) {
+
+                $auction = $bid->getAuction();
+                if ($auction) {
+                    $highestBid = $this->getHighestBidByAuctionId($auctionId);
+                    $currentPrice = $highestBid > 0 ? $highestBid : $auction->getStartingPrice();
+                    $auction->setCurrentPrice($currentPrice);
+                }
+
+                $uniqueBids[$auctionId] = $bid;
+            }
+        }
+
+        return [
+            'unique' => array_values($uniqueBids),
+            'grouped' => $groupedBids
+        ];
+    }
+
     public function getBidsForUser(int $userId): array
     {
         $bids = $this->bidRepo->getByUserId($userId);
