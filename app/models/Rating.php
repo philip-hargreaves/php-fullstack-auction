@@ -81,12 +81,12 @@ class Rating
         $this->ratingId = $ratingId;
     }
 
-    public function setRatedId(int $ratedId): void
+    public function setRatedId(?int $ratedId): void
     {
         $this->ratedId = $ratedId;
     }
 
-    public function setRaterId(int $raterId): void {
+    public function setRaterId(?int $raterId): void {
         $this->raterId = $raterId;
     }
 

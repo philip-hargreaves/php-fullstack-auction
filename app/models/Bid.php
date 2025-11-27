@@ -65,11 +65,11 @@ class Bid
         $this->bidId = $bidId;
     }
 
-    public function setBuyerId(int $buyerId): void {
+    public function setBuyerId(?int $buyerId): void {
         $this->buyerId = $buyerId;
     }
 
-    public function setAuctionId(int $auctionId): void {
+    public function setAuctionId(?int $auctionId): void {
         $this->auctionId = $auctionId;
     }
 

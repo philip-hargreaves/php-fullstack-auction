@@ -46,7 +46,7 @@ class Conversation
         $this->conversationId = $conversationId;
     }
 
-    public function setAuctionId(int $auctionId): void {
+    public function setAuctionId(?int $auctionId): void {
         $this->auctionId = $auctionId;
     }
 

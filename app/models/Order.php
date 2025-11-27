@@ -58,11 +58,11 @@ class Order
         $this->orderId = $orderId;
     }
 
-    public function setAuctionId(int $auctionId): void {
+    public function setAuctionId(?int $auctionId): void {
         $this->auctionId = $auctionId;
     }
 
-    public function setAddressId(int $addressId): void {
+    public function setAddressId(?int $addressId): void {
         $this->addressId = $addressId;
     }
 
@@ -75,12 +75,12 @@ class Order
     }
 
     // RELATIONSHIP GETTERS/SETTERS
-    public function getAuction(): Auction {
+    public function getAuction(): ?Auction {
         return $this->auction;
     }
 
     public function setAuction(Auction $auction): void {
-        $this-> auction = $auction;
+        $this->auction = $auction;
     }
 
     public function setAddress(Address $address): void {

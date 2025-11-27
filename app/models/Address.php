@@ -65,14 +65,14 @@ class Address
         $this->userId = $userId;
     }
 
-    public function setAddress(int $address): void
+    public function setAddress(string $address): void
     {
         $this->address = $address;
     }
 
     public function setIsDefault(int $isDefault): void
     {
-        $this-> isDefault = $isDefault;
+        $this->isDefault = $isDefault;
     }
 
     public function setIsDeleted(int $isDeleted): void

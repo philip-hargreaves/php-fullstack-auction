@@ -14,7 +14,8 @@ class Auction
     private DateTime $endDatetime;
     private float $startingPrice;
     private ?float $reservePrice;
-    private string $auctionStatus; // enum('Scheduled', 'Active', 'Sold', 'Unsold', 'Deleted')
+    private string $auctionStatus; // enum('Scheduled', 'Active', 'Sold', 'Unsold', 'Canceled')
+    private int $isDeleted;
 
     // RELATIONSHIP PROPERTIES
     private Item $item;
@@ -29,7 +30,8 @@ class Auction
         string|DateTime $endDatetime,   // Accept string from DB
         float $startingPrice,
         ?float $reservePrice,
-        string $auctionStatus
+        string $auctionStatus,
+        int $isDeleted
     ) {
         $this->auctionId = $auctionId;
         $this->itemId = $itemId;
@@ -37,6 +39,7 @@ class Auction
         $this->startingPrice = $startingPrice;
         $this->reservePrice = $reservePrice;
         $this->auctionStatus = $auctionStatus;
+        $this->isDeleted = $isDeleted;
 
         // Handle string-to-DateTime conversion from database
         $this->startDatetime = is_string($startDatetime) ? new DateTime($startDatetime) : $startDatetime;
@@ -97,6 +100,11 @@ class Auction
         return $this->auctionStatus;
     }
 
+    public function getIsDeleted(): int
+    {
+        return $this->isDeleted;
+    }
+
     // SETTERS
     public function setAuctionId(int $auctionId): void
     {
@@ -108,12 +116,12 @@ class Auction
         $this->auctionStatus = $auctionStatus;
     }
 
-    public function setWinningBidId(int $winningBidId): void
+    public function setWinningBidId(?int $winningBidId): void
     {
         $this->winningBidId = $winningBidId;
     }
 
-    public function setReservePrice(float $reservePrice): void {
+    public function setReservePrice(?float $reservePrice): void {
         $this->reservePrice = $reservePrice;
     }
 
@@ -131,6 +139,10 @@ class Auction
 
     public function setItemId(int $itemId): void {
         $this->itemId = $itemId;
+    }
+
+    public function setIsDeleted(int $isDeleted): void {
+        $this->isDeleted = $isDeleted;
     }
 
     // RELATIONSHIP GETTERS/SETTERS
