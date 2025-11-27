@@ -50,6 +50,9 @@ class AuctionService
 
             // Create Item
             $createItemResult = $this->itemService->createItem($itemInput);
+
+
+
             if (!$createItemResult['success']) {
                 return Utilities::creationResult($createItemResult['message'], false, null);
             }
@@ -83,6 +86,7 @@ class AuctionService
             // Insertion Failed -> Roll Back
             if (is_null($auction)) {
                 $pdo->rollBack();
+
                 return Utilities::creationResult("Failed to create an auction.", false, null);
             }
 

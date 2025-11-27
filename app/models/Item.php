@@ -4,43 +4,49 @@ namespace app\models;
 
 class Item
 {
-    // 1. PROPERTIES
+    // PROPERTIES
     private int $itemId;
-    private int $sellerId;
+    private ?int $sellerId;
+    private ?int $categoryId;
     private string $itemName;
     private string $itemDescription;
     private string $itemCondition; // enum('new','like new','used')
 
-    // 2. RELATIONSHIP PROPERTIES
+    // RELATIONSHIP PROPERTIES
     private ?User $seller = null;
-    // Remove $auction: when the item is created, we don't want to create objects for all the auctions of the item.
-//    private array $auctions = [];
+    private ?Category $category = null;
 
-    // 3. CONSTRUCTOR
+    // CONSTRUCTOR
     public function __construct(
         int $itemId,
-        int $sellerId,
+        ?int $sellerId,
+        ?int $categoryId,
         string $itemName,
         string $itemDescription,
         string $itemCondition
     ) {
         $this->itemId = $itemId;
         $this->sellerId = $sellerId;
+        $this->categoryId = $categoryId;
         $this->itemName = $itemName;
         $this->itemDescription = $itemDescription;
         $this->itemCondition = $itemCondition;
     }
 
-    // 4. GETTERS
-
+    // GETTERS
     public function getItemId(): int
     {
         return $this->itemId;
     }
 
-    public function getSellerId(): int
+    public function getSellerId(): ?int
     {
         return $this->sellerId;
+    }
+
+    public function getCategoryId(): ?int
+    {
+        return $this->categoryId;
     }
 
     public function getItemName(): string
@@ -58,8 +64,7 @@ class Item
         return $this->itemCondition;
     }
 
-    // 5. SETTERS (Only for data that can change)
-
+    // SETTERS
     public function setItemName(string $itemName): void
     {
         $this->itemName = $itemName;
@@ -81,7 +86,11 @@ class Item
         $this->itemId = $itemId;
     }
 
-    // 6. RELATIONSHIP GETTERS/SETTERS
+    public function setCategoryId(int $categoryId): void {
+        $this->categoryId = $categoryId;
+    }
+
+    // RELATIONSHIP GETTERS/SETTERS
 
     public function setSeller(User $seller): void
     {
@@ -91,5 +100,13 @@ class Item
     public function getSeller(): ?User
     {
         return $this->seller;
+    }
+
+    public function getCategory(): ?Category {
+        return $this->category;
+    }
+
+    public function setCategory(Category $category): void {
+        $this->category = $category;
     }
 }

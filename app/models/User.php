@@ -4,17 +4,18 @@ namespace app\models;
 
 class User
 {
-    // 1. PROPERTIES
+    // PROPERTIES
     private int $userId;
     private string $username;
     private string $email;
     private string $password;
     private bool $isActive;
 
-    // 2. RELATIONSHIP PROPERTIES (started empty, will be filled by repositories)
-    private array $roles = [];  // roles will now be stored as role objects
+    // RELATIONSHIP PROPERTIES
+    private array $roles = [];
+    private array $addresses = [];
 
-    // 3. CONSTRUCTOR
+    // CONSTRUCTOR
     public function __construct(
         int $userId,
         string $username,
@@ -29,7 +30,7 @@ class User
         $this->isActive = (bool)$isActive;
     }
 
-    // 4. BUSINESS LOGIC METHODS
+    // BUSINESS LOGIC METHODS
     public function verifyPassword(string $password): bool
     {
         // Compare plain-text password against stored hash
@@ -47,7 +48,7 @@ class User
         return false;
     }
 
-    // 5. CONVENIENCE HELPERS
+    // CONVENIENCE HELPERS
     public function isBuyer(): bool
     {
         return $this->hasRoles('buyer');
@@ -63,7 +64,7 @@ class User
         return $this->hasRoles('admin');
     }
 
-    // 6. GETTERS
+    // GETTERS
     public function getUserId(): int
     {
         return $this->userId;
@@ -102,13 +103,11 @@ class User
         return $this->isActive;
     }
 
-    public function setUserId(int $userId): void
-    {
-        $this->userId = $userId;
+    public function getAddresses(): array {
+        return $this->addresses;
     }
 
-
-    // 7. SETTERS
+    // SETTERS
     public function setRoles(array $roles): void
     {
         $this->roles = [];
@@ -135,6 +134,14 @@ class User
         ));
     }
 
+    public function setUserId(int $userId): void
+    {
+        $this->userId = $userId;
+    }
+
+    public function setAddresses(array $addresses): void {
+        $this->addresses = $addresses;
+    }
 
     // 8. PRIVATE HELPERS
     private function findRole(string $roleName): ?Role

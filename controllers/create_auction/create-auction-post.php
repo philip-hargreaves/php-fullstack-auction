@@ -25,7 +25,8 @@ try {
         'seller_id'         => $authService->getUserId(),
         'item_name'         => Request::post('item_name'),
         'item_description'  => Request::post('item_description'),
-        'item_condition'    => Request::post('item_condition')
+        'item_condition'    => Request::post('item_condition'),
+        'category_id'       => 1 // Request::post('category_id')
     ];
 
     // $auctionInput should offer: start_datetime, end_datetime, starting_price, reserve_price
