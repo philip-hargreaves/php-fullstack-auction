@@ -23,32 +23,34 @@ class ItemRepository
         }
 
         $object = new Item(
-            (int)$row['id'],
-            (int)$row['seller_id'],
-            (int)$row['category_id'],
             (string)$row['item_name'],
-            (string)$row['item_description'],
-            (string)$row['item_condition']
+            $row['seller_id'] ? (int)$row['seller_id'] : null,
+            (int)$row['id'],
+            $row['current_auction_id'] ? (int)$row['current_auction_id'] : null,
+            (bool)$row['is_deleted'],
+            (bool)$row['is_sold']
         );
 
         // Set relationship properties
         $seller = $this->userRepo->getById($object->getSellerId());
 
-        $object->setSeller($seller);
+        if ($seller) {
+            $object->setSeller($seller);
+        }
 
         return $object;
     }
 
     public function getById(int $itemId): ?Item {
         try {
-            // Query
-            $sql = "SELECT id, seller_id, category_id, item_name, item_description, item_condition 
+            // Query updated for new schema
+            $sql = "SELECT id, seller_id, current_auction_id, item_name, is_deleted, is_sold 
                     FROM items 
                     WHERE id = :item_id";
             $param = ['item_id' => $itemId];
             $row = $this->db->query($sql, $param)->fetch();
 
-                return $this->hydrate($row);
+            return $this->hydrate($row);
         } catch (PDOException $e) {
             // TODO: add logging
             return null;
@@ -58,28 +60,53 @@ class ItemRepository
     private function extract(Item $item): array {
         $row = [];
         $row['seller_id'] = $item->getSellerId();
-        $row['category_id'] = $item->getCategoryId();
+        $row['current_auction_id'] = $item->getCurrentAuctionId();
         $row['item_name'] = $item->getItemName();
-        $row['item_description'] = $item->getItemDescription();
-        $row['item_condition'] = $item->getItemCondition();
+        $row['is_deleted'] = $item->isDeleted() ? 1 : 0;
+        $row['is_sold'] = $item->isSold() ? 1 : 0;
         return $row;
     }
 
     public function create(Item $item): ?Item {
         try {
             $params = $this->extract($item);
-            $sql = "INSERT INTO items (seller_id, item_name, item_description, 
-                        item_condition, category_id)
-                    VALUES (:seller_id, :item_name, :item_description, 
-                        :item_condition, :category_id)";
+
+            // Updated SQL Insert
+            $sql = "INSERT INTO items (seller_id, current_auction_id, item_name, is_deleted, is_sold)
+                    VALUES (:seller_id, :current_auction_id, :item_name, :is_deleted, :is_sold)";
+
             $result = $this->db->query($sql, $params);
 
-            $id = (int)$this->db->connection->lastInsertId();
-            $item->setItemId($id);
-            return $item;
+            if ($result) {
+                $id = (int)$this->db->connection->lastInsertId();
+                $item->setItemId($id);
+                return $item;
+            }
+            return null;
         } catch (PDOException $e) {
             // TODO: add logging
             return null;
+        }
+    }
+
+    // You will likely need an update method to link the auction later
+    public function update(Item $item): bool {
+        try {
+            $params = $this->extract($item);
+            $params['id'] = $item->getItemId();
+
+            $sql = "UPDATE items SET 
+                        seller_id = :seller_id,
+                        current_auction_id = :current_auction_id,
+                        item_name = :item_name,
+                        is_deleted = :is_deleted,
+                        is_sold = :is_sold
+                    WHERE id = :id";
+
+            $this->db->query($sql, $params);
+            return true;
+        } catch (PDOException $e) {
+            return false;
         }
     }
 }

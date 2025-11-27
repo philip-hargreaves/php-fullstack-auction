@@ -1,6 +1,6 @@
 <?php
 
-use app\repositories\ItemImageRepository;
+use app\repositories\AuctionImageRepository;
 use app\repositories\UserRepository;
 use app\repositories\RoleRepository;
 use app\repositories\ItemRepository;
@@ -50,7 +50,7 @@ DIContainer::bind('bidRepo', new BidRepository(
     DIContainer::get('userRepo'),
     DIContainer::get('auctionRepo')));
 
-DIContainer::bind('itemImageRepo', new ItemImageRepository(
+DIContainer::bind('auctionImageRepo', new AuctionImageRepository(
     DIContainer::get('db')
 ));
 
@@ -60,8 +60,8 @@ DIContainer::bind('itemServ', new ItemService(
 ));
 
 DIContainer::bind('imageServ', new ImageService(
-    DIContainer::get('itemImageRepo'),
-    DIContainer::get('itemRepo'),
+    DIContainer::get('auctionImageRepo'),
+    DIContainer::get('auctionRepo'),
     DIContainer::get('db')));
 
 // Bind Services (they depend on repositories)
@@ -94,6 +94,7 @@ DIContainer::bind('roleServ', new RoleService(
 DIContainer::bind('auctionServ', new AuctionService(
     DIContainer::get('db'),
     DIContainer::get('auctionRepo'),
+    DIContainer::get('itemRepo'),
     DIContainer::get('itemServ'),
     DIContainer::get('imageServ'),
     DIContainer::get('bidServ')));

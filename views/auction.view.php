@@ -21,9 +21,11 @@
  * @var $statusTextSmall string
  * @var $bids array
  * @var $highestBid
- * @var $itemCondition string
+ * @var $condition string
  * @var $currencyText string
  * @var $timeText string
+ * @var $itemIsSold bool
+ * @var $itemIsDeleted bool
  */
 ?>
 
@@ -79,7 +81,16 @@
             <!-- Auction Content -->
             <div class="card bg-light p-3 mb-3">
                 <!-- Display Data Depending on Auction Status -->
-                <?php if ($auctionStatus == 'Scheduled'): ?>
+                <?php if ($itemIsDeleted): ?>
+                    <h4 class="text-danger"><?= $statusText ?></h4>
+                    <p class="small mb-1 mt-1"><?= $statusTextSmall ?></p>
+                <?php elseif ($itemIsSold): ?>
+                    <h4 class="text-danger"><?= $statusText ?></h4>
+                    <p class="small mb-1 mt-1"><?= $statusTextSmall ?></p>
+                    <hr class="mb-3">
+                    <p class="text mb-2">Ended on: <?= date_format($endTime, 'j M Y,  H:i') ?></p>
+                    <h6 class="text mb-0"><?= $bidText ?> : £<?= number_format($highestBidAmount, 2) ?></h6>
+                <?php elseif ($auctionStatus == 'Scheduled'): ?>
                     <h4 class="text-danger"><?= $statusText ?></h4>
                     <p class="small mb-1 mt-1"><?= $statusTextSmall ?></p>
                     <hr class="mb-3">
@@ -134,7 +145,7 @@
                             Sign In to Place Bid
                         </button>
                     <?php endif; ?>
-                <?php elseif ($auctionStatus == 'Sold'): ?>
+                <?php elseif ($auctionStatus == 'Finished'): ?>
                     <h4 class="text-success"><?= $statusText ?></h4>
                     <p class="small mb-2 mt-1"><?= $statusTextSmall ?></p>
                     <p class="small mb-2">Ended on: <?= date_format($endTime, 'j M Y,  H:i') ?></p>
@@ -143,15 +154,6 @@
                         <?= $bidText ?>
                         <span class="text-danger">£<?= number_format($highestBidAmount, 2) ?></span>
                     </h6>
-                <?php elseif ($auctionStatus == 'Unsold'): ?>
-                    <h4 class="text-danger"><?= $statusText ?></h4>
-                    <p class="small mb-1 mt-1"><?= $statusTextSmall ?></p>
-                    <hr class="mb-3">
-                    <p class="text mb-2">Ended on: <?= date_format($endTime, 'j M Y,  H:i') ?></p>
-                    <h6 class="text mb-0"><?= $bidText ?> : £<?= number_format($highestBidAmount, 2) ?></h6>
-                <?php elseif ($auctionStatus == 'Deleted'): ?>
-                    <h4 class="text-danger"><?= $statusText ?></h4>
-                    <p class="small mb-1 mt-1"><?= $statusTextSmall ?></p>
                 <?php else: ?>
                     <!-- lead to index page -->
                 <?php endif; ?>
@@ -288,7 +290,7 @@
                     </tr>
 
                     <tr>
-                        <td class="text">Status</td>
+                        <td class="text">Auction Status</td>
                         <td class="text-end">
                             <?php $badgeColor = ($auctionStatus === 'Active') ? 'bg-success' : 'bg-secondary'; ?>
                             <span class="badge rounded-pill <?= $badgeColor ?>">
@@ -298,9 +300,19 @@
                     </tr>
 
                     <tr>
+                        <td class="text">Item Status</td>
+                        <td class="text-end">
+                            <?php $badgeColor = ($itemIsSold) ? 'bg-success' : 'bg-secondary'; ?>
+                            <span class="badge rounded-pill <?= $badgeColor ?>">
+                            <?= htmlspecialchars($itemIsSold ? "Sold" : "Not Sold") ?>
+                        </span>
+                        </td>
+                    </tr>
+
+                    <tr>
                         <td class="text">Condition</td>
                         <td class="text-end fw-bold">
-                            <?= htmlspecialchars($itemCondition) ?>
+                            <?= htmlspecialchars($condition) ?>
                         </td>
                     </tr>
 

@@ -27,14 +27,9 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
             </div>
 
             <div class="card">
-
                 <div class="card-body">
-                    <!-- Note: This form does not do any dynamic / client-side /
-                    JavaScript-based validation of data. -->
                     <form method="POST" id="create-auction-form" action="/create-auction" enctype="multipart/form-data">
-
                         <!-- item name-->
-
                         <div class="form-group row">
                             <label for="item_name" class="col-sm-2 col-form-label text-left">Item Name</label>
                             <div class="col-sm-10">
@@ -45,7 +40,7 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
                                        value="<?= htmlspecialchars($oldInput['item_name'] ?? '') ?>"
                                        placeholder="Item name"
                                        required>
-                                <small id="titleHelp" class="form-text text-muted"><span class="text-danger">* Required.</span></small>
+                                <small id="titleHelp" class="form-text text-muted"><span class="text-danger">* Required.</span> Item name cannot be changed after created.</small>
                             </div>
                         </div>
                         <!-- item name error -->
@@ -57,30 +52,30 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
 
                         <!-- item description -->
                         <div class="form-group row">
-                            <label for="item_description" class="col-sm-2 col-form-label text-left">Item Description</label>
+                            <label for="auction_description" class="col-sm-2 col-form-label text-left">Item Description</label>
                             <div class="col-sm-10">
                                 <input type="text"
                                        class="form-control"
-                                       id="item_description"
-                                       name = "item_description"
-                                       value="<?= htmlspecialchars($oldInput['item_description'] ?? '') ?>"
+                                       id="auction_description"
+                                       name = "auction_description"
+                                       value="<?= htmlspecialchars($oldInput['auction_description'] ?? '') ?>"
                                        placeholder="Item Description"
                                        required>
                                 <small id="titleHelp" class="form-text text-muted"><span class="text-danger">* Required.</span></small>
                             </div>
                         </div>
                         <!-- item description error handling -->
-                        <?php if (!empty($exception['item_description'])): ?>
+                        <?php if (!empty($exception['auction_description'])): ?>
                             <div class = "text-danger">
-                                <?= $exception['item_description'] ?>
+                                <?= $exception['auction_description'] ?>
                             </div>
                         <?php endif ?>
 
                         <!-- item condition -->
                         <div class="form-group row">
-                            <label for="item_condition" class="col-sm-2 col-form-label text-left">Item Condition</label>
+                            <label for="auction_condition" class="col-sm-2 col-form-label text-left">Item Condition</label>
                             <div class="col-sm-10">
-                                <select class="form-control" id="item_condition" name="item_condition">
+                                <select class="form-control" id="auction_condition" name="auction_condition">
                                     <option value="">Select a condition</option>
                                     <option value="New">New</option>
                                     <option value="Like New">Like New</option>
@@ -90,9 +85,9 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
                             </div>
                         </div>
                         <!-- item condition error handling -->
-                        <?php if (!empty($exception['item_condition'])): ?>
+                        <?php if (!empty($exception['auction_condition'])): ?>
                             <div class = "text-danger">
-                                <?= $exception['item_condition'] ?>
+                                <?= $exception['auction_condition'] ?>
                             </div>
                         <?php endif ?>
 
