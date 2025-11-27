@@ -31,7 +31,7 @@ class Auction
         float $startingPrice,
         ?float $reservePrice,
         string $auctionStatus,
-        int $isDeleted
+        int $isDeleted = 0
     ) {
         $this->auctionId = $auctionId;
         $this->itemId = $itemId;
