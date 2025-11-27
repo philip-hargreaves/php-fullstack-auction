@@ -29,17 +29,17 @@ class RoleService {
         // Fetch and check user exists
         $user = $this->userRepository->getById($userId);
         if ($user === null) {
-            return $this->response('User not found.');
+            return Utilities::creationResult('User not found.', false, null);
         }
 
         if ($user->isSeller()) {
-            return $this->response('You are already a seller!');
+            return Utilities::creationResult('You are already a seller!', false, null);
         }
 
         // Get seller role from database
         $sellerRole = $this->roleRepository->getByName('seller');
         if ($sellerRole === null) {
-            return $this->response('Seller role not found in system. Please contact support.');
+            return Utilities::creationResult('Seller role not found in system. Please contact support.', false, null);
         }
 
         // Get the DB connection
@@ -55,23 +55,16 @@ class RoleService {
             // Commit the transaction
             $pdo->commit();
 
-            return $this->response('Congratulations! You are now a seller. You can create auctions and manage your listings.', true);
+            return Utilities::creationResult('Congratulations! You are now a seller. You can create auctions and manage your listings.', true, null);
+
         } catch (\Throwable $e) {
             // Roll back the transaction to avoid partial state
             if ($pdo->inTransaction()) {
                 $pdo->rollBack();
             }
 
-            return $this->response('Failed to upgrade account. Please try again later.');
+            return Utilities::creationResult('Failed to upgrade account. Please try again later.', false, null);
         }
     }
 
-    // Return a response (success or failure)
-    private function response(string $message, bool $isSuccess = false): array
-    {
-        return [
-            'success' => $isSuccess,
-            'message' => $message,
-        ];
-    }
 }

@@ -20,20 +20,10 @@ class BidRepository
         $this->auctionRepo = $auctionRepo;
     }
 
-    private function hydrate($row) : ?Bid {
+    private function hydrate($row): ?Bid {
         if (empty($row)) {
             return null;
         }
-
-        $buyer = $this->userRepo->getById($row['buyer_id']);
-        $auction = $this->auctionRepo->getById($row['auction_id']);
-
-        if ($buyer === null || $auction === null)
-        {
-            return null;
-        }
-
-        // Create the object using constructor
         $object = new Bid(
             (int)$row['id'],
             (int)$row['buyer_id'],
@@ -43,15 +33,20 @@ class BidRepository
         );
 
         // Set relationship properties
-//        $buyer = $this->userRepo->getUserById($row['buyer_id']);
+        $buyer = $this->userRepo->getById($row['buyer_id']);
+        $auction = $this->auctionRepo->getById($row['auction_id']);
+
+        if ($buyer === null || $auction === null)
+        {
+            return null;
+        }
         $object->setBuyer($buyer);
         $object->setAuction($auction);
 
         return $object;
     }
 
-    private function extract(bid $bid) : array {
-        // Create the object using constructor
+    private function extract(bid $bid): array {
         $row = [];
         $row['buyer_id'] = $bid->getBuyerId();
         $row['auction_id'] = $bid->getAuctionId();
@@ -63,92 +58,107 @@ class BidRepository
 
     public function getById(int $bidId): ?Bid
     {
-        // Query
-        $sql = "SELECT * FROM bids WHERE id = :bid_id";
-        $params = ['bid_id' => $bidId];
-        $row = $this->db->query($sql, $params)->fetch();
+        try {
+            // Query
+            $sql = "SELECT * FROM bids WHERE id = :bid_id";
+            $params = ['bid_id' => $bidId];
+            $row = $this->db->query($sql, $params)->fetch();
 
-        // hydrate() will handle the empty row and return null
-        return $this->hydrate($row);
+            // hydrate() will handle the empty row and return null
+            return $this->hydrate($row);
+        } catch (PDOException $e) {
+            // TODO: add logging
+            return null;
+        }
     }
 
     public function create(Bid $bid): ?Bid
     {
-        $params = $this->extract($bid);
-        $sql = "INSERT INTO bids (buyer_id, auction_id, bid_amount, bid_datetime) 
-                    VALUES (:buyer_id, :auction_id, :bid_amount, :bid_datetime)";
+        try {
+            $params = $this->extract($bid);
+            $sql = "INSERT INTO bids (buyer_id, auction_id, bid_amount, bid_datetime) 
+                VALUES (:buyer_id, :auction_id, :bid_amount, :bid_datetime)";
 
-        $result = $this->db->query($sql, $params);
+            $result = $this->db->query($sql, $params);
 
-        // Check if the insert was successful.
-        if ($result) {
-            $id = (int)$this->db->connection->lastInsertId();
-            $bid->setBidId($id);
-            return $bid;
-        } else {
+            // Check if the insert was successful.
+            if ($result) {
+                $id = (int)$this->db->connection->lastInsertId();
+                $bid->setBidId($id);
+                return $bid;
+            } else {
+                return null;
+            }
+        } catch (PDOException $e) {
+            // TODO: add logging
             return null;
         }
     }
 
     public function getHighestBidByAuctionId(int $auctionId): ?Bid
     {
-        $sql = "SELECT * FROM bids 
-                WHERE auction_id = :auction_id 
-                ORDER BY bid_amount DESC 
-                LIMIT 1";
-        $params = ['auction_id' => $auctionId];
-        $row = $this->db->query($sql, $params)->fetch();
+        try {
+            $sql = "SELECT * FROM bids 
+                    WHERE auction_id = :auction_id 
+                    ORDER BY bid_amount DESC 
+                    LIMIT 1";
+            $params = ['auction_id' => $auctionId];
+            $row = $this->db->query($sql, $params)->fetch();
 
-        // hydrate will handle the empty row and return null
-        return $this->hydrate($row);
+            // hydrate will handle the empty row and return null
+            return $this->hydrate($row);
+        } catch (PDOException $e) {
+            // TODO: add logging
+            return null;
+        }
     }
 
     public function getByAuctionId(int $auctionId): array {
-        $sql = "SELECT * FROM bids 
+        try {
+            $sql = "SELECT * FROM bids 
             WHERE auction_id = :auction_id
             ORDER BY bid_datetime DESC"; // sort by date descending
 
-        $params = ['auction_id' => $auctionId];
-        $rows = $this->db->query($sql, $params)->fetchAll();
+            $params = ['auction_id' => $auctionId];
+            $rows = $this->db->query($sql, $params)->fetchAll();
 
-        // Hydrate all rows to objects
-        $objects = [];
-        foreach ($rows as $row) {
-            $objects[] = $this->hydrate($row);
+            // Hydrate all rows to objects
+            $objects = [];
+            foreach ($rows as $row) {
+                $objects[] = $this->hydrate($row);
+            }
+
+            return $objects;
+        } catch (PDOException $e) {
+            // TODO: add logging
+            return [];
         }
-
-        return $objects;
     }
 
-    public function getByUserId(int $userId): array
-    {
+    public function getByUserId(int $userId): array {
         try {
-            $sql = "SELECT * FROM bids
-                    WHERE buyer_id = :user_id
+            $sql = "SELECT * FROM bids WHERE buyer_id = :user_id
                     ORDER BY bid_datetime DESC";
             $params = ['user_id' => $userId];
             $rows = $this->db->query($sql, $params)->fetchAll();
 
             return $this->hydrateMany($rows);
         } catch (PDOException $e) {
-            // error_log($e->getMessage());
+            // TODO: add logging
             return [];
         }
     }
 
-    public function hydrateMany(array $rows): array
-    {
-        $bids = [];
+    public function hydrateMany(array $rows): array {
+        $objects = [];
 
         foreach ($rows as $row) {
-            $bid = $this->hydrate($row);
+            $object = $this->hydrate($row);
 
-            if ($bid != null) {
-                $bids[] = $bid;
+            if ($object != null) {
+                $objects[] = $object;
             }
         }
-        return $bids;
+        return $objects;
     }
-
-
 }

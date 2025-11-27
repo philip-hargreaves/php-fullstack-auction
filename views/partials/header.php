@@ -24,8 +24,9 @@ $isSeller = AuthService::hasRole('seller');
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!-- Bootstrap and FontAwesome CSS -->
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/bootstrap.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- <link rel="stylesheet" href="/css/font-awesome.min.css"> -->
     <!-- Global CSS - Site-wide styles and variables -->
     <link rel="stylesheet" href="/css/global.css">
     <!-- Component-specific CSS files -->
@@ -39,6 +40,7 @@ $isSeller = AuthService::hasRole('seller');
     <link rel="stylesheet" href="/css/create-auction.css">
     <link rel="stylesheet" href="/css/auction-page.css">
     <link rel="stylesheet" href="/css/alert.css">
+    <link rel="stylesheet" href="/css/uploaded-images.css">
     <title>Auctivity</title>
 </head>
 <body>
@@ -71,7 +73,7 @@ $isSeller = AuthService::hasRole('seller');
         <?php if ($isLoggedIn): ?>
         <div class="middle-section">
             <?php if ($isBuyer): ?>
-                <a href="/mybids" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/mybids') !== false ? 'active' : '' ?>">My Bids</a>
+                <a href="/my-bids" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/my-bids') !== false ? 'active' : '' ?>">My Bids</a>
                 <a href="/watchlist" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/watchlist') !== false ? 'active' : '' ?>">Watchlist</a>
             <?php endif; ?>
 
@@ -97,7 +99,9 @@ $isSeller = AuthService::hasRole('seller');
                 <a href="/account" class="nav-button" style="color: var(--color-text-primary) !important; text-decoration: none !important;">Account</a>
                 <a href="/logout" class="nav-button" style="color: var(--color-text-primary) !important; text-decoration: none !important;">Logout</a>
             <?php else: ?>
-                <button type="button" class="nav-button" data-toggle="modal" data-target="#loginModal">Log in</button>
+                <button type="button" class="nav-button" onclick="window.location.href='/register'" style="padding-right: 4px; color: var(--color-text-secondary) !important;">Register</button>
+                <span style="color: var(--color-text-secondary); margin: 0;">or</span>
+                <button type="button" class="nav-button" data-toggle="modal" data-target="#loginModal" style="padding-left: 4px; color: var(--color-text-secondary) !important;">Log in</button>
             <?php endif; ?>
         </div>
     </div>
@@ -184,14 +188,16 @@ $isSeller = AuthService::hasRole('seller');
             <div class="modal-body">
                 <form method="POST" action="/login">
                     <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
+                        <label for="email_or_username">Email or Username</label>
+                        <input type="text" class="form-control" id="email_or_username" name="email_or_username" placeholder="Email or username" required>
                     </div>
                     <div class="form-group">
                         <label for="password">Password</label>
                         <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
                     </div>
-                    <button type="submit" class="btn btn-primary form-control">Sign in</button>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-danger form-control">Sign in</button>
+                    </div>
                 </form>
                 <div class="text-center">or <a href="/register">create an account</a></div>
             </div>

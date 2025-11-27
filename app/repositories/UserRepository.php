@@ -2,6 +2,7 @@
 namespace app\repositories;
 use app\models\User;
 use infrastructure\Database;
+use infrastructure\Utilities;
 use PDOException;
 
 // Data access for user
@@ -26,8 +27,24 @@ class UserRepository
                   LEFT JOIN user_roles ur ON u.id = ur.user_id
                   LEFT JOIN roles r       ON ur.role_id = r.id
                   WHERE u.email = :email";
-        $param = ['email' => $email];
-        $rows = $this->db->query($sql, $param)->fetchAll();
+        $params = ['email' => $email];
+        $rows = $this->db->query($sql, $params)->fetchAll();
+
+        return empty($rows) ? null : $this->hydrate($rows);
+    }
+
+    // Find user by email OR username
+    public function getByEmailOrUsername(string $emailOrUsername): ?User
+    {
+        // *** CHECK ONE QUERY REDUNDANT DATA VS TWO QUERIES WITH NO REDUNDANT DATA ***
+        $sql = "SELECT u.id, u.username, u.email, u.password, u.is_active,
+                     r.id AS role_id, r.role_name
+              FROM users u
+              LEFT JOIN user_roles ur ON u.id = ur.user_id
+              LEFT JOIN roles r       ON ur.role_id = r.id
+              WHERE u.email = :emailOrUsername OR u.username = :emailOrUsername";
+        $params = ['emailOrUsername' => $emailOrUsername];
+        $rows = $this->db->query($sql, $params)->fetchAll();
 
         return empty($rows) ? null : $this->hydrate($rows);
     }
@@ -42,8 +59,8 @@ class UserRepository
                   LEFT JOIN user_roles ur ON u.id = ur.user_id
                   LEFT JOIN roles r       ON ur.role_id = r.id
                   WHERE u.id = :id";
-        $param = ['id' => $userId];
-        $rows = $this->db->query($sql, $param)->fetchAll();
+        $params = ['id' => $userId];
+        $rows = $this->db->query($sql, $params)->fetchAll();
 
         return empty($rows) ? null : $this->hydrate($rows);
     }
@@ -52,9 +69,9 @@ class UserRepository
     public function existsByEmail(string $email): bool
     {
         $sql = 'SELECT 1 FROM users WHERE email = :email LIMIT 1';
-        $param = ['email' => $email];
+        $params = ['email' => $email];
         return $this->db
-                ->query($sql, $param)
+                ->query($sql, $params)
                 ->fetchColumn() !== false;
     }
 
@@ -83,7 +100,6 @@ class UserRepository
             $sql = 'INSERT INTO users (username, email, password, is_active)
                     VALUES (:username, :email, :password, :is_active)';
             $params = $this->extract($user);
-
             $this->db->query($sql, $params);
 
             $user->setUserId((int)$this->db->connection->lastInsertId());
@@ -95,8 +111,11 @@ class UserRepository
         }
     }
 
-    private function hydrate(array $rows): User
+    private function hydrate(array $rows): ?User
     {
+        if (empty($rows)) {
+            return null;
+        }
         $user = new User(
             (int)$rows[0]['id'],
             $rows[0]['username'],

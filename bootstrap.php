@@ -1,6 +1,6 @@
 <?php
 
-use app\repositories\ImageRepository;
+use app\repositories\ItemImageRepository;
 use app\repositories\UserRepository;
 use app\repositories\RoleRepository;
 use app\repositories\ItemRepository;
@@ -10,15 +10,14 @@ use app\repositories\UserRoleRepository;
 use app\repositories\WatchlistRepository;
 use app\services\BidService;
 use app\services\AuthService;
-use app\services\CreateAuctionService;
-use app\services\RegistrationService;
 use app\services\AuctionService;
+use app\services\RegistrationService;
 use app\services\WatchlistService;
-use app\services\UploadImageService;
+use app\services\ImageService;
 use infrastructure\Database;
 use infrastructure\DIContainer;
 use app\services\RoleService;
-use app\services\CreateItemService;
+use app\services\ItemService;
 
 // --- Build all objects and bind them to the App Container ---
 // Bind the Database first (it has no dependencies)
@@ -51,18 +50,19 @@ DIContainer::bind('bidRepo', new BidRepository(
     DIContainer::get('userRepo'),
     DIContainer::get('auctionRepo')));
 
-DIContainer::bind('imageRepo', new ImageRepository(
+DIContainer::bind('itemImageRepo', new ItemImageRepository(
     DIContainer::get('db')
 ));
 
-DIContainer::bind('createItemService', new CreateItemService(
-    //DIContainer::get('db'),
-    DIContainer::get('itemRepo')
+DIContainer::bind('itemServ', new ItemService(
+    DIContainer::get('itemRepo'),
+    DIContainer::get('userRepo')
 ));
 
-DIContainer::bind('uploadImageService', new UploadImageService(
-    DIContainer::get('imageRepo'),
-));
+DIContainer::bind('imageServ', new ImageService(
+    DIContainer::get('itemImageRepo'),
+    DIContainer::get('itemRepo'),
+    DIContainer::get('db')));
 
 // Bind Services (they depend on repositories)
 DIContainer::bind('bidServ', new BidService(
@@ -83,8 +83,7 @@ DIContainer::bind('registrationServ', new RegistrationService(
 DIContainer::bind('watchlistServ', new WatchlistService(
     DIContainer::get('watchlistRepo'),
     DIContainer::get('auctionRepo'),
-    DIContainer::get('bidServ')
-));
+    DIContainer::get('bidServ')));
 
 DIContainer::bind('roleServ', new RoleService(
     DIContainer::get('userRepo'),
@@ -93,12 +92,8 @@ DIContainer::bind('roleServ', new RoleService(
     DIContainer::get('db')));
 
 DIContainer::bind('auctionServ', new AuctionService(
-    DIContainer::get('auctionRepo'),
-    DIContainer::get('bidServ')));
-
-DIContainer ::bind('createAuctionService', new CreateAuctionService(
     DIContainer::get('db'),
     DIContainer::get('auctionRepo'),
-    DIContainer::get('createItemService'),
-    DIContainer::get('uploadImageService'),
-));
+    DIContainer::get('itemServ'),
+    DIContainer::get('imageServ'),
+    DIContainer::get('bidServ')));
