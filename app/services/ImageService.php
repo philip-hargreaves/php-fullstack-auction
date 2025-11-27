@@ -2,39 +2,39 @@
 
 namespace app\services;
 
-use app\models\Item;
-use app\models\ItemImage;
-use app\repositories\ItemImageRepository;
-use app\repositories\ItemRepository;
+use app\models\Auction;
+use app\models\AuctionImage;
+use app\repositories\AuctionImageRepository;
+use app\repositories\AuctionRepository;
 use DateTime;
 use infrastructure\Database;
 use infrastructure\Utilities;
 use PDOException;
 
-// ImageService provides services for all image related models (ItemImage, ProfileImage etc.)
+// ImageService provides services for all image related models
 class ImageService
 {
-    private ItemImageRepository $itemImageRepo;
-    private ItemRepository $itemRepo;
+    private AuctionImageRepository $auctionImageRepo;
+    private AuctionRepository $auctionRepo;
     private Database $db;
 
-    public function __construct(ItemImageRepository $itemImageRepo, ItemRepository $itemRepo, Database $db) {
-        $this->itemImageRepo = $itemImageRepo;
-        $this->itemRepo = $itemRepo;
+    public function __construct(AuctionImageRepository $auctionImageRepo, AuctionRepository $auctionRepo, Database $db) {
+        $this->auctionImageRepo = $auctionImageRepo;
+        $this->auctionRepo = $auctionRepo;
         $this->db = $db;
     }
 
-    public function uploadItemImages(Item $item, array $inputs): array {
+    public function uploadAuctionImages(Auction $auction, array $inputs): array {
         // $inputs offer: an array of multiple [image_url, is_main]
 
-        // Validate Item ID
-        if (!filter_var($item->getItemId(), FILTER_VALIDATE_INT)) {
-            return Utilities::creationResult("Failed to create an auction.", false, null);
+        // Validate Auction ID
+        if ($auction->getAuctionId() === null) {
+            return Utilities::creationResult("Invalid auction ID.", false, null);
         }
 
-        // Check if item exists
-        if (is_null($this->itemRepo->getById($item->getItemId()))) {
-            return Utilities::creationResult("Failed to create an auction.", false, null);
+        // Check if auction exists
+        if (is_null($this->auctionRepo->getById($auction->getAuctionId()))) {
+            return Utilities::creationResult("Auction not found.", false, null);
         }
 
         // Check the image count (1 <= count <= 10)
@@ -45,14 +45,14 @@ class ImageService
             return Utilities::creationResult("Please upload no more than 10 image.", false, null);
         }
 
-        $itemImages = [];
+        $auctionImages = [];
         $hasMainImage = false;
 
         // Loop through inputs
         foreach ($inputs as $index => $rawInput)
         {
-            // Validates input for auction, and fix data type
-            $validationResult = $this->validateAndFixItemImageInput($rawInput, "Image {$index}");
+            // Validates input for image
+            $validationResult = $this->validateAndFixImageInput($rawInput, "Image {$index}");
 
             // If validation fails, skip this specific image
             if ($validationResult['success'] === false) {
@@ -71,33 +71,35 @@ class ImageService
             }
 
             // Create Object
-            $itemImage = new ItemImage(
-                0,
-                $item->getItemId(),
+            // Constructor: int $auctionId, string $imageUrl, int|bool $isMain, string|DateTime $uploadedDatetime, ?int $imageId = null
+            $auctionImage = new AuctionImage(
+                $auction->getAuctionId(),
                 $cleanInput['image_url'],
                 $cleanInput['is_main'],
                 new DateTime()
             );
 
             // Execute insertion
-            $itemImage = $this->itemImageRepo->create($itemImage);
+            $savedImage = $this->auctionImageRepo->create($auctionImage);
 
-            $itemImages[] = $itemImage;
+            if ($savedImage) {
+                $auctionImages[] = $savedImage;
+            }
         }
 
         // Safety Net: If NO image was marked as main after the loop, make the first one main
-        if (!$hasMainImage && count($itemImages) > 0) {
-            $firstImage = $itemImages[0];
+        if (!$hasMainImage && count($auctionImages) > 0) {
+            $firstImage = $auctionImages[0];
 
             // Update is_main in db
             $firstImage->setIsMain(true);
-            $this->itemImageRepo->update($firstImage);
+            $this->auctionImageRepo->update($firstImage);
         }
 
-        return Utilities::creationResult("Item images successfully created.", true, $itemImages);
+        return Utilities::creationResult("Auction images successfully created.", true, $auctionImages);
     }
 
-    private function validateAndFixItemImageInput(array $input, string $imageName) : array
+    private function validateAndFixImageInput(array $input, string $imageName) : array
     {
         // Validate Image URL
         $url = isset($input['image_url']) ? trim($input['image_url']) : '';
@@ -106,8 +108,8 @@ class ImageService
             return Utilities::creationResult("{$imageName} does not have a valid url.", false, null);
         }
 
-        // DB Limit check (VARCHAR 1024)
-        if (strlen($url) > 1024) {
+        // DB Limit check (VARCHAR 2048 based on new schema)
+        if (strlen($url) > 2048) {
             return Utilities::creationResult("The url of {$imageName} is too long.", false, null);
         }
         $input['image_url'] = $url;
@@ -119,7 +121,7 @@ class ImageService
         return Utilities::creationResult('', true, $input);
     }
 
-    public function updateImage(ItemImage $image): bool
+    public function updateImage(AuctionImage $image): bool
     {
         $pdo = $this->db->connection;
         $startedTransaction = false;
@@ -131,13 +133,13 @@ class ImageService
                 $startedTransaction = true;
             }
 
-            // Business Logic: Only one main image allowed
+            // Business Logic: Only one main image allowed per auction
             if ($image->isMain()) {
-                $this->itemImageRepo->resetMainImageFlags($image->getItemId(), $image->getImageId());
+                $this->auctionImageRepo->resetMainImageFlags($image->getAuctionId(), $image->getImageId());
             }
 
             // Perform the Update
-            $this->itemImageRepo->update($image);
+            $this->auctionImageRepo->update($image);
 
             // Only commit if this function started the transaction.
             if ($startedTransaction) {

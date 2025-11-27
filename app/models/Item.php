@@ -5,36 +5,36 @@ namespace app\models;
 class Item
 {
     // PROPERTIES
-    private int $itemId;
-    private ?int $sellerId;
-    private ?int $categoryId;
+    private ?int $itemId = null;
+    private ?int $sellerId = null;
+    private ?int $currentAuctionId = null;
     private string $itemName;
-    private string $itemDescription;
-    private string $itemCondition; // enum('new','like new','used')
+    private bool $isDeleted = false;
+    private bool $isSold = false;
 
     // RELATIONSHIP PROPERTIES
     private ?User $seller = null;
-    private ?Category $category = null;
 
     // CONSTRUCTOR
     public function __construct(
-        int $itemId,
-        ?int $sellerId,
-        ?int $categoryId,
         string $itemName,
-        string $itemDescription,
-        string $itemCondition
+        ?int $sellerId = null,
+        ?int $itemId = null,
+        ?int $currentAuctionId = null,
+        bool $isDeleted = false,
+        bool $isSold = false
     ) {
-        $this->itemId = $itemId;
-        $this->sellerId = $sellerId;
-        $this->categoryId = $categoryId;
         $this->itemName = $itemName;
-        $this->itemDescription = $itemDescription;
-        $this->itemCondition = $itemCondition;
+        $this->sellerId = $sellerId;
+        $this->itemId = $itemId;
+        $this->currentAuctionId = $currentAuctionId;
+        $this->isDeleted = $isDeleted;
+        $this->isSold = $isSold;
     }
 
     // GETTERS
-    public function getItemId(): int
+
+    public function getItemId(): ?int
     {
         return $this->itemId;
     }
@@ -44,9 +44,9 @@ class Item
         return $this->sellerId;
     }
 
-    public function getCategoryId(): ?int
+    public function getCurrentAuctionId(): ?int
     {
-        return $this->categoryId;
+        return $this->currentAuctionId;
     }
 
     public function getItemName(): string
@@ -54,45 +54,51 @@ class Item
         return $this->itemName;
     }
 
-    public function getItemDescription(): string
+    public function isDeleted(): bool
     {
-        return $this->itemDescription;
+        return $this->isDeleted;
     }
 
-    public function getItemCondition(): string
+    public function isSold(): bool
     {
-        return $this->itemCondition;
+        return $this->isSold;
     }
 
     // SETTERS
+
+    public function setItemId(?int $itemId): void
+    {
+        $this->itemId = $itemId;
+    }
+
+    public function setSellerId(?int $sellerId): void
+    {
+        $this->sellerId = $sellerId;
+    }
+
+    public function setCurrentAuctionId(?int $currentAuctionId): void
+    {
+        $this->currentAuctionId = $currentAuctionId;
+    }
+
     public function setItemName(string $itemName): void
     {
         $this->itemName = $itemName;
     }
 
-    public function setItemDescription(string $itemDescription): void
+    public function setIsDeleted(bool $isDeleted): void
     {
-        $this->itemDescription = $itemDescription;
+        $this->isDeleted = $isDeleted;
     }
 
-    public function setItemCondition(string $itemCondition): void
+    public function setIsSold(bool $isSold): void
     {
-        // Add Validation ('new', 'like new', 'used')
-        $this->itemCondition = $itemCondition;
-    }
-
-    public function setItemId(int $itemId): void
-    {
-        $this->itemId = $itemId;
-    }
-
-    public function setCategoryId(int $categoryId): void {
-        $this->categoryId = $categoryId;
+        $this->isSold = $isSold;
     }
 
     // RELATIONSHIP GETTERS/SETTERS
 
-    public function setSeller(User $seller): void
+    public function setSeller(?User $seller): void
     {
         $this->seller = $seller;
     }
@@ -100,13 +106,5 @@ class Item
     public function getSeller(): ?User
     {
         return $this->seller;
-    }
-
-    public function getCategory(): ?Category {
-        return $this->category;
-    }
-
-    public function setCategory(Category $category): void {
-        $this->category = $category;
     }
 }

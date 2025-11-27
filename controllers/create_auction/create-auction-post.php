@@ -20,21 +20,21 @@ $auctionService = DIContainer::get('auctionServ');
 $authService = DIContainer::get('authServ');
 
 try {
-    // $itemInput should offer: seller_id, item_name, item_description, item_condition
+    // $itemInput should offer: seller_id, item_name
     $itemInput = [
         'seller_id'         => $authService->getUserId(),
-        'item_name'         => Request::post('item_name'),
-        'item_description'  => Request::post('item_description'),
-        'item_condition'    => Request::post('item_condition'),
-        'category_id'       => 1 // Request::post('category_id')
+        'item_name'         => Request::post('item_name')
     ];
 
-    // $auctionInput should offer: start_datetime, end_datetime, starting_price, reserve_price
+    // $auctionInput should offer: auction_description, auction_condition, category_id, start_datetime, end_datetime, starting_price, reserve_price
     $auctionInput = [
         'start_datetime'    => Request::post('start_datetime'),
         'end_datetime'      => Request::post('end_datetime'),
         'starting_price'    => Request::post('starting_price'),
         'reserve_price'     => Request::post('reserve_price'),
+        'auction_description'  => Request::post('auction_description'),
+        'auction_condition'    => Request::post('auction_condition'),
+        'category_id'       => 1 // Request::post('category_id')
     ];
 
     // $imageInputs should offer: an array of multiple [image_url, is_main]

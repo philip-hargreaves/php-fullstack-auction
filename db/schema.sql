@@ -44,37 +44,45 @@ CREATE TABLE categories (
 CREATE TABLE items (
     id INT AUTO_INCREMENT PRIMARY KEY,
     seller_id INT NULL,
-    category_id INT NULL,
-    item_name VARCHAR(100) NOT NULL,
-    item_description TEXT NULL,
-    item_condition ENUM('New', 'Like New', 'Used') NULL,
-    FOREIGN KEY (seller_id) REFERENCES users(id) ON DELETE SET NULL,
-    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL
-   -- ON DELETE Restrict for category_id
-);
+    current_auction_id INT NULL,
+    item_name VARCHAR(255) NOT NULL,
+    is_deleted TINYINT(1) NOT NULL DEFAULT 0,
+    is_sold TINYINT(1) NOT NULL DEFAULT 0,
 
-CREATE TABLE item_images (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    item_id INT NOT NULL,
-    image_url VARCHAR(1024) NOT NULL,
-    is_main TINYINT(1) NOT NULL DEFAULT 0,
-    uploaded_datetime DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE
+    FOREIGN KEY (seller_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
 CREATE TABLE auctions (
     id INT AUTO_INCREMENT PRIMARY KEY,
     item_id INT NOT NULL,
     winning_bid_id INT NULL,
-    start_datetime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    category_id INT NULL,
+    auction_description TEXT NOT NULL,
+    auction_condition ENUM('New', 'Like New', 'Used') NOT NULL,
+    start_datetime DATETIME NOT NULL,
     end_datetime DATETIME NOT NULL,
     starting_price DECIMAL(10, 2) NOT NULL,
     reserve_price DECIMAL(10, 2) NULL,
-    auction_status ENUM('Scheduled', 'Active', 'Sold', 'Unsold', 'Canceled') NOT NULL DEFAULT 'Scheduled',
-    is_deleted TINYINT(1) NOT NULL DEFAULT 0,
+    auction_status ENUM('Scheduled', 'Active', 'Finished') NOT NULL DEFAULT 'Scheduled',
+
     FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE,
+    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL,
     CONSTRAINT chk_auction_times CHECK (end_datetime > start_datetime)
 );
+
+CREATE TABLE auction_images (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    auction_id INT NOT NULL,
+    image_url VARCHAR(2048) NOT NULL,
+    is_main TINYINT(1) NOT NULL DEFAULT 0,
+    uploaded_datetime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (auction_id) REFERENCES auctions(id) ON DELETE CASCADE
+);
+
+ALTER TABLE items
+    ADD CONSTRAINT fk_items_current_auction
+        FOREIGN KEY (current_auction_id) REFERENCES auctions(id) ON DELETE SET NULL;
 
 CREATE TABLE bids (
     id INT AUTO_INCREMENT PRIMARY KEY,

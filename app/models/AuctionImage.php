@@ -4,42 +4,39 @@ namespace app\models;
 
 use DateTime;
 
-class ItemImage
+class AuctionImage
 {
     // PROPERTIES
-    private int $imageId;
-    private int $itemId;
+    private ?int $imageId;
+    private int $auctionId;
     private string $imageUrl;
     private bool $isMain;
     private DateTime $uploadedDatetime;
 
-    // RELATIONSHIP PROPERTIES
-
     // CONSTRUCTOR
     public function __construct(
-        int $imageId,
-        int $itemId,
+        int $auctionId,
         string $imageUrl,
         int|bool $isMain,
-        string|DateTime $uploadedDatetime
-    )
-    {
-        $this->imageId = $imageId;
-        $this->itemId = $itemId;
+        string|DateTime $uploadedDatetime,
+        ?int $imageId = null
+    ) {
+        $this->auctionId = $auctionId;
         $this->imageUrl = $imageUrl;
-        $this->isMain = $isMain;
+        $this->isMain = (bool)$isMain;
         $this->uploadedDatetime = is_string($uploadedDatetime) ? new DateTime($uploadedDatetime) : $uploadedDatetime;
+        $this->imageId = $imageId;
     }
 
     // GETTERS
-    public function getImageId(): int
+    public function getImageId(): ?int
     {
         return $this->imageId;
     }
 
-    public function getItemId(): int
+    public function getAuctionId(): int
     {
-        return $this->itemId;
+        return $this->auctionId;
     }
 
     public function getImageUrl(): string
@@ -58,28 +55,23 @@ class ItemImage
     }
 
     // SETTERS
-    public function setImageId($imageId): void
+    public function setImageId(int $imageId): void
     {
         $this->imageId = $imageId;
     }
 
-    public function setItemId($itemId): void
+    public function setAuctionId(int $auctionId): void
     {
-        $this->itemId = $itemId;
+        $this->auctionId = $auctionId;
     }
 
-    public function setImageUrl($imageUrl): void
+    public function setImageUrl(string $imageUrl): void
     {
         $this->imageUrl = $imageUrl;
     }
 
-    public function setIsMain($isMain): void
+    public function setIsMain(bool $isMain): void
     {
         $this->isMain = $isMain;
-    }
-
-    public function setUploadDatetime(DateTime $uploadDatetime): void
-    {
-        $this->uploadedDatetime = $uploadDatetime;
     }
 }
