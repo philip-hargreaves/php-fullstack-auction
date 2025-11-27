@@ -57,7 +57,7 @@ CREATE TABLE item_images (
     id INT AUTO_INCREMENT PRIMARY KEY,
     item_id INT NOT NULL,
     image_url VARCHAR(1024) NOT NULL,
-    is_main_image TINYINT(1) NOT NULL DEFAULT 0,
+    is_main TINYINT(1) NOT NULL DEFAULT 0,
     uploaded_datetime DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE
 );

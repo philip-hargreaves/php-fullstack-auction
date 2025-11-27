@@ -27,6 +27,7 @@ class Item
     ) {
         $this->itemId = $itemId;
         $this->sellerId = $sellerId;
+        $this->categoryId = $categoryId;
         $this->itemName = $itemName;
         $this->itemDescription = $itemDescription;
         $this->itemCondition = $itemCondition;

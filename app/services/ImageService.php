@@ -133,7 +133,7 @@ class ImageService
 
             // Business Logic: Only one main image allowed
             if ($image->isMain()) {
-                $this->itemImageRepo->resetMainImageFlags($image->getItemId(), $image->id);
+                $this->itemImageRepo->resetMainImageFlags($image->getItemId(), $image->getImageId());
             }
 
             // Perform the Update
