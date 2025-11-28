@@ -165,19 +165,30 @@ class AuctionRepository
             $limit = (int)$limit;
             $offset = (int)$offset;
 
-            // Sorting filters
-            $orderClause = match($orderBy) {
-                'date' => 'start_datetime DESC',           // Newest first
-                'ending_soonest' => 'end_datetime ASC',    // Ending soonest first
-                default => 'end_datetime ASC'
-            };
-
-            $sql = "SELECT * FROM auctions 
+            // Price sorting
+            if ($orderBy === 'pricelow' || $orderBy === 'pricehigh') {
+                $priceOrder = $orderBy === 'pricelow' ? 'ASC' : 'DESC';
+                $sql = "SELECT a.*, COALESCE(MAX(b.bid_amount), a.starting_price) AS current_price
+                    FROM auctions a
+                    LEFT JOIN bids b ON a.id = b.auction_id
+                    WHERE a.auction_status = 'Active'
+                    GROUP BY a.id
+                    ORDER BY current_price {$priceOrder}
+                    LIMIT {$limit} OFFSET {$offset}";
+            } else {
+                // Date Sorting
+                $orderClause = match($orderBy) {
+                    'date' => 'start_datetime DESC',
+                    'ending_soonest' => 'end_datetime ASC',
+                    default => 'end_datetime ASC'
+                };
+                $sql = "SELECT * FROM auctions 
                     WHERE auction_status = 'Active' 
                     ORDER BY {$orderClause}
                     LIMIT {$limit} OFFSET {$offset}";
-            $rows = $this->db->query($sql)->fetchAll();
+            }
 
+            $rows = $this->db->query($sql)->fetchAll();
             return $this->hydrateMany($rows);
         } catch (PDOException $e) {
             // TODO: add logging
