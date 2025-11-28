@@ -242,4 +242,34 @@ class AuctionService
         // Success
         return Utilities::creationResult('', true, $input);
     }
+
+    public function getActiveListings(int $page = 1, int $perPage = 12): array
+    {
+        // Calculate offset for pagination
+        $offset = ($page - 1) * $perPage;
+
+        $auctions = $this->auctionRepo->getActiveAuctions($perPage, $offset);
+        $total = $this->auctionRepo->countActiveAuctions();
+
+        foreach ($auctions as $auction) {
+            // Current price
+            $highestBid = $this->bidService->getHighestBidAmountByAuctionId($auction->getAuctionId());
+            $currentPrice = $highestBid > 0 ? $highestBid : $auction->getStartingPrice();
+            $auction->setCurrentPrice($currentPrice);
+
+            // Bid count
+            $bidCount = $this->bidService->countBidsByAuctionId($auction->getAuctionId());
+            $auction->setBidCount($bidCount);
+
+            // Image URL
+            $imageUrl = $this->imageService->getMainImageUrlByAuctionId($auction->getAuctionId());
+            $auction->setImageUrl($imageUrl);
+        }
+
+        return [
+            'auctions' => $auctions,
+            'total' => $total,
+            'perPage' => $perPage
+        ];
+    }
 }
