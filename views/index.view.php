@@ -118,7 +118,7 @@ require Utilities::basePath('views/partials/header.php');
                                 <path d="M7.75,5.34A1.16,1.16,0,0,0,7,5l-.1,0L6.8,5a1.24,1.24,0,0,0-.74.32L3.21,8.13a.7.7,0,0,0,0,1,.7.7,0,0,0,.5.21.67.67,0,0,0,.49-.2l2-2V18.3a.7.7,0,1,0,1.4,0V7.16l2,1.94a.7.7,0,0,0,1,0,.71.71,0,0,0,0-1Z"></path>
                                 <path d="M20.8,14.88a.7.7,0,0,0-1,0l-2,2V5.7a.7.7,0,1,0-1.4,0V16.84l-2-1.95a.7.7,0,0,0-1,1l2.83,2.76a1.28,1.28,0,0,0,.62.3.85.85,0,0,0,.22,0,.6.6,0,0,0,.24-.05,1.2,1.2,0,0,0,.61-.29l2.85-2.79A.7.7,0,0,0,20.8,14.88Z"></path>
                             </svg>
-                            <span class="sort-text">Newest</span>
+                            <span class="sort-text">Ending Soonest</span>
                         </button>
                         <div class="sort-menu" id="sortMenu">
                             <form method="get" action="/">
@@ -227,7 +227,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Get current sort option from URL
     const urlParams = new URLSearchParams(window.location.search);
-    const currentSort = urlParams.get('order_by') || 'date';
+    const currentSort = urlParams.get('order_by') || 'ending_soonest';
     
     // Update sort text based on current selection
     const sortLabels = {
