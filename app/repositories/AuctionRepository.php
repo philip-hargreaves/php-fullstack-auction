@@ -159,14 +159,22 @@ class AuctionRepository
     }
 
     // Fetches paginated active auctions for the index page
-    public function getActiveAuctions(int $limit = 12, int $offset = 0): array
+    public function getActiveAuctions(int $limit = 12, int $offset = 0, string $orderBy = 'ending_soonest'): array
     {
         try {
             $limit = (int)$limit;
             $offset = (int)$offset;
+
+            // Sorting filters
+            $orderClause = match($orderBy) {
+                'date' => 'start_datetime DESC',           // Newest first
+                'ending_soonest' => 'end_datetime ASC',    // Ending soonest first
+                default => 'end_datetime ASC'
+            };
+
             $sql = "SELECT * FROM auctions 
                     WHERE auction_status = 'Active' 
-                    ORDER BY end_datetime ASC
+                    ORDER BY {$orderClause}
                     LIMIT {$limit} OFFSET {$offset}";
             $rows = $this->db->query($sql)->fetchAll();
 

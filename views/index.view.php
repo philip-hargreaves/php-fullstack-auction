@@ -121,7 +121,7 @@ require Utilities::basePath('views/partials/header.php');
                             <span class="sort-text">Newest</span>
                         </button>
                         <div class="sort-menu" id="sortMenu">
-                            <form method="get" action="index.php">
+                            <form method="get" action="/">
                                 <button type="submit" name="order_by" value="recommended" class="sort-option">Recommended order</button>
                                 <button type="submit" name="order_by" value="date" class="sort-option active">Newest</button>
                                 <button type="submit" name="order_by" value="ending_soonest" class="sort-option">Ending Soonest</button>
@@ -243,6 +243,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Mark active option
+    sortMenu.querySelectorAll('.sort-option').forEach(btn => btn.classList.remove('active'));
     const activeOption = sortMenu.querySelector(`button[value="${currentSort}"]`);
     if (activeOption) {
         activeOption.classList.add('active');

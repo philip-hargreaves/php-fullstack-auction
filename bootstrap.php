@@ -94,7 +94,6 @@ DIContainer::bind('roleServ', new RoleService(
 DIContainer::bind('auctionServ', new AuctionService(
     DIContainer::get('db'),
     DIContainer::get('auctionRepo'),
-    DIContainer::get('itemRepo'),
     DIContainer::get('itemServ'),
     DIContainer::get('imageServ'),
     DIContainer::get('bidServ')));

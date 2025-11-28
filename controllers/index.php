@@ -8,14 +8,14 @@ use infrastructure\DIContainer;
 // Retrieve keyword, category and ordering parameters, defaults are placeholders for now
 $keyword = Request::get('keyword', '');
 $category = Request::get('cat', 'all');
-$ordering = Request::get('order_by', 'date');
+$ordering = Request::get('order_by', 'ending_soonest');
 
 // Handle page number, defaulting to page 1
 $curr_page = Request::get('page', 1);
 $auctionServ = DIContainer::get('auctionServ');
 $results_per_page = 12;
 
-$result = $auctionServ->getActiveListings($curr_page, $results_per_page);
+$result = $auctionServ->getActiveListings($curr_page, $results_per_page, $ordering);
 $auctions = $result['auctions'];
 $num_results = $result['total'];
 $max_page = ceil($num_results / $results_per_page);
