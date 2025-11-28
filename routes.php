@@ -15,7 +15,7 @@ $router->post('/create-auction-result', 'controllers/create-auction-result.php')
 
 // GET Pages
 $router->get('/my-auctions', 'controllers/my-auctions.php');
-$router->get('/mybids', 'controllers/mybids.php');
+$router->get('/my-bids', 'controllers/my-bids.php');
 
 $router->get('/account', 'controllers/account.php');
 $router->post('/account/update', 'controllers/account-update-handler.php');

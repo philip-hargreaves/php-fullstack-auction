@@ -32,7 +32,7 @@ $targetUserRoles = $user->getRoleNames();
 $isTargetUserSeller = in_array('seller', $targetUserRoles);
 
 $auctionServ = DIContainer::get('auctionServ');
-$activeAuctions = $auctionServ->getAuctionsForSeller($targetUserId);
+$activeAuctions = $auctionServ->getByUserId($targetUserId);
 $showSellerSection = $isTargetUserSeller || !empty($activeAuctions);
 
 require Utilities::basePath('views/account.view.php');
