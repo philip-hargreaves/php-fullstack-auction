@@ -123,6 +123,24 @@ class AuctionRepository
         }
     }
 
+    public function getActiveAuctionsBySellerId(int $sellerId): array
+    {
+        try {
+            $sql = "SELECT a.* FROM auctions a
+                    JOIN items i ON a.item_id = i.id
+                    WHERE i.seller_id = :seller_id
+                      AND a.auction_status = 'Active' 
+                    ORDER BY a.end_datetime ASC";
+
+            $params = ['seller_id' => $sellerId];
+            $rows = $this->db->query($sql, $params)->fetchAll();
+
+            return $this->hydrateMany($rows);
+        } catch (PDOException $e) {
+            return [];
+        }
+    }
+
     public function getWatchedAuctionsByUserId(int $userId): array
     {
         try {
