@@ -23,6 +23,8 @@ class Auction
     private ?Item $item = null;
     private ?Category $category = null;
     private ?float $currentPrice = null;
+    private ?int $bidCount = null;
+    private ?string $imageUrl = null;
 
     // CONSTRUCTOR
     public function __construct(
@@ -201,5 +203,25 @@ class Auction
     public function getCurrentPrice(): ?float
     {
         return $this->currentPrice;
+    }
+
+    public function setBidCount(int $bidCount): void
+    {
+        $this->bidCount = $bidCount;
+    }
+
+    public function getBidCount(): ?int
+    {
+        return $this->bidCount;
+    }
+
+    public function setImageUrl(?string $imageUrl): void
+    {
+        $this->imageUrl = $imageUrl;
+    }
+
+    public function getImageUrl(): ?string
+    {
+        return $this->imageUrl;
     }
 }
