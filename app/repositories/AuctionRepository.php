@@ -101,6 +101,34 @@ class AuctionRepository
         }
     }
 
+    public function getActiveAuctions(int $limit = 12, int $offset = 0): array
+    {
+        try {
+            $sql = "SELECT * FROM auctions 
+                    WHERE auction_status = 'Active' 
+                    ORDER BY end_datetime ASC
+                    LIMIT :limit OFFSET :offset";
+            $params = ['limit' => $limit, 'offset' => $offset];
+            $rows = $this->db->query($sql, $params)->fetchAll();
+
+            return $this->hydrateMany($rows);
+        } catch (PDOException $e) {
+            // TODO: add logging
+            return [];
+        }
+    }
+    public function countActiveAuctions(): int
+    {
+        try {
+            $sql = "SELECT COUNT(*) as total FROM auctions WHERE auction_status = 'Active'";
+            $row = $this->db->query($sql)->fetch();
+            return (int)$row['total'];
+        } catch (PDOException $e) {
+            // TODO: add logging
+            return 0;
+        }
+    }
+
     private function hydrateMany(array $rows) : array {
         $auctions = [];
 
