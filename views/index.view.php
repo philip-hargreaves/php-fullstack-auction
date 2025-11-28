@@ -1,7 +1,7 @@
 <?php use infrastructure\Utilities;
 require Utilities::basePath('views/partials/header.php');
 /**
- * @var $dummy_auctions array
+ * @var $processed_auctions array
  * @var $curr_page
  * @var $querystring
  * @var $low_page
@@ -132,44 +132,13 @@ require Utilities::basePath('views/partials/header.php');
                     </div>
                 </div>
                 <div class="auction-gallery">
-            <?php foreach ($dummy_auctions as $auction): 
-                // Generate appropriate image URL based on title keywords
-                $title = strtolower($auction['title']);
-                $imageUrl = '';
-                
-                // Map titles to specific Unsplash photo IDs that match item types
-                // Using Unsplash image IDs for category-specific photos
-                if (stripos($title, 'camera') !== false) {
-                    $imageUrl = "https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=300&h=300&fit=crop";
-                } elseif (stripos($title, 'laptop') !== false || stripos($title, 'gaming') !== false) {
-                    $imageUrl = "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=300&h=300&fit=crop";
-                } elseif (stripos($title, 'chair') !== false || stripos($title, 'antique') !== false) {
-                    $imageUrl = "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=300&h=300&fit=crop";
-                } elseif (stripos($title, 'iphone') !== false || stripos($title, 'smartphone') !== false) {
-                    $imageUrl = "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=300&h=300&fit=crop";
-                } elseif (stripos($title, 'handbag') !== false || stripos($title, 'designer') !== false) {
-                    $imageUrl = "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=300&h=300&fit=crop";
-                } elseif (stripos($title, 'watch') !== false) {
-                    $imageUrl = "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300&h=300&fit=crop";
-                } elseif (stripos($title, 'guitar') !== false) {
-                    $imageUrl = "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300&h=300&fit=crop";
-                } elseif (stripos($title, 'lamp') !== false || stripos($title, 'art deco') !== false) {
-                    $imageUrl = "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=300&h=300&fit=crop";
-                } elseif (stripos($title, 'jacket') !== false || stripos($title, 'leather') !== false) {
-                    $imageUrl = "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=300&h=300&fit=crop";
-                } elseif (stripos($title, 'action figure') !== false || stripos($title, 'collectible') !== false) {
-                    // Toy/action figure image from a reliable source
-                    $imageUrl = "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=300&h=300&fit=crop";
-                } elseif (stripos($title, 'comic') !== false) {
-                    $imageUrl = "https://images.unsplash.com/photo-1532012197267-da84d127e765?w=300&h=300&fit=crop";
-                } else {
-                    // Default: used item placeholder
-                    $imageUrl = "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=300&h=300&fit=crop";
-                }
-            ?>
+                    <?php foreach ($processed_auctions as $auction):
+                        // Use image from database, or default placeholder
+                        $imageUrl = $auction['image_url'] ?? 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=300&h=300&fit=crop';
+                        ?>
                     <div class="auction-card card h-100">
                         <div class="auction-image-container">
-                            <a href="/auction?auction_id=2222">
+                            <a href="/auction?auction_id=<?= htmlspecialchars($auction['auction_id']) ?>">
                                 <img src="<?= htmlspecialchars($imageUrl) ?>" 
                                      alt="<?= htmlspecialchars($auction['title']) ?>" 
                                      class="auction-image card-img-top">
@@ -179,7 +148,7 @@ require Utilities::basePath('views/partials/header.php');
                             <div class="d-flex justify-content-between align-items-start mb-0">
                                 <div>
                                     <h6 class="card-title mb-0">
-                                        <a href="/auction?auction_id=2222" class="text-decoration-none">
+                                        <a href="/auction?auction_id=<?= htmlspecialchars($auction['auction_id']) ?>" class="text-decoration-none">
                                             <?= htmlspecialchars($auction['title']) ?>
                                         </a>
                                     </h6>

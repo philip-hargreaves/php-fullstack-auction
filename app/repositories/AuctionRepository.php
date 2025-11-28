@@ -4,7 +4,6 @@ namespace app\repositories;
 use infrastructure\Database;
 use app\models\Auction;
 use app\repositories\ItemRepository;
-use infrastructure\Utilities;
 use PDOException;
 
 class AuctionRepository
@@ -21,8 +20,7 @@ class AuctionRepository
         if (empty($row)) {
             return null;
         }
-
-        // Create the object using constructor matching the new Model signature
+        // Create the object using constructor matching new Model signature
         $object = new Auction(
             (int)$row['item_id'],
             $row['auction_description'],
@@ -40,9 +38,10 @@ class AuctionRepository
         // Set relationship properties
         $item = $this->itemRepo->getById($object->getItemId());
 
-        if ($item !== null) {
-            $object->setItem($item);
+        if ($item === null) {
+            return null;
         }
+        $object->setItem($item);
 
         return $object;
     }
@@ -50,7 +49,6 @@ class AuctionRepository
     public function getById(int $auctionId): ?Auction
     {
         try {
-            // Updated columns to match new schema
             $sql = "SELECT * FROM auctions WHERE id = :auction_id";
             $param = ['auction_id' => $auctionId];
             $row = $this->db->query($sql, $param)->fetch();
@@ -69,7 +67,6 @@ class AuctionRepository
     public function getBySellerId(int $sellerId): array
     {
         try {
-            // JOIN relies on the items table having the seller_id
             $sql = "SELECT a.* FROM auctions a
                     JOIN items i ON a.item_id = i.id
                     WHERE i.seller_id = :seller_id
@@ -101,34 +98,6 @@ class AuctionRepository
         }
     }
 
-    public function getActiveAuctions(int $limit = 12, int $offset = 0): array
-    {
-        try {
-            $sql = "SELECT * FROM auctions 
-                    WHERE auction_status = 'Active' 
-                    ORDER BY end_datetime ASC
-                    LIMIT :limit OFFSET :offset";
-            $params = ['limit' => $limit, 'offset' => $offset];
-            $rows = $this->db->query($sql, $params)->fetchAll();
-
-            return $this->hydrateMany($rows);
-        } catch (PDOException $e) {
-            // TODO: add logging
-            return [];
-        }
-    }
-    public function countActiveAuctions(): int
-    {
-        try {
-            $sql = "SELECT COUNT(*) as total FROM auctions WHERE auction_status = 'Active'";
-            $row = $this->db->query($sql)->fetch();
-            return (int)$row['total'];
-        } catch (PDOException $e) {
-            // TODO: add logging
-            return 0;
-        }
-    }
-
     private function hydrateMany(array $rows) : array {
         $auctions = [];
 
@@ -151,10 +120,8 @@ class AuctionRepository
         $row['item_id'] = $auction->getItemId();
         $row['category_id'] = $auction->getCategoryId();
         $row['winning_bid_id'] = $auction->getWinningBidId();
-
         $row['auction_description'] = $auction->getAuctionDescription();
         $row['auction_condition'] = $auction->getAuctionCondition();
-
         $row['start_datetime'] = $auction->getStartDateTime()->format('Y-m-d H:i:s');
         $row['end_datetime'] = $auction->getEndDateTime()->format('Y-m-d H:i:s');
         $row['starting_price'] = $auction->getStartingPrice();
@@ -168,18 +135,12 @@ class AuctionRepository
     {
         try {
             $params = $this->extract($auction);
-
-            $sql = "INSERT INTO auctions (
-                        item_id, category_id, winning_bid_id, 
-                        auction_description, auction_condition,
-                        start_datetime, end_datetime, starting_price, reserve_price, auction_status
-                    )
-                    VALUES (
-                        :item_id, :category_id, :winning_bid_id, 
-                        :auction_description, :auction_condition,
-                        :start_datetime, :end_datetime, :starting_price, :reserve_price, :auction_status
-                    )";
-
+            $sql = "INSERT INTO auctions (item_id, category_id, winning_bid_id, auction_description, 
+                        auction_condition, start_datetime, end_datetime, starting_price, 
+                        reserve_price, auction_status)
+                    VALUES (:item_id, :category_id, :winning_bid_id, :auction_description, 
+                        :auction_condition, :start_datetime, :end_datetime, :starting_price, 
+                        :reserve_price, :auction_status)";
             $result = $this->db->query($sql, $params);
 
             // Check if the insert was successful.
@@ -193,6 +154,39 @@ class AuctionRepository
         } catch (PDOException $e) {
             // TODO: add logging
             return null;
+        }
+
+    }
+
+    // Fetches paginated active auctions for the index page
+    public function getActiveAuctions(int $limit = 12, int $offset = 0): array
+    {
+        try {
+            $limit = (int)$limit;
+            $offset = (int)$offset;
+            $sql = "SELECT * FROM auctions 
+                    WHERE auction_status = 'Active' 
+                    ORDER BY end_datetime ASC
+                    LIMIT {$limit} OFFSET {$offset}";
+            $rows = $this->db->query($sql)->fetchAll();
+
+            return $this->hydrateMany($rows);
+        } catch (PDOException $e) {
+            // TODO: add logging
+            return [];
+        }
+    }
+
+    // Returns total count of active auctions for pagination
+    public function countActiveAuctions(): int
+    {
+        try {
+            $sql = "SELECT COUNT(*) as total FROM auctions WHERE auction_status = 'Active'";
+            $row = $this->db->query($sql)->fetch();
+            return (int)$row['total'];
+        } catch (PDOException $e) {
+            // TODO: add logging
+            return 0;
         }
     }
 }
