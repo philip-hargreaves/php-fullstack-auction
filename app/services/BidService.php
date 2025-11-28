@@ -24,10 +24,10 @@ class BidService
         $this->db = $db;
     }
 
-    public function getHighestBidAmountByAuctionId($auctionId): float {
+    public function getHighestBidAmountByAuctionId($auctionId): ?float {
         $highestBid = $this->bidRepo->getHighestBidByAuctionId($auctionId);
         if(is_null($highestBid)) {
-            return 0;
+            return null;
         }else{
             return $highestBid->getBidAmount();
         }

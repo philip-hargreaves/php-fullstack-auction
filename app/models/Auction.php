@@ -23,6 +23,7 @@ class Auction
     private ?Item $item = null;
     private ?Category $category = null;
     private ?float $currentPrice = null;
+    private ?array $auctionImages = null;
 
     // CONSTRUCTOR
     public function __construct(
@@ -36,7 +37,7 @@ class Auction
         ?float  $reservePrice = null,
         ?int $categoryId = null,
         ?int $winningBidId = null,
-        ?int $auctionId = null
+        ?int $auctionId = null,
     ) {
         $this->itemId = $itemId;
         $this->auctionDescription = $auctionDescription;
@@ -201,5 +202,13 @@ class Auction
     public function getCurrentPrice(): ?float
     {
         return $this->currentPrice;
+    }
+
+    public function setAuctionImages(?array $auctionImages): void {
+        $this->auctionImages = $auctionImages;
+    }
+
+    public function getAuctionImages(): ?array {
+        return $this->auctionImages;
     }
 }

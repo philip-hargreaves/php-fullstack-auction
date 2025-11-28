@@ -11,10 +11,12 @@ class AuctionRepository
 {
     private Database $db;
     private ItemRepository $itemRepo;
+    private AuctionImageRepository $auctionImageRepo;
 
-    public function __construct(Database $db, ItemRepository $itemRepo) {
+    public function __construct(Database $db, ItemRepository $itemRepo, AuctionImageRepository $auctionImageRepo) {
         $this->db = $db;
         $this->itemRepo = $itemRepo;
+        $this->auctionImageRepo = $auctionImageRepo;
     }
 
     private function hydrate($row) : ?Auction {
@@ -39,9 +41,13 @@ class AuctionRepository
 
         // Set relationship properties
         $item = $this->itemRepo->getById($object->getItemId());
-
         if ($item !== null) {
             $object->setItem($item);
+        }
+
+        $auction_images = $this->auctionImageRepo->getByAuctionId($object->getAuctionId());
+        if ($auction_images !== []) {
+            $object->setAuctionImages($auction_images);
         }
 
         return $object;
@@ -142,9 +148,16 @@ class AuctionRepository
             $params = $this->extract($auction);
 
             $sql = "INSERT INTO auctions (
-                        item_id, category_id, winning_bid_id, 
-                        auction_description, auction_condition,
-                        start_datetime, end_datetime, starting_price, reserve_price, auction_status
+                        item_id, 
+                        category_id, 
+                        winning_bid_id, 
+                        auction_description, 
+                        auction_condition,
+                        start_datetime, 
+                        end_datetime, 
+                        starting_price, 
+                        reserve_price, 
+                        auction_status
                     )
                     VALUES (
                         :item_id, :category_id, :winning_bid_id, 
@@ -164,6 +177,46 @@ class AuctionRepository
             }
         } catch (PDOException $e) {
             // TODO: add logging
+            return null;
+        }
+    }
+
+    public function update(Auction $auction): ?Auction
+    {
+        try {
+            // 1. Get the data array from the object
+            $params = $this->extract($auction);
+
+            // 2. Add the ID manually because it is needed for the WHERE clause
+            // (The extract method usually doesn't include ID if it was built for Insert)
+//            $params['auction_id'] = $auction->getAuctionId();
+
+            // 3. Prepare SQL
+            // Note: We usually do NOT update 'item_id' as that breaks the link
+            // to the inventory item, but I included it here for completeness.
+            $sql = "UPDATE auctions 
+                SET 
+                    item_id = :item_id,
+                    category_id = :category_id, 
+                    winning_bid_id = :winning_bid_id, 
+                    auction_description = :auction_description, 
+                    auction_condition = :auction_condition,
+                    start_datetime = :start_datetime, 
+                    end_datetime = :end_datetime, 
+                    starting_price = :starting_price, 
+                    reserve_price = :reserve_price, 
+                    auction_status = :auction_status
+                WHERE id = :id";
+
+            // 4. Execute
+            $this->db->query($sql, $params);
+
+            // 5. Return the object
+            return $auction;
+
+        } catch (PDOException $e) {
+            Utilities::dd($e->getMessage());
+            // TODO: add logging (e.g. error_log($e->getMessage()))
             return null;
         }
     }

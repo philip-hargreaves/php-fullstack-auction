@@ -1,50 +1,29 @@
 
 // Upload image to cloud
 function initializeImageUploader(config) {
-    // 1. Destructure and set defaults
     const {
-        submitBtnId,
-        uploaderId,
-        previewContainerId,
-        formId,
-        hiddenContainerId,
-        alertContainerId,
-        uploadUrl = 'ajax/upload-image.php', // Default URL
+        submitBtnId, uploaderId, previewContainerId, formId, hiddenContainerId, alertContainerId,
+        uploadUrl = 'ajax/upload-image.php',
         maxImages = 10,
-        minImages = 1
+        minImages = 1,
+        initialImages = [] // <--- NEW: Accept existing images array
     } = config;
 
-    // 2. Get DOM Elements
     const submitBtn = document.getElementById(submitBtnId);
     const uploader = document.getElementById(uploaderId);
     const container = document.getElementById(previewContainerId);
     const form = document.getElementById(formId);
     const hiddenContainer = document.getElementById(hiddenContainerId);
+    console.log(initialImages);
+    if (!submitBtn || !form || !hiddenContainer || !uploader || !container) return;
 
-    // 3. Critical Error Check
-    if (!submitBtn || !form || !hiddenContainer || !uploader || !container) {
-        console.error("Image Uploader Error: One or more required HTML elements are missing.", config);
-        return;
-    }
-
-    // --- INTERNAL FUNCTIONS ---
-
-    // Create the visual card element
-    function createCard(url, isLoading = false) {
+    // --- REUSABLE HELPER: Create the Card DOM Element ---
+    function renderImageCard(url) {
         const div = document.createElement('div');
         div.className = 'img-card';
+        div.dataset.url = url; // Important: Store URL for submission logic
 
-        if (isLoading) {
-            div.innerHTML = '<div class="p-4 text-muted">Uploading...</div>';
-            return div;
-        }
-        return div; // Should not happen in current logic, but safe fallback
-    }
-
-    // Update card content after upload and attach events
-    function updateCardWithImage(card, url) {
-        card.dataset.url = url; // Store URL in data attribute
-        card.innerHTML = `
+        div.innerHTML = `
             <div class="main-badge">MAIN</div>
             <img src="${url}" alt="Preview">
             <div class="img-actions">
@@ -54,113 +33,96 @@ function initializeImageUploader(config) {
             </div>
         `;
 
-        // Attach Card Events
-        card.querySelector('.btn-remove').addEventListener('click', () => card.remove());
+        // Attach Events
+        div.querySelector('.btn-remove').addEventListener('click', () => div.remove());
 
-        card.querySelector('.btn-move-left').addEventListener('click', () => {
-            if (card.previousElementSibling) {
-                container.insertBefore(card, card.previousElementSibling);
-            }
+        div.querySelector('.btn-move-left').addEventListener('click', () => {
+            if (div.previousElementSibling) container.insertBefore(div, div.previousElementSibling);
         });
 
-        card.querySelector('.btn-move-right').addEventListener('click', () => {
-            if (card.nextElementSibling) {
-                container.insertBefore(card.nextElementSibling, card);
-            }
+        div.querySelector('.btn-move-right').addEventListener('click', () => {
+            if (div.nextElementSibling) container.insertBefore(div.nextElementSibling, div);
         });
+
+        return div;
     }
 
-    // Handle AJAX Upload
+    // --- LOGIC: Upload New File ---
     function uploadFileToCloud(file) {
-        // Create placeholder
-        const card = createCard(null, true);
-        container.appendChild(card);
+        // 1. Create Loading Card
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'img-card';
+        loadingDiv.innerHTML = '<div class="p-4 text-muted">Uploading...</div>';
+        container.appendChild(loadingDiv);
 
+        // 2. AJAX
         const formData = new FormData();
         formData.append('file', file);
 
-        fetch(uploadUrl, {
-            method: 'POST',
-            body: formData
-        })
-            .then(response => response.json())
+        fetch(uploadUrl, { method: 'POST', body: formData })
+            .then(res => res.json())
             .then(data => {
                 if (data.url) {
-                    updateCardWithImage(card, data.url);
+                    // 3. Replace Loading Card with Real Card
+                    const newCard = renderImageCard(data.url);
+                    container.replaceChild(newCard, loadingDiv);
                 } else {
-                    console.warn('Upload failed:', data);
-                    alert('Upload failed: ' + (data.message || 'Unknown error'));
-                    card.remove();
+                    alert('Upload failed');
+                    loadingDiv.remove();
                 }
             })
-            .catch(error => {
-                console.error('Error uploading image:', error);
-                alert('Error uploading image. Please check console.');
-                card.remove();
+            .catch(err => {
+                console.error(err);
+                loadingDiv.remove();
             });
     }
 
-    // --- EVENT LISTENERS ---
+    // --- INITIALIZATION: Load Existing Images ---
 
-    // 1. File Selection Listener
-    uploader.addEventListener('change', function(e) {
-        const files = Array.from(e.target.files);
-        files.forEach(file => uploadFileToCloud(file));
-        uploader.value = ''; // Reset input
+    if (initialImages && initialImages.length > 0) {
+        initialImages.forEach(url => {
+            const card = renderImageCard(url);
+            container.appendChild(card);
+        });
+    }
+
+    // --- LISTENERS ---
+    uploader.addEventListener('change', (e) => {
+        Array.from(e.target.files).forEach(file => uploadFileToCloud(file));
+        uploader.value = '';
     });
 
-    // 2. Submit Button Listener
-    submitBtn.addEventListener('click', function(e) {
-        e.preventDefault(); // Stop default button behavior immediately
-
-        // Clear previous hidden inputs
+    submitBtn.addEventListener('click', (e) => {
+        e.preventDefault();
         hiddenContainer.innerHTML = '';
-
         const cards = container.querySelectorAll('.img-card');
 
         // Validation
         if (cards.length < minImages || cards.length > maxImages) {
-            const errorHtml = `
-                <div class="alert alert-danger shadow-sm" role="alert" id="create-auction-alert">
-                    <i class="fa fa-exclamation-circle"></i>
-                    Please upload at least ${minImages} and up to ${maxImages} image(s).
-                </div>
-            `;
-
-            const alertBox = document.getElementById(alertContainerId);
-            if (alertBox) {
-                alertBox.innerHTML = errorHtml;
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-
-                // Call global autoDismiss if available
-                if (typeof autoDismissAlerts === 'function') {
-                    autoDismissAlerts();
-                }
-            }
-            return; // Stop submission
+            // ... (Your existing validation alert logic here) ...
+            alert(`Please upload between ${minImages} and ${maxImages} images.`);
+            return;
         }
 
-        // Generate Hidden Inputs
+        // Generate Hidden Inputs (Works for BOTH new and existing images)
         cards.forEach((card, index) => {
             const url = card.dataset.url;
-            if (!url) return;
 
-            // Image URL Input
+            // URL Input
             const inputUrl = document.createElement('input');
             inputUrl.type = 'hidden';
-            inputUrl.name = `uploaded_images[${index}][image_url]`;
+            inputUrl.name = `auction_image_urls[${index}][image_url]`;
             inputUrl.value = url;
             hiddenContainer.appendChild(inputUrl);
 
-            // Is Main Input
+            // Is Main Input (First card is always main)
             const inputMain = document.createElement('input');
             inputMain.type = 'hidden';
-            inputMain.name = `uploaded_images[${index}][is_main]`;
+            inputMain.name = `auction_image_urls[${index}][is_main]`;
             inputMain.value = (index === 0) ? '1' : '0';
             hiddenContainer.appendChild(inputMain);
         });
 
-        // Submit Form
         form.submit();
     });
 }
@@ -363,6 +325,165 @@ function autoDismissAlerts() {
             }, 500);
         }, 3000);
     });
+}
+
+// Initialize Category Selector in Create Auction Page
+function initializeCategorySelector(config) {
+    // 1. Destructure Config
+    const {
+        selectorId,
+        backBtnId,
+        hiddenInputId,
+        breadcrumbsId,
+        treeData,
+        initialPath
+    } = config;
+
+    // 2. Get DOM Elements
+    const selector = document.getElementById(selectorId);
+    const backBtn = document.getElementById(backBtnId);
+    const hiddenInput = document.getElementById(hiddenInputId);
+    const breadcrumbs = document.getElementById(breadcrumbsId);
+
+    if (!selector || !backBtn || !hiddenInput || !breadcrumbs) return;
+
+    let currentLevelCategories = treeData;
+    let parentStack = [];
+
+    // --- CORE FUNCTION: Render the dropdown ---
+    function renderList(list, selectedValue = null, parentLabel = null) {
+        // 1. Determine top text
+        let topOptionText = parentLabel ? `Selected: ${parentLabel}` : 'Select a Category...';
+
+        // 2. Set the placeholder
+        selector.innerHTML = `<option value="">${topOptionText}</option>`;
+
+        // 3. Render the options
+        list.forEach(cat => {
+            const option = document.createElement('option');
+            option.value = cat.id;
+            option.textContent = cat.name;
+
+            if (cat.children && cat.children.length > 0) {
+                option.textContent += ' >';
+            }
+
+            // 4. Selection Logic (Use loose equality '==' for string/int safety)
+            if (selectedValue && cat.id == selectedValue) {
+                option.selected = true;
+            }
+
+            selector.appendChild(option);
+        });
+
+        // 5. Update UI
+        backBtn.style.display = parentStack.length > 0 ? 'inline-block' : 'none';
+        updateBreadcrumbs();
+    }
+
+    // --- EVENT: User selects a category ---
+    selector.addEventListener('change', function() {
+        const selectedId = this.value;
+        if (!selectedId) return;
+
+        const selectedObj = currentLevelCategories.find(c => c.id == selectedId);
+
+        if (selectedObj && selectedObj.children && selectedObj.children.length > 0) {
+            // CASE 1: Drill down
+
+            // Get current label before we leave this level
+            const currentHeaderLabel = parentStack.length > 0
+                ? parentStack[parentStack.length - 1].itemName
+                : null;
+
+            // Push State (Save ID and Label so we can go back accurately)
+            parentStack.push({
+                list: currentLevelCategories,
+                itemName: selectedObj.name,
+                selectedId: selectedId,        // <--- SAVED: The ID we just clicked
+                headerLabel: currentHeaderLabel // <--- SAVED: The label of the list we are leaving
+            });
+
+            currentLevelCategories = selectedObj.children;
+
+            // Render next level
+            // Arg 2 is null (nothing selected in new list yet)
+            // Arg 3 is the name of the item we just clicked
+            renderList(currentLevelCategories, null, selectedObj.name);
+
+            hiddenInput.value = selectedId;
+        } else {
+            // CASE 2: Final Selection
+            hiddenInput.value = selectedId;
+        }
+    });
+
+    // --- EVENT: User clicks Back ---
+    backBtn.addEventListener('click', function() {
+        if (parentStack.length === 0) return;
+
+        // Pop the state
+        const previousState = parentStack.pop();
+        currentLevelCategories = previousState.list;
+
+        // Restore the list, highlighting what was previously selected
+        renderList(
+            currentLevelCategories,
+            previousState.selectedId,  // <--- RESTORED
+            previousState.headerLabel  // <--- RESTORED
+        );
+
+        hiddenInput.value = previousState.selectedId;
+    });
+
+    // --- HELPER: Breadcrumbs ---
+    function updateBreadcrumbs() {
+        if(parentStack.length === 0) {
+            breadcrumbs.innerText = "";
+            return;
+        }
+        // Use 'itemName' because that's what we saved in the stack object
+        let text = parentStack.map(p => p.itemName).join(' > ');
+        breadcrumbs.innerText = "Current path: " + text;
+    }
+
+    // --- INITIALIZATION ---
+    if (initialPath && initialPath.length > 0) {
+        initialPath.forEach((id, index) => {
+            const isLast = index === initialPath.length - 1;
+
+            if (!isLast) {
+                // Find parent in current level to drill down
+                const parentObj = currentLevelCategories.find(c => c.id == id);
+                if (parentObj && parentObj.children) {
+
+                    // Logic to populate stack for Breadcrumbs/Back button
+                    const currentHeaderLabel = parentStack.length > 0
+                        ? parentStack[parentStack.length - 1].itemName
+                        : null;
+
+                    parentStack.push({
+                        list: currentLevelCategories,
+                        itemName: parentObj.name,
+                        selectedId: id,
+                        headerLabel: currentHeaderLabel
+                    });
+
+                    currentLevelCategories = parentObj.children;
+                }
+            } else {
+                // FINAL RENDER
+                // Get the name of the immediate parent for the label
+                const lastParent = parentStack.length > 0 ? parentStack[parentStack.length - 1] : null;
+                const parentLabel = lastParent ? lastParent.itemName : null;
+
+                renderList(currentLevelCategories, id, parentLabel);
+                hiddenInput.value = id; // Ensure hidden input is set on load
+            }
+        });
+    } else {
+        renderList(currentLevelCategories);
+    }
 }
 
 

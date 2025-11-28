@@ -44,7 +44,22 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
                         </td>
                         <td><?= htmlspecialchars($auction->getEndDateTime()->format('Y-m-d H:i')) ?></td>
                         <td>
-                            <a href="/auction?auction_id=<?= htmlspecialchars($auction->getAuctionId()) ?>">Edit</a>
+                            <?php if ($auction->getAuctionStatus() != 'Finished'): ?>
+                            <!-- Link to the create-auction view (update mode) -->
+                            <a href="/create-auction?auction_mode=update&auction_id=<?= htmlspecialchars($auction->getAuctionId()) ?>">
+                                Edit
+                            </a>
+                            <?php else: ?>
+                                <?php if (!$auction->getItem()->isSold()): ?>
+                                <!-- Link to the create-auction view (relist mode) -->
+                                <a href="/create-auction?auction_mode=relist&auction_id=<?= htmlspecialchars($auction->getAuctionId()) ?>">
+                                    Relist
+                                </a>
+                                <?php else: ?>
+                                <a>Sold</a>
+                                <?php endif; ?>
+                            <?php endif; ?>
+                            <a
                         </td>
                     </tr>
                 <?php endforeach; ?>

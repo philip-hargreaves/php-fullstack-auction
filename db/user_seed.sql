@@ -19,8 +19,17 @@ INSERT IGNORE INTO user_roles (user_id, role_id) VALUES
 
 -- Insert categories
 INSERT IGNORE INTO categories (id, name, parent_category_id) VALUES
-                                                                 (1, 'Digital Devices', null),
-                                                                 (2, 'Cooking Utensils', 1);
+     (1, 'Digital Devices', null),
+     (2, 'Computers', 1),
+     (3, 'Phones', 1),
+     (4, 'Earphones', 1),
+     (5, 'Cookware', null),
+     (6, 'Clothes', null),
+     (7, 'iPhone', 3),
+     (8, 'Samsung Galaxy', 3),
+     (9, 'Google Pixel', 3),
+     (10, 'Sony', 3),
+     (11, 'Xiao Mi', 3);
 
 -- 1. Insert items (Inventory Noun)
 -- Note: We initially set current_auction_id to NULL because the auction doesn't exist yet.

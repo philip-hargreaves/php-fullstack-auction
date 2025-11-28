@@ -112,7 +112,7 @@ class AuctionImageRepository
         $this->db->query($sql, ['auction_id' => $auctionId, 'id' => $excludeImageId]);
     }
 
-    public function update(AuctionImage $image): bool
+    public function update(AuctionImage $image): AuctionImage
     {
         $param = $this->extract($image);
         $sql = "UPDATE auction_images
@@ -122,6 +122,16 @@ class AuctionImageRepository
                     uploaded_datetime = :uploaded_datetime
                 WHERE id = :id";
 
-        return (bool)$this->db->query($sql, $param);
+        return $this->hydrate($this->db->query($sql, $param));
+    }
+
+    public function deleteByAuctionId(int $auctionId): bool {
+        try {
+            $sql = "DELETE FROM auction_images WHERE auction_id = :auction_id";
+            return (bool)$this->db->query($sql, ['auction_id' => $auctionId]);
+        } catch (PDOException $e) {
+            // TODO: add logging
+            return false;
+        }
     }
 }

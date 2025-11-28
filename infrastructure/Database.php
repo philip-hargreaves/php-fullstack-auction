@@ -3,10 +3,12 @@ namespace infrastructure;
 
 use PDO;
 use PDOException;
+use PDOStatement;
+use Exception;
 
 class Database
 {
-    public $connection;
+    public PDO $connection;
 
     public function __construct()
     {
@@ -31,15 +33,21 @@ class Database
             $this->connection = new PDO($dsn, $user, $pass, $options);
 
         } catch (PDOException $e) {
-            die("Database connection failed: " . $e->getMessage());
+            throw new Exception("Database connection error: " . $e->getMessage());
         }
     }
 
-    # Prepares and executes query statement
-    public function query($query, $params = [])
+    // Prepares and executes query statement
+    public function query($query, $params = []): PDOStatement
     {
         $statement = $this->connection->prepare($query);
         $statement->execute($params);
         return $statement;
+    }
+
+    // Exposes the raw PDO prepare method
+    public function prepare($query, $options = [])
+    {
+        return $this->connection->prepare($query, $options);
     }
 }

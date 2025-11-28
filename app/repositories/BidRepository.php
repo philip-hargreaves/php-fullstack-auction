@@ -59,7 +59,6 @@ class BidRepository
     public function getById(int $bidId): ?Bid
     {
         try {
-            // Query
             $sql = "SELECT * FROM bids WHERE id = :bid_id";
             $params = ['bid_id' => $bidId];
             $row = $this->db->query($sql, $params)->fetch();
