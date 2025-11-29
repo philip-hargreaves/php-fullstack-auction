@@ -57,7 +57,13 @@ class AuctionRepository
     public function getById(int $auctionId): ?Auction
     {
         try {
-            $sql = "SELECT * FROM auctions WHERE id = :auction_id";
+            $sql = "SELECT a.*, 
+                        COALESCE(MAX(b.bid_amount), a.starting_price) AS current_price,
+                        COUNT(b.id) AS bid_count
+                    FROM auctions a
+                    LEFT JOIN bids b ON a.id = b.auction_id
+                    WHERE a.id = :auction_id
+                    GROUP BY a.id";
             $param = ['auction_id' => $auctionId];
             $row = $this->db->query($sql, $param)->fetch();
 
