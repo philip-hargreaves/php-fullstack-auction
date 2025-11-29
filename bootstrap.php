@@ -1,5 +1,6 @@
 <?php
 
+use app\repositories\NotificationRepository;
 use app\repositories\AuctionImageRepository;
 use app\repositories\UserRepository;
 use app\repositories\RoleRepository;
@@ -11,6 +12,7 @@ use app\repositories\WatchlistRepository;
 use app\services\BidService;
 use app\services\AuthService;
 use app\services\AuctionService;
+use app\services\NotificationService;
 use app\services\RegistrationService;
 use app\services\WatchlistService;
 use app\services\ImageService;
@@ -54,6 +56,11 @@ DIContainer::bind('auctionImageRepo', new AuctionImageRepository(
     DIContainer::get('db')
 ));
 
+//TODO JW Notification Repo
+DIContainer::bind('notificationRepo', new NotificationRepository(
+    DIContainer::get('db')
+));
+
 DIContainer::bind('itemServ', new ItemService(
     DIContainer::get('itemRepo'),
     DIContainer::get('userRepo')
@@ -64,12 +71,25 @@ DIContainer::bind('imageServ', new ImageService(
     DIContainer::get('auctionRepo'),
     DIContainer::get('db')));
 
+
+//TODO JW test
+DIContainer :: bind('notificationServ', new NotificationService(
+    DIContainer::get('db'),
+    DIContainer::get('notificationRepo'),
+    DIContainer::get('userRepo'),
+    DIContainer::get('auctionRepo'),
+));
+
 // Bind Services (they depend on repositories)
 DIContainer::bind('bidServ', new BidService(
     DIContainer::get('bidRepo'),
     DIContainer::get('auctionRepo'),
     DIContainer::get('userRepo'),
-    DIContainer::get('db')));
+    DIContainer::get('db'),
+
+    //TODO JW TEST
+    DIContainer::get('notificationServ')
+));
 
 DIContainer::bind('authServ', new AuthService(
     DIContainer::get('userRepo')));

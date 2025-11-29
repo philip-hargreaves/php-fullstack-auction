@@ -34,3 +34,7 @@ $router->get('/my-bids', 'controllers/my-bids.php');
 
 // Watchlist Page
 $router->get('/watchlist', 'controllers/watchlist.php');
+
+//test JW notifications
+$router->get('/notifications', 'controllers/auction/notification.php');
+$router->post('/notifications', 'controllers/auction/notification.php');

@@ -1,0 +1,22 @@
+.popup {
+    position: fixed;     /* stays relative to viewport, not document flow */
+    top: 20px;           /* distance from top of page */
+    right: 20px;         /* distance from right side */
+    background-color: #ff0000;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    z-index: 9999;       /* ensure it appears above other content */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+
+    /* INITIAL hidden state */
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* When visible */
+.popup.show {
+    opacity: 1;
+    transform: translateY(0);
+}

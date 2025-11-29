@@ -153,3 +153,15 @@ CREATE TABLE messages (
     sent_datetime DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (participant_id) REFERENCES participants(id) ON DELETE SET NULL
 );
+
+-- JW test notification table
+CREATE TABLE notifications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    auction_id INT NOT NULL,
+    current_highest_bidder_id INT NOT NULL,
+    prev_highest_bidder_id INT NOT NULL,
+    is_sent TINYINT DEFAULT 0,
+    FOREIGN KEY (auction_id) REFERENCES auctions(id),
+    FOREIGN KEY (current_highest_bidder_id) REFERENCES users(id),
+    FOREIGN KEY (prev_highest_bidder_id) REFERENCES users(id)
+)
