@@ -32,13 +32,34 @@ class AuctionService
 
     public function getByUserId(int $sellerId): array {
         $auctions = $this->auctionRepo->getBySellerId($sellerId);
+        $this->hydrateMany($auctions);
+        return $auctions;
+    }
 
-        foreach ($auctions as $auction) {
+    private function hydrate(Auction $auction): void
+    {
+        // Only fetch if NOT already set by repository SQL
+        if ($auction->getCurrentPrice() === null) {
             $highestBid = $this->bidService->getHighestBidAmountByAuctionId($auction->getAuctionId());
-            $currentPrice = $highestBid > 0 ? $highestBid : $auction->getStartingPrice();
-            $auction->setCurrentPrice($currentPrice);
+            $auction->setCurrentPrice($highestBid > 0 ? $highestBid : $auction->getStartingPrice());
         }
+        if ($auction->getBidCount() === null) {
+            $auction->setBidCount($this->bidService->countBidsByAuctionId($auction->getAuctionId()));
+        }
+        // Image still requires separate query (different table)
+        $auction->setImageUrl($this->imageService->getMainImageUrlByAuctionId($auction->getAuctionId()));
+    }
 
+    private function hydrateMany(array $auctions): void
+    {
+        foreach ($auctions as $auction) {
+            $this->hydrate($auction);
+        }
+    }
+
+    public function getWatchedByUserId(int $userId): array {
+        $auctions = $this->auctionRepo->getWatchedAuctionsByUserId($userId);
+        $this->hydrateMany($auctions);
         return $auctions;
     }
 
@@ -229,6 +250,7 @@ class AuctionService
         return Utilities::creationResult('', true, $input);
     }
 
+
     public function getActiveListings(int $page = 1, int $perPage = 12, string $orderBy = 'ending_soonest'): array
     {
         $offset = ($page - 1) * $perPage;
@@ -236,20 +258,7 @@ class AuctionService
         $auctions = $this->auctionRepo->getActiveAuctions($perPage, $offset, $orderBy);
         $total = $this->auctionRepo->countActiveAuctions();
 
-        foreach ($auctions as $auction) {
-            // Current price
-            $highestBid = $this->bidService->getHighestBidAmountByAuctionId($auction->getAuctionId());
-            $currentPrice = $highestBid > 0 ? $highestBid : $auction->getStartingPrice();
-            $auction->setCurrentPrice($currentPrice);
-
-            // Bid count
-            $bidCount = $this->bidService->countBidsByAuctionId($auction->getAuctionId());
-            $auction->setBidCount($bidCount);
-
-            // Image URL
-            $imageUrl = $this->imageService->getMainImageUrlByAuctionId($auction->getAuctionId());
-            $auction->setImageUrl($imageUrl);
-        }
+        $this->hydrateMany($auctions);
 
         return [
             'auctions' => $auctions,

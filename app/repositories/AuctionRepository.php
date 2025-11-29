@@ -35,6 +35,14 @@ class AuctionRepository
             (int)$row['id']
         );
 
+        // Set computed properties if query included them (via JOIN)
+        if (isset($row['current_price'])) {
+            $object->setCurrentPrice((float)$row['current_price']);
+        }
+        if (isset($row['bid_count'])) {
+            $object->setBidCount((int)$row['bid_count']);
+        }
+
         // Set relationship properties
         $item = $this->itemRepo->getById($object->getItemId());
 
@@ -67,9 +75,14 @@ class AuctionRepository
     public function getBySellerId(int $sellerId): array
     {
         try {
-            $sql = "SELECT a.* FROM auctions a
+            $sql = "SELECT a.*, 
+                        COALESCE(MAX(b.bid_amount), a.starting_price) AS current_price,
+                        COUNT(b.id) AS bid_count
+                    FROM auctions a
                     JOIN items i ON a.item_id = i.id
+                    LEFT JOIN bids b ON a.id = b.auction_id
                     WHERE i.seller_id = :seller_id
+                    GROUP BY a.id
                     ORDER BY a.start_datetime DESC";
             $params = ['seller_id' => $sellerId];
             $rows = $this->db->query($sql, $params)->fetchAll();
@@ -84,9 +97,14 @@ class AuctionRepository
     public function getWatchedAuctionsByUserId(int $userId): array
     {
         try {
-            $sql = "SELECT a.* FROM auctions a
+            $sql = "SELECT a.*, 
+                        COALESCE(MAX(b.bid_amount), a.starting_price) AS current_price,
+                        COUNT(b.id) AS bid_count
+                    FROM auctions a
                     INNER JOIN watchlists w ON a.id = w.auction_id
+                    LEFT JOIN bids b ON a.id = b.auction_id
                     WHERE w.user_id = :user_id
+                    GROUP BY a.id
                     ORDER BY w.watched_datetime DESC";
             $params = ['user_id' => $userId];
             $rows = $this->db->query($sql, $params)->fetchAll();
@@ -165,28 +183,25 @@ class AuctionRepository
             $limit = (int)$limit;
             $offset = (int)$offset;
 
-            // Price sorting
-            if ($orderBy === 'pricelow' || $orderBy === 'pricehigh') {
-                $priceOrder = $orderBy === 'pricelow' ? 'ASC' : 'DESC';
-                $sql = "SELECT a.*, COALESCE(MAX(b.bid_amount), a.starting_price) AS current_price
+            // Determine ORDER BY clause
+            $orderClause = match($orderBy) {
+                'pricelow' => 'current_price ASC',
+                'pricehigh' => 'current_price DESC',
+                'date' => 'a.start_datetime DESC',
+                'ending_soonest' => 'a.end_datetime ASC',
+                default => 'a.end_datetime ASC'
+            };
+
+            // Single unified query for all sort types
+            $sql = "SELECT a.*, 
+                        COALESCE(MAX(b.bid_amount), a.starting_price) AS current_price,
+                        COUNT(b.id) AS bid_count
                     FROM auctions a
                     LEFT JOIN bids b ON a.id = b.auction_id
                     WHERE a.auction_status = 'Active'
                     GROUP BY a.id
-                    ORDER BY current_price {$priceOrder}
-                    LIMIT {$limit} OFFSET {$offset}";
-            } else {
-                // Date Sorting
-                $orderClause = match($orderBy) {
-                    'date' => 'start_datetime DESC',
-                    'ending_soonest' => 'end_datetime ASC',
-                    default => 'end_datetime ASC'
-                };
-                $sql = "SELECT * FROM auctions 
-                    WHERE auction_status = 'Active' 
                     ORDER BY {$orderClause}
                     LIMIT {$limit} OFFSET {$offset}";
-            }
 
             $rows = $this->db->query($sql)->fetchAll();
             return $this->hydrateMany($rows);
