@@ -49,15 +49,15 @@
 </script>
 
 <!-- popup out bid notification -->
-<!-- JW TEST (generated wit GPT)-->
 <script>
     function fetchNotifications()
     {
         console.log("fetchNotifications() called");
 
+        //Gets messages from notification controller
         fetch('/notifications', {
         method: 'GET',
-            credentials: 'same-origin' // <- this includes the session cookie
+            credentials: 'same-origin'
         })
             .then(function(response) {
                 return response.json();
@@ -72,29 +72,27 @@
             });
     }
 
-    // Call every 5 seconds for real-time updates
+    //calls fetNotification every 5 seconds in the background
     setInterval(fetchNotifications, 5000);
 
-    function showPopup(notification) {
+    //extracts message from notification and displays it
+    function showPopup(notification)
+    {
         const div = document.createElement('div');
         div.className = 'popup';
         div.innerText = notification.message;
-
-        // Add to DOM
         document.body.appendChild(div);
 
-        // Notify server that this notification was displayed
+        //Marks messages as having been sent
         fetch('/notifications', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id: notification.notificationId })
         });
 
-
-        // Trigger animation
         requestAnimationFrame(() => div.classList.add('show'));
 
-        // Automatically remove after 4 seconds
+        //Message disappears after 4 seconds
         setTimeout(function() {
             div.remove();
         }, 4000);
