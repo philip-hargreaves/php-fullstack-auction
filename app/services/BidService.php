@@ -200,4 +200,8 @@ class BidService
         return $this->bidRepo->getByUserId($userId);
     }
 
+    public function countBidsByAuctionId(int $auctionId): int
+    {
+        return $this->bidRepo->countByAuctionId($auctionId);
+    }
 }

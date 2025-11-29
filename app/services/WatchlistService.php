@@ -3,33 +3,22 @@
 namespace app\services;
 
 use app\repositories\WatchlistRepository;
-use app\repositories\AuctionRepository;
-use app\services\BidService;
-use PDOException;
+use app\services\AuctionService;
 
 class WatchlistService
 {
     private WatchlistRepository $watchlistRepo;
-    private AuctionRepository $auctionRepo;
-    private BidService $bidServ;
+    private AuctionService $auctionServ;
 
-    public function __construct(WatchlistRepository $watchlistRepo, AuctionRepository $auctionRepo, BidService $bidServ)
+    public function __construct(WatchlistRepository $watchlistRepo, AuctionService $auctionServ)
     {
         $this->watchlistRepo = $watchlistRepo;
-        $this->auctionRepo = $auctionRepo;
-        $this->bidServ = $bidServ;
+        $this->auctionServ = $auctionServ;
     }
 
     public function getWatchList(int $userId): array
     {
-        $auctions = $this->auctionRepo->getWatchedAuctionsByUserId($userId);
-
-        foreach ($auctions as $auction) {
-            $highestBid = $this->bidServ->getHighestBidAmountByAuctionId($auction->getAuctionId());
-            $currentPrice = $highestBid > 0 ? $highestBid : $auction->getStartingPrice();
-            $auction->setCurrentPrice($currentPrice);
-        }
-        return $auctions;
+        return $this->auctionServ->getWatchedByUserId($userId);
     }
 
     public function addAuctionToWatchlist(int $userId, int $auctionId): bool

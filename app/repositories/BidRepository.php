@@ -149,6 +149,19 @@ class BidRepository
         }
     }
 
+    public function countByAuctionId(int $auctionId): int
+    {
+        try {
+            $sql = "SELECT COUNT(*) as total FROM bids WHERE auction_id = :auction_id";
+            $params = ['auction_id' => $auctionId];
+            $row = $this->db->query($sql, $params)->fetch();
+            return (int)$row['total'];
+        } catch (PDOException $e) {
+            // TODO: add logging
+            return 0;
+        }
+    }
+
     public function hydrateMany(array $rows): array {
         $objects = [];
 
