@@ -97,7 +97,10 @@
                     <h6 class="text mb-2"><?= $timeText ?> <?= $timeRemaining->format('%ad %hh %im') ?></h6>
                 <?php elseif ($auctionStatus == 'Active'): ?>
                     <!-- Current Highest Bid -->
-                    <h4 class="text-success mb-1"><?= $bidText ?> £<?= number_format($highestBidAmount, 2) ?></h4>
+                    <h4 class="text-success mb-1">
+                        <?= $bidText ?> £
+                        <?= !is_null($highestBidAmount) ? number_format($highestBidAmount, 2) : number_format($startingPrice, 2); ?>
+                    </h4>
                     <!-- Auction Status -->
                     <p class="text-danger small mb-1 mt-1"><?= $statusTextSmall ?></p>
                     <hr class="mb-3">

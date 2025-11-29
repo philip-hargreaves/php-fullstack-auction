@@ -16,7 +16,7 @@ class Auction
     private DateTime $startDatetime;
     private DateTime $endDatetime;
     private float $startingPrice;
-    private float $reservePrice;
+    private ?float $reservePrice;
     private string $auctionStatus; // enum('Scheduled', 'Active', 'Finished')
 
     // RELATIONSHIP PROPERTIES

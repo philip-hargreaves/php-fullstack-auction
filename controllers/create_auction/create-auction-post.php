@@ -53,7 +53,7 @@ try {
         $result = $auctionService->updateAuction($auctionId, $auctionInput, $imageInputs);
     } else if ($actionMode == 'relist') {
         $auctionInput['start_datetime'] = Request::post('start_datetime');
-        $result = $auctionService->relistAuction($itemInput, $auctionInput, $imageInputs);
+        $result = $auctionService->relistAuction($auctionId, $auctionInput, $imageInputs);
     }
 
     // Save Result Message
