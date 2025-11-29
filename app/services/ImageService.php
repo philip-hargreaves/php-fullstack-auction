@@ -157,4 +157,16 @@ class ImageService
             return false;
         }
     }
+
+    public function getMainImageUrlByAuctionId(int $auctionId): ?string
+    {
+        $images = $this->auctionImageRepo->getByAuctionId($auctionId);
+
+        if (empty($images)) {
+            return null;
+        }
+
+        // getByAuctionId returns images with main first (like the old repo)
+        return $images[0]->getImageUrl();
+    }
 }

@@ -219,7 +219,7 @@
                                 <?php
                                 // Check if this is the winning bid
                                 $isHighestBid = $highestBid && $highestBid->getBidId() == $bid->getBidId();
-                                $isMyBid = $bid->getBuyerId() == $_SESSION['user_id'];
+                                $isMyBid = isset($_SESSION['user_id']) && $bid->getBuyerId() == $_SESSION['user_id'];
                                 ?>
                                 <tr class="<?php
                                 if ($isHighestBid) {echo 'table-success';}

@@ -1,16 +1,15 @@
 <?php
 
 namespace app\services;
-
 use app\repositories\AuctionRepository;
 use app\repositories\ItemRepository;
-use DateInterval;
 use infrastructure\Database;
 use app\models\Auction;
 use DateTime;
 use infrastructure\Utilities;
 use PDOException;
 use Exception;
+use DateInterval;
 
 class AuctionService
 {
@@ -21,14 +20,8 @@ class AuctionService
     private ImageService $imageService;
     private BidService $bidService;
 
-    public function __construct(
-        Database $db,
-        AuctionRepository $auctionRepo,
-        ItemRepository $itemRepo,
-        ItemService $itemService,
-        ImageService $imageService,
-        BidService $bidService
-    ) {
+    public function __construct(Database $db, AuctionRepository $auctionRepo, ItemRepository $itemRepo,
+                                ItemService $itemService, ImageService $imageService, BidService $bidService) {
         $this->db = $db;
         $this->auctionRepo = $auctionRepo;
         $this->itemRepo = $itemRepo;
@@ -39,38 +32,55 @@ class AuctionService
 
     public function getByUserId(int $sellerId): array {
         $auctions = $this->auctionRepo->getBySellerId($sellerId);
-
-        foreach ($auctions as $auction) {
-            $highestBid = $this->bidService->getHighestBidAmountByAuctionId($auction->getAuctionId());
-            $currentPrice = $highestBid > 0 ? $highestBid : $auction->getStartingPrice();
-            $auction->setCurrentPrice($currentPrice);
-        }
-
+        $this->hydrateMany($auctions);
         return $auctions;
     }
 
-    public function createAuction(array $itemInput, array $auctionInput, array $imageInputs): array {
-        // $itemInput: seller_id, item_name (inventory data)
-        // $auctionInput: auction_description, auction_condition, start_datetime, end_datetime, starting_price, reserve_price, category_id
-        // $imageInputs: array of file data
+    private function hydrate(Auction $auction): void
+    {
+        // Only fetch if NOT already set by repository SQL
+        if ($auction->getCurrentPrice() === null) {
+            $highestBid = $this->bidService->getHighestBidAmountByAuctionId($auction->getAuctionId());
+            $auction->setCurrentPrice($highestBid > 0 ? $highestBid : $auction->getStartingPrice());
+        }
+        if ($auction->getBidCount() === null) {
+            $auction->setBidCount($this->bidService->countBidsByAuctionId($auction->getAuctionId()));
+        }
+        // Image still requires separate query (different table)
+        $auction->setImageUrl($this->imageService->getMainImageUrlByAuctionId($auction->getAuctionId()));
+    }
+
+    private function hydrateMany(array $auctions): void
+    {
+        foreach ($auctions as $auction) {
+            $this->hydrate($auction);
+        }
+    }
+
+    public function getWatchedByUserId(int $userId): array {
+        $auctions = $this->auctionRepo->getWatchedAuctionsByUserId($userId);
+        $this->hydrateMany($auctions);
+        return $auctions;
+    }
+
+    public function createAuction(array $itemInput, array $auctionInput, array $imageInputs): array { // $imageInputs is an array with multiple $imageInput
+        // $auctionInput offers: start_datetime, end_datetime, starting_price, reserve_price
 
         $pdo = $this->db->connection;
 
         // --- Start Transaction ---
         try {
+            // Wrap "item creation" + "auction creation" + "image uploading" in a transaction
             Utilities::beginTransaction($pdo);
 
-            // 1. Create Inventory Item (The Noun)
-            // This creates the permanent record in 'items'
+            // Create Item
             $createItemResult = $this->itemService->createItem($itemInput);
-
             if (!$createItemResult['success']) {
-                $pdo->rollBack();
                 return Utilities::creationResult($createItemResult['message'], false, null);
             }
             $item = $createItemResult['object'];
 
-            // 2. Validate Auction Data (The Action/Snapshot)
+            // Validates user input for auction, and fix data type
             $validationResult = $this->validateAndFixType($auctionInput);
 
             // Validation Fail -> Abort transaction
@@ -80,8 +90,7 @@ class AuctionService
             }
 
             // Validation Pass -> Create Auction object
-            $auctionInput = $validationResult['object'];
-
+            $auctionInput = $validationResult['object']; // The fixed-type inputs are stored in $validationResult['object']
             $auction = new Auction(
                 $item->getItemId(),
                 $auctionInput['auction_description'],
@@ -103,7 +112,7 @@ class AuctionService
                 return Utilities::creationResult("Failed to create an auction.", false, null);
             }
 
-            // 3. Link Item to Auction (Update 'current_auction_id' on the Item)
+            // Link Item to Auction
             $item->setCurrentAuctionId($auction->getAuctionId());
             $updateItemResult = $this->itemRepo->update($item);
             if (!$updateItemResult) {
@@ -111,15 +120,14 @@ class AuctionService
                 return Utilities::creationResult("Failed to link item to auction.", false, null);
             }
 
-            // 4. Upload Images (Now linked to the Auction, not the Item)
+            // Upload Images
             $uploadImageResult = $this->imageService->uploadAuctionImages($auction, $imageInputs);
-
             if (!$uploadImageResult['success']) {
                 $pdo->rollBack();
                 return Utilities::creationResult($uploadImageResult['message'], false, null);
             }
 
-            // All Succeed -> Commit Transaction
+            // Insertion Succeed -> Commit Transaction
             $pdo->commit();
             return Utilities::creationResult("Auction created successfully!", true, $auction);
 
@@ -127,8 +135,7 @@ class AuctionService
             if ($pdo->inTransaction()) {
                 $pdo->rollBack();
             }
-            // Return error
-            return Utilities::creationResult("Database Error: " . $e->getMessage(), false, null);
+            throw $e;
         }
     }
 
@@ -205,7 +212,7 @@ class AuctionService
 
             // Check if start date is in the past (Allowing a 1 hr small buffer)
             if ($startDate < $now->add(DateInterval::createFromDateString('1 hour'))) {
-                 return Utilities::creationResult("Auction start date cannot be in the past.", false, null);
+                return Utilities::creationResult("Auction start date cannot be in the past.", false, null);
             }
         } catch (Exception $e) {
             return Utilities::creationResult("Invalid start date format.", false, null);
@@ -241,5 +248,20 @@ class AuctionService
 
         // Success
         return Utilities::creationResult('', true, $input);
+    }
+
+
+    public function getActiveListings(int $page = 1, int $perPage = 12, string $orderBy = 'ending_soonest'): array
+    {
+        $offset = ($page - 1) * $perPage;
+        $auctions = $this->auctionRepo->getByFilters($perPage, $offset, $orderBy);
+        $this->hydrateMany($auctions);
+        return $auctions;
+    }
+
+    // Count active auctions for pagination
+    public function countActiveListings(): int
+    {
+        return $this->auctionRepo->countByFilters();
     }
 }
