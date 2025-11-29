@@ -48,5 +48,58 @@
     window.showBecomeSellerModal = showBecomeSellerModal;
 </script>
 
+<!-- popup out bid notification -->
+<!-- JW TEST (generated wit GPT)-->
+<script>
+    function fetchNotifications()
+    {
+        console.log("fetchNotifications() called");
+
+        fetch('/notifications', {
+        method: 'GET',
+            credentials: 'same-origin' // <- this includes the session cookie
+        })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(notifications) {
+                notifications.forEach(function(n) {
+                    showPopup(n);
+                });
+            })
+            .catch(function(err) {
+                console.error('Error fetching notifications:', err);
+            });
+    }
+
+    // Call every 5 seconds for real-time updates
+    setInterval(fetchNotifications, 5000);
+
+    function showPopup(notification) {
+        const div = document.createElement('div');
+        div.className = 'popup';
+        div.innerText = notification.message;
+
+        // Add to DOM
+        document.body.appendChild(div);
+
+        // Notify server that this notification was displayed
+        fetch('/notifications', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: notification.notificationId })
+        });
+
+
+        // Trigger animation
+        requestAnimationFrame(() => div.classList.add('show'));
+
+        // Automatically remove after 4 seconds
+        setTimeout(function() {
+            div.remove();
+        }, 4000);
+    }
+</script>
+
 </body>
 </html>

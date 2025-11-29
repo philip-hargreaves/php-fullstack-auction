@@ -18,11 +18,17 @@ class BidService
     private UserRepository $userRepo;
     private Database $db;
 
-    public function __construct(BidRepository $bidRepo, AuctionRepository $auctionRepo, UserRepository $userRepo, Database $db) {
+    //TODO JW test
+    private NotificationService $notificationServ;
+
+    public function __construct(BidRepository $bidRepo, AuctionRepository $auctionRepo, UserRepository $userRepo, Database $db, NotificationService $notificationServ) {
         $this->bidRepo = $bidRepo;
         $this->auctionRepo = $auctionRepo;
         $this->userRepo = $userRepo;
         $this->db = $db;
+
+        //TODO JW test
+        $this->notificationServ = $notificationServ;
     }
 
     public function getHighestBidAmountByAuctionId($auctionId): ?float {
@@ -139,6 +145,9 @@ class BidService
         return Utilities::creationResult('Bid successfully placed!', true, $bid);
     }
 
+
+    //add notification system here?
+    //TODO JW: everytime someone places bid, checks previous bids?
     public function placeBid(array $input): array {
         // Get the DB connection
         $pdo = $this->db->connection;
@@ -158,6 +167,10 @@ class BidService
                 return $validationResult;
             }
 
+
+            //TODO JW get previous highest bid and check if outbid
+            $userOutBid = $this -> userOutbid($input);
+
             // Validation Pass -> Create Bid
             $creationResult = $this->createBid($input);
 
@@ -168,7 +181,29 @@ class BidService
             }
 
             // Insertion Succeed -> Commit Transaction
+            //TODO JW test if user was outbid, store the users in toNotify table.
+            if($userOutBid != null)
+            {
+                $auctionId = $creationResult['object'] -> getAuctionId();
+                $newHighestBidder = $creationResult['object'] -> getBuyerId();
+                $prevHighestBidder = $userOutBid -> getBuyerId();
+
+                //temporarily stores notification to be sent
+                $createOutBidNotificationResult = $this -> notificationServ -> createOutBidNotification(
+                    $auctionId,
+                    $newHighestBidder,
+                    $prevHighestBidder
+                );
+
+                if (!$createOutBidNotificationResult['success'])
+                {
+                    $pdo->rollBack();
+                    return $creationResult;
+                }
+            }
+
             $pdo->commit();
+
             return $creationResult;
 
         } catch (PDOException $e) {
@@ -176,6 +211,40 @@ class BidService
                 $pdo->rollBack();
             }
             throw $e;
+        }
+    }
+
+    //TODO JW function for checking highest bid.
+    private function userOutbid($input)
+    {
+        $currentHighestBid = $this->bidRepo->getHighestBidByAuctionId($input['auction_id']);
+
+        if ($currentHighestBid === null)
+        {
+            return null;
+        }
+
+        $currentHighestBidderId = $currentHighestBid -> getBuyerId();
+
+        $newBidderId = $input['user_id'];
+
+        $newBidAmount = $input['bid_amount'];
+
+        //notification will not be sent to the user if already highest bidder.
+        if($currentHighestBidderId === $newBidderId)
+        {
+            return null;
+        }
+        else
+        {
+            if ($newBidAmount > $currentHighestBid -> getBidAmount())
+            {
+                return $currentHighestBid;
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 
