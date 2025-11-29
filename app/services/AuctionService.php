@@ -236,11 +236,6 @@ class AuctionService
     }
 
     // --- PRIVATE HELPER FUNCTIONS ---
-
-    /**
-     * Factory method to create Auction Objects.
-     * Used by Create, Relist, and Update to ensure consistent object structure.
-     */
     private function instantiateAuction(array $input, int $itemId, string $status, ?int $auctionId = null): Auction
     {
         return new Auction(
