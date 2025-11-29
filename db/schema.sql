@@ -154,7 +154,6 @@ CREATE TABLE messages (
     FOREIGN KEY (participant_id) REFERENCES participants(id) ON DELETE SET NULL
 );
 
--- JW test notification table
 CREATE TABLE notifications (
     id INT AUTO_INCREMENT PRIMARY KEY,
     auction_id INT NOT NULL,
