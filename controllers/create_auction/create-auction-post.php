@@ -24,7 +24,7 @@ try {
     // start_datetime, end_datetime, starting_price, reserve_price
     // $imageInputs should offer: an array of multiple [image_url, is_main]
     $actionMode = Request::post('auction_mode');
-    $auctionId = Request::post('auction_id');
+    $auctionId = (int)Request::post('auction_id');
     if (!($actionMode == "create")) {
         $prevAuction = $auctionService->getById($auctionId);
     }
@@ -40,6 +40,7 @@ try {
     $auctionInput['category_id'] = Request::post('category_id');
 
     $imageInputs = Request::postRaw('auction_image_urls');
+
 
     $result = [];
 

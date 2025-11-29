@@ -36,8 +36,10 @@
     <div class="row justify-content-center">
         <!-- Image Gallery -->
         <div class="col-12 col-md-7 mx-auto mb-4" style="max-width: 600px;">
-            <?php $firstImage = $imageUrls[0] ?? \infrastructure\Utilities::basePath('infrastructure/resources/images/default_item_image.jpg'); ?>
-
+            <?php
+            $defaultPath = "/images/default_item_image.jpg";
+            $firstImage = !empty($imageUrls[0]) ? $imageUrls[0] : $defaultPath;
+            ?>
             <div id="image-gallery" class="gallery-container mb-2 border rounded bg-transparent" style="height: 400px; overflow: hidden;">
                 <img src="<?= htmlspecialchars($firstImage) ?>"
                      alt="<?= htmlspecialchars($title) ?>"
@@ -222,7 +224,7 @@
                                 <?php
                                 // Check if this is the winning bid
                                 $isHighestBid = $highestBid && $highestBid->getBidId() == $bid->getBidId();
-                                $isMyBid = $bid->getBuyerId() == $_SESSION['user_id'];
+                                $isMyBid = isset($_SESSION['user_id']) && $bid->getBuyerId() == $_SESSION['user_id'];
                                 ?>
                                 <tr class="<?php
                                 if ($isHighestBid) {echo 'table-success';}
@@ -298,6 +300,16 @@
                             <?php $badgeColor = ($auctionStatus === 'Active') ? 'bg-success' : 'bg-secondary'; ?>
                             <span class="badge rounded-pill <?= $badgeColor ?>">
                             <?= htmlspecialchars($auctionStatus) ?>
+                        </span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="text">Item Status</td>
+                        <td class="text-end">
+                            <?php $badgeColor = ($itemIsSold) ? 'bg-success' : 'bg-secondary'; ?>
+                            <span class="badge rounded-pill <?= $badgeColor ?>">
+                            <?= htmlspecialchars($itemIsSold ? "Sold" : "Not Sold") ?>
                         </span>
                         </td>
                     </tr>

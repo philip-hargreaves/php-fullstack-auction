@@ -111,16 +111,9 @@ function initializeImageUploader(config) {
             // URL Input
             const inputUrl = document.createElement('input');
             inputUrl.type = 'hidden';
-            inputUrl.name = `auction_image_urls[${index}][image_url]`;
+            inputUrl.name = 'auction_image_urls[]';
             inputUrl.value = url;
             hiddenContainer.appendChild(inputUrl);
-
-            // Is Main Input (First card is always main)
-            const inputMain = document.createElement('input');
-            inputMain.type = 'hidden';
-            inputMain.name = `auction_image_urls[${index}][is_main]`;
-            inputMain.value = (index === 0) ? '1' : '0';
-            hiddenContainer.appendChild(inputMain);
         });
 
         form.submit();

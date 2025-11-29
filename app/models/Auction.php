@@ -24,6 +24,7 @@ class Auction
     private ?Category $category = null;
     private ?float $currentPrice = null;
     private ?array $auctionImages = null;
+    private ?int $bidCount = null;
 
     // CONSTRUCTOR
     public function __construct(
@@ -210,5 +211,15 @@ class Auction
 
     public function getAuctionImages(): ?array {
         return $this->auctionImages;
+    }
+
+    public function setBidCount(int $bidCount): void
+    {
+        $this->bidCount = $bidCount;
+    }
+
+    public function getBidCount(): ?int
+    {
+        return $this->bidCount;
     }
 }

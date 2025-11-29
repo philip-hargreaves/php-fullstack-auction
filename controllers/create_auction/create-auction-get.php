@@ -21,10 +21,10 @@ if ($auctionMode == 'update' || $auctionMode == 'relist') {
     $categoryPathIds = [];
     if ($categoryId) {
         // Return an array of Category Objects ordered Root to Leaf
-        $categoryPathIds[] = $categoryServ->getAllParentId($categoryId);
+        $parents = $categoryServ->getAllParentId($categoryId);
         // Add currentId to the end of the path
-        $categoryPathIds[] = $categoryId;
-        $jsonCategoryPath = json_encode($categoryPathIds);
+        $flatPath = array_merge($parents, [(int)$categoryId]);
+        $jsonCategoryPath = json_encode($flatPath);
     }
 
     // Prepare imageUrls

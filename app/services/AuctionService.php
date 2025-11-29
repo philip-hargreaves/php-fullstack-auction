@@ -1,7 +1,6 @@
 <?php
 
 namespace app\services;
-
 use app\repositories\AuctionImageRepository;
 use app\repositories\AuctionRepository;
 use app\repositories\CategoryRepository;
@@ -47,14 +46,11 @@ class AuctionService
     }
 
     public function getByUserId(int $sellerId): array {
-        $auctions = $this->auctionRepo->getBySellerId($sellerId);
+        return $this->auctionRepo->getBySellerId($sellerId);
+    }
 
-        foreach ($auctions as $auction) {
-            $highestBid = $this->bidService->getHighestBidAmountByAuctionId($auction->getAuctionId());
-            $currentPrice = $highestBid > 0 ? $highestBid : $auction->getStartingPrice();
-            $auction->setCurrentPrice($currentPrice);
-        }
-        return $auctions;
+    public function getWatchedByUserId(int $userId): array {
+        return $this->auctionRepo->getWatchedAuctionsByUserId($userId);
     }
 
     public function getById(int $auctionId): ?Auction {
@@ -63,6 +59,7 @@ class AuctionService
 
     public function createAuction(array $itemInput, array $auctionInput, array $imageInputs): array
     {
+
         $pdo = $this->db->connection;
         Utilities::beginTransaction($pdo);
 
@@ -94,6 +91,7 @@ class AuctionService
             }
 
             // Link Item & Save Images
+
             if (!$this->finalizeAuctionSetup($auction, $item, $imageInputs)) {
                 $pdo->rollBack();
                 return Utilities::creationResult("Failed to link item or save images.", false, null);
@@ -253,10 +251,6 @@ class AuctionService
         );
     }
 
-    /**
-     * Shared logic for Create and Relist.
-     * Links the Item to the Auction and Uploads Images.
-     */
     private function finalizeAuctionSetup(Auction $auction, Item $item, array $images): bool
     {
         // Link Item to current auction
@@ -454,5 +448,18 @@ class AuctionService
         }
 
         return null; // No errors
+    }
+
+
+    public function getActiveListings(int $page = 1, int $perPage = 12, string $orderBy = 'ending_soonest'): array
+    {
+        $offset = ($page - 1) * $perPage;
+        return $this->auctionRepo->getByFilters($perPage, $offset, $orderBy);
+    }
+
+    // Count active auctions for pagination
+    public function countActiveListings(): int
+    {
+        return $this->auctionRepo->countByFilters();
     }
 }

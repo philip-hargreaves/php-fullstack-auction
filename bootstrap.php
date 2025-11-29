@@ -91,11 +91,6 @@ DIContainer::bind('registrationServ', new RegistrationService(
     DIContainer::get('roleRepo'),
     DIContainer::get('db')));
 
-DIContainer::bind('watchlistServ', new WatchlistService(
-    DIContainer::get('watchlistRepo'),
-    DIContainer::get('auctionRepo'),
-    DIContainer::get('bidServ')));
-
 DIContainer::bind('roleServ', new RoleService(
     DIContainer::get('userRepo'),
     DIContainer::get('roleRepo'),
@@ -111,3 +106,7 @@ DIContainer::bind('auctionServ', new AuctionService(
     DIContainer::get('bidServ'),
     DIContainer::get('categoryRepo'),
     DIContainer::get('auctionImageRepo')));
+
+DIContainer::bind('watchlistServ', new WatchlistService(
+    DIContainer::get('watchlistRepo'),
+    DIContainer::get('auctionServ')));

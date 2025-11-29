@@ -11,6 +11,7 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
  * @var $jsonCategoryPath
  * @var $jsonCategoryTree
  * @var $ReservePriceText string
+ * @var $categoryServ
  */
 ?>
 
@@ -21,13 +22,20 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
     if (isset($_SESSION['create_auction_old_input'])) {
         // placing old input
         $placeHolder = $_SESSION['create_auction_old_input'];
+
+        $categoryId = $placeHolder["category_id"] ?? null;
+        if ($categoryId) {
+            $parents = $categoryServ->getAllParentId((int)$categoryId);
+            $flatPath = array_merge($parents, [(int)$categoryId]);
+            $jsonCategoryPath = json_encode($flatPath);
+        }
     } elseif ($auctionMode == "create") {
 
     } elseif ($auctionMode == "update" || $auctionMode == "relist") {
         $placeHolder = $prevAuction;
     }
     ?>
-    
+
     <?php $isItemNameLocked = ($auctionMode == 'update' || $auctionMode == 'relist'); ?>
     <?php $isStartDatetimeLocked = ($auctionMode == 'update'); ?>
 
@@ -130,7 +138,9 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
                                 <select id="cat-selector" class="form-control flex-grow-1">
                                     <option value="">Select a Category...</option>
                                 </select>
-                            </div>
+                            </div> <small id="titleHelp" class="form-text text-muted">
+                                <span class="text-danger">* Required.</span>
+                            </small>
                             <!-- Display current cat path -->
                             <small id="cat-breadcrumbs" class="text-muted mb-2"></small>
                             <input type="hidden"
@@ -175,7 +185,7 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
                                         value="<?= htmlspecialchars($placeHolder['reserve_price'] ?? '') ?>">
                             </div>
                             <small id="reservePriceHelp" class="form-text text-muted">* Optional. This value is not displayed in the auction listing.</small>
-                            <small id="reservePriceHelp" class="form-text text-muted"><?= $ReservePriceText ? "* " . $ReservePriceText : "" ?></small>
+                            <small id="reservePriceHelp" class="form-text text-muted"><?= !empty($ReservePriceText) ? "* " . $ReservePriceText : "" ?></small>
                         </div>
                     </div>
                     <!-- Start Datetime -->
@@ -260,7 +270,7 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
             uploadUrl:          'ajax/upload-image.php',
             minImages:          1,
             maxImages:          10,
-            initialImages: <?= json_encode($placeHolder['auction_image_urls'] ?? []) ?>
+            initialImages:      <?= json_encode($placeHolder['auction_image_urls'] ?? []) ?>
         });
 
         // 3. Initialize Category Selector
