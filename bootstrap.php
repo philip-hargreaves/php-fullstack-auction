@@ -64,7 +64,6 @@ DIContainer::bind('categoryRepo', new CategoryRepository(
     DIContainer::get('db')
 ));
 
-//TODO JW Notification Repo
 DIContainer::bind('notificationRepo', new NotificationRepository(
     DIContainer::get('db')
 ));
@@ -83,8 +82,6 @@ DIContainer::bind('imageServ', new ImageService(
     DIContainer::get('auctionRepo'),
     DIContainer::get('db')));
 
-
-//TODO JW test
 DIContainer :: bind('notificationServ', new NotificationService(
     DIContainer::get('db'),
     DIContainer::get('notificationRepo'),
@@ -98,8 +95,6 @@ DIContainer::bind('bidServ', new BidService(
     DIContainer::get('auctionRepo'),
     DIContainer::get('userRepo'),
     DIContainer::get('db'),
-
-    //TODO JW TEST
     DIContainer::get('notificationServ')
 ));
 

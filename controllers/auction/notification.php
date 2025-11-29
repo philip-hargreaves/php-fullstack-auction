@@ -1,9 +1,4 @@
 <?php
-//this will be the cron controller.
-//call notification service.
-//notification service calls on repo to extract.
-//send notification.
-
 use infrastructure\DIContainer;
 use infrastructure\Utilities;
 use infrastructure\Request;
@@ -18,27 +13,25 @@ $userId = $_SESSION['user_id'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
-    //TODO need error handling here?
-    //for when no user is logged in.
+    //when no user is logged in, no notifications are sent.
     if (!$userId) {
         echo json_encode([]);
         exit;
     }
-    ///////////////////////////////
 
+    //retrieves unsent notifications
     $notificationsToSend = $notificationServ -> prepareNotifications($userId);
 
-    //test
+    //send an array of notifications to be handled by relevant javascripts
     echo json_encode($notificationsToSend);
-    //////////////////////////
-
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST')
 {
-    // Mark a notification as sent
+    //Java script will return all notifications sent
     $data = json_decode(file_get_contents('php://input'), true);
 
+    //Based on the ID, notifications are marked as sent
     if (isset($data['id']))
     {
         $notificationId = (int)$data['id'];

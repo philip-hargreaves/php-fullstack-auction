@@ -53,7 +53,6 @@ class NotificationService
 
     public function prepareNotifications(int $userId)
     {
-        //TODO send notifications here.
         $notifications = $this -> notificationRepo -> getPendingNotification();
 
         $notificationsToSend = [];
