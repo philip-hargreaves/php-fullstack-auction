@@ -176,9 +176,14 @@ class AuctionRepository
 
     }
 
-    // Fetches paginated active auctions for the index page
-    public function getActiveAuctions(int $limit = 12, int $offset = 0, string $orderBy = 'ending_soonest'): array
-    {
+    // Fetches paginated auctions with optional filters
+    public function getByFilters(
+        int $limit = 12,
+        int $offset = 0,
+        string $orderBy = 'ending_soonest',
+        array $statuses = ['Active'],
+        array $conditions = []
+    ): array {
         try {
             $limit = (int)$limit;
             $offset = (int)$offset;
@@ -192,18 +197,43 @@ class AuctionRepository
                 default => 'a.end_datetime ASC'
             };
 
-            // Single unified query for all sort types
+            // Build WHERE clause
+            $whereConditions = [];
+            $params = [];
+
+            // Status filter
+            if (!empty($statuses)) {
+                $statusPlaceholders = [];
+                foreach ($statuses as $i => $status) {
+                    $statusPlaceholders[] = ":status{$i}";
+                    $params["status{$i}"] = $status;
+                }
+                $whereConditions[] = "a.auction_status IN (" . implode(',', $statusPlaceholders) . ")";
+            }
+
+            // Condition filter
+            if (!empty($conditions)) {
+                $conditionPlaceholders = [];
+                foreach ($conditions as $i => $condition) {
+                    $conditionPlaceholders[] = ":condition{$i}";
+                    $params["condition{$i}"] = $condition;
+                }
+                $whereConditions[] = "a.auction_condition IN (" . implode(',', $conditionPlaceholders) . ")";
+            }
+
+            $whereClause = !empty($whereConditions) ? 'WHERE ' . implode(' AND ', $whereConditions) : '';
+
             $sql = "SELECT a.*, 
                         COALESCE(MAX(b.bid_amount), a.starting_price) AS current_price,
                         COUNT(b.id) AS bid_count
                     FROM auctions a
                     LEFT JOIN bids b ON a.id = b.auction_id
-                    WHERE a.auction_status = 'Active'
+                    {$whereClause}
                     GROUP BY a.id
                     ORDER BY {$orderClause}
                     LIMIT {$limit} OFFSET {$offset}";
 
-            $rows = $this->db->query($sql)->fetchAll();
+            $rows = $this->db->query($sql, $params)->fetchAll();
             return $this->hydrateMany($rows);
         } catch (PDOException $e) {
             // TODO: add logging
@@ -211,12 +241,36 @@ class AuctionRepository
         }
     }
 
-    // Returns total count of active auctions for pagination
-    public function countActiveAuctions(): int
+    // Count auctions matching filters (for pagination)
+
+    public function countByFilters(array $statuses = ['Active'], array $conditions = []): int
     {
         try {
-            $sql = "SELECT COUNT(*) as total FROM auctions WHERE auction_status = 'Active'";
-            $row = $this->db->query($sql)->fetch();
+            $whereConditions = [];
+            $params = [];
+
+            if (!empty($statuses)) {
+                $statusPlaceholders = [];
+                foreach ($statuses as $i => $status) {
+                    $statusPlaceholders[] = ":status{$i}";
+                    $params["status{$i}"] = $status;
+                }
+                $whereConditions[] = "auction_status IN (" . implode(',', $statusPlaceholders) . ")";
+            }
+
+            if (!empty($conditions)) {
+                $conditionPlaceholders = [];
+                foreach ($conditions as $i => $condition) {
+                    $conditionPlaceholders[] = ":condition{$i}";
+                    $params["condition{$i}"] = $condition;
+                }
+                $whereConditions[] = "auction_condition IN (" . implode(',', $conditionPlaceholders) . ")";
+            }
+
+            $whereClause = !empty($whereConditions) ? 'WHERE ' . implode(' AND ', $whereConditions) : '';
+
+            $sql = "SELECT COUNT(*) as total FROM auctions {$whereClause}";
+            $row = $this->db->query($sql, $params)->fetch();
             return (int)$row['total'];
         } catch (PDOException $e) {
             // TODO: add logging

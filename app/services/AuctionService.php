@@ -254,16 +254,14 @@ class AuctionService
     public function getActiveListings(int $page = 1, int $perPage = 12, string $orderBy = 'ending_soonest'): array
     {
         $offset = ($page - 1) * $perPage;
-
-        $auctions = $this->auctionRepo->getActiveAuctions($perPage, $offset, $orderBy);
-        $total = $this->auctionRepo->countActiveAuctions();
-
+        $auctions = $this->auctionRepo->getByFilters($perPage, $offset, $orderBy);
         $this->hydrateMany($auctions);
+        return $auctions;
+    }
 
-        return [
-            'auctions' => $auctions,
-            'total' => $total,
-            'perPage' => $perPage
-        ];
+    // Count active auctions for pagination
+    public function countActiveListings(): int
+    {
+        return $this->auctionRepo->countByFilters();
     }
 }

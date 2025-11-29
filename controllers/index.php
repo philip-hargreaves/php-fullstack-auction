@@ -15,11 +15,9 @@ $curr_page = Request::get('page', 1);
 $auctionServ = DIContainer::get('auctionServ');
 $results_per_page = 12;
 
-$result = $auctionServ->getActiveListings($curr_page, $results_per_page, $ordering);
-$auctions = $result['auctions'];
-$num_results = $result['total'];
+$auctions = $auctionServ->getActiveListings($curr_page, $results_per_page, $ordering);
+$num_results = $auctionServ->countActiveListings();
 $max_page = ceil($num_results / $results_per_page);
-
 
 // Pagination
 $querystring = "";
