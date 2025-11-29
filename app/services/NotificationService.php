@@ -45,9 +45,9 @@ class NotificationService
 
         $notification = $this -> notificationRepo -> create($outBidNotification);
 
-        // Insertion Failed -> Return failed result to the transaction in createAuction()
+        // insertion failed, failed to create outbid notification
         if (is_null($notification)) {
-            return Utilities::creationResult("Failed to create an auction.", false, null);
+            return Utilities::creationResult("Failed to create outbid notification.", false, null);
         }
 
         return Utilities::creationResult("outbid notification successfully created!", true, $notification);
@@ -61,10 +61,6 @@ class NotificationService
 
         foreach ($notifications as $notification)
         {
-            //send notification logic here.
-            //change the status to sent.
-            //need to return json stuff?
-
             //checks if user is still active.
             $prevPrevHighestBidderId = $notification->getPrevHighestBidderId();
             $prevUser = $this-> userRepo ->getById($prevPrevHighestBidderId);
@@ -103,7 +99,6 @@ class NotificationService
                     ];
 
                     $notificationsToSend[] = $message;
-                    //$this -> notificationRepo -> changeNotificationStatusToSent($notificationId);
                 }
             }
         }

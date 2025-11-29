@@ -53,10 +53,13 @@ class NotificationRepository
                     VALUES (:auction_id, :current_highest_bidder_id, :prev_highest_bidder_id, :is_sent)";
             $result = $this->db->query($sql, $params);
 
-            $id = (int)$this->db->connection->lastInsertId();
-            $notification->setOutBidNotificationId($id);
+            if ($result) {
+                $id = (int)$this->db->connection->lastInsertId();
+                $notification->setOutBidNotificationId($id);
+                return $notification;
+            }
 
-            return $notification;
+            return null;
         }
         catch (PDOException $e)
         {
