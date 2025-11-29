@@ -75,6 +75,7 @@ DIContainer :: bind('notificationServ', new NotificationService(
     DIContainer::get('notificationRepo'),
     DIContainer::get('userRepo'),
     DIContainer::get('auctionRepo'),
+    DIContainer::get('itemRepo')
 ));
 
 // Bind Services (they depend on repositories)

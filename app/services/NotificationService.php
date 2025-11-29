@@ -4,6 +4,7 @@ namespace app\services;
 
 use app\models\OutBidNotification;
 use app\repositories\AuctionRepository;
+use app\repositories\ItemRepository;
 use app\repositories\NotificationRepository;
 use app\repositories\UserRepository;
 use infrastructure\Database;
@@ -12,23 +13,24 @@ use infrastructure\Utilities;
 class NotificationService
 {
     private Database $db;
-
     private NotificationRepository $notificationRepo;
-
     private UserRepository $userRepo;
     private AuctionRepository $auctionRepo;
+    private ItemRepository $itemRepo;
 
     public function __construct(
         Database $db,
         NotificationRepository $notificationRepository,
         UserRepository $userRepo,
-        AuctionRepository $auctionRepo
+        AuctionRepository $auctionRepo,
+        ItemRepository $itemRepo
     )
     {
         $this->db = $db;
         $this->notificationRepo = $notificationRepository;
         $this->userRepo = $userRepo;
         $this->auctionRepo = $auctionRepo;
+        $this->itemRepo = $itemRepo;
     }
 
     public function createOutBidNotification($auctionId, $newHighestBidder, $prevHighestBidder)
@@ -84,13 +86,20 @@ class NotificationService
                 $notificationId = $notification -> getOutBidNotificationId();
                 $prevHighestBidderId = $notification -> getPrevHighestBidderId();
 
+                //get auction name
+                $auctionItemId = $auction -> getItemId();
+                $auctionItem = $this -> itemRepo -> getById($auctionItemId);
+
+                //get item name from auction item
+                $auctionItemName = $auctionItem -> getItemName();
+
                 if($userId === $prevHighestBidderId)
                 {
                     //store messages
                     $message = [
                         'notificationId' => $notificationId,
                         'prevHighestBidderId' => $prevHighestBidderId,
-                        'message' => "You have been outbid for (placeholder)!"
+                        'message' => "You have been outbid for " . $auctionItemName . "!",
                     ];
 
                     $notificationsToSend[] = $message;
