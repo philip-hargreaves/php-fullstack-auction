@@ -12,7 +12,7 @@ require Utilities::basePath('views/partials/header.php');
 
     <!-- Main Content with Filters -->
     <div class="container-fluid mt-5 px-4">
-        <div class="main-content-wrapper">
+        <div class="main-content-wrapper<?= !empty($activeFilters['keyword']) ? ' has-search-results' : '' ?>">
             <!-- Left Sidebar Filters -->
             <div class="filter-sidebar">
                 <form method="GET" action="/" id="filterForm">
@@ -177,7 +177,25 @@ require Utilities::basePath('views/partials/header.php');
 
             <!-- Main Content Area -->
             <div class="main-content-area">
-                <div class="sort-container mb-3">
+                <!-- Search Results Header and Sort Container (same row) -->
+                <div class="search-sort-container mb-3" style="display: flex; justify-content: space-between; align-items: center; min-height: 33px;">
+                    <!-- Search Results Header -->
+                    <?php if (!empty($activeFilters['keyword'])): ?>
+                        <div class="search-results-header" style="flex: 1; color: #b0b0b0;">
+                            <span style="font-size: 28px; font-weight: 500;">
+                                <i class="fa fa-search" style="margin-right: 8px;"></i>
+                                Search results for "<strong style="color: #fff;"><?= htmlspecialchars($activeFilters['keyword']) ?></strong>"
+                                <?php if ($activeFilters['includeDescription'] ?? false): ?>
+                                    <span style="color: #888; font-size: 24px;">(including descriptions)</span>
+                                <?php endif; ?>
+                                <?php if (isset($num_results) && $num_results > 0): ?>
+                                    <span style="color: #888; margin-left: 8px; font-size: 24px;">- <?= $num_results ?> <?= $num_results == 1 ? 'result' : 'results' ?></span>
+                                <?php endif; ?>
+                            </span>
+                        </div>
+                    <?php endif; ?>
+                    
+                    <div class="sort-container" style="<?= !empty($activeFilters['keyword']) ? 'flex-shrink: 0;' : 'margin-left: auto;' ?>">
                     <div class="sort-dropdown">
                         <button type="button" class="sort-button" id="sortButton">
                             <svg width="20" height="20" class="sort-icon" fill-rule="evenodd" viewBox="0 0 24 24">
@@ -247,23 +265,8 @@ require Utilities::basePath('views/partials/header.php');
                             </form>
                         </div>
                     </div>
-                </div>
-                
-                <!-- Search Results Header -->
-                <?php if (!empty($activeFilters['keyword'])): ?>
-                    <div class="search-results-header mb-3" style="padding: 16px 0; color: #b0b0b0;">
-                        <span style="font-size: 28px; font-weight: 500;">
-                            <i class="fa fa-search" style="margin-right: 8px;"></i>
-                            Search results for "<strong style="color: #fff;"><?= htmlspecialchars($activeFilters['keyword']) ?></strong>"
-                            <?php if ($activeFilters['includeDescription'] ?? false): ?>
-                                <span style="color: #888; font-size: 24px;">(including descriptions)</span>
-                            <?php endif; ?>
-                            <?php if (isset($num_results) && $num_results > 0): ?>
-                                <span style="color: #888; margin-left: 8px; font-size: 24px;">- <?= $num_results ?> <?= $num_results == 1 ? 'result' : 'results' ?></span>
-                            <?php endif; ?>
-                        </span>
                     </div>
-                <?php endif; ?>
+                </div>
                 
                 <div class="auction-gallery">
                     <?php if (empty($processed_auctions)): ?>
