@@ -2,6 +2,8 @@
 require Utilities::basePath('views/partials/header.php');
 /**
  * @var $processed_auctions array
+ * @var $processed_recommended_auctions array
+ * @var $popular_categories array
  * @var $curr_page
  * @var $querystring
  * @var $low_page
@@ -111,6 +113,26 @@ require Utilities::basePath('views/partials/header.php');
 
             <!-- Main Content Area -->
             <div class="main-content-area">
+                <!-- Popular Categories -->
+                <?php if (!empty($popular_categories)): ?>
+                    <section class="popular-categories-section">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h4 class="section-title m-0">Popular categories</h4>
+                            <a href="/categories" class="btn btn-link text-decoration-none">View all</a>
+                        </div>
+                        <div class="horizontal-scroll-wrapper mb-3" style="">
+                            <?php foreach ($popular_categories as $index => $cat): ?>
+                                <a href="/category_view?id=<?= $cat->getCategoryId() ?>" class="category-card cat-color-<?= $index % 6 ?>">
+                                    <div class="cat-content">
+                                        <h4 class="cat-title"><?= htmlspecialchars($cat->getCategoryName()) ?></h4>
+                                    </div>
+                                </a>
+                            <?php endforeach; ?>
+                        </div>
+                    </section>
+                <?php endif; ?>
+
+                <!-- Processed Auctions -->
                 <div class="sort-container mb-3">
                     <div class="sort-dropdown">
                         <button type="button" class="sort-button" id="sortButton">
@@ -134,7 +156,7 @@ require Utilities::basePath('views/partials/header.php');
                 <div class="auction-gallery">
                     <?php foreach ($processed_auctions as $auction):
                         // Use image from database, or default placeholder
-                        $imageUrl = $auction['image_url'] ?? 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=300&h=300&fit=crop';
+                        $imageUrl = $auction['image_url'] ?? '/images/default_item_image.jpg';
                         ?>
                     <div class="auction-card card h-100">
                         <div class="auction-image-container">
@@ -173,50 +195,102 @@ require Utilities::basePath('views/partials/header.php');
                     </div>
             <?php endforeach; ?>
                 </div>
-                
+
+                <hr class="my-4">
+
                 <!-- Pagination -->
                 <div class="pagination-container mt-5">
-        <nav aria-label="Search results pages">
-            <ul class="pagination justify-content-center">
-            <!-- Previous button -->
-            <?php if ($curr_page != 1) : ?>
-                <li class="page-item">
-                    <a class="page-link" href="/?<?php echo $querystring; ?>page=<?php echo $curr_page - 1; ?>" aria-label="Previous">
-                        <span aria-hidden="true"><i class="fa fa-arrow-left"></i></span>
-                        <span class="sr-only">Previous</span>
-                    </a>
-                </li>
-            <?php endif; ?>
+                    <nav aria-label="Search results pages">
+                        <ul class="pagination justify-content-center">
+                            <!-- Previous button -->
+                            <?php if ($curr_page != 1) : ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="/?<?php echo $querystring; ?>page=<?php echo $curr_page - 1; ?>" aria-label="Previous">
+                                        <span aria-hidden="true"><i class="fa fa-arrow-left"></i></span>
+                                        <span class="sr-only">Previous</span>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
 
-            <!-- Numbered Pages -->
-            <?php for ($i = $low_page; $i <= $high_page; $i++) : ?>
-                <?php if ($i == $curr_page) : ?>
-                    <li class="page-item active">
-                <?php else : ?>
-                    <li class="page-item">
-                <?php endif; ?>
+                            <!-- Numbered Pages -->
+                            <?php for ($i = $low_page; $i <= $high_page; $i++) : ?>
+                                <?php if ($i == $curr_page) : ?>
+                                    <li class="page-item active">
+                                <?php else : ?>
+                                    <li class="page-item">
+                                <?php endif; ?>
 
-                <a class="page-link" href="/?<?php echo $querystring; ?>page=<?php echo $i; ?>"><?php echo $i; ?></a>
-                </li>
-            <?php endfor; ?>
+                                <a class="page-link" href="/?<?php echo $querystring; ?>page=<?php echo $i; ?>"><?php echo $i; ?></a>
+                                </li>
+                            <?php endfor; ?>
 
-            <!-- Next Button -->
-            <?php if ($curr_page != $max_page) : ?>
-                <li class="page-item">
-                    <a class="page-link" href="/?<?php echo $querystring; ?>page=<?php echo $curr_page + 1; ?>" aria-label="Next">
-                        <span aria-hidden="true"><i class="fa fa-arrow-right"></i></span>
-                        <span class="sr-only">Next</span>
-                    </a>
-                </li>
-            <?php endif; ?>
-            </ul>
-        </nav>
+                            <!-- Next Button -->
+                            <?php if ($curr_page != $max_page) : ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="/?<?php echo $querystring; ?>page=<?php echo $curr_page + 1; ?>" aria-label="Next">
+                                        <span aria-hidden="true"><i class="fa fa-arrow-right"></i></span>
+                                        <span class="sr-only">Next</span>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+                        </ul>
+                    </nav>
                 </div>
             </div>
         </div>
+        <!-- Recommended Auctions -->
+        <?php if (!empty($processed_recommended_auctions)): ?>
+            <div class="recommended-section mb-4">
+                <h4 class="mb-4">Recommended For You</h4>
+
+                <div class="horizontal-scroll-wrapper">
+                    <?php foreach ($processed_recommended_auctions as $recAuction):
+                        // Logic identical to your main loop
+                        $recImageUrl = $recAuction['image_url'] ?? '/images/default_item_image.jpg';
+                        ?>
+                        <div class="auction-card card scroller-card h-100">
+                            <div class="auction-image-container">
+                                <a href="/auction?auction_id=<?= htmlspecialchars($recAuction['auction_id']) ?>">
+                                    <img src="<?= htmlspecialchars($recImageUrl) ?>"
+                                         alt="<?= htmlspecialchars($recAuction['title']) ?>"
+                                         class="auction-image card-img-top">
+                                </a>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-0">
+                                    <div>
+                                        <h6 class="card-title mb-0">
+                                            <a href="/auction?auction_id=<?= htmlspecialchars($recAuction['auction_id']) ?>" class="text-decoration-none">
+                                                <?= htmlspecialchars($recAuction['title']) ?>
+                                            </a>
+                                        </h6>
+                                        <?php if (isset($recAuction['condition'])): ?>
+                                            <div class="auction-condition"><?= htmlspecialchars($recAuction['condition']) ?></div>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="auction-info">
+                                        <?= htmlspecialchars($recAuction['bid_text'] ?? '0 Bids') ?>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-end">
+                                    <div class="auction-price">
+                                        <span class="price-amount">£<?= number_format($recAuction['current_price'], 2) ?></span>
+                                    </div>
+                                    <div class="auction-time">
+                                        <i class="fa fa-clock-o" aria-hidden="true"></i>
+                                        <span><?= htmlspecialchars($recAuction['time_remaining']) ?></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <hr class="my-4">
+        <?php endif; ?>
     </div>
     <!-- Pagination -->
-            <?php require Utilities::basePath('views/partials/footer.php'); ?>
+<?php require Utilities::basePath('views/partials/footer.php'); ?>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {

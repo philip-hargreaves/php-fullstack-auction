@@ -5,6 +5,7 @@ use infrastructure\Database;
 use app\models\Auction;
 use infrastructure\Utilities;
 use PDOException;
+use PDO;
 
 class AuctionRepository
 {
@@ -164,6 +165,7 @@ class AuctionRepository
                 'pricehigh' => 'current_price DESC',
                 'date' => 'a.start_datetime DESC',
                 'ending_soonest' => 'a.end_datetime ASC',
+                'popularity' => 'recent_bid_count DESC, bid_count DESC',
                 default => 'a.end_datetime ASC'
             };
 
@@ -193,7 +195,8 @@ class AuctionRepository
             $sql = "SELECT a.*, 
                         i.item_name,
                         COALESCE(MAX(b.bid_amount), a.starting_price) AS current_price,
-                        COUNT(b.id) AS bid_count
+                        COUNT(b.id) AS bid_count,
+                        COUNT(CASE WHEN b.bid_datetime >= NOW() - INTERVAL 7 DAY THEN 1 END) as recent_bid_count
                     FROM auctions a
                     JOIN items i ON a.item_id = i.id
                     LEFT JOIN bids b ON a.id = b.auction_id
@@ -313,5 +316,227 @@ class AuctionRepository
         $rows = $this->db->query($sql, array_values($ids))->fetchAll();
 
         return $this->hydrateMany($rows);
+    }
+
+    // Fetch recommended auctions based on the watchlist and bid history that users bid on the same auction as me have
+    public function getRecommendedAuctionsByUserId(
+        int $currentUserId,
+        int $targetLimit = 40,
+        int $myLimit = 30,
+        int $similarUserLimit = 100,
+        int $bidWeight = 3,
+        int $watchlistWeight = 1
+    ): array {
+        if (empty($currentUserId)) return [];
+
+        $sql = "
+            WITH CurrentUserRecentBids AS (
+                -- WITH...AS creates temporary tables
+                -- A temporary list of the last 'myLimit' auctions the current user participated in
+                SELECT auction_id 
+                FROM bids 
+                WHERE buyer_id = :currentUserId
+                ORDER BY bid_datetime DESC 
+                LIMIT :myLimit
+            ),
+            SimilarUsers AS (
+                -- Find users who bid on the same auctions
+                -- DISTINCT: If a user bid 5 times on the same auction, we only want their ID once.\
+                -- != :currentUserId: Exclude current user itself
+                SELECT DISTINCT b.buyer_id
+                FROM bids b
+                JOIN CurrentUserRecentBids curb ON b.auction_id = curb.auction_id
+                WHERE b.buyer_id != :currentUserId
+                LIMIT :similarUserLimit
+            ),
+            CandidateAuctions AS (
+                -- Get auctions similar users BID on
+                SELECT 
+                    b.auction_id, 
+                    :bidWeight AS weight
+                FROM bids b
+                JOIN SimilarUsers su ON b.buyer_id = su.buyer_id
+                WHERE b.bid_datetime > NOW() - INTERVAL 30 DAY
+                
+                UNION ALL
+                
+                -- Get auctions similar users WATCHED
+                SELECT 
+                    w.auction_id, 
+                    :watchlistWeight AS weight
+                FROM watchlists w
+                JOIN SimilarUsers su ON w.user_id = su.buyer_id
+            )
+            -- Aggregate and Rank
+            SELECT 
+                ca.auction_id,
+                SUM(ca.weight) as recommendation_score
+            FROM CandidateAuctions ca
+            JOIN auctions a ON ca.auction_id = a.id
+            LEFT JOIN CurrentUserRecentBids curb ON ca.auction_id = curb.auction_id
+            WHERE curb.auction_id IS NULL -- Exclude auctions current have already bid on
+            AND auction_status = 'Active' -- Ensure auction hasn't ended
+            GROUP BY ca.auction_id
+            ORDER BY recommendation_score DESC
+            LIMIT :targetLimit;
+        ";
+
+        $stmt = $this->db->prepare($sql);
+
+        $stmt->bindValue(':currentUserId', $currentUserId, PDO::PARAM_INT);
+        $stmt->bindValue(':myLimit', $myLimit, PDO::PARAM_INT);
+        $stmt->bindValue(':similarUserLimit', $similarUserLimit, PDO::PARAM_INT);
+        $stmt->bindValue(':bidWeight', $bidWeight, PDO::PARAM_INT);
+        $stmt->bindValue(':watchlistWeight', $watchlistWeight, PDO::PARAM_INT);
+        $stmt->bindValue(':targetLimit', $targetLimit, PDO::PARAM_INT);
+
+        $stmt->execute();
+
+        // 4. Get IDs in ranked order
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $sortedIds = array_column($results, 'auction_id');
+
+        if (empty($sortedIds)) {
+            return [];
+        }
+
+        // 5. Fetch Objects
+        // NOTE: getByIds usually returns items sorted by ID (1, 2, 3), not by our Score.
+        // We must manually re-sort them to match $sortedIds.
+        $auctions = $this->getByIds($sortedIds);
+
+        return $this->reorderAuctionsByIds($auctions, $sortedIds);
+    }
+
+    public function getRecommended(
+        int $currentUserId,
+        int $limit = 40,
+        int $offset = 0,
+        array $conditions = [],
+        array $statuses = ['Active']
+    ): array {
+        if (empty($currentUserId)) return [];
+
+        // 1. Build the Dynamic WHERE Clause (Same logic as countByFilters)
+        $whereConditions = [];
+        $params = [];
+
+        // Filter by Status (e.g., 'Active')
+        if (!empty($statuses)) {
+            $placeholders = [];
+            foreach ($statuses as $i => $status) {
+                $key = "status{$i}";
+                $placeholders[] = ":{$key}";
+                $params[$key] = $status;
+            }
+            $whereConditions[] = "a.auction_status IN (" . implode(',', $placeholders) . ")";
+        }
+
+        // Filter by Condition (e.g., 'New', 'Used')
+        if (!empty($conditions)) {
+            $placeholders = [];
+            foreach ($conditions as $i => $condition) {
+                $key = "condition{$i}";
+                $placeholders[] = ":{$key}";
+                $params[$key] = $condition;
+            }
+            $whereConditions[] = "a.auction_condition IN (" . implode(',', $placeholders) . ")";
+        }
+
+        // We prefix with 'AND' because the query already has a WHERE clause
+        $dynamicWhereSQL = !empty($whereConditions) ? 'AND ' . implode(' AND ', $whereConditions) : '';
+
+        // 2. The Big SQL Query
+        // We inject $dynamicWhereSQL into the final SELECT block
+        $sql = "
+        WITH CurrentUserRecentBids AS (
+            SELECT auction_id 
+            FROM bids 
+            WHERE buyer_id = :currentUserId
+            ORDER BY bid_datetime DESC 
+            LIMIT 30
+        ),
+        SimilarUsers AS (
+            SELECT DISTINCT b.buyer_id
+            FROM bids b
+            JOIN CurrentUserRecentBids curb ON b.auction_id = curb.auction_id
+            WHERE b.buyer_id != :currentUserId
+            LIMIT 100
+        ),
+        CandidateAuctions AS (
+            SELECT b.auction_id, 3 AS weight
+            FROM bids b
+            JOIN SimilarUsers su ON b.buyer_id = su.buyer_id
+            WHERE b.bid_datetime > NOW() - INTERVAL 30 DAY
+            UNION ALL
+            SELECT w.auction_id, 1 AS weight
+            FROM watchlists w
+            JOIN SimilarUsers su ON w.user_id = su.buyer_id
+        )
+        SELECT 
+            ca.auction_id,
+            SUM(ca.weight) as recommendation_score
+        FROM CandidateAuctions ca
+        JOIN auctions a ON ca.auction_id = a.id
+        LEFT JOIN CurrentUserRecentBids curb ON ca.auction_id = curb.auction_id
+        WHERE curb.auction_id IS NULL 
+        {$dynamicWhereSQL}  -- <--- INJECTED FILTERS HERE
+        GROUP BY ca.auction_id
+        ORDER BY recommendation_score DESC
+        LIMIT :limit OFFSET :offset
+    ";
+
+        // 3. Prepare and Bind
+        $stmt = $this->db->prepare($sql);
+
+
+
+        // Bind fixed params
+        $stmt->bindValue(':currentUserId', $currentUserId, PDO::PARAM_INT);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+
+        // Bind dynamic filter params (status0, condition0, etc.)
+        foreach ($params as $key => $val) {
+            $stmt->bindValue(":{$key}", $val);
+        }
+
+        $stmt->execute();
+
+        // 4. Get IDs in ranked order
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $sortedIds = array_column($results, 'auction_id');
+
+        if (empty($sortedIds)) {
+            return [];
+        }
+
+        // 5. Fetch Objects
+        // NOTE: getByIds usually returns items sorted by ID (1, 2, 3), not by our Score.
+        // We must manually re-sort them to match $sortedIds.
+        $auctions = $this->getByIds($sortedIds);
+
+        return $this->reorderAuctionsByIds($auctions, $sortedIds);
+    }
+
+    /**
+     * Helper to sort the hydrated object array to match the specific ID order
+     * returned by the recommendation engine.
+     */
+    private function reorderAuctionsByIds(array $auctions, array $sortedIds): array
+    {
+        $map = [];
+        foreach ($auctions as $auction) {
+            // Assuming your Auction model has getId()
+            $map[$auction->getAuctionId()] = $auction;
+        }
+
+        $sorted = [];
+        foreach ($sortedIds as $id) {
+            if (isset($map[$id])) {
+                $sorted[] = $map[$id];
+            }
+        }
+        return $sorted;
     }
 }

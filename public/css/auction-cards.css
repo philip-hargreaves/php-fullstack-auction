@@ -6,7 +6,12 @@
     align-items: flex-start;
     gap: 40px;
     width: 100%;
+
+    margin: 0 auto;
     flex-wrap: nowrap;
+
+    padding-left: 40px;
+    padding-right: 40px;
 }
 
 /* Sort Dropdown*/
@@ -93,18 +98,24 @@
 /* Auction Gallery Layout */
 .auction-gallery {
     display: grid;
-    grid-template-columns: repeat(4, 250px);
-    gap: 20px;
+    /* CHANGE THIS: Makes columns flexible instead of fixed 4 columns */
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    row-gap: 30px;
+    column-gap: 20px;
+
+    /* CHANGE THIS: Remove the fixed pixel width */
+    width: 100%;
+    max-width: 100%;
+
     margin: 0 auto;
     justify-content: start;
-    width: 1060px;
 }
 
 .auction-card {
     border: none;
     border-radius: 8px;
     overflow: hidden;
-    width: 100%;
+    width: 97%;
     display: flex;
     flex-direction: column;
     background-color: var(--color-background-primary);
@@ -215,4 +226,101 @@
     opacity: 0.7;
 }
 
+/* Add this to handle the space next to the sidebar */
+.main-content-area {
+    flex: 1;            /* Take up remaining space next to sidebar */
+    min-width: 0;       /* CRITICAL: This allows the div to be smaller than the scrollable content inside it */
+    width: 100%;        /* Ensure it fills available width */
+    display: flex;
+    flex-direction: column;
+}
 
+/* Ensure your sidebar doesn't get squashed */
+.filter-sidebar {
+    flex-shrink: 0;    /* Prevents sidebar from shrinking when content is wide */
+    width: 280px;      /* Adjust to your preference */
+}
+
+.horizontal-scroll-wrapper {
+    display: flex;         /* Lines items up in a row */
+    overflow-x: auto;      /* Enables the horizontal scroll */
+    gap: 20px;             /* Matches your gallery gap */
+    padding-bottom: 15px;  /* Space for the scrollbar/shadows */
+    width: 100%;           /* Constrain to parent width */
+
+    /* Smooth scrolling feel */
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+
+    /* Optional: Hide scrollbar for cleaner look (Firefox) */
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-auctivity-red) #464545;
+}
+
+/* Custom Scrollbar for Chrome/Safari/Edge */
+.horizontal-scroll-wrapper::-webkit-scrollbar {
+    height: 8px;
+}
+.horizontal-scroll-wrapper::-webkit-scrollbar-track {
+    background: #464545;
+    border-radius: 4px;
+}
+.horizontal-scroll-wrapper::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+}
+.horizontal-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+    background: var(--color-auctivity-red);
+}
+
+/* Target only cards inside the scroll wrapper */
+.horizontal-scroll-wrapper .auction-card {
+    flex: 0 0 200px;   /* Don't grow, Don't shrink, Fixed width 250px */
+    width: 200px;      /* Enforce width matches your main gallery columns */
+    height: 100%;      /* Ensure all cards in the row are same height */
+}
+
+/* Ensure the image container maintains aspect ratio inside the fixed card */
+.horizontal-scroll-wrapper .auction-image-container {
+    height: 200px;     /* Match width for 1:1 square */
+    width: 100%;
+}
+
+.recommended-section {
+    padding-left: 20px;
+    padding-right: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* --- Category Card Adjustments --- */
+.category-card {
+    /* CRITICAL: Don't shrink, don't grow, fixed width */
+    flex: 0 0 auto;
+    width: 170px; /* You can adjust this width */
+
+    /* Keep previous styles */
+    display: flex;
+    justify-content: space-between;
+    height: 70px;
+    border-radius: 12px;
+    text-decoration: none;
+    color: #1a1a1a;
+    transition: transform 0.3s ease;
+    overflow: hidden;
+}
+
+.category-card:hover {
+    transform: translateY(-5px); /* Lift effect */
+}
+
+/* --- Colors (Same as before) --- */
+.cat-content { padding: 12px; }
+.cat-title { font-size: 1.1rem; font-weight: bold; margin: 0; }
+
+.cat-color-0 { background-color: #C4CDEA; }
+.cat-color-1 { background-color: #FDBDA6; }
+.cat-color-2 { background-color: #B77272; }
+.cat-color-3 { background-color: #A6B794; }
+.cat-color-4 { background-color: #D3C4E3; }
+.cat-color-5 { background-color: #F4E8C1; }

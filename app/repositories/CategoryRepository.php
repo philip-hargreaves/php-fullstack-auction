@@ -4,6 +4,7 @@ namespace app\repositories;
 
 use app\models\Category;
 use infrastructure\Database;
+use infrastructure\Utilities;
 use PDO;
 use PDOException;
 
@@ -91,5 +92,43 @@ class CategoryRepository
         $rows = $this->db->query($sql, array_values($ids))->fetchAll();
 
         return $this->hydrateMany($rows);
+    }
+
+    public function getPopularCategories(int $limit = 6): array
+    {
+        try {
+            // FIX 1: Changed 'c.category_name' to 'c.name' (to match your Schema)
+            // FIX 2: Ensure we are querying valid data.
+            // If auctions.category_id is usually NULL, you might need to join via items (see note below).
+            $sql = "SELECT c.id, c.name, c.parent_category_id, COUNT(a.id) as activity_count
+                FROM categories c
+                JOIN auctions a ON c.id = a.category_id
+                WHERE a.start_datetime >= NOW() - INTERVAL 1000 DAY
+                GROUP BY c.id
+                ORDER BY activity_count DESC
+                LIMIT :limit";
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $categories = [];
+            foreach ($rows as $row) {
+                $categories[] = new Category(
+                    (int)$row['id'],
+                    $row['name'], // Updated to match schema
+                    $row['parent_category_id'] !== null ? (int)$row['parent_category_id'] : null
+                );
+            }
+
+            return $categories;
+
+        } catch (PDOException $e) {
+            // Tip: Uncomment this during development to see "Unknown Column" errors!
+            // Utilities::dd($e->getMessage());
+            return [];
+        }
     }
 }

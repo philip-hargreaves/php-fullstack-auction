@@ -134,4 +134,8 @@ class CategoryService
 
         return $tree;
     }
+
+    public function getPopularCategories(int $limit = 6): array {
+        return $this->categoryRepo->getPopularCategories($limit);
+    }
 }

@@ -554,14 +554,18 @@ class AuctionService
         return null; // No errors
     }
 
-    public function getActiveListings(int $page = 1, int $perPage = 12, string $orderBy = 'ending_soonest'): array
+    public function getActiveAuctions(int $page = 1, int $perPage = 12, string $orderBy = 'ending_soonest'): array
     {
+
         $offset = ($page - 1) * $perPage;
+        if ($orderBy == 'recommended') {
+            return $this->auctionRepo->getRecommended(AuthService::getUserId(), $perPage, $offset);
+        }
         return $this->auctionRepo->getByFilters($perPage, $offset, $orderBy);
     }
 
     // Count active auctions for pagination
-    public function countActiveListings(): int
+    public function countActiveAuctions(): int
     {
         return $this->auctionRepo->countByFilters();
     }

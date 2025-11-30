@@ -16,6 +16,7 @@ use app\services\UserService;
 use app\services\WatchlistService;
 use app\services\ImageService;
 use app\services\CategoryService;
+use app\services\RecommendationService;
 use infrastructure\Database;
 use infrastructure\DIContainer;
 use app\services\RoleService;
@@ -110,3 +111,6 @@ DIContainer::bind('auctionServ', new AuctionService(
 DIContainer::bind('watchlistServ', new WatchlistService(
     DIContainer::get('watchlistRepo'),
     DIContainer::get('auctionServ')));
+
+DIContainer::bind('recommendationServ', new RecommendationService(
+    DIContainer::get('auctionRepo')));
