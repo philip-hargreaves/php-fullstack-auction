@@ -3,10 +3,13 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
 ?>
 
     <div class="container my-5">
-        <h1 class="page-title">
-            <?= $isOwnProfile ? 'Manage Account' : 'User Profile' ?>
-        </h1>
-        <p class="lead">Account details for: <?= htmlspecialchars($user->getUsername()) ?></p>
+
+        <?php if ($isOwnProfile): ?>
+            <h1 class="page-title">Manage Account</h1>
+            <p class="lead">Account details for: <?= htmlspecialchars($user->getUsername()) ?></p>
+        <?php else: ?>
+            <h1 class="page-title mb-2">User Profile</h1> <h3 class="text-danger mt-0"><?= htmlspecialchars($user->getUsername()) ?></h3>
+        <?php endif; ?>
 
         <?php if ($isOwnProfile): ?>
             <?php if (isset($_SESSION['account_success'])): ?>

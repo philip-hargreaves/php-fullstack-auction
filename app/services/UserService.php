@@ -39,12 +39,16 @@ class UserService
     {
         $errors = $this->validateAccountUpdate($userId, $data);
         if (!empty($errors)) {
-            return ['success' => false, 'errors' => $errors];
+            return Utilities::creationResult('Validation failed.', false, null, $errors);
         }
 
         $success = $this->userRepo->updateAccount($userId, $data);
 
-        return ['success' => $success, 'errors' => []];
+        if ($success) {
+            return Utilities::creationResult('Account updated successfully.', true, null);
+        } else {
+            return Utilities::creationResult('Failed to update account.', false, null);
+        }
     }
 
     // Register a new user
@@ -140,11 +144,11 @@ class UserService
 
         $errors = $this->validatePasswordChange($user, $data);
         if (!empty($errors)) {
-            return ['success' => false, 'errors' => $errors];
+            return Utilities::creationResult('Validation failed.', false, null, $errors);
         }
 
         if (!$user->verifyPassword($data['current_password'])) {
-            return ['success' => false, 'errors' => ['Current password is incorrect.']];
+            return Utilities::creationResult('Current password is incorrect.', false, null, ['Current password is incorrect.']);
         }
 
         $newPasswordHash = password_hash($data['new_password'], PASSWORD_DEFAULT);
@@ -152,9 +156,9 @@ class UserService
         $success = $this->userRepo->updatePassword($userId, $newPasswordHash);
 
         if ($success) {
-            return ['success' => true, 'message' => 'Password updated.', 'errors' => []];
+            return Utilities::creationResult('Password updated.', true, null);
         } else {
-            return ['success' => false, 'message' => 'Database update failed.', 'errors' => []];
+            return Utilities::creationResult('Database update failed.', false, null);
         }
     }
 

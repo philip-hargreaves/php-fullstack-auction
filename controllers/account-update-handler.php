@@ -21,9 +21,9 @@ $data = ['username' => $username, 'email' => $currentEmail];
 $result = $userService->updateAccount($userId, $data);
 
 if ($result['success']) {
-    $_SESSION['account_success'] = 'Your account has been updated successfully.';
+    $_SESSION['account_success'] = $result['message'];
 } else {
-    $_SESSION['account_errors'] = $result['errors'];
+    $_SESSION['account_errors'] = $result['errors'] ?? [$result['message']];
 }
 
 header('Location: /account');
