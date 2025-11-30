@@ -1,6 +1,7 @@
 <?php
 use infrastructure\DIContainer;
-require \infrastructure\Utilities::basePath('views/partials/header.php');
+use infrastructure\Utilities;
+require Utilities::basePath('views/partials/header.php');
 /**
  * @var $auctionId int
  * @var $auctionMode string
@@ -82,7 +83,7 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
                                    <?= $isItemNameLocked ? 'readonly style="color: #6A6A6A;"' : '' ?> >
                             <small id="titleHelp" class="form-text text-muted">
                                 <span class="text-danger"><?php if (!$isItemNameLocked) {echo "* Required.";} ?>
-                                </span><?php if ($isItemNameLocked) {echo "* ";} ?> Item name cannot be changed after created.
+                                </span><?php if ($isItemNameLocked) {echo "* ";} ?> Item name cannot be changed after the auction is created.
                             </small>
                         </div>
                     </div>
@@ -196,11 +197,11 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
                                     class="form-control"
                                     id="start_datetime"
                                     name="start_datetime"
-                                    value="<?= $placeHolder['start_datetime'] ?? formatForInput(date("Y-m-d H:i:s")) ?>"
+                                    value="<?= $placeHolder['start_datetime'] ?? Utilities::formatForInput(date("Y-m-d H:i:s")) ?>"
                                     <?= $isStartDatetimeLocked ? 'readonly style="color: #6A6A6A;"' : '' ?>>
                             <small class="form-text text-muted">
                                 <span class="text-danger"><?php if (!$isStartDatetimeLocked) {echo "* Required. ";} ?>
-                                </span><?php if ($isStartDatetimeLocked) {echo "*";} ?> Start Date cannot be changed after created
+                                </span><?php if ($isStartDatetimeLocked) {echo "*";} ?> Start date cannot be changed after the auction is created
                             </small>
                         </div>
                     </div>
@@ -212,7 +213,7 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
                                     class="form-control"
                                     id="end_datetime"
                                     name="end_datetime"
-                                    value="<?= $placeHolder['end_datetime'] ?? formatForInput(date("Y-m-d H:i:s")) ?>">
+                                    value="<?= $placeHolder['end_datetime'] ?? Utilities::formatForInput(date("Y-m-d H:i:s")) ?>">
                             <small id="endDateHelp" class="form-text text-muted"><span class="text-danger">* Required.</span> The duration has to be at least 24 hours. </small>
                             <small id="endDateHelp" class="form-text text-muted"><?= $EndDatetimeText ?? "" ?> </small>
                         </div>

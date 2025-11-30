@@ -546,7 +546,8 @@ class AuctionService
         }
 
         // 4. Start Date Check (Locked)
-        if ($prevAuction->getStartDatetime()->format('Y-m-d H:i:s') !== $newInput['start_datetime']) {
+        // convert both of them to Unix Timestamps (integers representing seconds)
+        if ($prevAuction->getStartDatetime()->getTimestamp() !== strtotime($newInput['start_datetime'])) {
             return "Start date cannot be changed after the auction is created.";
         }
 

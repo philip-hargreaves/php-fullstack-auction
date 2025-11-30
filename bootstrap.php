@@ -85,7 +85,7 @@ DIContainer::bind('bidServ', new BidService(
 DIContainer::bind('authServ', new AuthService(
     DIContainer::get('userRepo')));
 
-DIContainer::bind('registrationServ', new UserService(
+DIContainer::bind('userService', new UserService(
     DIContainer::get('userRepo'),
     DIContainer::get('userRoleRepo'),
     DIContainer::get('roleRepo'),
