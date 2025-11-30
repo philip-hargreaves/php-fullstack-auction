@@ -93,7 +93,7 @@ use infrastructure\DIContainer;
                     <p class="small mb-1 mt-1"><?= $statusTextSmall ?></p>
                     <hr class="mb-3">
                     <p class="text mb-2">Ended on: <?= date_format($endTime, 'j M Y,  H:i') ?></p>
-                    <h6 class="text mb-0"><?= $bidText ?> £<?= number_format($highestBidAmount, 2) ?></h6>
+                    <h6 class="text mb-0"><?= $bidText ?> £<?= number_format($highestBidAmount ?? 0, 2) ?></h6>
                 <?php elseif ($auctionStatus == 'Scheduled'): ?>
                     <h4 class="text-danger"><?= $statusText ?></h4>
                     <p class="small mb-1 mt-1"><?= $statusTextSmall ?></p>
@@ -123,9 +123,9 @@ use infrastructure\DIContainer;
                                        class="form-control form-control-lg"
                                        id="bid_amount"
                                        name="bid_amount"
-                                       placeholder="<?= number_format($highestBidAmount + 1, 2) ?>"
+                                       placeholder="<?= number_format(($highestBidAmount ?? $startingPrice) + 1, 2) ?>"
                                        step="0.01"
-                                       min="<?= $highestBidAmount + 0.01 ?>"
+                                       min="<?= ($highestBidAmount ?? $startingPrice) + 0.01 ?>"
                                        required>
                             </div>
                             <input type="hidden" name="auction_id" value="<?= $auctionId ?>">
@@ -159,7 +159,7 @@ use infrastructure\DIContainer;
                     <hr class="mb-3">
                     <h6 class="text mb-2">
                         <?= $bidText ?>
-                        <span class="text-danger">£<?= number_format($highestBidAmount, 2) ?></span>
+                        <span class="text-danger">£<?= number_format($highestBidAmount ?? 0, 2) ?></span>
                     </h6>
                 <?php else: ?>
                     <!-- lead to index page -->
@@ -292,7 +292,9 @@ use infrastructure\DIContainer;
                     <tr>
                         <td class="text">Seller</td>
                         <td class="text-end fw-bold text-danger">
-                            <?= htmlspecialchars($sellerName) ?>
+                            <a href="/account?user_id=<?= htmlspecialchars($auction->getItem()->getSellerId()) ?>">
+                                <?= htmlspecialchars($sellerName) ?>
+                            </a>
                         </td>
                     </tr>
 

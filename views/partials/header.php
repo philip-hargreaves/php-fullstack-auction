@@ -56,12 +56,47 @@ $isSeller = AuthService::hasRole('seller');
             </a>
 
             <form method="GET" action="/" class="search-container">
+                <?php
+                // Preserve all active filters when searching
+                if (!empty($_GET['category'])): ?>
+                    <input type="hidden" name="category" value="<?= htmlspecialchars($_GET['category']) ?>">
+                <?php endif;
+                
+                if (!empty($_GET['item_condition_id']) && is_array($_GET['item_condition_id'])): ?>
+                    <?php foreach ($_GET['item_condition_id'] as $condition): ?>
+                        <input type="hidden" name="item_condition_id[]" value="<?= htmlspecialchars($condition) ?>">
+                    <?php endforeach; ?>
+                <?php endif;
+                
+                if (!empty($_GET['auction_status']) && is_array($_GET['auction_status'])): ?>
+                    <?php foreach ($_GET['auction_status'] as $status): ?>
+                        <input type="hidden" name="auction_status[]" value="<?= htmlspecialchars($status) ?>">
+                    <?php endforeach; ?>
+                <?php endif; ?>
+                
+                <?php if (!empty($_GET['include_description'])): ?>
+                    <input type="hidden" name="include_description" value="<?= htmlspecialchars($_GET['include_description']) ?>">
+                <?php endif; ?>
+                
+                <?php if (!empty($_GET['min_price'])): ?>
+                    <input type="hidden" name="min_price" value="<?= htmlspecialchars($_GET['min_price']) ?>">
+                <?php endif; ?>
+                
+                <?php if (!empty($_GET['max_price'])): ?>
+                    <input type="hidden" name="max_price" value="<?= htmlspecialchars($_GET['max_price']) ?>">
+                <?php endif; ?>
+                
+                <?php if (!empty($_GET['order_by'])): ?>
+                    <input type="hidden" name="order_by" value="<?= htmlspecialchars($_GET['order_by']) ?>">
+                <?php endif; ?>
+                
                 <input
                         class="search-input"
                         type="text"
                         name="keyword"
                         placeholder="What are you looking for?"
                         aria-label="Enter your search keywords"
+                        value="<?= isset($_GET['keyword']) ? htmlspecialchars($_GET['keyword']) : '' ?>"
                 >
                 <button type="submit" class="search-button" aria-label="Search">
                     <i class="fa fa-search search-icon"></i>
@@ -72,7 +107,7 @@ $isSeller = AuthService::hasRole('seller');
         <!-- Middle Section: Navigation Tabs (only when logged in) -->
         <?php if ($isLoggedIn): ?>
         <div class="middle-section">
-            <?php if ($isBuyer): ?>
+            <?php if ($isBuyer || $isSeller): ?>
                 <a href="/my-bids" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/my-bids') !== false ? 'active' : '' ?>">My Bids</a>
                 <a href="/watchlist" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/watchlist') !== false ? 'active' : '' ?>">Watchlist</a>
             <?php endif; ?>

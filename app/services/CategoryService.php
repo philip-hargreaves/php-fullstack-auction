@@ -138,4 +138,34 @@ class CategoryService
     public function getPopularCategories(int $limit = 6): array {
         return $this->categoryRepo->getPopularCategories($limit);
     }
+
+    // Used for filtering auctions by category and all its subcategories
+    public function getAllDescendantIds(int $categoryId): array
+    {
+        $this->loadAllCategories();
+
+        if (!isset($this->allCategoriesMap[$categoryId])) {
+            return [$categoryId]; // Return just the ID if category doesn't exist
+        }
+
+        $result = [$categoryId]; // Include the parent category itself
+
+        // Recursively get all children
+        $this->collectDescendants($categoryId, $result);
+
+        return $result;
+    }
+
+    // Helper method to recursively collect all descendant category IDs
+    private function collectDescendants(int $parentId, array &$result): void
+    {
+        foreach ($this->allCategoriesMap as $cat) {
+            if ($cat->getParentCategoryId() === $parentId) {
+                $childId = $cat->getCategoryId();
+                $result[] = $childId;
+                // Recursively get children of this child
+                $this->collectDescendants($childId, $result);
+            }
+        }
+    }
 }

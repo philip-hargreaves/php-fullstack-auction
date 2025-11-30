@@ -5,6 +5,7 @@ use app\repositories\AuctionImageRepository;
 use app\repositories\AuctionRepository;
 use app\repositories\CategoryRepository;
 use app\repositories\ItemRepository;
+use app\services\CategoryService;
 use DateInterval;
 use infrastructure\Database;
 use app\models\Auction;
@@ -24,17 +25,20 @@ class AuctionService
     private BidService $bidService;
     private CategoryRepository $categoryRepo;
     private AuctionImageRepository $auctionImageRepo;
+    private CategoryService $categoryService;
 
     public function __construct(
-        Database $db,
-        AuctionRepository $auctionRepo,
-        ItemRepository $itemRepo,
-        ItemService $itemService,
-        ImageService $imageService,
-        BidService $bidService,
-        CategoryRepository $categoryRepo,
-        AuctionImageRepository $auctionImageRepo
-    ) {
+        Database               $db,
+        AuctionRepository      $auctionRepo,
+        ItemRepository         $itemRepo,
+        ItemService            $itemService,
+        ImageService           $imageService,
+        BidService             $bidService,
+        CategoryRepository     $categoryRepo,
+        AuctionImageRepository $auctionImageRepo,
+        CategoryService        $categoryService
+    )
+    {
         $this->db = $db;
         $this->auctionRepo = $auctionRepo;
         $this->itemRepo = $itemRepo;
@@ -43,24 +47,38 @@ class AuctionService
         $this->bidService = $bidService;
         $this->categoryRepo = $categoryRepo;
         $this->auctionImageRepo = $auctionImageRepo;
+        $this->categoryService = $categoryService;
     }
 
-    public function getByUserId(int $sellerId): array {
-
+    public function getByUserId(int $sellerId): array
+    {
         return $this->auctionRepo->getBySellerId($sellerId);
     }
 
-    public function getWatchedByUserId(int $userId): array {
+    public function getWatchedByUserId(int $userId): array
+    {
         return $this->auctionRepo->getWatchedAuctionsByUserId($userId);
     }
 
-    public function getById(int $auctionId): ?Auction {
+    public function getById(int $auctionId): ?Auction
+    {
         return $this->auctionRepo->getById($auctionId);
+    }
+
+    public function getActiveAuctionsByUserId(int $sellerId): array {
+        $auctions = $this->auctionRepo->getActiveAuctionsBySellerId($sellerId);
+
+        foreach ($auctions as $auction) {
+            $highestBid = $this->bidService->getHighestBidAmountByAuctionId($auction->getAuctionId());
+            $currentPrice = $highestBid > 0 ? $highestBid : $auction->getStartingPrice();
+            $auction->setCurrentPrice($currentPrice);
+        }
+
+        return $auctions;
     }
 
     public function createAuction(array $itemInput, array $auctionInput, array $imageInputs): array
     {
-
         $pdo = $this->db->connection;
         Utilities::beginTransaction($pdo);
 
@@ -92,7 +110,6 @@ class AuctionService
             }
 
             // Link Item & Save Images
-
             if (!$this->finalizeAuctionSetup($auction, $item, $imageInputs)) {
                 $pdo->rollBack();
                 return Utilities::creationResult("Failed to link item or save images.", false, null);
@@ -280,16 +297,16 @@ class AuctionService
         // Remove duplicates
         $categoryIds = array_unique($categoryIds);
 
-        // Fetch all Items in ONE query
+        // Fetch all Categories in ONE query
         $categories = $this->categoryRepo->getByIds($categoryIds);
 
-        // Re-key the Items array by ID for instant lookup
+        // Re-key the Categories array by ID for instant lookup
         $map = [];
         foreach ($categories as $category) {
             $map[$category->getCategoryId()] = $category;
         }
 
-        // Attach Items to Auctions
+        // Attach Categories to Auctions
         foreach ($auctions as $auction) {
             $categoryId = $auction->getCategoryId();
 
@@ -494,7 +511,7 @@ class AuctionService
             // Note: Creating a clone of $now to avoid modifying the original $now object
             $bufferTime = (clone $now)->sub(new DateInterval('PT1H'));
 
-            if ($start < $bufferTime && !($mode == 'update') ) {
+            if ($start < $bufferTime && !($mode == 'update')) {
                 return Utilities::creationResult("Auction start date cannot be in the past.", false, null);
             }
 
@@ -513,7 +530,7 @@ class AuctionService
 
             return Utilities::creationResult('', true, [
                 'start_datetime' => $start->format('Y-m-d H:i:s'),
-                'end_datetime'   => $end->format('Y-m-d H:i:s')
+                'end_datetime' => $end->format('Y-m-d H:i:s')
             ]);
 
         } catch (Exception $e) {
@@ -554,21 +571,85 @@ class AuctionService
         return null; // No errors
     }
 
-    public function getActiveAuctions(int $page = 1, int $perPage = 12, string $orderBy = 'ending_soonest'): array
+    public function countAuctions(array $filters = []): int
     {
-        $offset = ($page - 1) * $perPage;
-        if ($orderBy == 'recommended') {
-            return $this->auctionRepo->getRecommendedByUserIdAndFilter(
-                AuthService::getUserId(), $perPage, $offset, fallBackOrderBy: 'ending_soonest',
-                myLimit: 1000, similarUserLimit: 1000,
-                bidWeight: 5, watchlistWeight: 2);
-        }
-        return $this->auctionRepo->getByFilters($perPage, $offset, $orderBy);
+        $extracted = $this->extractFilters($filters);
+
+        return $this->auctionRepo->countByFilters(
+            $extracted['statuses'],
+            $extracted['conditions'],
+            $extracted['minPrice'],
+            $extracted['maxPrice'],
+            $extracted['categoryIds'],
+            $extracted['soldFilter'],
+            $extracted['completedFilter'],
+            $extracted['keyword'],
+            $extracted['includeDescription']
+        );
     }
 
-    // Count active auctions for pagination
-    public function countActiveAuctions(): int
+    private function extractFilters(array $filters): array
     {
-        return $this->auctionRepo->countByFilters();
+        $categoryId = $filters['categoryId'] ?? null;
+
+        // If a category is selected, get all descendant category IDs (including children)
+        $categoryIds = null;
+        if ($categoryId !== null) {
+            $categoryIds = $this->categoryService->getAllDescendantIds($categoryId);
+        }
+
+        return [
+            'statuses' => $filters['statuses'] ?? ['Active'],
+            'conditions' => $filters['conditions'] ?? [],
+            'minPrice' => $filters['minPrice'] ?? null,
+            'maxPrice' => $filters['maxPrice'] ?? null,
+            'categoryIds' => $categoryIds,
+            'soldFilter' => $filters['soldFilter'] ?? false,
+            'completedFilter' => $filters['completedFilter'] ?? false,
+            'keyword' => $filters['keyword'] ?? null,
+            'includeDescription' => $filters['includeDescription'] ?? false,
+        ];
+    }
+
+    public function getAuctions(int $page = 1, int $perPage = 12, string $orderBy = 'ending_soonest', array $filters = []): array
+    {
+        $extracted = $this->extractFilters($filters);
+        $offset = ($page - 1) * $perPage;
+
+        if ($orderBy == 'recommended') {
+            return $this->auctionRepo->getRecommendedByUserIdAndFilter(
+                AuthService::getUserId(),
+                $perPage,
+                $offset,
+                'ending_soonest',
+                $extracted['statuses'],
+                $extracted['conditions'],
+                $extracted['minPrice'],
+                $extracted['maxPrice'],
+                $extracted['categoryIds'],
+                $extracted['soldFilter'],
+                $extracted['completedFilter'],
+                $extracted['keyword'],
+                $extracted['includeDescription'],
+                myLimit: 50,
+                similarUserLimit: 100,
+                bidWeight: 5,
+                watchlistWeight: 2);
+        }
+
+        return $this->auctionRepo->getByFilters(
+            $perPage,
+            $offset,
+            $orderBy,
+            $extracted['statuses'],
+            $extracted['conditions'],
+            $extracted['minPrice'],
+            $extracted['maxPrice'],
+            $extracted['categoryIds'],
+            $extracted['soldFilter'],
+            $extracted['completedFilter'],
+            $extracted['keyword'],
+            $extracted['includeDescription']
+        );
     }
 }

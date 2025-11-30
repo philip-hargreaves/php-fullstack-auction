@@ -7,6 +7,14 @@ $auctionServ = DIContainer::get('auctionServ');
 $itemServ = DIContainer::get('itemServ');
 $categoryServ = DIContainer::get('categoryServ');
 $auctionMode = Request::get('auction_mode');
+$authServ = DIContainer::get('authServ');
+
+// Check if user is logged in
+if (!$authServ->isLoggedIn()) {
+    $_SESSION['error_message'] = 'Please log in to create an auction.';
+    header("Location: /");
+    exit();
+}
 
 // All
 if ($auctionMode == 'update' || $auctionMode == 'relist') {

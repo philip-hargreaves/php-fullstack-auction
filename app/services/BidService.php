@@ -111,8 +111,15 @@ class BidService
 
         // Check if the bid is high enough
         $highestBidAmount = $this->getHighestBidAmountByAuctionId($input['auction_id']);
-        if ($bidAmount < $highestBidAmount + 0.01) {
-            return Utilities::creationResult('Bid must be at least' . number_format($highestBidAmount, 2), false, null);
+        $startingPrice = $auction->getStartingPrice();
+        if ($highestBidAmount > 0) {
+            if ($bidAmount < $highestBidAmount + 0.01) {
+                return Utilities::creationResult('Bid must be higher than £' . number_format($highestBidAmount, 2), false, null);
+            }
+        } else {
+            if ($bidAmount < $startingPrice) {
+                return Utilities::creationResult('Bid must be at least the starting price: £' . number_format($startingPrice, 2), false, null);
+            }
         }
 
         return Utilities::creationResult('', true, $input);
@@ -183,9 +190,69 @@ class BidService
         return $this->bidRepo->getByAuctionId($auctionId);
     }
 
+    public function getWinningBidByAuctionId($auctionId): ?Bid {
+        // Get Auction status
+        $auction = $this->auctionRepo->getById($auctionId);
+        $isAuctionActive = $auction->getAuctionStatus() == 'Active';
+        if ($isAuctionActive) {
+            $isItemSold = $auction->getAuctionStatus() == 'Sold';
+            if ($isItemSold) {
+                return $this->bidRepo->getById($auction->getWinningBidID());
+            }
+        }
+        return null;
+    }
+
+    public function getBidsForUserDashboard(int $userId): array
+    {
+        $allBids = $this->bidRepo->getByUserId($userId);
+
+        $uniqueBids = [];
+        $groupedBids = [];
+
+        foreach ($allBids as $bid) {
+            $auctionId = $bid->getAuctionId();
+            $groupedBids[$auctionId][] = $bid;
+
+            if (!isset($uniqueBids[$auctionId]) ||
+                $bid->getBidAmount() > $uniqueBids[$auctionId]->getBidAmount()) {
+
+                $auction = $bid->getAuction();
+                if ($auction) {
+                    $highestBidAmount = $this->getHighestBidAmountByAuctionId($auctionId);
+
+                    $currentPrice = $highestBidAmount > 0 ? $highestBidAmount : $auction->getStartingPrice();
+                    $auction->setCurrentPrice($currentPrice);
+                }
+
+                $uniqueBids[$auctionId] = $bid;
+            }
+        }
+
+        return [
+            'unique' => array_values($uniqueBids),
+            'grouped' => $groupedBids
+        ];
+    }
+
     public function getBidsForUser(int $userId): array
     {
-        return $this->bidRepo->getByUserId($userId);
+        $bids = $this->bidRepo->getByUserId($userId);
+
+        foreach ($bids as $bid)
+        {
+            $auction = $bid->getAuction();
+
+            if ($auction === null) {
+                continue;
+            }
+
+            $highestBid = $this->getHighestBidByAuctionId($auction->getAuctionId());
+            $currentPrice = $highestBid > 0 ? $highestBid : $auction->getStartingPrice();
+            $auction->setCurrentPrice($currentPrice);
+        }
+
+        return $bids;
     }
 
     public function countBidsByAuctionId(int $auctionId): int

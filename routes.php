@@ -9,6 +9,14 @@
 // Index Page
 $router->get('/', 'controllers/index.php');
 
+// GET Pages
+$router->get('/my-auctions', 'controllers/my-auctions.php');
+$router->get('/my-bids', 'controllers/my-bids.php');
+
+$router->get('/account', 'controllers/account.php');
+$router->post('/account/update', 'controllers/account-update-handler.php');
+$router->post('/account/change-password', 'controllers/change-password-handler.php');
+
 // Create Auction Page
 $router->get('/create-auction', 'controllers/create_auction/create-auction-get.php');
 $router->post('/create-auction', 'controllers/create_auction/create-auction-post.php');

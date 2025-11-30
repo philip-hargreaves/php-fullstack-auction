@@ -12,7 +12,19 @@ if (!isset($_SESSION['user_id'])) {
 $bidServ = DIContainer::get('bidServ');
 $userId = (int)$_SESSION['user_id'];
 
-$bids = $bidServ->getBidsForUser($userId);
-$bidServ->fillAuctionsInBids($bids);
+$data = $bidServ->getBidsForUserDashboard($userId);
+
+$uniqueBids = $data['unique'];
+$groupedBids = $data['grouped'];
+
+if (!empty($uniqueBids)) {
+    $bidServ->fillAuctionsInBids($uniqueBids);
+}
+
+if (!empty($groupedBids)) {
+    foreach ($groupedBids as $auctionId => $bidsInGroup) {
+        $bidServ->fillAuctionsInBids($bidsInGroup);
+    }
+}
 
 require Utilities::basePath('views/my-bids.view.php');
