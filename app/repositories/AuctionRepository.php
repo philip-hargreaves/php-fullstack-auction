@@ -175,6 +175,8 @@ class AuctionRepository
         ?float $maxPrice,
         bool $soldFilter,
         bool $completedFilter,
+        ?string $keyword,
+        bool $includeDescription,
         array &$params
     ): array {
         $whereConditions = [];
@@ -221,6 +223,18 @@ class AuctionRepository
             $whereConditions[] = "a.category_id IN (" . implode(',', $placeholders) . ")";
         }
 
+        // Search filter
+        if ($keyword !== null && $keyword !== '') {
+            if ($includeDescription) {
+                // Search both item name and auction description
+                $whereConditions[] = "(i.item_name LIKE :keyword OR a.auction_description LIKE :keyword)";
+            } else {
+                // Search item name only
+                $whereConditions[] = "i.item_name LIKE :keyword";
+            }
+            $params["keyword"] = "%" . trim($keyword) . "%";
+        }
+
         // Price filters (use HAVING because current_price is calculated)
         if ($minPrice !== null) {
             $havingConditions[] = "current_price >= :min_price";
@@ -248,7 +262,9 @@ class AuctionRepository
         ?float $maxPrice = null,
         ?array $categoryIds = null,
         bool $soldFilter = false,
-        bool $completedFilter = false
+        bool $completedFilter = false,
+        ?string $keyword = null,
+        bool $includeDescription = false
     ): array {
         try {
             $limit = (int)$limit;
@@ -263,7 +279,7 @@ class AuctionRepository
             };
 
             $params = [];
-            $filterResult = $this->buildFilterConditions($statuses, $conditions, $categoryIds, $minPrice, $maxPrice, $soldFilter, $completedFilter, $params);
+            $filterResult = $this->buildFilterConditions($statuses, $conditions, $categoryIds, $minPrice, $maxPrice, $soldFilter, $completedFilter, $keyword, $includeDescription, $params);
             $whereConditions = $filterResult['where'];
             $havingConditions = $filterResult['having'];
 
@@ -297,12 +313,14 @@ class AuctionRepository
         ?float $maxPrice = null,
         ?array $categoryIds = null,
         bool $soldFilter = false,
-        bool $completedFilter = false
+        bool $completedFilter = false,
+        ?string $keyword = null,
+        bool $includeDescription = false
     ): int
     {
         try {
             $params = [];
-            $filterResult = $this->buildFilterConditions($statuses, $conditions, $categoryIds, $minPrice, $maxPrice, $soldFilter, $completedFilter, $params);
+            $filterResult = $this->buildFilterConditions($statuses, $conditions, $categoryIds, $minPrice, $maxPrice, $soldFilter, $completedFilter, $keyword, $includeDescription, $params);
             $whereConditions = $filterResult['where'];
             $havingConditions = $filterResult['having'];
 
@@ -315,15 +333,34 @@ class AuctionRepository
             $whereClause = !empty($whereConditions) ? 'WHERE ' . implode(' AND ', $whereConditions) : '';
             $havingClause = !empty($countHavingConditions) ? 'HAVING ' . implode(' AND ', $countHavingConditions) : '';
 
-            if (!empty($havingClause)) {
-                $sql = "SELECT COUNT(*) as total FROM (
-                    SELECT a.id 
-                    FROM auctions a
-                    LEFT JOIN bids b ON a.id = b.auction_id
-                    {$whereClause}
-                    GROUP BY a.id
-                    {$havingClause}
-                ) as filtered_auctions";
+            // Check items table (for keyword search) or bids table (for price filters) to see if needs join
+            $needsItemsJoin = ($keyword !== null && $keyword !== '');
+            $needsBidsJoin = !empty($havingClause);
+            
+            if ($needsBidsJoin || $needsItemsJoin) {
+                $joins = [];
+                if ($needsItemsJoin) {
+                    $joins[] = "JOIN items i ON a.item_id = i.id";
+                }
+                if ($needsBidsJoin) {
+                    $joins[] = "LEFT JOIN bids b ON a.id = b.auction_id";
+                }
+                $joinClause = implode(' ', $joins);
+                
+                if ($needsBidsJoin) {
+                    // Need GROUP BY and HAVING for price filters
+                    $sql = "SELECT COUNT(*) as total FROM (
+                        SELECT a.id 
+                        FROM auctions a
+                        {$joinClause}
+                        {$whereClause}
+                        GROUP BY a.id
+                        {$havingClause}
+                    ) as filtered_auctions";
+                } else {
+                    // Just need items join for keyword search, no GROUP BY needed
+                    $sql = "SELECT COUNT(*) as total FROM auctions a {$joinClause} {$whereClause}";
+                }
             } else {
                 $sql = "SELECT COUNT(*) as total FROM auctions a {$whereClause}";
             }

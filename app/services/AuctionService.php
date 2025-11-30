@@ -580,7 +580,7 @@ class AuctionService
         if ($categoryId !== null) {
             $categoryIds = $this->categoryService->getAllDescendantIds($categoryId);
         }
-        
+
         return [
             'statuses' => $filters['statuses'] ?? ['Active'],
             'conditions' => $filters['conditions'] ?? [],
@@ -589,6 +589,8 @@ class AuctionService
             'categoryIds' => $categoryIds,
             'soldFilter' => $filters['soldFilter'] ?? false,
             'completedFilter' => $filters['completedFilter'] ?? false,
+            'keyword' => $filters['keyword'] ?? null,
+            'includeDescription' => $filters['includeDescription'] ?? false,
         ];
     }
 
@@ -607,7 +609,9 @@ class AuctionService
             $extracted['maxPrice'],
             $extracted['categoryIds'],
             $extracted['soldFilter'],
-            $extracted['completedFilter']
+            $extracted['completedFilter'],
+            $extracted['keyword'],
+            $extracted['includeDescription']
         );
     }
 
@@ -623,7 +627,9 @@ class AuctionService
             $extracted['maxPrice'],
             $extracted['categoryIds'],
             $extracted['soldFilter'],
-            $extracted['completedFilter']
+            $extracted['completedFilter'],
+            $extracted['keyword'],
+            $extracted['includeDescription']
         );
     }
 }

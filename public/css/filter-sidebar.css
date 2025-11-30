@@ -5,6 +5,7 @@
     padding: 0;
     flex-shrink: 0;
     width: 200px;
+    padding-top: 49px; /* Align with gallery (search-sort-container height + margin) */
 }
 
 .main-content-area {

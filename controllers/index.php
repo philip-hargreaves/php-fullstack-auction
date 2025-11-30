@@ -7,11 +7,13 @@ use infrastructure\DIContainer;
 $auctionServ = DIContainer::get('auctionServ');
 $categoryServ = DIContainer::get('categoryServ');
 
-// Retrieve filtering and ordering
+// Retrieve ordering, filtering, search parameters
 $ordering = Request::get('order_by', 'ending_soonest');
 $minPrice = Request::get('min_price', null);
 $maxPrice = Request::get('max_price', null);
 $categoryId = Request::get('category', null);
+$keyword = Request::get('keyword', null);
+$includeDescription = Request::get('include_description', false);
 
 // Validate and swap price range if reversed
 if ($minPrice !== null && $minPrice !== '' && $maxPrice !== null && $maxPrice !== '') {
@@ -90,6 +92,8 @@ $filters = [
     'minPrice' => $minPrice !== null && $minPrice !== '' ? (float)$minPrice : null,
     'maxPrice' => $maxPrice !== null && $maxPrice !== '' ? (float)$maxPrice : null,
     'categoryId' => $categoryId !== null && $categoryId !== '' ? (int)$categoryId : null,
+    'keyword' => $keyword !== null && $keyword !== '' ? trim($keyword) : null,
+    'includeDescription' => $includeDescription === true || $includeDescription === '1' || $includeDescription === 1,
 ];
 
 // Get category tree for cascading dropdowns
@@ -134,15 +138,17 @@ $high_page = min($max_page, $curr_page + 2 + $high_page_boost);
 // Pass filter values to view for preserving selections
 $activeFilters = [
     'ordering' => $ordering,
-    'conditions' => $filters['conditions'],
-    'statuses' => $filters['statuses'],
-    'soldFilter' => $filters['soldFilter'],
-    'completedFilter' => $filters['completedFilter'],
-    'minPrice' => $filters['minPrice'],
-    'maxPrice' => $filters['maxPrice'],
-    'categoryId' => $filters['categoryId'],
+    'conditions' => $conditions,
+    'statuses' => $statuses,
+    'soldFilter' => $soldFilter,
+    'completedFilter' => $completedFilter,
+    'minPrice' => $minPrice,
+    'maxPrice' => $maxPrice,
+    'categoryId' => $categoryId,
     'categoryTree' => $allCategories,
     'selectedCategoryPath' => $selectedCategoryPath,
+    'keyword' => $keyword,
+    'includeDescription' => $filters['includeDescription'],
 ];
 
 // Process auctions for display
