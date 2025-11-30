@@ -413,7 +413,9 @@ UPDATE items SET current_auction_id = 3065 WHERE id = 2048;
 UPDATE items SET current_auction_id = 3066 WHERE id = 2139;
 
 -- Mark sold items
-UPDATE items SET is_sold = 1 WHERE id IN (2043, 2048);
+-- Item 2043 (Microsoft Surface Pro) - auction 3064 has winning_bid_id = 4098, so it IS sold
+-- Item 2048 (Apple Watch) - auction 3065 has winning_bid_id = NULL (didn't meet reserve), so it is NOT sold
+UPDATE items SET is_sold = 1 WHERE id IN (2043);
 
 -- BIDS (for testing "My Bids" page and bid history)
 -- Some auctions with 0 bids (just starting price)
