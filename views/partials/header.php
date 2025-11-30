@@ -79,7 +79,7 @@ $isSeller = AuthService::hasRole('seller');
 
             <?php if ($isSeller): ?>
                 <a href="/my-listings" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/my-listings') !== false ? 'active' : '' ?>">My Listings</a>
-                <a href="/create-auction" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/create-auction') !== false ? 'active' : '' ?>">Create Auction</a>
+                <a href="/create-auction?auction_mode=create" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/create-auction') !== false ? 'active' : '' ?>">Create Auction</a>
             <?php endif; ?>
 
         </div>

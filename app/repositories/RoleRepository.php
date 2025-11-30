@@ -116,7 +116,6 @@ class RoleRepository
         }
     }
 
-    // Helper to build or fetch a single Role instance
     private function hydrate(array $row): ?Role
     {
         if (empty($row)) {
@@ -137,7 +136,6 @@ class RoleRepository
         return $role;
     }
 
-    // Helper to convert multiple rows into Role objects
     private function hydrateMany(array $rows): array
     {
         $roles = [];
@@ -152,5 +150,32 @@ class RoleRepository
         }
 
         return $roles;
+    }
+
+    public function createRoleFromRow(array $row): ?Role
+    {
+        // Remap 'role_id' (from JOIN) to 'id' (expected by hydrate)
+        $hydrationData = [
+            'id' => $row['role_id'],
+            'role_name' => $row['role_name']
+        ];
+
+        return $this->hydrate($hydrationData);
+    }
+
+    public function getRolesByUserIds(array $userIds): array
+    {
+        if (empty($userIds)) {
+            return [];
+        }
+
+        $placeholders = implode(',', array_fill(0, count($userIds), '?'));
+
+        $sql = "SELECT ur.user_id, r.id as role_id, r.role_name
+            FROM user_roles ur
+            JOIN roles r ON ur.role_id = r.id
+            WHERE ur.user_id IN ($placeholders)";
+
+        return $this->db->query($sql, array_values($userIds))->fetchAll();
     }
 }

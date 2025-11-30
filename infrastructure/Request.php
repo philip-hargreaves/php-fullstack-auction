@@ -23,7 +23,7 @@ class Request
     }
 
     // Check if current HTTP request method is POST (else it is GET)
-    public static function isPost()
+    public static function isPost(): bool
     {
         return $_SERVER['REQUEST_METHOD'] === 'POST';
     }
@@ -31,5 +31,10 @@ class Request
     public static function postRaw($key, $default = null)
     {
         return $_POST[$key] ?? $default;
+    }
+
+    public static function has($key): bool
+    {
+        return isset($_GET[$key]);
     }
 }

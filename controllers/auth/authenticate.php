@@ -27,7 +27,7 @@ try {
     // Dependencies
     $authService = DIContainer::get('authServ');
 
-    // Attempt login via Authservice
+    // Attempt login via AuthService
     if ($authService->attemptLogin($emailOrUsername, $password)) {
         $_SESSION['login_success'] = 'Login successful!';
         header('Location: /');

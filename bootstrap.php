@@ -8,12 +8,14 @@ use app\repositories\AuctionRepository;
 use app\repositories\BidRepository;
 use app\repositories\UserRoleRepository;
 use app\repositories\WatchlistRepository;
+use app\repositories\CategoryRepository;
 use app\services\BidService;
 use app\services\AuthService;
 use app\services\AuctionService;
-use app\services\RegistrationService;
+use app\services\UserService;
 use app\services\WatchlistService;
 use app\services\ImageService;
+use app\services\CategoryService;
 use infrastructure\Database;
 use infrastructure\DIContainer;
 use app\services\RoleService;
@@ -41,17 +43,26 @@ DIContainer::bind('itemRepo', new ItemRepository(
 DIContainer::bind('watchlistRepo', new WatchlistRepository(
     DIContainer::get('db')));
 
+DIContainer::bind('auctionImageRepo', new AuctionImageRepository(
+    DIContainer::get('db')
+));
+
 DIContainer::bind('auctionRepo', new AuctionRepository(
     DIContainer::get('db'),
-    DIContainer::get('itemRepo')));
+    DIContainer::get('itemRepo'),
+    DIContainer::get('auctionImageRepo'),));
 
 DIContainer::bind('bidRepo', new BidRepository(
     DIContainer::get('db'),
     DIContainer::get('userRepo'),
     DIContainer::get('auctionRepo')));
 
-DIContainer::bind('auctionImageRepo', new AuctionImageRepository(
+DIContainer::bind('categoryRepo', new CategoryRepository(
     DIContainer::get('db')
+));
+
+DIContainer::bind('categoryServ', new CategoryService(
+    DIContainer::get('categoryRepo')
 ));
 
 DIContainer::bind('itemServ', new ItemService(
@@ -74,7 +85,7 @@ DIContainer::bind('bidServ', new BidService(
 DIContainer::bind('authServ', new AuthService(
     DIContainer::get('userRepo')));
 
-DIContainer::bind('registrationServ', new RegistrationService(
+DIContainer::bind('userServ', new UserService(
     DIContainer::get('userRepo'),
     DIContainer::get('userRoleRepo'),
     DIContainer::get('roleRepo'),
@@ -92,7 +103,9 @@ DIContainer::bind('auctionServ', new AuctionService(
     DIContainer::get('itemRepo'),
     DIContainer::get('itemServ'),
     DIContainer::get('imageServ'),
-    DIContainer::get('bidServ')));
+    DIContainer::get('bidServ'),
+    DIContainer::get('categoryRepo'),
+    DIContainer::get('auctionImageRepo')));
 
 DIContainer::bind('watchlistServ', new WatchlistService(
     DIContainer::get('watchlistRepo'),

@@ -46,9 +46,8 @@ class ImageService
         }
 
         $auctionImages = [];
-        $hasMainImage = false;
 
-        // Loop through inputs
+        // Loop through inputs (array of urls)
         foreach ($inputs as $index => $rawInput)
         {
             // Validates input for image
@@ -62,20 +61,19 @@ class ImageService
             // Use the cleaned data
             $cleanInput = $validationResult['object'];
 
-            // Handle Main Image Logic: to prevent from more than 1 main image
-            if ($cleanInput['is_main'] && $hasMainImage) { // Force subsequent images to not be main
-                $cleanInput['is_main'] = false;
-            }
-            if ($cleanInput['is_main']) {
-                $hasMainImage = true;
+            // Make first image as main
+            if ($index == 0) {
+                $is_main = true;
+            } else {
+                $is_main = false;
             }
 
             // Create Object
             // Constructor: int $auctionId, string $imageUrl, int|bool $isMain, string|DateTime $uploadedDatetime, ?int $imageId = null
             $auctionImage = new AuctionImage(
                 $auction->getAuctionId(),
-                $cleanInput['image_url'],
-                $cleanInput['is_main'],
+                $cleanInput,
+                $is_main,
                 new DateTime()
             );
 
@@ -87,22 +85,13 @@ class ImageService
             }
         }
 
-        // Safety Net: If NO image was marked as main after the loop, make the first one main
-        if (!$hasMainImage && count($auctionImages) > 0) {
-            $firstImage = $auctionImages[0];
-
-            // Update is_main in db
-            $firstImage->setIsMain(true);
-            $this->auctionImageRepo->update($firstImage);
-        }
-
         return Utilities::creationResult("Auction images successfully created.", true, $auctionImages);
     }
 
-    private function validateAndFixImageInput(array $input, string $imageName) : array
+    private function validateAndFixImageInput(string $imageUrls, string $imageName) : array
     {
         // Validate Image URL
-        $url = isset($input['image_url']) ? trim($input['image_url']) : '';
+        $url = trim($imageUrls);
 
         if ($url === '') {
             return Utilities::creationResult("{$imageName} does not have a valid url.", false, null);
@@ -112,13 +101,10 @@ class ImageService
         if (strlen($url) > 2048) {
             return Utilities::creationResult("The url of {$imageName} is too long.", false, null);
         }
-        $input['image_url'] = $url;
-
-        // Fix Is Main: if not set, default to false, and force to boolean
-        $input['is_main'] = isset($input['is_main']) && (bool)$input['is_main'];
+        $imageUrls = $url;
 
         // Success
-        return Utilities::creationResult('', true, $input);
+        return Utilities::creationResult('', true, $imageUrls);
     }
 
     public function updateImage(AuctionImage $image): bool

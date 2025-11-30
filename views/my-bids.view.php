@@ -1,4 +1,5 @@
 <?php
+use infrastructure\DIContainer;
 require \infrastructure\Utilities::basePath('views/partials/header.php');
 ?>
 
@@ -21,13 +22,12 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
                 <?php foreach ($bids as $bid): ?>
                     <?php
                         $auctionObj = $bid->getAuction();
-                        $itemObj = $auctionObj ? $auctionObj->getItem() : null;
                     ?>
                     <tr>
                         <td>
                             <?php if ($auctionObj): ?>
                                 <a href="/auction?auction_id=<?= htmlspecialchars($auctionObj->getAuctionId()) ?>">
-                                    <?= htmlspecialchars($itemObj ? $itemObj->getItemName() : '[Item Deleted]') ?>
+                                    <?= htmlspecialchars($auctionObj->getItemName() ?? '[Item Missing]') ?>
                                 </a>
                             <?php else: ?>
                                 [Auction Deleted]
@@ -35,7 +35,7 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
                         </td>
                         <td>£<?= htmlspecialchars(number_format($bid->getBidAmount(), 2)) ?></td>
                         <td><?= htmlspecialchars($bid->getBidDateTime()->format('Y-m-d H:i')) ?></td>
-                        <td><?= htmlspecialchars($bid->getAuction()->getAuctionStatus()) ?></td>
+                        <td><?= htmlspecialchars($auctionObj->getAuctionStatus()) ?></td>
                     </tr>
                 <?php endforeach; ?>
                 </tbody>

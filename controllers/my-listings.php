@@ -30,5 +30,7 @@ if (!AuthService::hasRole("seller"))
 
 $auctionServ = DIContainer::get('auctionServ');
 $auctions = $auctionServ->getByUserId($userId);
+// Fill the Item relationship attribute in Auctions
+$auctionServ->fillItemInAuctions($auctions);
 
 require Utilities::basePath('views/my-listings.view.php');
