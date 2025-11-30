@@ -48,6 +48,36 @@ class AuctionService
     public function getByUserId(int $sellerId): array {
 
         return $this->auctionRepo->getBySellerId($sellerId);
+    public function getByStatus(string $auctionStatus):array
+    {
+        $auctions = $this -> auctionRepo -> getByAuctionStatus($auctionStatus);
+        return $auctions;
+    }
+
+    public function getByAuctionId(int $auctionId)
+    {
+        return $this -> auctionRepo -> getById($auctionId);
+    }
+
+    private function hydrate(Auction $auction): void
+    {
+        // Only fetch if NOT already set by repository SQL
+        if ($auction->getCurrentPrice() === null) {
+            $highestBid = $this->bidService->getHighestBidAmountByAuctionId($auction->getAuctionId());
+            $auction->setCurrentPrice($highestBid > 0 ? $highestBid : $auction->getStartingPrice());
+        }
+        if ($auction->getBidCount() === null) {
+            $auction->setBidCount($this->bidService->countBidsByAuctionId($auction->getAuctionId()));
+        }
+        // Image still requires separate query (different table)
+        $auction->setImageUrl($this->imageService->getMainImageUrlByAuctionId($auction->getAuctionId()));
+    }
+
+    private function hydrateMany(array $auctions): void
+    {
+        foreach ($auctions as $auction) {
+            $this->hydrate($auction);
+        }
     }
 
     public function getWatchedByUserId(int $userId): array {

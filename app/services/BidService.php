@@ -179,22 +179,27 @@ class BidService
             {
                 //get id of new highest bidder
                 $auctionId = $creationResult['object'] -> getAuctionId();
-                $newHighestBidder = $creationResult['object'] -> getBuyerId();
+                //$newHighestBidder = $creationResult['object'] -> getBuyerId();
 
                 //get id of previous highest bidder
-                $prevHighestBidder = $userOutBid -> getBuyerId();
+                $recipientId = $userOutBid -> getBuyerId();
 
-                //creates notification and mark as unsent
-                $createOutBidNotificationResult = $this -> notificationServ -> createOutBidNotification(
-                    $auctionId,
-                    $newHighestBidder,
-                    $prevHighestBidder
-                );
-
-                if (!$createOutBidNotificationResult['success'])
+                //creates pop up and email notification for when user is outbid
+                $channels = ['popUp', 'email'];
+                foreach ($channels as $channel)
                 {
-                    $pdo->rollBack();
-                    return $creationResult;
+
+                    $result = $this->notificationServ->createNotification(
+                        $auctionId,
+                        $recipientId,
+                        $channel,
+                        'outBid'
+                    );
+
+                    if (!$result['success']) {
+                        $pdo->rollBack();
+                        return $creationResult;
+                    }
                 }
             }
 
@@ -247,6 +252,26 @@ class BidService
 
     public function getBidsByAuctionId($auctionId): array {
         return $this->bidRepo->getByAuctionId($auctionId);
+    }
+
+    public function getBidById(int $bidId)
+    {
+        return $this->bidRepo->getById($bidId);
+    }
+
+    public function getWinningBidByAuctionId($auctionId): ?Bid {
+        // Get Auction status
+        $auction = $this->auctionRepo->getById($auctionId);
+        $isAuctionActive = $auction->getAuctionStatus() == 'Active';
+        if ($isAuctionActive) {
+            // Get Item Status
+            $item = $auction->getItem();
+            $isItemSold = $auction->getAuctionStatus() == 'Sold';
+            if ($isItemSold) {
+                return $this->bidRepo->getById($auction->getWinningBidID());
+            }
+        }
+        return null;
     }
 
     public function getBidsForUser(int $userId): array

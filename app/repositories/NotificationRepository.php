@@ -2,7 +2,7 @@
 
 namespace app\repositories;
 
-use app\models\OutBidNotification;
+use app\models\Notification;
 use infrastructure\Database;
 
 use app\models;
@@ -17,45 +17,72 @@ class NotificationRepository
         $this->db = $db;
     }
 
-    private function hydrate($row) :?OutBidNotification
+    private function hydrate($row) :?Notification
     {
         if (empty($row)) {
             return null;
         }
 
-        $object = new OutBidNotification(
+        $object = new Notification(
             (int)$row['id'],
             (int)$row['auction_id'],
-            (int)$row['current_highest_bidder_id'],
-            (int)$row['prev_highest_bidder_id'],
-            (int)$row['is_sent']
+            (int)$row['recipient_id'],
+            (string)$row['notification_type'],
+            (string)$row['notification_content_type'],
+            (int)$row['is_sent'],
         );
 
         return $object;
     }
 
-    private function extract(OutBidNotification $notification)
+    private function extract(Notification $notification)
     {
         $row = [];
         $row['auction_id'] = $notification->getAuctionId();
-        $row['current_highest_bidder_id'] = $notification->getNewHighestBidderId();
-        $row['prev_highest_bidder_id'] = $notification->getPrevHighestBidderId();
+        $row['recipient_id'] = $notification->getRecipientId();
+        $row['notification_type'] = $notification->getNotificationType();
+        $row['notification_content_type'] = $notification->getNotificationContentType();
         $row['is_sent'] = $notification->getIsSent();
         return $row;
     }
 
-    public function create(OutBidNotification $notification)
+    public function create(Notification $notification)
     {
         try
         {
             $params = $this->extract($notification);
-            $sql = "INSERT INTO notifications (auction_id, current_highest_bidder_id, prev_highest_bidder_id, is_sent)
-                    VALUES (:auction_id, :current_highest_bidder_id, :prev_highest_bidder_id, :is_sent)";
+
+            // 1️⃣ Check if notification already exists
+            $sqlCheck = "SELECT id 
+                     FROM notifications 
+                     WHERE auction_id = :auction_id
+                       AND recipient_id = :recipient_id
+                       AND notification_type = :notification_type
+                       AND notification_content_type = :notification_content_type
+                     LIMIT 1";
+
+            $paramsCheck = [
+                'auction_id' => $params['auction_id'],
+                'recipient_id' => $params['recipient_id'],
+                'notification_type' => $params['notification_type'],
+                'notification_content_type' => $params['notification_content_type']
+            ];
+
+            $existing = $this->db->query($sqlCheck, $paramsCheck)->fetch();
+
+            if ($existing)
+            {
+                // Already exists, skip creation
+                return null;
+            }
+
+            $sql = "INSERT INTO notifications (auction_id, recipient_id, notification_type, notification_content_type, is_sent)
+                    VALUES (:auction_id, :recipient_id, :notification_type, :notification_content_type, :is_sent)";
             $result = $this->db->query($sql, $params);
 
             if ($result) {
                 $id = (int)$this->db->connection->lastInsertId();
-                $notification->setOutBidNotificationId($id);
+                $notification->setNotificationId($id);
                 return $notification;
             }
 

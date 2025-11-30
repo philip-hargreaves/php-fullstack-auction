@@ -147,6 +147,31 @@ class AuctionRepository
         }
     }
 
+    public function getByAuctionStatus(string $auctionStatus) : array
+    {
+        try
+        {
+            $sql = "SELECT * FROM auctions WHERE auction_status = :auction_status";
+            $param = ['auction_status' => $auctionStatus];
+            //$result = $this->db->query($sql, $param);
+            $rows = $this->db->query($sql, $param)->fetchAll();
+
+            if($rows)
+            {
+                return $this->hydrateMany($rows);
+            }
+            else
+            {
+                return [];
+            }
+        }
+        catch (PDOException $e)
+        {
+            // TODO: add logging
+            return [];
+        }
+    }
+
     // Fetches paginated auctions with optional filters
     public function getByFilters(
         int $limit = 12,
