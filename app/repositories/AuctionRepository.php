@@ -147,48 +147,94 @@ class AuctionRepository
         }
     }
 
+    // Builds WHERE and HAVING conditions for filtering auctions
+    private function buildFilterConditions(
+        array $statuses,
+        array $conditions,
+        ?array $categoryIds,
+        ?float $minPrice,
+        ?float $maxPrice,
+        array &$params
+    ): array {
+        $whereConditions = [];
+        $havingConditions = [];
+
+        // Status filter
+        if (!empty($statuses)) {
+            $placeholders = [];
+            foreach ($statuses as $i => $status) {
+                $placeholders[] = ":status{$i}";
+                $params["status{$i}"] = $status;
+            }
+            $whereConditions[] = "a.auction_status IN (" . implode(',', $placeholders) . ")";
+        }
+
+        // Condition filter
+        if (!empty($conditions)) {
+            $placeholders = [];
+            foreach ($conditions as $i => $condition) {
+                $placeholders[] = ":condition{$i}";
+                $params["condition{$i}"] = $condition;
+            }
+            $whereConditions[] = "a.auction_condition IN (" . implode(',', $placeholders) . ")";
+        }
+
+        // Category filter (supports multiple category IDs for parent/child filtering)
+        if (!empty($categoryIds)) {
+            $placeholders = [];
+            foreach ($categoryIds as $i => $catId) {
+                $placeholders[] = ":category_id{$i}";
+                $params["category_id{$i}"] = $catId;
+            }
+            $whereConditions[] = "a.category_id IN (" . implode(',', $placeholders) . ")";
+        }
+
+        // Price filters (use HAVING because current_price is calculated)
+        if ($minPrice !== null) {
+            $havingConditions[] = "current_price >= :min_price";
+            $params["min_price"] = $minPrice;
+        }
+        if ($maxPrice !== null) {
+            $havingConditions[] = "current_price <= :max_price";
+            $params["max_price"] = $maxPrice;
+        }
+
+        return [
+            'where' => $whereConditions,
+            'having' => $havingConditions
+        ];
+    }
+
     // Fetches paginated auctions with optional filters
     public function getByFilters(
         int $limit = 12,
         int $offset = 0,
         string $orderBy = 'ending_soonest',
         array $statuses = ['Active'],
-        array $conditions = []
+        array $conditions = [],
+        ?float $minPrice = null,
+        ?float $maxPrice = null,
+        ?array $categoryIds = null
     ): array {
         try {
             $limit = (int)$limit;
             $offset = (int)$offset;
 
             $orderClause = match($orderBy) {
-                'pricelow' => 'current_price ASC', // Works because we calculate current_price in SELECT
+                'pricelow' => 'current_price ASC',
                 'pricehigh' => 'current_price DESC',
                 'date' => 'a.start_datetime DESC',
                 'ending_soonest' => 'a.end_datetime ASC',
                 default => 'a.end_datetime ASC'
             };
 
-            $whereConditions = [];
             $params = [];
-
-            if (!empty($statuses)) {
-                $placeholders = [];
-                foreach ($statuses as $i => $status) {
-                    $placeholders[] = ":status{$i}";
-                    $params["status{$i}"] = $status;
-                }
-                $whereConditions[] = "a.auction_status IN (" . implode(',', $placeholders) . ")";
-            }
-
-            if (!empty($conditions)) {
-                $placeholders = [];
-                foreach ($conditions as $i => $condition) {
-                    $placeholders[] = ":condition{$i}";
-                    $params["condition{$i}"] = $condition;
-                }
-                $whereConditions[] = "a.auction_condition IN (" . implode(',', $placeholders) . ")";
-            }
+            $filterResult = $this->buildFilterConditions($statuses, $conditions, $categoryIds, $minPrice, $maxPrice, $params);
+            $whereConditions = $filterResult['where'];
+            $havingConditions = $filterResult['having'];
 
             $whereClause = !empty($whereConditions) ? 'WHERE ' . implode(' AND ', $whereConditions) : '';
+            $havingClause = !empty($havingConditions) ? 'HAVING ' . implode(' AND ', $havingConditions) : '';
 
             $sql = "SELECT a.*, 
                         i.item_name,
@@ -199,6 +245,7 @@ class AuctionRepository
                     LEFT JOIN bids b ON a.id = b.auction_id
                     {$whereClause}
                     GROUP BY a.id
+                    {$havingClause}
                     ORDER BY {$orderClause}
                     LIMIT {$limit} OFFSET {$offset}";
 
@@ -209,34 +256,42 @@ class AuctionRepository
         }
     }
 
-    public function countByFilters(array $statuses = ['Active'], array $conditions = []): int
+    public function countByFilters(
+        array $statuses = ['Active'],
+        array $conditions = [],
+        ?float $minPrice = null,
+        ?float $maxPrice = null,
+        ?array $categoryIds = null
+    ): int
     {
-        // Simple Count Query (No joins needed for count unless filtering by bid amounts)
         try {
-            $whereConditions = [];
             $params = [];
+            $filterResult = $this->buildFilterConditions($statuses, $conditions, $categoryIds, $minPrice, $maxPrice, $params);
+            $whereConditions = $filterResult['where'];
+            $havingConditions = $filterResult['having'];
 
-            if (!empty($statuses)) {
-                $placeholders = [];
-                foreach ($statuses as $i => $status) {
-                    $placeholders[] = ":status{$i}";
-                    $params["status{$i}"] = $status;
-                }
-                $whereConditions[] = "auction_status IN (" . implode(',', $placeholders) . ")";
-            }
-
-            if (!empty($conditions)) {
-                $placeholders = [];
-                foreach ($conditions as $i => $condition) {
-                    $placeholders[] = ":condition{$i}";
-                    $params["condition{$i}"] = $condition;
-                }
-                $whereConditions[] = "auction_condition IN (" . implode(',', $placeholders) . ")";
+            // For count query, price filters need to use COALESCE in HAVING clause
+            $countHavingConditions = [];
+            foreach ($havingConditions as $havingCondition) {
+                $countHavingConditions[] = str_replace('current_price', 'COALESCE(MAX(b.bid_amount), a.starting_price)', $havingCondition);
             }
 
             $whereClause = !empty($whereConditions) ? 'WHERE ' . implode(' AND ', $whereConditions) : '';
+            $havingClause = !empty($countHavingConditions) ? 'HAVING ' . implode(' AND ', $countHavingConditions) : '';
 
-            $sql = "SELECT COUNT(*) as total FROM auctions {$whereClause}";
+            if (!empty($havingClause)) {
+                $sql = "SELECT COUNT(*) as total FROM (
+                    SELECT a.id 
+                    FROM auctions a
+                    LEFT JOIN bids b ON a.id = b.auction_id
+                    {$whereClause}
+                    GROUP BY a.id
+                    {$havingClause}
+                ) as filtered_auctions";
+            } else {
+                $sql = "SELECT COUNT(*) as total FROM auctions a {$whereClause}";
+            }
+            
             $row = $this->db->query($sql, $params)->fetch();
             return (int)$row['total'];
         } catch (PDOException $e) {
@@ -270,7 +325,6 @@ class AuctionRepository
     {
         try {
             $params = $this->extract($auction);
-            // Critical Fix: Add the ID to params for the WHERE clause
             $params['id'] = $auction->getAuctionId();
 
             $sql = "UPDATE auctions 
