@@ -168,6 +168,4 @@ class UserRepository
 
         return $this->hydrateMany($rows);
     }
-
-
 }

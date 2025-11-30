@@ -258,7 +258,7 @@ class AuctionRepository
 
             $this->db->query($sql, $params);
 
-            $id = (int)$this->db->lastInsertId();
+            $id = (int)$this->db->connection->lastInsertId();
             $auction->setAuctionId($id);
             return $auction;
         } catch (PDOException $e) {

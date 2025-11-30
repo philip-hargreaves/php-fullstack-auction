@@ -21,11 +21,11 @@ $input = [
 
 // Dependencies (Database → RoleRepository → UserRepository → UserRoleRepository → AuthService → RegistrationService)
 try {
-    $registrationService = DIContainer::get('registrationServ');
+    $userService = DIContainer::get('userServ');
     $authService = DIContainer::get('authServ');
 
     // Delegate registration to the service
-    $result = $registrationService->register($input);
+    $result = $userService->register($input);
 
     if ($result['success']) {
         // Auto-login newly created user for a smoother experience
