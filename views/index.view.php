@@ -19,6 +19,24 @@ require Utilities::basePath('views/partials/header.php');
                     <!-- Preserve sort order -->
                     <input type="hidden" name="order_by" value="<?= htmlspecialchars($activeFilters['ordering']) ?>">
                     
+                    <!-- Search Options Accordion -->
+                    <div class="filter-section">
+                        <button type="button" class="accordion-button" id="searchAccordion" aria-expanded="true" aria-controls="searchContent">
+                            <span>Search Options</span>
+                            <div class="accordion-icon">
+                                <svg width="16" height="16" class="icon-primary" fill-rule="evenodd" viewBox="0 0 24 24"><path d="M13.67,6.45a2.46,2.46,0,0,0-3.42,0l-8,8a1,1,0,0,0,0,1.42,1,1,0,0,0,1.41,0l8-8a.35.35,0,0,1,.58,0l8,8.1a1,1,0,1,0,1.42-1.41Z"></path></svg>
+                            </div>
+                        </button>
+                        <div id="searchContent" class="accordion-content" aria-labelledby="searchAccordion">
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input class="mer-checkbox" type="checkbox" name="include_description" value="1" <?= ($activeFilters['includeDescription'] ?? false) ? 'checked' : '' ?>>
+                                    <span class="checkbox-text">Include description</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <!-- Categories Accordion -->
                     <div class="filter-section">
                         <button type="button" class="accordion-button" id="categoryAccordion" aria-expanded="true" aria-controls="categoryContent">
@@ -205,6 +223,14 @@ require Utilities::basePath('views/partials/header.php');
                                     <input type="hidden" name="auction_status[]" value="sold">
                                 <?php endif; ?>
                                 
+                                <?php if (!empty($activeFilters['keyword'])): ?>
+                                    <input type="hidden" name="keyword" value="<?= htmlspecialchars($activeFilters['keyword']) ?>">
+                                <?php endif; ?>
+                                
+                                <?php if (($activeFilters['includeDescription'] ?? false)): ?>
+                                    <input type="hidden" name="include_description" value="1">
+                                <?php endif; ?>
+                                
                                 <?php if (!empty($activeFilters['minPrice'])): ?>
                                     <input type="hidden" name="min_price" value="<?= htmlspecialchars($activeFilters['minPrice']) ?>">
                                 <?php endif; ?>
@@ -222,6 +248,23 @@ require Utilities::basePath('views/partials/header.php');
                         </div>
                     </div>
                 </div>
+                
+                <!-- Search Results Header -->
+                <?php if (!empty($activeFilters['keyword'])): ?>
+                    <div class="search-results-header mb-3" style="padding: 16px 0; color: #b0b0b0;">
+                        <span style="font-size: 28px; font-weight: 500;">
+                            <i class="fa fa-search" style="margin-right: 8px;"></i>
+                            Search results for "<strong style="color: #fff;"><?= htmlspecialchars($activeFilters['keyword']) ?></strong>"
+                            <?php if ($activeFilters['includeDescription'] ?? false): ?>
+                                <span style="color: #888; font-size: 24px;">(including descriptions)</span>
+                            <?php endif; ?>
+                            <?php if (isset($num_results) && $num_results > 0): ?>
+                                <span style="color: #888; margin-left: 8px; font-size: 24px;">- <?= $num_results ?> <?= $num_results == 1 ? 'result' : 'results' ?></span>
+                            <?php endif; ?>
+                        </span>
+                    </div>
+                <?php endif; ?>
+                
                 <div class="auction-gallery">
                     <?php if (empty($processed_auctions)): ?>
                         <!-- No Results Message -->
@@ -372,6 +415,14 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Accordion functionality
+    const searchAccordion = document.getElementById('searchAccordion');
+    if (searchAccordion) {
+        searchAccordion.addEventListener('click', function() {
+            const isExpanded = this.getAttribute('aria-expanded') === 'true';
+            this.setAttribute('aria-expanded', !isExpanded);
+        });
+    }
+
     const conditionAccordion = document.getElementById('conditionAccordion');
     if (conditionAccordion) {
         conditionAccordion.addEventListener('click', function() {
