@@ -3,21 +3,23 @@ USE auction_db;
 -- Insert roles (if they don't exist)
 INSERT IGNORE INTO roles (id, role_name) VALUES
     (1, 'buyer'),
-    (2, 'seller');
+    (2, 'seller'),
+    (3, 'admin');
 
 -- Insert test users with hashed passwords
 -- Password: password123 (hashed with bcrypt)
-INSERT IGNORE INTO users (id, username, email, password, is_active) VALUES
-    (101, 'john_buyer', 'john@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1),
-    (102, 'jane_seller', 'jane@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1),
-    (201, 'seller_alice', 'alice@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1),
-    (202, 'seller_bob', 'bob@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1),
-    (203, 'seller_charlie', 'charlie@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1),
-    (204, 'seller_diana', 'diana@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1),
-    (205, 'seller_edward', 'edward@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1),
-    (206, 'seller_fiona', 'fiona@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1),
-    (207, 'seller_george', 'george@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1),
-    (208, 'seller_helen', 'helen@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1);
+INSERT IGNORE INTO users (id, username, email, password, is_active, created_datetime) VALUES
+    (101, 'john_buyer', 'john@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-01-15 10:00:00'),
+    (102, 'jane_seller', 'jane@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-02-20 14:30:00'),
+    (201, 'seller_alice', 'alice@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-03-10 09:15:00'),
+    (202, 'seller_bob', 'bob@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-03-25 16:45:00'),
+    (203, 'seller_charlie', 'charlie@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-04-05 11:20:00'),
+    (204, 'seller_diana', 'diana@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-04-18 13:10:00'),
+    (205, 'seller_edward', 'edward@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-05-12 08:30:00'),
+    (206, 'seller_fiona', 'fiona@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-05-28 15:00:00'),
+    (207, 'seller_george', 'george@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-06-10 10:45:00'),
+    (208, 'seller_helen', 'helen@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-06-22 12:15:00'),
+    (301, 'admin', 'admin@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-01-01 00:00:00');
 
 -- Assign roles to users
 -- User 101 (john_buyer) - buyer only
@@ -33,7 +35,8 @@ INSERT IGNORE INTO user_roles (user_id, role_id) VALUES
     (205, 1), (205, 2),
     (206, 1), (206, 2),
     (207, 1), (207, 2),
-    (208, 1), (208, 2);
+    (208, 1), (208, 2),
+    (301, 1), (301, 3);  -- admin is both buyer and admin
 
 -- CATEGORIES (based on comments in old seed)
 -- TOP-LEVEL CATEGORY: Computers

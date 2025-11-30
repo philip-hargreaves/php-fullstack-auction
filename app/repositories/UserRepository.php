@@ -6,7 +6,6 @@ use infrastructure\Database;
 use infrastructure\Utilities;
 use PDOException;
 
-// Data access for user
 class UserRepository
 {
     private Database $db;
@@ -31,10 +30,6 @@ class UserRepository
         );
     }
 
-    /**
-     * Hydrates a User with roles from multiple JOIN rows
-     * (Each row contains the same user data but different role data)
-     */
     private function hydrateWithRoles(array $rows): ?User
     {
         if (empty($rows)) {
