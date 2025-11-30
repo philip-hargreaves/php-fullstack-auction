@@ -16,6 +16,7 @@ $auctionServ = DIContainer::get('auctionServ');
 $results_per_page = 12;
 
 $auctions = $auctionServ->getActiveListings($curr_page, $results_per_page, $ordering);
+$auctionServ->fillAuctionImagesInAuctions($auctions); // Fill in AuctionImages property
 $num_results = $auctionServ->countActiveListings();
 $max_page = ceil($num_results / $results_per_page);
 
@@ -41,11 +42,23 @@ foreach ($auctions as $auction) {
 
     // Basic info from Auction object
     $processed['auction_id'] = $auction->getAuctionId();
-    $processed['title'] = $auction->getItem()->getItemName();
+    $processed['title'] = $auction->getItemName();
     $processed['description'] = $auction->getAuctionDescription();
     $processed['condition'] = $auction->getAuctionCondition();
     $processed['current_price'] = $auction->getCurrentPrice();
-    $processed['image_url'] = $auction->getImageUrl();
+
+    // Get main image, or else use the default image
+    $images = $auction->getAuctionImages();
+    if (!($images == [] || $images == null) || !empty($imageUrls[0])) {
+        foreach ($images as $image) {
+            if ($image->getImageType() == 'image') {
+                $processed['image_url'] = $image->getImageUrl();
+            }
+        }
+    } else {
+        $processed['image_url'] = "/images/default_item_image.jpg";
+    }
+
 
     // Truncate description
     if (strlen($processed['description']) > 250) {

@@ -1,4 +1,5 @@
 <?php
+use infrastructure\DIContainer;
 /**
  * @var $auctionId int
  * @var $title string
@@ -19,13 +20,14 @@
  * @var $bidText string
  * @var $statusText string
  * @var $statusTextSmall string
- * @var $bids array
+ * @var $displayedBids array
  * @var $highestBid
  * @var $condition string
  * @var $currencyText string
  * @var $timeText string
  * @var $itemIsSold bool
  * @var $itemIsDeleted bool
+ * @var $category
  */
 ?>
 
@@ -36,8 +38,10 @@
     <div class="row justify-content-center">
         <!-- Image Gallery -->
         <div class="col-12 col-md-7 mx-auto mb-4" style="max-width: 600px;">
-            <?php $firstImage = $imageUrls[0] ?? \infrastructure\Utilities::basePath('infrastructure/resources/images/default_item_image.jpg'); ?>
-
+            <?php
+            $defaultPath = "/images/default_item_image.jpg";
+            $firstImage = !empty($imageUrls[0]) ? $imageUrls[0] : $defaultPath;
+            ?>
             <div id="image-gallery" class="gallery-container mb-2 border rounded bg-transparent" style="height: 400px; overflow: hidden;">
                 <img src="<?= htmlspecialchars($firstImage) ?>"
                      alt="<?= htmlspecialchars($title) ?>"
@@ -89,7 +93,7 @@
                     <p class="small mb-1 mt-1"><?= $statusTextSmall ?></p>
                     <hr class="mb-3">
                     <p class="text mb-2">Ended on: <?= date_format($endTime, 'j M Y,  H:i') ?></p>
-                    <h6 class="text mb-0"><?= $bidText ?> : £<?= number_format($highestBidAmount, 2) ?></h6>
+                    <h6 class="text mb-0"><?= $bidText ?> £<?= number_format($highestBidAmount, 2) ?></h6>
                 <?php elseif ($auctionStatus == 'Scheduled'): ?>
                     <h4 class="text-danger"><?= $statusText ?></h4>
                     <p class="small mb-1 mt-1"><?= $statusTextSmall ?></p>
@@ -97,7 +101,10 @@
                     <h6 class="text mb-2"><?= $timeText ?> <?= $timeRemaining->format('%ad %hh %im') ?></h6>
                 <?php elseif ($auctionStatus == 'Active'): ?>
                     <!-- Current Highest Bid -->
-                    <h4 class="text-success mb-1"><?= $bidText ?> : £<?= number_format($highestBidAmount, 2) ?></h4>
+                    <h4 class="text-success mb-1">
+                        <?= $bidText ?> £
+                        <?= !is_null($highestBidAmount) ? number_format($highestBidAmount, 2) : number_format($startingPrice, 2); ?>
+                    </h4>
                     <!-- Auction Status -->
                     <p class="text-danger small mb-1 mt-1"><?= $statusTextSmall ?></p>
                     <hr class="mb-3">
@@ -197,7 +204,7 @@
         <div class="col-7">
             <h3 class="mb-3" >Bid History</h3>
             <div class="card mb-5" >
-                <?php if (empty($bids)): ?>
+                <?php if (empty($displayedBids)): ?>
                     <div class="card-body">
                         <div class="alert alert-info" role="alert" style="margin-bottom: 0;">
                             No bids have been placed yet. Be the first!
@@ -215,7 +222,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <?php foreach ($bids as $bid): ?>
+                            <?php foreach ($displayedBids as $bid): ?>
                                 <?php
                                 // Check if this is the winning bid
                                 $isHighestBid = $highestBid && $highestBid->getBidId() == $bid->getBidId();
@@ -310,6 +317,16 @@
                     </tr>
 
                     <tr>
+                        <td class="text">Item Status</td>
+                        <td class="text-end">
+                            <?php $badgeColor = ($itemIsSold) ? 'bg-success' : 'bg-secondary'; ?>
+                            <span class="badge rounded-pill <?= $badgeColor ?>">
+                            <?= htmlspecialchars($itemIsSold ? "Sold" : "Not Sold") ?>
+                        </span>
+                        </td>
+                    </tr>
+
+                    <tr>
                         <td class="text">Condition</td>
                         <td class="text-end fw-bold">
                             <?= htmlspecialchars($condition) ?>
@@ -319,7 +336,7 @@
                     <tr>
                         <td class="text">Category</td>
                         <td class="text-end fw-bold">
-                            <?= htmlspecialchars("categoryName") ?>
+                            <?= htmlspecialchars($category->getCategoryName()) ?>
                         </td>
                     </tr>
                     </tbody>

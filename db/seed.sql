@@ -32,6 +32,46 @@ INSERT IGNORE INTO user_roles (user_id, role_id) VALUES
     (207, 1), (207, 2),
     (208, 1), (208, 2);
 
+INSERT IGNORE INTO categories (id, name, parent_category_id) VALUES
+    -- ROOT CATEGORIES
+    (1, 'Computers & Office', NULL),
+    (2, 'Phones & Tablets', NULL),
+    (3, 'Audio', NULL),
+    (4, 'Cameras & Photography', NULL),
+    (5, 'Wearables', NULL),
+    (6, 'Gaming', NULL),
+
+    -- 1. COMPUTER SUBCATEGORIES
+    (11, 'Laptops', 1),                -- For ASUS ROG, MacBook Pro, ThinkPad
+    (12, 'Desktops & All-in-Ones', 1), -- For Custom PC, Mac Studio, iMac
+    (13, 'Monitors', 1),               -- For LG UltraGear, Dell UltraSharp
+    (14, 'Keyboards & Mice', 1),       -- For Keychron, Logitech MX Master
+    (15, 'Storage & Components', 1),   -- For Samsung T7 SSD
+
+    -- 2. PHONE & TABLET SUBCATEGORIES
+    (21, 'Apple iPhone', 2),           -- For iPhone 15/14/13
+    (22, 'Samsung Galaxy Phones', 2),  -- For Galaxy S24/S23
+    (23, 'Google Pixel Phones', 2),    -- For Pixel 8/7a
+    (24, 'Other Smartphones', 2),      -- For OnePlus 12
+    (25, 'Tablets', 2),                -- For iPads, Galaxy Tabs, Surface Pro
+
+    -- 3. AUDIO SUBCATEGORIES
+    (31, 'Headphones (Over-Ear)', 3),  -- For Sony WH-1000XM5, AirPods Max
+    (32, 'Earbuds (In-Ear)', 3),       -- For AirPods Pro, Galaxy Buds
+    (33, 'Speakers', 3),               -- For Sonos, Echo, Bose SoundLink
+
+    -- 4. CAMERA SUBCATEGORIES
+    (41, 'DSLR & Mirrorless', 4),      -- For Canon EOS, Sony Alpha, Nikon
+    (42, 'Action Cameras', 4),         -- For GoPro, DJI Osmo
+
+    -- 5. WEARABLE SUBCATEGORIES
+    (51, 'Smartwatches', 5),           -- For Apple Watch, Galaxy Watch
+    (52, 'Fitness Trackers', 5),       -- For Fitbit
+
+    -- 6. GAMING SUBCATEGORIES
+    (61, 'Consoles', 6),               -- For PS5, Xbox, Switch
+    (62, 'Gaming Accessories', 6);     -- For Controllers, Headsets
+
 -- ITEMS (simple: id, seller_id, item_name only)
 -- Description and condition are now on auctions table
 INSERT IGNORE INTO items (id, seller_id, item_name) VALUES
@@ -116,87 +156,88 @@ INSERT IGNORE INTO items (id, seller_id, item_name) VALUES
 
 -- AUCTIONS (now includes auction_description, auction_condition)
 -- Active Auctions - Ending Soon (1-3 days)
-INSERT IGNORE INTO auctions (id, item_id, auction_description, auction_condition, start_datetime, end_datetime, starting_price, reserve_price, auction_status) VALUES
-    (3001, 2001, 'Powerful gaming laptop with Intel i9, 32GB RAM, 1TB SSD, RTX 4070 graphics. 16 inch 165Hz display. Excellent condition, barely used. Perfect for gaming and content creation.', 'Like New', DATE_SUB(NOW(), INTERVAL 5 DAY), DATE_ADD(NOW(), INTERVAL 1 DAY), 1299.99, 1600.00, 'Active'),
-    (3002, 2007, 'Excellent condition MacBook Pro with M2 chip, 16GB RAM, 512GB SSD. Perfect for professionals and creatives. Includes original charger and box. Barely used, like new condition.', 'Like New', DATE_SUB(NOW(), INTERVAL 4 DAY), DATE_ADD(NOW(), INTERVAL 2 DAY), 1899.99, 2200.00, 'Active'),
-    (3003, 2026, 'Brand new iPhone 15 Pro Max in Titanium Blue. Still sealed in original packaging. Includes all accessories. Unlocked for all carriers.', 'New', DATE_SUB(NOW(), INTERVAL 6 DAY), DATE_ADD(NOW(), INTERVAL 1 DAY), 1099.99, 1400.00, 'Active'),
-    (3004, 2030, 'Flagship smartphone with S Pen. Excellent condition, barely used. Includes original box and charger. Unlocked.', 'Like New', DATE_SUB(NOW(), INTERVAL 5 DAY), DATE_ADD(NOW(), INTERVAL 3 DAY), 899.99, 1200.00, 'Active'),
-    (3005, 2063, 'Professional full-frame mirrorless camera with 24.2MP sensor. Includes body, battery, charger, and 2 memory cards. Excellent condition, well maintained.', 'Like New', DATE_SUB(NOW(), INTERVAL 4 DAY), DATE_ADD(NOW(), INTERVAL 2 DAY), 1299.99, 1600.00, 'Active'),
-    (3006, 2077, 'Premium noise-cancelling wireless headphones. Excellent sound quality and battery life. Includes carrying case and charging cable. Lightly used.', 'Like New', DATE_SUB(NOW(), INTERVAL 6 DAY), DATE_ADD(NOW(), INTERVAL 1 DAY), 249.99, 300.00, 'Active'),
-    (3007, 2085, 'Premium wireless earbuds with active noise cancellation. Excellent condition, includes charging case and all accessories.', 'Like New', DATE_SUB(NOW(), INTERVAL 5 DAY), DATE_ADD(NOW(), INTERVAL 3 DAY), 199.99, 280.00, 'Active'),
-    (3008, 2101, 'PS5 console with one DualSense controller. Includes all original cables and packaging. Excellent condition, barely used. Comes with 3 games included.', 'Like New', DATE_SUB(NOW(), INTERVAL 4 DAY), DATE_ADD(NOW(), INTERVAL 2 DAY), 449.99, 550.00, 'Active'),
-    (3009, 2119, 'Professional gaming mouse with high DPI sensor. Excellent condition, barely used. Perfect for competitive gaming.', 'Like New', DATE_SUB(NOW(), INTERVAL 6 DAY), DATE_ADD(NOW(), INTERVAL 1 DAY), 79.99, 110.00, 'Active'),
-    (3010, 2138, 'Rugged external SSD with excellent performance. Excellent condition, includes USB-C cable. Perfect for backups.', 'Like New', DATE_SUB(NOW(), INTERVAL 5 DAY), DATE_ADD(NOW(), INTERVAL 3 DAY), 149.99, 220.00, 'Active');
+-- Active Auctions - Short Term (< 1 week)
+INSERT IGNORE INTO auctions (id, item_id, auction_description, auction_condition, start_datetime, end_datetime, starting_price, reserve_price, auction_status, category_id) VALUES
+    (3001, 2001, 'Powerful gaming laptop with Intel i9, 32GB RAM, 1TB SSD, RTX 4070 graphics. 16 inch 165Hz display. Excellent condition, barely used. Perfect for gaming and content creation.', 'Like New', DATE_SUB(NOW(), INTERVAL 5 DAY), DATE_ADD(NOW(), INTERVAL 1 DAY), 1299.99, 1600.00, 'Active', 11), -- Laptops
+    (3002, 2007, 'Excellent condition MacBook Pro with M2 chip, 16GB RAM, 512GB SSD. Perfect for professionals and creatives. Includes original charger and box. Barely used, like new condition.', 'Like New', DATE_SUB(NOW(), INTERVAL 4 DAY), DATE_ADD(NOW(), INTERVAL 2 DAY), 1899.99, 2200.00, 'Active', 11), -- Laptops
+    (3003, 2026, 'Brand new iPhone 15 Pro Max in Titanium Blue. Still sealed in original packaging. Includes all accessories. Unlocked for all carriers.', 'New', DATE_SUB(NOW(), INTERVAL 6 DAY), DATE_ADD(NOW(), INTERVAL 1 DAY), 1099.99, 1400.00, 'Active', 21), -- iPhone
+    (3004, 2030, 'Flagship smartphone with S Pen. Excellent condition, barely used. Includes original box and charger. Unlocked.', 'Like New', DATE_SUB(NOW(), INTERVAL 5 DAY), DATE_ADD(NOW(), INTERVAL 3 DAY), 899.99, 1200.00, 'Active', 22), -- Samsung Phone
+    (3005, 2063, 'Professional full-frame mirrorless camera with 24.2MP sensor. Includes body, battery, charger, and 2 memory cards. Excellent condition, well maintained.', 'Like New', DATE_SUB(NOW(), INTERVAL 4 DAY), DATE_ADD(NOW(), INTERVAL 2 DAY), 1299.99, 1600.00, 'Active', 41), -- DSLR/Mirrorless
+    (3006, 2077, 'Premium noise-cancelling wireless headphones. Excellent sound quality and battery life. Includes carrying case and charging cable. Lightly used.', 'Like New', DATE_SUB(NOW(), INTERVAL 6 DAY), DATE_ADD(NOW(), INTERVAL 1 DAY), 249.99, 300.00, 'Active', 31), -- Headphones
+    (3007, 2085, 'Premium wireless earbuds with active noise cancellation. Excellent condition, includes charging case and all accessories.', 'Like New', DATE_SUB(NOW(), INTERVAL 5 DAY), DATE_ADD(NOW(), INTERVAL 3 DAY), 199.99, 280.00, 'Active', 32), -- Earbuds
+    (3008, 2101, 'PS5 console with one DualSense controller. Includes all original cables and packaging. Excellent condition, barely used. Comes with 3 games included.', 'Like New', DATE_SUB(NOW(), INTERVAL 4 DAY), DATE_ADD(NOW(), INTERVAL 2 DAY), 449.99, 550.00, 'Active', 61), -- Consoles
+    (3009, 2119, 'Professional gaming mouse with high DPI sensor. Excellent condition, barely used. Perfect for competitive gaming.', 'Like New', DATE_SUB(NOW(), INTERVAL 6 DAY), DATE_ADD(NOW(), INTERVAL 1 DAY), 79.99, 110.00, 'Active', 14), -- Keyboards & Mice
+    (3010, 2138, 'Rugged external SSD with excellent performance. Excellent condition, includes USB-C cable. Perfect for backups.', 'Like New', DATE_SUB(NOW(), INTERVAL 5 DAY), DATE_ADD(NOW(), INTERVAL 3 DAY), 149.99, 220.00, 'Active', 15); -- Storage
 
 -- Active Auctions - Medium Term (1-2 weeks)
-INSERT IGNORE INTO auctions (id, item_id, auction_description, auction_condition, start_datetime, end_datetime, starting_price, reserve_price, auction_status) VALUES
-    (3011, 2002, 'High-end gaming laptop with Intel i9, 32GB RAM, 2TB SSD, RTX 4080 graphics. 18 inch 165Hz display. Excellent condition, well maintained. Perfect for serious gamers.', 'Like New', DATE_SUB(NOW(), INTERVAL 3 DAY), DATE_ADD(NOW(), INTERVAL 10 DAY), 1999.99, 2400.00, 'Active'),
-    (3012, 2008, 'Ultrabook with Intel i7, 16GB RAM, 512GB SSD. 13.3 inch OLED display. Lightweight and portable. Good condition, some minor scratches on lid.', 'Used', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 12 DAY), 1299.99, 1600.00, 'Active'),
-    (3013, 2010, 'High-end custom gaming PC with Intel i9, 64GB RAM, 2TB SSD, RTX 4090 graphics. Excellent condition, perfect for 4K gaming and streaming.', 'Like New', DATE_SUB(NOW(), INTERVAL 4 DAY), DATE_ADD(NOW(), INTERVAL 11 DAY), 2499.99, 3000.00, 'Active'),
-    (3014, 2018, '4K gaming monitor with 144Hz refresh rate. Excellent color accuracy and response time. Perfect for gaming and design work. Excellent condition, includes stand.', 'Like New', DATE_SUB(NOW(), INTERVAL 3 DAY), DATE_ADD(NOW(), INTERVAL 13 DAY), 349.99, 480.00, 'Active'),
-    (3015, 2027, 'Excellent condition iPhone 15 Pro. Barely used, includes original box and charger. Unlocked for all carriers.', 'Like New', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 10 DAY), 999.99, 1300.00, 'Active'),
-    (3016, 2031, 'Premium Android phone with excellent camera. Good condition with minor wear. Includes charger and case.', 'Used', DATE_SUB(NOW(), INTERVAL 4 DAY), DATE_ADD(NOW(), INTERVAL 12 DAY), 699.99, 900.00, 'Active'),
-    (3017, 2037, 'Large iPad Pro with M2 chip. Excellent condition, includes Apple Pencil 2nd generation and Magic Keyboard. Perfect for professionals.', 'Like New', DATE_SUB(NOW(), INTERVAL 3 DAY), DATE_ADD(NOW(), INTERVAL 11 DAY), 999.99, 1300.00, 'Active'),
-    (3018, 2046, 'Latest Apple Watch with fitness tracking. Good condition with some minor wear. Includes charger and band.', 'Used', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 13 DAY), 299.99, 400.00, 'Active'),
-    (3019, 2055, 'Professional full-frame DSLR camera body. Excellent condition with low shutter count. Includes battery, charger, and body cap.', 'Like New', DATE_SUB(NOW(), INTERVAL 4 DAY), DATE_ADD(NOW(), INTERVAL 10 DAY), 1899.99, 2200.00, 'Active'),
-    (3020, 2064, 'Professional full-frame mirrorless camera. Excellent condition, barely used. Perfect for photography and videography.', 'Like New', DATE_SUB(NOW(), INTERVAL 3 DAY), DATE_ADD(NOW(), INTERVAL 12 DAY), 1999.99, 2400.00, 'Active'),
-    (3021, 2078, 'Premium over-ear headphones with active noise cancellation. Excellent condition, includes case and cable.', 'Like New', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 11 DAY), 449.99, 600.00, 'Active'),
-    (3022, 2086, 'Premium wireless earbuds with noise cancellation. Excellent condition, includes charging case. Great sound quality.', 'Like New', DATE_SUB(NOW(), INTERVAL 4 DAY), DATE_ADD(NOW(), INTERVAL 13 DAY), 199.99, 280.00, 'Active'),
-    (3023, 2093, 'Premium smart speaker with spatial audio. Excellent condition, includes power cable. Perfect for home audio setup.', 'Like New', DATE_SUB(NOW(), INTERVAL 3 DAY), DATE_ADD(NOW(), INTERVAL 10 DAY), 399.99, 550.00, 'Active'),
-    (3024, 2104, 'Next-gen gaming console with 1TB SSD. Excellent condition, includes controller and all cables. Perfect for gaming enthusiasts.', 'Like New', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 12 DAY), 399.99, 500.00, 'Active'),
-    (3025, 2110, 'Premium PS5 controller with customizable buttons. Excellent condition, includes case and accessories.', 'Like New', DATE_SUB(NOW(), INTERVAL 4 DAY), DATE_ADD(NOW(), INTERVAL 11 DAY), 179.99, 250.00, 'Active'),
-    (3026, 2116, 'RGB mechanical keyboard with cherry switches. Excellent condition, includes wrist rest. Perfect for gaming and typing.', 'Like New', DATE_SUB(NOW(), INTERVAL 3 DAY), DATE_ADD(NOW(), INTERVAL 13 DAY), 199.99, 280.00, 'Active'),
-    (3027, 2122, 'Premium mechanical keyboard with excellent build quality. Excellent condition, includes keycap puller and cable.', 'Like New', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 10 DAY), 149.99, 220.00, 'Active'),
-    (3028, 2130, 'Ultra-lightweight gaming mouse with excellent sensor. Excellent condition, includes accessories. Highly sought after.', 'Like New', DATE_SUB(NOW(), INTERVAL 4 DAY), DATE_ADD(NOW(), INTERVAL 12 DAY), 99.99, 140.00, 'Active'),
-    (3029, 2133, 'Premium productivity mouse with excellent ergonomics. Excellent condition, includes USB receiver.', 'Like New', DATE_SUB(NOW(), INTERVAL 3 DAY), DATE_ADD(NOW(), INTERVAL 11 DAY), 79.99, 110.00, 'Active'),
-    (3030, 2004, 'Business laptop with Intel i7, 16GB RAM, 1TB SSD. 14 inch display. Excellent condition, well maintained. Perfect for professionals.', 'Like New', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 10 DAY), 1299.99, 1600.00, 'Active');
+INSERT IGNORE INTO auctions (id, item_id, auction_description, auction_condition, start_datetime, end_datetime, starting_price, reserve_price, auction_status, category_id) VALUES
+    (3011, 2002, 'High-end gaming laptop with Intel i9, 32GB RAM, 2TB SSD, RTX 4080 graphics. 18 inch 165Hz display. Excellent condition, well maintained. Perfect for serious gamers.', 'Like New', DATE_SUB(NOW(), INTERVAL 3 DAY), DATE_ADD(NOW(), INTERVAL 10 DAY), 1999.99, 2400.00, 'Active', 11), -- Laptops
+    (3012, 2008, 'Ultrabook with Intel i7, 16GB RAM, 512GB SSD. 13.3 inch OLED display. Lightweight and portable. Good condition, some minor scratches on lid.', 'Used', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 12 DAY), 1299.99, 1600.00, 'Active', 11), -- Laptops
+    (3013, 2010, 'High-end custom gaming PC with Intel i9, 64GB RAM, 2TB SSD, RTX 4090 graphics. Excellent condition, perfect for 4K gaming and streaming.', 'Like New', DATE_SUB(NOW(), INTERVAL 4 DAY), DATE_ADD(NOW(), INTERVAL 11 DAY), 2499.99, 3000.00, 'Active', 12), -- Desktops
+    (3014, 2018, '4K gaming monitor with 144Hz refresh rate. Excellent color accuracy and response time. Perfect for gaming and design work. Excellent condition, includes stand.', 'Like New', DATE_SUB(NOW(), INTERVAL 3 DAY), DATE_ADD(NOW(), INTERVAL 13 DAY), 349.99, 480.00, 'Active', 13), -- Monitors
+    (3015, 2027, 'Excellent condition iPhone 15 Pro. Barely used, includes original box and charger. Unlocked for all carriers.', 'Like New', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 10 DAY), 999.99, 1300.00, 'Active', 21), -- iPhone
+    (3016, 2031, 'Premium Android phone with excellent camera. Good condition with minor wear. Includes charger and case.', 'Used', DATE_SUB(NOW(), INTERVAL 4 DAY), DATE_ADD(NOW(), INTERVAL 12 DAY), 699.99, 900.00, 'Active', 23), -- Pixel Phone
+    (3017, 2037, 'Large iPad Pro with M2 chip. Excellent condition, includes Apple Pencil 2nd generation and Magic Keyboard. Perfect for professionals.', 'Like New', DATE_SUB(NOW(), INTERVAL 3 DAY), DATE_ADD(NOW(), INTERVAL 11 DAY), 999.99, 1300.00, 'Active', 25), -- Tablets
+    (3018, 2046, 'Latest Apple Watch with fitness tracking. Good condition with some minor wear. Includes charger and band.', 'Used', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 13 DAY), 299.99, 400.00, 'Active', 51), -- Smartwatches
+    (3019, 2055, 'Professional full-frame DSLR camera body. Excellent condition with low shutter count. Includes battery, charger, and body cap.', 'Like New', DATE_SUB(NOW(), INTERVAL 4 DAY), DATE_ADD(NOW(), INTERVAL 10 DAY), 1899.99, 2200.00, 'Active', 41), -- DSLR/Mirrorless
+    (3020, 2064, 'Professional full-frame mirrorless camera. Excellent condition, barely used. Perfect for photography and videography.', 'Like New', DATE_SUB(NOW(), INTERVAL 3 DAY), DATE_ADD(NOW(), INTERVAL 12 DAY), 1999.99, 2400.00, 'Active', 41), -- DSLR/Mirrorless
+    (3021, 2078, 'Premium over-ear headphones with active noise cancellation. Excellent condition, includes case and cable.', 'Like New', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 11 DAY), 449.99, 600.00, 'Active', 31), -- Headphones
+    (3022, 2086, 'Premium wireless earbuds with noise cancellation. Excellent condition, includes charging case. Great sound quality.', 'Like New', DATE_SUB(NOW(), INTERVAL 4 DAY), DATE_ADD(NOW(), INTERVAL 13 DAY), 199.99, 280.00, 'Active', 32), -- Earbuds
+    (3023, 2093, 'Premium smart speaker with spatial audio. Excellent condition, includes power cable. Perfect for home audio setup.', 'Like New', DATE_SUB(NOW(), INTERVAL 3 DAY), DATE_ADD(NOW(), INTERVAL 10 DAY), 399.99, 550.00, 'Active', 33), -- Speakers
+    (3024, 2104, 'Next-gen gaming console with 1TB SSD. Excellent condition, includes controller and all cables. Perfect for gaming enthusiasts.', 'Like New', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 12 DAY), 399.99, 500.00, 'Active', 61), -- Consoles
+    (3025, 2110, 'Premium PS5 controller with customizable buttons. Excellent condition, includes case and accessories.', 'Like New', DATE_SUB(NOW(), INTERVAL 4 DAY), DATE_ADD(NOW(), INTERVAL 11 DAY), 179.99, 250.00, 'Active', 62), -- Gaming Accessories
+    (3026, 2116, 'RGB mechanical keyboard with cherry switches. Excellent condition, includes wrist rest. Perfect for gaming and typing.', 'Like New', DATE_SUB(NOW(), INTERVAL 3 DAY), DATE_ADD(NOW(), INTERVAL 13 DAY), 199.99, 280.00, 'Active', 14), -- Keyboards & Mice
+    (3027, 2122, 'Premium mechanical keyboard with excellent build quality. Excellent condition, includes keycap puller and cable.', 'Like New', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 10 DAY), 149.99, 220.00, 'Active', 14), -- Keyboards & Mice
+    (3028, 2130, 'Ultra-lightweight gaming mouse with excellent sensor. Excellent condition, includes accessories. Highly sought after.', 'Like New', DATE_SUB(NOW(), INTERVAL 4 DAY), DATE_ADD(NOW(), INTERVAL 12 DAY), 99.99, 140.00, 'Active', 14), -- Keyboards & Mice
+    (3029, 2133, 'Premium productivity mouse with excellent ergonomics. Excellent condition, includes USB receiver.', 'Like New', DATE_SUB(NOW(), INTERVAL 3 DAY), DATE_ADD(NOW(), INTERVAL 11 DAY), 79.99, 110.00, 'Active', 14), -- Keyboards & Mice
+    (3030, 2004, 'Business laptop with Intel i7, 16GB RAM, 1TB SSD. 14 inch display. Excellent condition, well maintained. Perfect for professionals.', 'Like New', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 10 DAY), 1299.99, 1600.00, 'Active', 11); -- Laptops
 
 -- Active Auctions - Longer Term (3-4 weeks)
-INSERT IGNORE INTO auctions (id, item_id, auction_description, auction_condition, start_datetime, end_datetime, starting_price, reserve_price, auction_status) VALUES
-    (3031, 2003, 'Premium gaming laptop with Intel i7, 16GB RAM, 1TB SSD, RTX 4060 graphics. 17.3 inch QHD display. Good condition with minor wear.', 'Used', DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 21 DAY), 1499.99, 1800.00, 'Active'),
-    (3032, 2009, 'Ultra-lightweight laptop with Intel i7, 16GB RAM, 1TB SSD. 17 inch display. Excellent condition, perfect for portability.', 'Like New', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 25 DAY), 1199.99, 1500.00, 'Active'),
-    (3033, 2013, 'Professional workstation with M2 Ultra chip, 64GB RAM, 1TB SSD. Excellent condition, perfect for video editing and 3D rendering.', 'Like New', DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 22 DAY), 2999.99, 3600.00, 'Active'),
-    (3034, 2019, 'Ultrawide curved gaming monitor with 240Hz refresh rate. Excellent condition, includes stand and all cables. Perfect for immersive gaming.', 'Like New', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 24 DAY), 899.99, 1200.00, 'Active'),
-    (3035, 2021, 'Professional 5K display with excellent color accuracy. Perfect for creative professionals. Excellent condition, includes stand.', 'Like New', DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 23 DAY), 1299.99, 1600.00, 'Active'),
-    (3036, 2028, 'Good condition iPhone 14 Pro Max with minor wear. Includes charger and case. Unlocked for all carriers.', 'Used', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 21 DAY), 799.99, 1000.00, 'Active'),
-    (3037, 2032, 'High-performance smartphone with fast charging. Excellent condition, includes original accessories.', 'Like New', DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 25 DAY), 599.99, 800.00, 'Active'),
-    (3038, 2038, 'iPad Air with M1 chip, 256GB storage. Space Grey color. Includes Apple Pencil 2nd generation and smart folio case. Perfect condition.', 'Like New', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 22 DAY), 599.99, 750.00, 'Active'),
-    (3039, 2047, 'Premium Apple Watch with titanium case. Excellent condition, includes charger and band. Perfect for outdoor activities.', 'Like New', DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 24 DAY), 699.99, 900.00, 'Active'),
-    (3040, 2049, 'Premium smartwatch with rotating bezel. Excellent condition, includes charger and band.', 'Like New', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 23 DAY), 299.99, 400.00, 'Active'),
-    (3041, 2058, 'High-resolution full-frame DSLR. Excellent condition, well maintained. Perfect for professional photography.', 'Like New', DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 21 DAY), 1999.99, 2400.00, 'Active'),
-    (3042, 2065, 'High-resolution full-frame mirrorless camera. Excellent condition, perfect for landscape and studio photography.', 'Like New', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 25 DAY), 2999.99, 3600.00, 'Active'),
-    (3043, 2072, 'Latest action camera with excellent stabilization. Excellent condition, includes mounts and accessories.', 'Like New', DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 22 DAY), 299.99, 400.00, 'Active'),
-    (3044, 2080, 'Premium wireless headphones with excellent sound quality. Excellent condition, includes case and cable.', 'Like New', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 24 DAY), 299.99, 400.00, 'Active'),
-    (3045, 2087, 'High-quality wireless earbuds with active noise cancellation. Good condition, includes charging case.', 'Used', DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 23 DAY), 149.99, 220.00, 'Active'),
-    (3046, 2094, 'High-fidelity smart speaker with Alexa. Excellent condition, includes power adapter. Perfect for smart home setup.', 'Like New', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 21 DAY), 79.99, 110.00, 'Active'),
-    (3047, 2107, 'Nintendo Switch OLED model with red and blue joy-cons. Includes dock, charger, and 5 games. Excellent condition, well cared for.', 'Like New', DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 25 DAY), 299.99, 380.00, 'Active'),
-    (3048, 2113, 'Premium gaming headset with dual battery system. Excellent condition, includes all accessories.', 'Like New', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 22 DAY), 249.99, 350.00, 'Active'),
-    (3049, 2005, 'Convertible business laptop with Intel i7, 16GB RAM, 512GB SSD. 14 inch touchscreen. Excellent condition, includes stylus.', 'Like New', DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 24 DAY), 1199.99, 1500.00, 'Active'),
-    (3050, 2006, 'Professional business laptop with Intel i7, 16GB RAM, 512GB SSD. 14 inch display. Good condition, well maintained.', 'Used', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 23 DAY), 999.99, 1300.00, 'Active'),
-    (3051, 2011, 'Gaming desktop with Intel i9, 32GB RAM, 1TB SSD, RTX 4080 graphics. Excellent condition, includes keyboard and mouse.', 'Like New', DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 21 DAY), 1999.99, 2400.00, 'Active'),
-    (3052, 2012, 'Compact gaming PC with Intel i9, 32GB RAM, 1TB SSD, RTX 4080. Excellent condition, space-saving design.', 'Like New', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 25 DAY), 2499.99, 3000.00, 'Active'),
-    (3053, 2014, 'Professional workstation with AMD Threadripper, 64GB RAM, 2TB SSD, RTX A5000 graphics. Excellent condition, perfect for CAD and rendering.', 'Like New', DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 22 DAY), 3499.99, 4200.00, 'Active'),
-    (3054, 2016, 'All-in-one desktop with M1 chip. 24 inch 4.5K Retina display. Excellent condition, includes Magic Mouse and Keyboard.', 'Like New', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 24 DAY), 999.99, 1300.00, 'Active'),
-    (3055, 2020, '4K OLED gaming monitor with 240Hz refresh rate. Excellent picture quality. Perfect for gaming and content creation. Excellent condition.', 'Like New', DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 23 DAY), 1299.99, 1600.00, 'Active');
+INSERT IGNORE INTO auctions (id, item_id, auction_description, auction_condition, start_datetime, end_datetime, starting_price, reserve_price, auction_status, category_id) VALUES
+    (3031, 2003, 'Premium gaming laptop with Intel i7, 16GB RAM, 1TB SSD, RTX 4060 graphics. 17.3 inch QHD display. Good condition with minor wear.', 'Used', DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 21 DAY), 1499.99, 1800.00, 'Active', 11), -- Laptops
+    (3032, 2009, 'Ultra-lightweight laptop with Intel i7, 16GB RAM, 1TB SSD. 17 inch display. Excellent condition, perfect for portability.', 'Like New', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 25 DAY), 1199.99, 1500.00, 'Active', 11), -- Laptops
+    (3033, 2013, 'Professional workstation with M2 Ultra chip, 64GB RAM, 1TB SSD. Excellent condition, perfect for video editing and 3D rendering.', 'Like New', DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 22 DAY), 2999.99, 3600.00, 'Active', 12), -- Desktops
+    (3034, 2019, 'Ultrawide curved gaming monitor with 240Hz refresh rate. Excellent condition, includes stand and all cables. Perfect for immersive gaming.', 'Like New', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 24 DAY), 899.99, 1200.00, 'Active', 13), -- Monitors
+    (3035, 2021, 'Professional 5K display with excellent color accuracy. Perfect for creative professionals. Excellent condition, includes stand.', 'Like New', DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 23 DAY), 1299.99, 1600.00, 'Active', 13), -- Monitors
+    (3036, 2028, 'Good condition iPhone 14 Pro Max with minor wear. Includes charger and case. Unlocked for all carriers.', 'Used', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 21 DAY), 799.99, 1000.00, 'Active', 21), -- iPhone
+    (3037, 2032, 'High-performance smartphone with fast charging. Excellent condition, includes original accessories.', 'Like New', DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 25 DAY), 599.99, 800.00, 'Active', 24), -- Other Phones
+    (3038, 2038, 'iPad Air with M1 chip, 256GB storage. Space Grey color. Includes Apple Pencil 2nd generation and smart folio case. Perfect condition.', 'Like New', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 22 DAY), 599.99, 750.00, 'Active', 25), -- Tablets
+    (3039, 2047, 'Premium Apple Watch with titanium case. Excellent condition, includes charger and band. Perfect for outdoor activities.', 'Like New', DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 24 DAY), 699.99, 900.00, 'Active', 51), -- Smartwatches
+    (3040, 2049, 'Premium smartwatch with rotating bezel. Excellent condition, includes charger and band.', 'Like New', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 23 DAY), 299.99, 400.00, 'Active', 51), -- Smartwatches
+    (3041, 2058, 'High-resolution full-frame DSLR. Excellent condition, well maintained. Perfect for professional photography.', 'Like New', DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 21 DAY), 1999.99, 2400.00, 'Active', 41), -- DSLR/Mirrorless
+    (3042, 2065, 'High-resolution full-frame mirrorless camera. Excellent condition, perfect for landscape and studio photography.', 'Like New', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 25 DAY), 2999.99, 3600.00, 'Active', 41), -- DSLR/Mirrorless
+    (3043, 2072, 'Latest action camera with excellent stabilization. Excellent condition, includes mounts and accessories.', 'Like New', DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 22 DAY), 299.99, 400.00, 'Active', 42), -- Action Cameras
+    (3044, 2080, 'Premium wireless headphones with excellent sound quality. Excellent condition, includes case and cable.', 'Like New', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 24 DAY), 299.99, 400.00, 'Active', 31), -- Headphones
+    (3045, 2087, 'High-quality wireless earbuds with active noise cancellation. Good condition, includes charging case.', 'Used', DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 23 DAY), 149.99, 220.00, 'Active', 32), -- Earbuds
+    (3046, 2094, 'High-fidelity smart speaker with Alexa. Excellent condition, includes power adapter. Perfect for smart home setup.', 'Like New', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 21 DAY), 79.99, 110.00, 'Active', 33), -- Speakers
+    (3047, 2107, 'Nintendo Switch OLED model with red and blue joy-cons. Includes dock, charger, and 5 games. Excellent condition, well cared for.', 'Like New', DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 25 DAY), 299.99, 380.00, 'Active', 61), -- Consoles
+    (3048, 2113, 'Premium gaming headset with dual battery system. Excellent condition, includes all accessories.', 'Like New', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 22 DAY), 249.99, 350.00, 'Active', 62), -- Gaming Accessories
+    (3049, 2005, 'Convertible business laptop with Intel i7, 16GB RAM, 512GB SSD. 14 inch touchscreen. Excellent condition, includes stylus.', 'Like New', DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 24 DAY), 1199.99, 1500.00, 'Active', 11), -- Laptops
+    (3050, 2006, 'Professional business laptop with Intel i7, 16GB RAM, 512GB SSD. 14 inch display. Good condition, well maintained.', 'Used', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 23 DAY), 999.99, 1300.00, 'Active', 11), -- Laptops
+    (3051, 2011, 'Gaming desktop with Intel i9, 32GB RAM, 1TB SSD, RTX 4080 graphics. Excellent condition, includes keyboard and mouse.', 'Like New', DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 21 DAY), 1999.99, 2400.00, 'Active', 12), -- Desktops
+    (3052, 2012, 'Compact gaming PC with Intel i9, 32GB RAM, 1TB SSD, RTX 4080. Excellent condition, space-saving design.', 'Like New', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 25 DAY), 2499.99, 3000.00, 'Active', 12), -- Desktops
+    (3053, 2014, 'Professional workstation with AMD Threadripper, 64GB RAM, 2TB SSD, RTX A5000 graphics. Excellent condition, perfect for CAD and rendering.', 'Like New', DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 22 DAY), 3499.99, 4200.00, 'Active', 12), -- Desktops
+    (3054, 2016, 'All-in-one desktop with M1 chip. 24 inch 4.5K Retina display. Excellent condition, includes Magic Mouse and Keyboard.', 'Like New', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 24 DAY), 999.99, 1300.00, 'Active', 12), -- Desktops
+    (3055, 2020, '4K OLED gaming monitor with 240Hz refresh rate. Excellent picture quality. Perfect for gaming and content creation. Excellent condition.', 'Like New', DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 23 DAY), 1299.99, 1600.00, 'Active', 13); -- Monitors
 
 -- Active Auctions - Longer Term (continued)
-INSERT IGNORE INTO auctions (id, item_id, auction_description, auction_condition, start_datetime, end_datetime, starting_price, reserve_price, auction_status) VALUES
-    (3056, 2022, 'Professional 4K monitor with excellent color accuracy. Perfect for design work. Excellent condition, includes stand.', 'Like New', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 21 DAY), 599.99, 800.00, 'Active'),
-    (3057, 2024, 'Ultrawide curved monitor with excellent color accuracy. Perfect for productivity and gaming. Excellent condition, includes stand.', 'Like New', DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 25 DAY), 1499.99, 1800.00, 'Active'),
-    (3058, 2029, 'Excellent condition iPhone 13 Pro. Well maintained, includes original box and charger. Unlocked.', 'Like New', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 22 DAY), 699.99, 900.00, 'Active'),
-    (3059, 2033, 'Flagship smartphone in excellent condition. Includes S Pen, charger, and case. Unlocked.', 'Like New', DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 24 DAY), 899.99, 1200.00, 'Active'),
-    (3060, 2034, 'Mid-range smartphone with excellent camera. Good condition, includes charger. Great value for money.', 'Used', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 23 DAY), 299.99, 400.00, 'Active');
+INSERT IGNORE INTO auctions (id, item_id, auction_description, auction_condition, start_datetime, end_datetime, starting_price, reserve_price, auction_status, category_id) VALUES
+    (3056, 2022, 'Professional 4K monitor with excellent color accuracy. Perfect for design work. Excellent condition, includes stand.', 'Like New', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 21 DAY), 599.99, 800.00, 'Active', 13), -- Monitors
+    (3057, 2024, 'Ultrawide curved monitor with excellent color accuracy. Perfect for productivity and gaming. Excellent condition, includes stand.', 'Like New', DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 25 DAY), 1499.99, 1800.00, 'Active', 13), -- Monitors
+    (3058, 2029, 'Excellent condition iPhone 13 Pro. Well maintained, includes original box and charger. Unlocked.', 'Like New', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 22 DAY), 699.99, 900.00, 'Active', 21), -- iPhone
+    (3059, 2033, 'Flagship smartphone in excellent condition. Includes S Pen, charger, and case. Unlocked.', 'Like New', DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 24 DAY), 899.99, 1200.00, 'Active', 22), -- Samsung Phone
+    (3060, 2034, 'Mid-range smartphone with excellent camera. Good condition, includes charger. Great value for money.', 'Used', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 23 DAY), 299.99, 400.00, 'Active', 23); -- Pixel Phone
 
 -- Scheduled Auctions
-INSERT IGNORE INTO auctions (id, item_id, auction_description, auction_condition, start_datetime, end_datetime, starting_price, reserve_price, auction_status) VALUES
-    (3061, 2039, 'Compact iPad Mini in excellent condition. Includes Apple Pencil 2nd generation and case. Perfect for portability.', 'Like New', DATE_ADD(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 8 DAY), 449.99, 600.00, 'Scheduled'),
-    (3062, 2040, 'Large tablet with S Pen included. Excellent condition, barely used. Perfect for productivity and creativity.', 'Like New', DATE_ADD(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 9 DAY), 799.99, 1000.00, 'Scheduled'),
-    (3063, 2041, 'Premium Android tablet in excellent condition. Includes S Pen and keyboard cover. Perfect for work and entertainment.', 'Like New', DATE_ADD(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 10 DAY), 599.99, 800.00, 'Scheduled');
+INSERT IGNORE INTO auctions (id, item_id, auction_description, auction_condition, start_datetime, end_datetime, starting_price, reserve_price, auction_status, category_id) VALUES
+    (3061, 2039, 'Compact iPad Mini in excellent condition. Includes Apple Pencil 2nd generation and case. Perfect for portability.', 'Like New', DATE_ADD(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 8 DAY), 449.99, 600.00, 'Scheduled', 25), -- Tablets
+    (3062, 2040, 'Large tablet with S Pen included. Excellent condition, barely used. Perfect for productivity and creativity.', 'Like New', DATE_ADD(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 9 DAY), 799.99, 1000.00, 'Scheduled', 25), -- Tablets
+    (3063, 2041, 'Premium Android tablet in excellent condition. Includes S Pen and keyboard cover. Perfect for work and entertainment.', 'Like New', DATE_ADD(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 10 DAY), 599.99, 800.00, 'Scheduled', 25); -- Tablets
 
 -- Finished Auctions (previously Sold)
-INSERT IGNORE INTO auctions (id, item_id, auction_description, auction_condition, start_datetime, end_datetime, starting_price, reserve_price, auction_status) VALUES
-    (3064, 2043, '2-in-1 tablet with detachable keyboard. Excellent condition, includes Surface Pen and keyboard cover.', 'Like New', '2024-12-01 10:00:00', '2024-12-15 12:00:00', 999.99, 1300.00, 'Finished'),
-    (3065, 2048, 'Budget-friendly Apple Watch in excellent condition. Includes charger and band. Perfect for fitness tracking.', 'Like New', '2024-12-02 14:00:00', '2024-12-16 15:00:00', 199.99, 280.00, 'Finished');
+INSERT IGNORE INTO auctions (id, item_id, auction_description, auction_condition, start_datetime, end_datetime, starting_price, reserve_price, auction_status, category_id) VALUES
+    (3064, 2043, '2-in-1 tablet with detachable keyboard. Excellent condition, includes Surface Pen and keyboard cover.', 'Like New', '2024-12-01 10:00:00', '2024-12-15 12:00:00', 999.99, 1300.00, 'Finished', 25), -- Tablets
+    (3065, 2048, 'Budget-friendly Apple Watch in excellent condition. Includes charger and band. Perfect for fitness tracking.', 'Like New', '2024-12-02 14:00:00', '2024-12-16 15:00:00', 199.99, 280.00, 'Finished', 51); -- Smartwatches
 
 -- BIDS
 INSERT IGNORE INTO bids (id, buyer_id, auction_id, bid_amount, bid_datetime) VALUES

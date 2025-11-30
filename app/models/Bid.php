@@ -32,8 +32,7 @@ class Bid
         $this->bidDatetime = is_string($bidDatetime) ? new DateTime($bidDatetime) : $bidDatetime;
     }
 
-    // GETTERS
-
+    // --- GETTERS ---
     public function getBidId(): int
     {
         return $this->bidId;
@@ -59,7 +58,7 @@ class Bid
         return $this->bidDatetime;
     }
 
-    // SETTER
+    // --- SETTERS ---
     public function setBidId(int $bidId): void
     {
         $this->bidId = $bidId;
@@ -81,8 +80,7 @@ class Bid
         $this->bidDatetime = $bidDatetime;
     }
 
-    // RELATIONSHIP GETTERS/SETTERS
-
+    // ---  GETTERS/SETTERS (Relationships) ---
     public function setBuyer(User $buyer): void
     {
         $this->buyer = $buyer;

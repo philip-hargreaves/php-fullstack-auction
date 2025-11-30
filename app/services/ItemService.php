@@ -19,6 +19,10 @@ class ItemService
         $this->userRepo = $userRepo;
     }
 
+    public function getById(int $itemId): ?Item {
+        return $this->itemRepo->getById($itemId);
+    }
+
     public function createItem(array $input) : array
     {
         // $input offers: seller_id, item_name
@@ -94,5 +98,37 @@ class ItemService
 
         // Success
         return Utilities::creationResult('', true, $input);
+    }
+
+    // --- FILL RELATIONSHIP PROPERTIES FUNCTION ---
+    public function fillSellerInItems(array $items): void
+    {
+        if (empty($items)) return;
+
+        // Collect Buyer IDs
+        $userIds = [];
+        foreach ($items as $item) {
+            $userIds[] = $item->getSellerId();
+        }
+        $userIds = array_unique($userIds);
+
+        if (empty($userIds)) return;
+
+        // Fetch Users (1 Query)
+        $users = $this->userRepo->getByIds($userIds);
+
+        // Map ID => User Object
+        $userMap = [];
+        foreach ($users as $user) {
+            $userMap[$user->getUserId()] = $user;
+        }
+
+        // Attach to Bids
+        foreach ($items as $item) {
+            $sellerId = $item->getSellerId();
+            if (isset($userMap[$sellerId])) {
+                $item->setSeller($userMap[$sellerId]);
+            }
+        }
     }
 }

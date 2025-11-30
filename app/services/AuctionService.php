@@ -1,15 +1,18 @@
 <?php
 
 namespace app\services;
+use app\repositories\AuctionImageRepository;
 use app\repositories\AuctionRepository;
+use app\repositories\CategoryRepository;
 use app\repositories\ItemRepository;
+use DateInterval;
 use infrastructure\Database;
 use app\models\Auction;
 use DateTime;
 use infrastructure\Utilities;
 use PDOException;
 use Exception;
-use DateInterval;
+use app\models\Item;
 
 class AuctionService
 {
@@ -19,244 +22,542 @@ class AuctionService
     private ItemService $itemService;
     private ImageService $imageService;
     private BidService $bidService;
+    private CategoryRepository $categoryRepo;
+    private AuctionImageRepository $auctionImageRepo;
 
-    public function __construct(Database $db, AuctionRepository $auctionRepo, ItemRepository $itemRepo,
-                                ItemService $itemService, ImageService $imageService, BidService $bidService) {
+    public function __construct(
+        Database $db,
+        AuctionRepository $auctionRepo,
+        ItemRepository $itemRepo,
+        ItemService $itemService,
+        ImageService $imageService,
+        BidService $bidService,
+        CategoryRepository $categoryRepo,
+        AuctionImageRepository $auctionImageRepo
+    ) {
         $this->db = $db;
         $this->auctionRepo = $auctionRepo;
         $this->itemRepo = $itemRepo;
         $this->itemService = $itemService;
         $this->imageService = $imageService;
         $this->bidService = $bidService;
+        $this->categoryRepo = $categoryRepo;
+        $this->auctionImageRepo = $auctionImageRepo;
     }
 
     public function getByUserId(int $sellerId): array {
-        $auctions = $this->auctionRepo->getBySellerId($sellerId);
-        $this->hydrateMany($auctions);
-        return $auctions;
-    }
 
-    private function hydrate(Auction $auction): void
-    {
-        // Only fetch if NOT already set by repository SQL
-        if ($auction->getCurrentPrice() === null) {
-            $highestBid = $this->bidService->getHighestBidAmountByAuctionId($auction->getAuctionId());
-            $auction->setCurrentPrice($highestBid > 0 ? $highestBid : $auction->getStartingPrice());
-        }
-        if ($auction->getBidCount() === null) {
-            $auction->setBidCount($this->bidService->countBidsByAuctionId($auction->getAuctionId()));
-        }
-        // Image still requires separate query (different table)
-        $auction->setImageUrl($this->imageService->getMainImageUrlByAuctionId($auction->getAuctionId()));
-    }
-
-    private function hydrateMany(array $auctions): void
-    {
-        foreach ($auctions as $auction) {
-            $this->hydrate($auction);
-        }
+        return $this->auctionRepo->getBySellerId($sellerId);
     }
 
     public function getWatchedByUserId(int $userId): array {
-        $auctions = $this->auctionRepo->getWatchedAuctionsByUserId($userId);
-        $this->hydrateMany($auctions);
-        return $auctions;
+        return $this->auctionRepo->getWatchedAuctionsByUserId($userId);
     }
 
-    public function createAuction(array $itemInput, array $auctionInput, array $imageInputs): array { // $imageInputs is an array with multiple $imageInput
-        // $auctionInput offers: start_datetime, end_datetime, starting_price, reserve_price
+    public function getById(int $auctionId): ?Auction {
+        return $this->auctionRepo->getById($auctionId);
+    }
+
+    public function createAuction(array $itemInput, array $auctionInput, array $imageInputs): array
+    {
 
         $pdo = $this->db->connection;
+        Utilities::beginTransaction($pdo);
 
-        // --- Start Transaction ---
         try {
-            // Wrap "item creation" + "auction creation" + "image uploading" in a transaction
-            Utilities::beginTransaction($pdo);
-
-            // Create Item
+            // Create Inventory Item
             $createItemResult = $this->itemService->createItem($itemInput);
             if (!$createItemResult['success']) {
-                return Utilities::creationResult($createItemResult['message'], false, null);
+                $pdo->rollBack();
+                return $createItemResult;
             }
             $item = $createItemResult['object'];
 
-            // Validates user input for auction, and fix data type
-            $validationResult = $this->validateAndFixType($auctionInput);
-
-            // Validation Fail -> Abort transaction
+            // Validate Input
+            $validationResult = $this->validateAuctionInput($auctionInput, 'create');
             if (!$validationResult['success']) {
                 $pdo->rollBack();
                 return $validationResult;
             }
+            $cleanInput = $validationResult['object'];
 
-            // Validation Pass -> Create Auction object
-            $auctionInput = $validationResult['object']; // The fixed-type inputs are stored in $validationResult['object']
-            $auction = new Auction(
-                $item->getItemId(),
-                $auctionInput['auction_description'],
-                $auctionInput['auction_condition'],
-                $auctionInput['start_datetime'],
-                $auctionInput['end_datetime'],
-                $auctionInput['starting_price'],
-                "Scheduled",
-                $auctionInput['reserve_price'] ?? null,
-                $auctionInput['category_id'] ?? null
-            );
+            // Create Object
+            $auction = $this->instantiateAuction($cleanInput, $item->getItemId(), 'Scheduled');
 
-            // Execute insertion
+            // Persist
             $auction = $this->auctionRepo->create($auction);
-
-            // Insertion Failed -> Roll Back
-            if (is_null($auction)) {
+            if (!$auction) {
                 $pdo->rollBack();
-                return Utilities::creationResult("Failed to create an auction.", false, null);
+                return Utilities::creationResult("Failed to create auction.", false, null);
             }
 
-            // Link Item to Auction
-            $item->setCurrentAuctionId($auction->getAuctionId());
-            $updateItemResult = $this->itemRepo->update($item);
-            if (!$updateItemResult) {
+            // Link Item & Save Images
+
+            if (!$this->finalizeAuctionSetup($auction, $item, $imageInputs)) {
                 $pdo->rollBack();
-                return Utilities::creationResult("Failed to link item to auction.", false, null);
+                return Utilities::creationResult("Failed to link item or save images.", false, null);
             }
 
-            // Upload Images
-            $uploadImageResult = $this->imageService->uploadAuctionImages($auction, $imageInputs);
-            if (!$uploadImageResult['success']) {
-                $pdo->rollBack();
-                return Utilities::creationResult($uploadImageResult['message'], false, null);
-            }
-
-            // Insertion Succeed -> Commit Transaction
             $pdo->commit();
             return Utilities::creationResult("Auction created successfully!", true, $auction);
 
         } catch (PDOException $e) {
-            if ($pdo->inTransaction()) {
-                $pdo->rollBack();
-            }
-            throw $e;
+            if ($pdo->inTransaction()) $pdo->rollBack();
+            return Utilities::creationResult("Service Error: " . $e->getMessage(), false, null);
         }
     }
 
-    private function validateAndFixType(array $input) : array
+    public function relistAuction(int $previousAuctionId, array $auctionInput, array $imageInputs): array
     {
-        // 1. Description (New Schema Requirement)
-        $auctionDescription = isset($input['auction_description']) ? trim($input['auction_description']) : '';
-        if ($auctionDescription == "") {
+        $pdo = $this->db->connection;
+        Utilities::beginTransaction($pdo);
+
+        try {
+            // 1. Fetch Previous Data
+            $prevAuction = $this->getById($previousAuctionId);
+            if (is_null($prevAuction)) {
+                $pdo->rollBack();
+                return Utilities::creationResult("Previous auction not found.", false, null);
+            }
+            $item = $this->itemRepo->getById($prevAuction->getItemId());
+
+            // 2. Relist Constraints (Item must be unsold, Prev Auction must be finished)
+            if ($item->isSold()) {
+                $pdo->rollBack();
+                return Utilities::creationResult("Cannot relist: Item is already sold.", false, null);
+            }
+            if ($prevAuction->getAuctionStatus() !== 'Finished') {
+                $pdo->rollBack();
+                return Utilities::creationResult("Cannot relist: Previous auction is still active.", false, null);
+            }
+
+            // 3. Validate Input
+            $validationResult = $this->validateAuctionInput($auctionInput, 'relist');
+            if (!$validationResult['success']) {
+                $pdo->rollBack();
+                return $validationResult;
+            }
+            $cleanInput = $validationResult['object'];
+
+            // 4. Create Object (New Auction, Existing Item)
+            $auction = $this->instantiateAuction($cleanInput, $item->getItemId(), 'Scheduled');
+
+            // 5. Persist
+            $auction = $this->auctionRepo->create($auction);
+            if (!$auction) {
+                $pdo->rollBack();
+                return Utilities::creationResult("Failed to relist auction.", false, null);
+            }
+
+            // 6. Link Item & Upload Images (Shared Helper)
+            if (!$this->finalizeAuctionSetup($auction, $item, $imageInputs)) {
+                $pdo->rollBack();
+                return Utilities::creationResult("Failed to setup relisted auction.", false, null);
+            }
+
+            $pdo->commit();
+            return Utilities::creationResult("Auction relisted successfully!", true, $auction);
+
+        } catch (PDOException $e) {
+            if ($pdo->inTransaction()) $pdo->rollBack();
+            return Utilities::creationResult("Service Error: " . $e->getMessage(), false, null);
+        }
+    }
+
+    public function updateAuction(int $auctionId, array $auctionInput, array $imageInputs): array
+    {
+        $pdo = $this->db->connection;
+        Utilities::beginTransaction($pdo);
+
+        try {
+            // 1. Get Data
+            $prevAuction = $this->getById($auctionId);
+            if (!$prevAuction) {
+                $pdo->rollBack();
+                return Utilities::creationResult("Auction not found.", false, null);
+            }
+
+            // 2. Validate Input
+            $validationResult = $this->validateAuctionInput($auctionInput, 'update');
+            if (!$validationResult['success']) {
+                $pdo->rollBack();
+                return $validationResult;
+            }
+            $cleanInput = $validationResult['object'];
+
+            // 3. Check Update Constraints (Business Logic)
+            $constraintError = $this->validateUpdateConstraints($prevAuction, $cleanInput);
+            if ($constraintError) {
+                $pdo->rollBack();
+                return Utilities::creationResult($constraintError, false, null);
+            }
+
+            // 4. Merge Data for Object Creation
+            // Force the Start Date to match the previous one (cannot be changed)
+            $cleanInput['start_datetime'] = $prevAuction->getStartDatetime();
+
+            // 5. Create Object (Existing ID, Existing Status)
+            $auction = $this->instantiateAuction(
+                $cleanInput,
+                $prevAuction->getItemId(),
+                $prevAuction->getAuctionStatus(),
+                $prevAuction->getAuctionId()
+            );
+            // Preserve the winning bid ID linkage
+            $auction->setWinningBidId($prevAuction->getWinningBidId());
+
+            // 6. Execute Update
+            $auction = $this->auctionRepo->update($auction);
+            if (!$auction) {
+                $pdo->rollBack();
+                return Utilities::creationResult("Failed to update auction.", false, null);
+            }
+
+            // 7. Handle Images (Delete Old -> Insert New)
+            if (!$this->auctionImageRepo->deleteByAuctionId($auctionId)) {
+                $pdo->rollBack();
+                return Utilities::creationResult("Failed to clear old images.", false, null);
+            }
+
+            $uploadResult = $this->imageService->uploadAuctionImages($auction, $imageInputs);
+            if (!$uploadResult['success']) {
+                $pdo->rollBack();
+                return Utilities::creationResult($uploadResult['message'], false, null);
+            }
+
+            $pdo->commit();
+            return Utilities::creationResult("Auction updated successfully!", true, $auction);
+
+        } catch (PDOException $e) {
+            if ($pdo->inTransaction()) $pdo->rollBack();
+            return Utilities::creationResult("Service Error: " . $e->getMessage(), false, null);
+        }
+    }
+
+    // --- FILL RELATIONSHIP PROPERTIES FUNCTION ---
+    public function fillItemInAuctions(array $auctions): void
+    {
+        if (empty($auctions)) return;
+
+        // Collect all Item IDs
+        $itemIds = [];
+        foreach ($auctions as $auction) {
+            $itemIds[] = $auction->getItemId();
+        }
+
+        // Remove duplicates
+        $itemIds = array_unique($itemIds);
+
+        // Fetch all Items in ONE query
+        $items = $this->itemRepo->getByIds($itemIds);
+
+        // Re-key the Items array by ID for instant lookup
+        $itemMap = [];
+        foreach ($items as $item) {
+            $itemMap[$item->getItemId()] = $item;
+        }
+
+        // Attach Items to Auctions
+        foreach ($auctions as $auction) {
+            $itemId = $auction->getItemId();
+
+            if (isset($itemMap[$itemId])) {
+                $auction->setItem($itemMap[$itemId]);
+            }
+        }
+    }
+
+    public function fillCategoryInAuctions(array $auctions): void
+    {
+        if (empty($auctions)) return;
+
+        // Collect all IDs
+        $categoryIds = [];
+        foreach ($auctions as $auction) {
+            $categoryIds[] = $auction->getCategoryId();
+        }
+
+        // Remove duplicates
+        $categoryIds = array_unique($categoryIds);
+
+        // Fetch all Items in ONE query
+        $categories = $this->categoryRepo->getByIds($categoryIds);
+
+        // Re-key the Items array by ID for instant lookup
+        $map = [];
+        foreach ($categories as $category) {
+            $map[$category->getCategoryId()] = $category;
+        }
+
+        // Attach Items to Auctions
+        foreach ($auctions as $auction) {
+            $categoryId = $auction->getCategoryId();
+
+            if (isset($map[$categoryId])) {
+                $auction->setCategory($map[$categoryId]);
+            }
+        }
+    }
+
+    public function fillAuctionImagesInAuctions(array $auctions): void
+    {
+        if (empty($auctions)) return;
+
+        // Collect all Auction IDs
+        $auctionIds = [];
+        foreach ($auctions as $auction) {
+            $auctionIds[] = $auction->getAuctionId();
+        }
+        $auctionIds = array_unique($auctionIds);
+
+        // Fetch all Images in ONE query
+        $allImages = $this->auctionImageRepo->getByAuctionIds($auctionIds);
+
+        // Group Images by Auction ID
+        $groupedImages = [];
+        foreach ($allImages as $image) {
+            $aucId = $image->getAuctionId();
+            if (!isset($groupedImages[$aucId])) {
+                $groupedImages[$aucId] = [];
+            }
+            $groupedImages[$aucId][] = $image;
+        }
+
+        // Attach Images to Auctions
+        foreach ($auctions as $auction) {
+            $aucId = $auction->getAuctionId();
+
+            if (isset($groupedImages[$aucId])) {
+                $auction->setAuctionImages($groupedImages[$aucId]);
+            } else {
+                // Important: Set empty array if no images found so it's not null
+                $auction->setAuctionImages([]);
+            }
+        }
+    }
+
+    // --- PRIVATE HELPER FUNCTIONS ---
+    private function instantiateAuction(array $input, int $itemId, string $status, ?int $auctionId = null): Auction
+    {
+        return new Auction(
+            $itemId,
+            $input['auction_description'],
+            $input['auction_condition'],
+            $input['start_datetime'],
+            $input['end_datetime'],
+            $input['starting_price'],
+            $status,
+            $input['reserve_price'] ?? null,
+            $input['category_id'] ?? null,
+            null, // Winning Bid ID is initially null (set manually in update if needed)
+            $auctionId // Null for new/relist, Integer for Update
+        );
+    }
+
+    private function finalizeAuctionSetup(Auction $auction, Item $item, array $images): bool
+    {
+        // Link Item to current auction
+        $item->setCurrentAuctionId($auction->getAuctionId());
+        if (!$this->itemRepo->update($item)) {
+            return false;
+        }
+
+        // Upload Images
+        $uploadResult = $this->imageService->uploadAuctionImages($auction, $images);
+        return $uploadResult['success'];
+    }
+
+    private function validateAuctionInput(array $input, string $mode): array
+    {
+        // Implement data transformation and validation
+
+        // A. Basic Text & Enum Validation
+        $basicResult = $this->validateBasicInfo($input);
+        if (!$basicResult['success']) return $basicResult;
+        $input = array_merge($input, $basicResult['object']);
+
+        // B. Category Validation
+        $catResult = $this->validateCategory($input['category_id'] ?? null);
+        if (!$catResult['success']) return $catResult;
+
+        // C. Pricing Validation
+        $priceResult = $this->validatePricing($input);
+        if (!$priceResult['success']) return $priceResult;
+        $input = array_merge($input, $priceResult['object']);
+
+        // D. Date Validation
+        $dateResult = $this->validateDates($input, $mode);
+        if (!$dateResult['success']) return $dateResult;
+        $input = array_merge($input, $dateResult['object']);
+
+        // All valid
+        return Utilities::creationResult('', true, $input);
+    }
+
+    private function validateBasicInfo(array $input): array
+    {
+        // Description
+        $description = isset($input['auction_description']) ? trim($input['auction_description']) : '';
+        if ($description === "") {
             return Utilities::creationResult("Auction description is required.", false, null);
         }
-        $input['auction_description'] = $auctionDescription;
 
-        // 2. Condition (New Schema Requirement)
+        // Condition
         $validConditions = ['New', 'Like New', 'Used'];
-        $auctionCondition = isset($input['auction_condition']) ? trim($input['auction_condition']) : '';
-        if ($auctionCondition === '' || !in_array($auctionCondition, $validConditions)) {
+        $condition = isset($input['auction_condition']) ? trim($input['auction_condition']) : '';
+
+        if ($condition === '' || !in_array($condition, $validConditions)) {
             return Utilities::creationResult("Valid item condition is required.", false, null);
         }
-        $input['auction_condition'] = $auctionCondition;
 
-        // 3. Category (New Schema Requirement)
-        if (empty($input['category_id'])) {
+        return Utilities::creationResult('', true, [
+            'auction_description' => $description,
+            'auction_condition' => $condition
+        ]);
+    }
+
+    private function validateCategory($categoryId): array
+    {
+        if (empty($categoryId)) {
             return Utilities::creationResult("Category is required.", false, null);
         }
-        // Check if category exist
 
-        // 4. Starting Price
-        $startPriceString = isset($input['starting_price']) ? trim($input['starting_price']) : '';
-        if ($startPriceString === '') {
+        // Validate integer format
+        if (!filter_var($categoryId, FILTER_VALIDATE_INT)) {
+            return Utilities::creationResult('Invalid category format.', false, null);
+        }
+
+        // Check existence in DB
+        // Assuming you have a getById method in categoryRepo
+        $category = $this->categoryRepo->getById($categoryId);
+        if (!$category) {
+            return Utilities::creationResult('Selected category does not exist.', false, null);
+        }
+
+        return Utilities::creationResult('', true, null);
+    }
+
+    private function validatePricing(array $input): array
+    {
+        // 1. Starting Price
+        $startPriceRaw = trim($input['starting_price'] ?? '');
+
+        if ($startPriceRaw === '') {
             return Utilities::creationResult("Starting price is required.", false, null);
         }
 
-        // Check Starting Price format (numeric, max 2 decimals)
-        if (!preg_match('/^\d+(\.\d{1,2})?$/', $startPriceString)){
-            return Utilities::creationResult("Starting price must be a valid number (max 2 decimal places).", false, null);
+        // Regex: Numbers only, max 2 decimals
+        if (!preg_match('/^\d+(\.\d{1,2})?$/', $startPriceRaw)) {
+            return Utilities::creationResult("Starting price must be a valid number (max 2 decimals).", false, null);
         }
 
-        $input['starting_price'] = (float)$startPriceString;
-
-        // Business Logic: Start > 0
-        if ($input['starting_price'] <= 0) {
+        $startPrice = (float)$startPriceRaw;
+        if ($startPrice <= 0) {
             return Utilities::creationResult("Starting price must be greater than 0.", false, null);
         }
 
-        // 5. Reserve Price
-        $reservePriceString = isset($input['reserve_price']) ? trim($input['reserve_price']) : '';
+        // 2. Reserve Price (Optional)
+        $reservePriceRaw = trim($input['reserve_price'] ?? '');
+        $reservePrice = null;
 
-        // If Reserve Price is not entered
-        if ($reservePriceString === '') {
-            $input['reserve_price'] = null;
-        } else {
-            // Check Reserve Price format (numeric, max 2 decimals)
-            if (!preg_match('/^\d+(\.\d{1,2})?$/', $reservePriceString)){
-                return Utilities::creationResult("Reserve price must be a valid number (max 2 decimal places).", false, null);
+        if ($reservePriceRaw !== '') {
+            if (!preg_match('/^\d+(\.\d{1,2})?$/', $reservePriceRaw)) {
+                return Utilities::creationResult("Reserve price must be a valid number (max 2 decimals).", false, null);
             }
 
-            $input['reserve_price'] = (float)$reservePriceString;
+            $reservePrice = (float)$reservePriceRaw;
 
-            // Business Logic: Reserve >= Start
-            if ($input['reserve_price'] < $input['starting_price']) {
+            // Logic: Reserve >= Start
+            if ($reservePrice < $startPrice) {
                 return Utilities::creationResult("Reserve price cannot be lower than the starting price.", false, null);
             }
         }
 
-        // 6. Start Date
-        if (empty($input['start_datetime'])) {
-            return Utilities::creationResult("Auction start date is required.", false, null);
+        return Utilities::creationResult('', true, [
+            'starting_price' => $startPrice,
+            'reserve_price' => $reservePrice
+        ]);
+    }
+
+    private function validateDates(array $input, string $mode): array
+    {
+        if (empty($input['start_datetime']) || empty($input['end_datetime'])) {
+            return Utilities::creationResult("Both start and end dates are required.", false, null);
         }
 
-        // Validate Start Date in DateTime format
         try {
-            $startDate = new DateTime($input['start_datetime']);
+            $start = new DateTime($input['start_datetime']);
+            $end = new DateTime($input['end_datetime']);
             $now = new DateTime();
 
-            // Check if start date is in the past (Allowing a 1 hr small buffer)
-            if ($startDate < $now->add(DateInterval::createFromDateString('1 hour'))) {
+            // 1. Check Start Date (Allow 1 hour buffer for "slow clickers")
+            // Note: Creating a clone of $now to avoid modifying the original $now object
+            $bufferTime = (clone $now)->sub(new DateInterval('PT1H'));
+
+            if ($start < $bufferTime && !($mode == 'update') ) {
                 return Utilities::creationResult("Auction start date cannot be in the past.", false, null);
             }
-        } catch (Exception $e) {
-            return Utilities::creationResult("Invalid start date format.", false, null);
-        }
 
-        // 7. End Date
-        if (empty($input['end_datetime'])) {
-            return Utilities::creationResult("Auction end date is required.", false, null);
-        }
-
-        // Validate End Date in DateTime format
-        try {
-            $endDate = new DateTime($input['end_datetime']);
-
-            // Check Sequence: End > Start
-            if ($endDate <= $startDate) {
+            // 2. Check Sequence
+            if ($end <= $start) {
                 return Utilities::creationResult("End date must be after the start date.", false, null);
             }
 
-            // Business Logic: Check Duration (At least 24 hours)
-            $interval = $startDate->diff($endDate);
+            // 3. Check Duration (24 Hours)
+            $interval = $start->diff($end);
             $totalHours = ($interval->days * 24) + $interval->h + ($interval->i / 60);
+
             if ($totalHours < 24) {
                 return Utilities::creationResult("Auction duration must be at least 24 hours.", false, null);
             }
+
+            return Utilities::creationResult('', true, [
+                'start_datetime' => $start->format('Y-m-d H:i:s'),
+                'end_datetime'   => $end->format('Y-m-d H:i:s')
+            ]);
+
         } catch (Exception $e) {
-            return Utilities::creationResult("Invalid end date format.", false, null);
+            return Utilities::creationResult("Invalid date format provided.", false, null);
         }
-
-        // Format dates to string for DB storage consistency
-        $input['start_datetime'] = $startDate->format('Y-m-d H:i:s');
-        $input['end_datetime'] = $endDate->format('Y-m-d H:i:s');
-
-        // Success
-        return Utilities::creationResult('', true, $input);
     }
 
+    private function validateUpdateConstraints(Auction $prevAuction, array $newInput): ?string
+    {
+        $auctionId = $prevAuction->getAuctionId();
+
+        // Check bids to see if prices are locked
+        $highestBidAmount = $this->bidService->getHighestBidAmountByAuctionId($auctionId);
+        $hasBids = ($highestBidAmount !== null);
+
+        // 1. Status Check
+        if ($prevAuction->getAuctionStatus() == 'Finished') {
+            return "This auction has already ended.";
+        }
+
+        // 2. Starting Price Check (Locked if bids exist)
+        // Note: float comparison might need epsilon, but strict check is usually fine for currency here
+        if ($hasBids && $prevAuction->getStartingPrice() != $newInput['starting_price']) {
+            return "Starting price cannot be changed after the first bid.";
+        }
+
+        // 3. Reserve Price Check (Must be > current bid)
+        if ($hasBids && $newInput['reserve_price'] !== null && $highestBidAmount >= $newInput['reserve_price']) {
+            return "Reserve price cannot be lower than the current highest bid.";
+        }
+
+        // 4. Start Date Check (Locked)
+        // convert both of them to Unix Timestamps (integers representing seconds)
+        if ($prevAuction->getStartDatetime()->getTimestamp() !== strtotime($newInput['start_datetime'])) {
+            return "Start date cannot be changed after the auction is created.";
+        }
+
+        return null; // No errors
+    }
 
     public function getActiveListings(int $page = 1, int $perPage = 12, string $orderBy = 'ending_soonest'): array
     {
         $offset = ($page - 1) * $perPage;
-        $auctions = $this->auctionRepo->getByFilters($perPage, $offset, $orderBy);
-        $this->hydrateMany($auctions);
-        return $auctions;
+        return $this->auctionRepo->getByFilters($perPage, $offset, $orderBy);
     }
 
     // Count active auctions for pagination
