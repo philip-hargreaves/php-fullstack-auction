@@ -30,7 +30,7 @@ class AuctionRepository
             $row['auction_status'],
             $row['reserve_price'] ? (float)$row['reserve_price'] : null,
             $row['category_id'] ? (int)$row['category_id'] : null,
-            $row['winning_bid_id'] ? (int)$row['winning_bid_id'] : null,
+            isset($row['winning_bid_id']) && $row['winning_bid_id'] !== null && $row['winning_bid_id'] !== '' ? (int)$row['winning_bid_id'] : null,
             (int)$row['id']
         );
 
@@ -154,6 +154,8 @@ class AuctionRepository
         ?array $categoryIds,
         ?float $minPrice,
         ?float $maxPrice,
+        bool $soldFilter,
+        bool $completedFilter,
         array &$params
     ): array {
         $whereConditions = [];
@@ -167,6 +169,17 @@ class AuctionRepository
                 $params["status{$i}"] = $status;
             }
             $whereConditions[] = "a.auction_status IN (" . implode(',', $placeholders) . ")";
+        }
+
+        // Distinguish between sold and completed auctions using winning_bid_id
+        if ($soldFilter && $completedFilter) {
+            // Both selected - show all Finished auctions (no additional filter needed)
+        } elseif ($soldFilter) {
+            // Only sold selected - Finished auctions with winning_bid_id
+            $whereConditions[] = "a.winning_bid_id IS NOT NULL";
+        } elseif ($completedFilter) {
+            // Only completed selected - show ALL Finished auctions (no winning_bid_id restriction)
+            // Don't add any filter - just show all Finished auctions
         }
 
         // Condition filter
@@ -214,7 +227,9 @@ class AuctionRepository
         array $conditions = [],
         ?float $minPrice = null,
         ?float $maxPrice = null,
-        ?array $categoryIds = null
+        ?array $categoryIds = null,
+        bool $soldFilter = false,
+        bool $completedFilter = false
     ): array {
         try {
             $limit = (int)$limit;
@@ -229,7 +244,7 @@ class AuctionRepository
             };
 
             $params = [];
-            $filterResult = $this->buildFilterConditions($statuses, $conditions, $categoryIds, $minPrice, $maxPrice, $params);
+            $filterResult = $this->buildFilterConditions($statuses, $conditions, $categoryIds, $minPrice, $maxPrice, $soldFilter, $completedFilter, $params);
             $whereConditions = $filterResult['where'];
             $havingConditions = $filterResult['having'];
 
@@ -261,12 +276,14 @@ class AuctionRepository
         array $conditions = [],
         ?float $minPrice = null,
         ?float $maxPrice = null,
-        ?array $categoryIds = null
+        ?array $categoryIds = null,
+        bool $soldFilter = false,
+        bool $completedFilter = false
     ): int
     {
         try {
             $params = [];
-            $filterResult = $this->buildFilterConditions($statuses, $conditions, $categoryIds, $minPrice, $maxPrice, $params);
+            $filterResult = $this->buildFilterConditions($statuses, $conditions, $categoryIds, $minPrice, $maxPrice, $soldFilter, $completedFilter, $params);
             $whereConditions = $filterResult['where'];
             $havingConditions = $filterResult['having'];
 

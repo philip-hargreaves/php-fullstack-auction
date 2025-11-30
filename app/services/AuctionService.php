@@ -574,7 +574,9 @@ class AuctionService
             'conditions' => $filters['conditions'] ?? [],
             'minPrice' => $filters['minPrice'] ?? null,
             'maxPrice' => $filters['maxPrice'] ?? null,
-            'categoryIds' => $categoryIds, // Changed to array of IDs
+            'categoryIds' => $categoryIds,
+            'soldFilter' => $filters['soldFilter'] ?? false,
+            'completedFilter' => $filters['completedFilter'] ?? false,
         ];
     }
 
@@ -591,7 +593,9 @@ class AuctionService
             $extracted['conditions'],
             $extracted['minPrice'],
             $extracted['maxPrice'],
-            $extracted['categoryIds']
+            $extracted['categoryIds'],
+            $extracted['soldFilter'],
+            $extracted['completedFilter']
         );
     }
 
@@ -605,7 +609,9 @@ class AuctionService
             $extracted['conditions'],
             $extracted['minPrice'],
             $extracted['maxPrice'],
-            $extracted['categoryIds']
+            $extracted['categoryIds'],
+            $extracted['soldFilter'],
+            $extracted['completedFilter']
         );
     }
 }

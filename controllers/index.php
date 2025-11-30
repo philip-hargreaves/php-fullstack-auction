@@ -13,7 +13,7 @@ $minPrice = Request::get('min_price', null);
 $maxPrice = Request::get('max_price', null);
 $categoryId = Request::get('category', null);
 
-// Read condition from form (checkboxes with name="item_condition_id[]")
+// Read condition from form
 $conditionInputs = isset($_GET['item_condition_id']) && is_array($_GET['item_condition_id']) ? $_GET['item_condition_id'] : [];
 
 // Map form values to database values: new -> New, like_new -> Like New, used -> Used
@@ -32,11 +32,14 @@ foreach ($conditionInputs as $condition) {
     }
 }
 
-// Read auction_status from form (checkboxes with name="auction_status[]")
+// Read auction_status from form
 $statusInputs = isset($_GET['auction_status']) && is_array($_GET['auction_status']) ? $_GET['auction_status'] : [];
 
-// Map form values to database values: active -> Active, completed -> Finished, sold -> Finished (with winning bid)
+// Map form values to database values
 $statuses = [];
+$soldFilter = false;
+$completedFilter = false;
+
 if (empty($statusInputs)) {
     // Default to Active if nothing selected
     $statuses = ['Active'];
@@ -47,11 +50,18 @@ if (empty($statusInputs)) {
                 $statuses[] = 'Active';
                 break;
             case 'completed':
-                $statuses[] = 'Finished';
+                $completedFilter = true;
+                // Need Finished status for completed auctions
+                if (!in_array('Finished', $statuses)) {
+                    $statuses[] = 'Finished';
+                }
                 break;
             case 'sold':
-                // This is to be done in separate PR, there is currently no distinction between finished and completed
-                $statuses[] = 'Finished';
+                $soldFilter = true;
+                // Need Finished status for sold auctions
+                if (!in_array('Finished', $statuses)) {
+                    $statuses[] = 'Finished';
+                }
                 break;
         }
     }
@@ -61,6 +71,8 @@ if (empty($statusInputs)) {
 $filters = [
     'conditions' => $conditions,
     'statuses' => $statuses,
+    'soldFilter' => $soldFilter,
+    'completedFilter' => $completedFilter,
     'minPrice' => $minPrice !== null && $minPrice !== '' ? (float)$minPrice : null,
     'maxPrice' => $maxPrice !== null && $maxPrice !== '' ? (float)$maxPrice : null,
     'categoryId' => $categoryId !== null && $categoryId !== '' ? (int)$categoryId : null,
@@ -111,6 +123,8 @@ $activeFilters = [
     'ordering' => $ordering,
     'conditions' => $filters['conditions'],
     'statuses' => $filters['statuses'],
+    'soldFilter' => $filters['soldFilter'],
+    'completedFilter' => $filters['completedFilter'],
     'minPrice' => $filters['minPrice'],
     'maxPrice' => $filters['maxPrice'],
     'categoryId' => $filters['categoryId'],
@@ -149,13 +163,30 @@ foreach ($auctions as $auction) {
     $bidCount = $auction->getBidCount();
     $processed['bid_text'] = $bidCount == 1 ? '1 bid' : $bidCount . ' bids';
 
-    // Time remaining
+    // Time remaining / Status for finished auctions
     $endDate = $auction->getEndDateTime();
-    if ($now > $endDate) {
+    $auctionStatus = $auction->getAuctionStatus();
+
+    if ($auctionStatus == 'Finished') {
+        // Check if auction is sold (has winning bid) or unsold
+        $winningBidId = $auction->getWinningBidId();
+        if ($winningBidId !== null) {
+            $processed['time_remaining'] = 'Sold';
+            $processed['status_class'] = 'text-success';
+        } else {
+            $processed['time_remaining'] = 'Unsold';
+            $processed['status_class'] = 'text-danger';
+        }
+        $processed['show_time_icon'] = false;
+    } elseif ($now > $endDate) {
         $processed['time_remaining'] = 'This auction has ended';
+        $processed['status_class'] = '';
+        $processed['show_time_icon'] = true;
     } else {
         $time_to_end = date_diff($now, $endDate);
         $processed['time_remaining'] = Utilities::displayTimeRemaining($time_to_end);
+        $processed['status_class'] = '';
+        $processed['show_time_icon'] = true;
     }
     $processed_auctions[] = $processed;
 }

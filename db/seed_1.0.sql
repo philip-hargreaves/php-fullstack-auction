@@ -256,7 +256,8 @@ INSERT IGNORE INTO items (id, seller_id, item_name) VALUES
     (2122, 204, 'Keychron Q1 Pro Mechanical Keyboard'),
     (2130, 203, 'Finalmouse Starlight-12 Small Gaming Mouse'),
     (2133, 206, 'Logitech MX Master 3S Wireless Mouse'),
-    (2138, 202, 'Samsung T7 Shield 2TB External SSD');
+    (2138, 202, 'Samsung T7 Shield 2TB External SSD'),
+    (2139, 201, 'Alienware m18 R2 Gaming Laptop RTX 4090');
 
 -- AUCTIONS (now includes auction_description, auction_condition, category_id)
 -- Active Auctions - Ending Soon (1-3 days) - 10 auctions
@@ -337,10 +338,11 @@ INSERT IGNORE INTO auctions (id, item_id, category_id, auction_description, auct
     (3062, 2040, 222, 'Large tablet with S Pen included. Excellent condition, barely used. Perfect for productivity and creativity.', 'Like New', DATE_ADD(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 9 DAY), 799.99, 1000.00, 'Scheduled'),
     (3063, 2041, 222, 'Premium Android tablet in excellent condition. Includes S Pen and keyboard cover. Perfect for work and entertainment.', 'Like New', DATE_ADD(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 10 DAY), 599.99, 800.00, 'Scheduled');
 
--- Finished Auctions - 2 auctions
+-- Finished Auctions - 3 auctions
 INSERT IGNORE INTO auctions (id, item_id, category_id, auction_description, auction_condition, start_datetime, end_datetime, starting_price, reserve_price, auction_status) VALUES
     (3064, 2043, 223, '2-in-1 tablet with detachable keyboard. Excellent condition, includes Surface Pen and keyboard cover.', 'Like New', '2024-12-01 10:00:00', '2024-12-15 12:00:00', 999.99, 1300.00, 'Finished'),
-    (3065, 2048, 231, 'Budget-friendly Apple Watch in excellent condition. Includes charger and band. Perfect for fitness tracking.', 'Like New', '2024-12-02 14:00:00', '2024-12-16 15:00:00', 199.99, 280.00, 'Finished');
+    (3065, 2048, 231, 'Budget-friendly Apple Watch in excellent condition. Includes charger and band. Perfect for fitness tracking.', 'Like New', '2024-12-02 14:00:00', '2024-12-16 15:00:00', 199.99, 280.00, 'Finished'),
+    (3066, 2139, 111, 'High-end gaming laptop that ended with no bids. Excellent condition, barely used. Perfect for gaming enthusiasts.', 'Like New', '2024-11-01 10:00:00', '2024-11-15 12:00:00', 1999.99, 2500.00, 'Finished');
 
 -- Update items to link to their auctions
 UPDATE items SET current_auction_id = 3001 WHERE id = 2001;
@@ -408,6 +410,7 @@ UPDATE items SET current_auction_id = 3062 WHERE id = 2040;
 UPDATE items SET current_auction_id = 3063 WHERE id = 2041;
 UPDATE items SET current_auction_id = 3064 WHERE id = 2043;
 UPDATE items SET current_auction_id = 3065 WHERE id = 2048;
+UPDATE items SET current_auction_id = 3066 WHERE id = 2139;
 
 -- Mark sold items
 UPDATE items SET is_sold = 1 WHERE id IN (2043, 2048);
@@ -528,7 +531,7 @@ INSERT IGNORE INTO bids (id, buyer_id, auction_id, bid_amount, bid_datetime) VAL
 
 -- Update winning_bid_id for finished auctions
 UPDATE auctions SET winning_bid_id = 4098 WHERE id = 3064;
-UPDATE auctions SET winning_bid_id = 4100 WHERE id = 3065;
+-- Auction 3065 is left with NULL winning_bid_id to represent a completed but not sold auction
 
 -- WATCHLISTS (for testing "My Watchlist" page)
 -- User 101 (buyer only) - watching several auctions
