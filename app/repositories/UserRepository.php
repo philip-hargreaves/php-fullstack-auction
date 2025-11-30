@@ -1,6 +1,7 @@
 <?php
 namespace app\repositories;
 use app\models\User;
+use app\models\Role;
 use infrastructure\Database;
 use infrastructure\Utilities;
 use PDOException;
@@ -30,6 +31,33 @@ class UserRepository
         );
     }
 
+    /**
+     * Hydrates a User with roles from multiple JOIN rows
+     * (Each row contains the same user data but different role data)
+     */
+    private function hydrateWithRoles(array $rows): ?User
+    {
+        if (empty($rows)) {
+            return null;
+        }
+
+        // Create user from first row
+        $user = $this->hydrate($rows[0]);
+        if ($user === null) {
+            return null;
+        }
+
+        // Add all roles from all rows
+        foreach ($rows as $row) {
+            if (!empty($row['role_id'])) {
+                $role = new Role((int)$row['role_id'], $row['role_name']);
+                $user->addRole($role);
+            }
+        }
+
+        return $user;
+    }
+
     private function hydrateMany(array $rows) : array {
         $objects = [];
 
@@ -55,50 +83,44 @@ class UserRepository
 
     public function getByEmail(string $email): ?User
     {
-        // *** CHECK ONE QUERY REDUNDANT DATA VS TWO QUERIES WITH NO REDUNDANT DATA ***
         $sql = "SELECT u.id, u.username, u.email, u.password, u.is_active,
-                         r.id AS role_id, r.role_name
-                  FROM users u
-                  LEFT JOIN user_roles ur ON u.id = ur.user_id
-                  LEFT JOIN roles r       ON ur.role_id = r.id
-                  WHERE u.email = :email";
+                       r.id AS role_id, r.role_name
+                FROM users u
+                LEFT JOIN user_roles ur ON u.id = ur.user_id
+                LEFT JOIN roles r       ON ur.role_id = r.id
+                WHERE u.email = :email";
         $params = ['email' => $email];
         $rows = $this->db->query($sql, $params)->fetchAll();
 
-        return empty($rows) ? null : $this->hydrate($rows);
+        return $this->hydrateWithRoles($rows);
     }
 
     public function getByEmailOrUsername(string $emailOrUsername): ?User
     {
-        // *** CHECK ONE QUERY REDUNDANT DATA VS TWO QUERIES WITH NO REDUNDANT DATA ***
         $sql = "SELECT u.id, u.username, u.email, u.password, u.is_active,
-                     r.id AS role_id, r.role_name
-              FROM users u
-              LEFT JOIN user_roles ur ON u.id = ur.user_id
-              LEFT JOIN roles r       ON ur.role_id = r.id
-              WHERE u.email = :emailOrUsername OR u.username = :emailOrUsername";
+                       r.id AS role_id, r.role_name
+                FROM users u
+                LEFT JOIN user_roles ur ON u.id = ur.user_id
+                LEFT JOIN roles r       ON ur.role_id = r.id
+                WHERE u.email = :emailOrUsername OR u.username = :emailOrUsername";
         $params = ['emailOrUsername' => $emailOrUsername];
         $rows = $this->db->query($sql, $params)->fetchAll();
 
-        return empty($rows) ? null : $this->hydrate($rows);
+        return $this->hydrateWithRoles($rows);
     }
 
     public function getById(int $userId): ?User
     {
         $sql = "SELECT u.id, u.username, u.email, u.password, u.is_active,
-                     r.id AS role_id, r.role_name
-              FROM users u
-              LEFT JOIN user_roles ur ON u.id = ur.user_id
-              LEFT JOIN roles r       ON ur.role_id = r.id
-              WHERE u.id = :id";
+                       r.id AS role_id, r.role_name
+                FROM users u
+                LEFT JOIN user_roles ur ON u.id = ur.user_id
+                LEFT JOIN roles r       ON ur.role_id = r.id
+                WHERE u.id = :id";
         $params = ['id' => $userId];
         $rows = $this->db->query($sql, $params)->fetchAll();
 
-        if (empty($rows)) {
-            return null;
-        }
-
-        return $this->hydrate($rows[0]);
+        return $this->hydrateWithRoles($rows);
     }
 
     public function existsByEmail(string $email): bool
