@@ -15,6 +15,10 @@ require Utilities::basePath('views/partials/header.php');
         <div class="main-content-wrapper">
             <!-- Left Sidebar Filters -->
             <div class="filter-sidebar">
+                <form method="GET" action="/" id="filterForm">
+                    <!-- Preserve sort order -->
+                    <input type="hidden" name="order_by" value="<?= htmlspecialchars($activeFilters['ordering']) ?>">
+                    
                     <!-- Categories Accordion -->
                     <div class="filter-section">
                         <button type="button" class="accordion-button" id="categoryAccordion" aria-expanded="true" aria-controls="categoryContent">
@@ -24,41 +28,66 @@ require Utilities::basePath('views/partials/header.php');
                             </div>
                         </button>
                         <div id="categoryContent" class="accordion-content" aria-labelledby="categoryAccordion">
-                            <select class="filter-select" name="category">
-                                <option value="all">All</option>
-                                <option value="electronics">Electronics</option>
-                                <option value="clothing">Clothing</option>
-                                <option value="home">Home & Garden</option>
-                                <option value="sports">Sports & Outdoors</option>
-                                <option value="books">Books</option>
-                            </select>
+                            <div id="categoryDropdowns">
+                                <!-- Level 1: Root Categories -->
+                                <select class="filter-select category-level" id="categoryLevel1" data-level="1">
+                                    <option value="">All Categories</option>
+                                    <?php if (!empty($activeFilters['categoryTree'])): ?>
+                                        <?php foreach ($activeFilters['categoryTree'] as $cat): ?>
+                                            <option value="<?= $cat['id'] ?>" 
+                                                <?= (!empty($activeFilters['selectedCategoryPath'][0]) && $activeFilters['selectedCategoryPath'][0] == $cat['id']) ? 'selected' : '' ?>>
+                                                <?= htmlspecialchars($cat['name']) ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </select>
+
+                                <!-- Level 2: Subcategories (dynamically populated) -->
+                                <select class="filter-select category-level" id="categoryLevel2" data-level="2" style="display: none; margin-top: 8px;">
+                                    <option value="">-- Select Subcategory --</option>
+                                </select>
+
+                                <!-- Level 3: Sub-subcategories (dynamically populated) -->
+                                <select class="filter-select category-level" id="categoryLevel3" data-level="3" style="display: none; margin-top: 8px;">
+                                    <option value="">-- Select Subcategory --</option>
+                                </select>
+
+                                <!-- Hidden field for final category ID -->
+                                <input type="hidden" name="category" id="selectedCategoryId" value="<?= htmlspecialchars($activeFilters['categoryId'] ?? '') ?>">
+                            </div>
                         </div>
                     </div>
 
                     <!-- Condition Accordion -->
                     <div class="filter-section">
                         <button type="button" class="accordion-button" id="conditionAccordion" aria-expanded="true" aria-controls="conditionContent">
-                            <span>Product condition</span>
+                            <span>Item condition</span>
                             <div class="accordion-icon">
                                 <svg width="16" height="16" class="icon-primary" fill-rule="evenodd" viewBox="0 0 24 24"><path d="M13.67,6.45a2.46,2.46,0,0,0-3.42,0l-8,8a1,1,0,0,0,0,1.42,1,1,0,0,0,1.41,0l8-8a.35.35,0,0,1,.58,0l8,8.1a1,1,0,1,0,1.42-1.41Z"></path></svg>
                             </div>
                         </button>
                         <div id="conditionContent" class="accordion-content" aria-labelledby="conditionAccordion">
                             <div class="checkbox-group">
+                                <?php
+                                // Map database condition values back to form values for checkboxes
+                                $activeConditions = $activeFilters['conditions'] ?? [];
+                                $hasNew = in_array('New', $activeConditions);
+                                $hasLikeNew = in_array('Like New', $activeConditions);
+                                $hasUsed = in_array('Used', $activeConditions);
+                                ?>
                                 <label class="checkbox-label">
-                                    <input class="mer-checkbox" type="checkbox" value="new" name="item_condition_id">
+                                    <input class="mer-checkbox" type="checkbox" value="new" name="item_condition_id[]"
+                                        <?= $hasNew ? 'checked' : '' ?>>
                                     <span class="checkbox-text">New</span>
                                 </label>
                                 <label class="checkbox-label">
-                                    <input class="mer-checkbox" type="checkbox" value="like_new" name="item_condition_id">
+                                    <input class="mer-checkbox" type="checkbox" value="like_new" name="item_condition_id[]"
+                                        <?= $hasLikeNew ? 'checked' : '' ?>>
                                     <span class="checkbox-text">Like new</span>
                                 </label>
                                 <label class="checkbox-label">
-                                    <input class="mer-checkbox" type="checkbox" value="refurbished" name="item_condition_id">
-                                    <span class="checkbox-text">Refurbished</span>
-                                </label>
-                                <label class="checkbox-label">
-                                    <input class="mer-checkbox" type="checkbox" value="used" name="item_condition_id">
+                                    <input class="mer-checkbox" type="checkbox" value="used" name="item_condition_id[]"
+                                        <?= $hasUsed ? 'checked' : '' ?>>
                                     <span class="checkbox-text">Used</span>
                                 </label>
                             </div>
@@ -75,16 +104,25 @@ require Utilities::basePath('views/partials/header.php');
                         </button>
                         <div id="statusContent" class="accordion-content" aria-labelledby="statusAccordion">
                             <div class="checkbox-group">
+                                <?php
+                                // Map database status values back to form values for checkboxes
+                                $activeStatuses = $activeFilters['statuses'] ?? ['Active'];
+                                $hasActive = in_array('Active', $activeStatuses);
+                                $hasFinished = in_array('Finished', $activeStatuses);
+                                ?>
                                 <label class="checkbox-label">
-                                    <input class="mer-checkbox" type="checkbox" value="active" name="auction_status">
+                                    <input class="mer-checkbox" type="checkbox" value="active" name="auction_status[]"
+                                        <?= $hasActive ? 'checked' : '' ?>>
                                     <span class="checkbox-text">Active</span>
                                 </label>
                                 <label class="checkbox-label">
-                                    <input class="mer-checkbox" type="checkbox" value="completed" name="auction_status">
+                                    <input class="mer-checkbox" type="checkbox" value="completed" name="auction_status[]"
+                                        <?= $hasFinished ? 'checked' : '' ?>>
                                     <span class="checkbox-text">Completed</span>
                                 </label>
                                 <label class="checkbox-label">
-                                    <input class="mer-checkbox" type="checkbox" value="sold" name="auction_status">
+                                    <input class="mer-checkbox" type="checkbox" value="sold" name="auction_status[]"
+                                        <?= $hasFinished ? 'checked' : '' ?>>
                                     <span class="checkbox-text">Sold</span>
                                 </label>
                             </div>
@@ -107,7 +145,14 @@ require Utilities::basePath('views/partials/header.php');
                             </div>
                         </div>
                     </div>
-                </div>
+
+                    <!-- Filter Buttons -->
+                    <div class="filter-section">
+                        <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+                        <a href="/" class="btn btn-outline-secondary w-100 mt-2">Clear All</a>
+                    </div>
+                </form>
+            </div>
 
             <!-- Main Content Area -->
             <div class="main-content-area">
@@ -294,5 +339,142 @@ document.addEventListener('DOMContentLoaded', function() {
             this.setAttribute('aria-expanded', !isExpanded);
         });
     }
+
+    // Cascading Category Dropdowns
+    (function() {
+        const categoryTree = <?= json_encode($activeFilters['categoryTree'] ?? []) ?>;
+        const selectedPath = <?= json_encode($activeFilters['selectedCategoryPath'] ?? []) ?>;
+        
+        // Build a flat map for quick lookup
+        const categoryMap = {};
+        function buildCategoryMap(categories, parentId = null) {
+            categories.forEach(cat => {
+                categoryMap[cat.id] = {
+                    id: cat.id,
+                    name: cat.name,
+                    parent_id: parentId,
+                    children: cat.children || []
+                };
+                if (cat.children && cat.children.length > 0) {
+                    buildCategoryMap(cat.children, cat.id);
+                }
+            });
+        }
+        buildCategoryMap(categoryTree);
+        
+        // Get children of a category
+        function getChildren(categoryId) {
+            const cat = categoryMap[categoryId];
+            return cat ? cat.children : [];
+        }
+        
+        // Populate a dropdown level
+        function populateLevel(level, categoryId) {
+            const select = document.getElementById('categoryLevel' + level);
+            if (!select) return;
+            
+            // Clear existing options except first
+            select.innerHTML = '<option value="">-- Select Subcategory --</option>';
+            
+            if (!categoryId) {
+                select.style.display = 'none';
+                // Hide all lower levels
+                for (let i = level + 1; i <= 3; i++) {
+                    const lowerSelect = document.getElementById('categoryLevel' + i);
+                    if (lowerSelect) {
+                        lowerSelect.style.display = 'none';
+                        lowerSelect.innerHTML = '<option value="">-- Select Subcategory --</option>';
+                    }
+                }
+                return;
+            }
+            
+            const children = getChildren(categoryId);
+            if (children.length > 0) {
+                select.style.display = 'block';
+                children.forEach(child => {
+                    const option = document.createElement('option');
+                    option.value = child.id;
+                    option.textContent = child.name;
+                    // Preserve selection if in path
+                    if (selectedPath[level - 1] === child.id) {
+                        option.selected = true;
+                    }
+                    select.appendChild(option);
+                });
+            } else {
+                // No children, this is a leaf category
+                select.style.display = 'none';
+                // Hide all lower levels
+                for (let i = level + 1; i <= 3; i++) {
+                    const lowerSelect = document.getElementById('categoryLevel' + i);
+                    if (lowerSelect) {
+                        lowerSelect.style.display = 'none';
+                    }
+                }
+            }
+        }
+        
+        // Function to sync category ID from dropdowns to hidden field
+        function syncCategoryId() {
+            const level1 = document.getElementById('categoryLevel1');
+            const level2 = document.getElementById('categoryLevel2');
+            const level3 = document.getElementById('categoryLevel3');
+            const hiddenField = document.getElementById('selectedCategoryId');
+            
+            if (!hiddenField) return;
+            
+            // Priority: level3 > level2 > level1 (use deepest selected category)
+            let selectedCategoryId = '';
+            if (level3 && level3.value && level3.value !== '') {
+                selectedCategoryId = level3.value;
+            } else if (level2 && level2.value && level2.value !== '') {
+                selectedCategoryId = level2.value;
+            } else if (level1 && level1.value && level1.value !== '') {
+                selectedCategoryId = level1.value;
+            }
+            
+            hiddenField.value = selectedCategoryId;
+        }
+        
+        // Initialize on page load
+        if (selectedPath.length > 0) {
+            // Level 1 is already set in HTML
+            if (selectedPath.length > 1) {
+                populateLevel(2, selectedPath[0]);
+                if (selectedPath.length > 2) {
+                    populateLevel(3, selectedPath[1]);
+                }
+            }
+            // Set final category ID
+            document.getElementById('selectedCategoryId').value = selectedPath[selectedPath.length - 1];
+        }
+        
+        // Event listeners for cascading
+        document.getElementById('categoryLevel1')?.addEventListener('change', function() {
+            const categoryId = this.value;
+            syncCategoryId();
+            populateLevel(2, categoryId);
+            populateLevel(3, null);
+        });
+        
+        document.getElementById('categoryLevel2')?.addEventListener('change', function() {
+            const categoryId = this.value;
+            syncCategoryId();
+            populateLevel(3, categoryId);
+        });
+        
+        document.getElementById('categoryLevel3')?.addEventListener('change', function() {
+            syncCategoryId();
+        });
+        
+        // Ensure category ID is set before form submission
+        const filterForm = document.getElementById('filterForm');
+        if (filterForm) {
+            filterForm.addEventListener('submit', function(e) {
+                syncCategoryId();
+            });
+        }
+    })();
 });
 </script>
