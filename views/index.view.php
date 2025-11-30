@@ -155,7 +155,7 @@ require Utilities::basePath('views/partials/header.php');
 
                     <!-- Filter Buttons -->
                     <div class="filter-section">
-                        <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+                        <button type="submit" class="btn btn-outline-secondary btn-apply-filters w-100">Apply Filters</button>
                         <a href="/" class="btn btn-outline-secondary w-100 mt-2">Clear All</a>
                     </div>
                 </form>
