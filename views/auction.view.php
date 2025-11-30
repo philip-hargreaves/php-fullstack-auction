@@ -20,7 +20,7 @@ use infrastructure\DIContainer;
  * @var $bidText string
  * @var $statusText string
  * @var $statusTextSmall string
- * @var $bids array
+ * @var $displayedBids array
  * @var $highestBid
  * @var $condition string
  * @var $currencyText string
@@ -204,7 +204,7 @@ use infrastructure\DIContainer;
         <div class="col-7">
             <h3 class="mb-3" >Bid History</h3>
             <div class="card mb-5" >
-                <?php if (empty($bids)): ?>
+                <?php if (empty($displayedBids)): ?>
                     <div class="card-body">
                         <div class="alert alert-info" role="alert" style="margin-bottom: 0;">
                             No bids have been placed yet. Be the first!
@@ -222,7 +222,7 @@ use infrastructure\DIContainer;
                             </tr>
                             </thead>
                             <tbody>
-                            <?php foreach ($bids as $bid): ?>
+                            <?php foreach ($displayedBids as $bid): ?>
                                 <?php
                                 // Check if this is the winning bid
                                 $isHighestBid = $highestBid && $highestBid->getBidId() == $bid->getBidId();
@@ -244,8 +244,6 @@ use infrastructure\DIContainer;
                                     <td>
                                         <?php
                                         // Semi-anonymise bidder names
-                                        $bidService = DIContainer::get('bidServ');
-                                        $bidService->fillBuyersInBids([$bid]);
                                         $username = $bid->getBuyer()->getUsername();
                                         $len = strlen($username);
                                         if ($len > 4) {

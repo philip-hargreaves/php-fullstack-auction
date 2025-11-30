@@ -26,7 +26,9 @@ $item = $auction->getItem();
 $itemServ->fillSellerInItems([$item]);
 // Get Bids
 $bids = $bidServ->getBidsByAuctionId($auctionId);
-$bids = array_slice($bids, 0, 15); // Keep only the first 15 elements (0 to 15)
+$bidService = DIContainer::get('bidServ');
+$bidService->fillBuyersInBids($bids);
+$displayedBids = array_slice($bids, 0, 15); // Keep only the first 15 elements (0 to 15)
 
 // Get auction images
 $imageArray = $auctionImageRepo->getByAuctionId($auction->getAuctionId());
