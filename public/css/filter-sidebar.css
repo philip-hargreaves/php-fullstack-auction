@@ -132,3 +132,28 @@
     flex-shrink: 0;
 }
 
+/* Apply Filters Button - red background with white text */
+.btn.btn-outline-secondary.btn-apply-filters {
+    background-color: var(--color-auctivity-red) !important;
+    border-color: var(--color-auctivity-red) !important;
+    border-width: 3px !important;
+    color: #fff !important;
+}
+
+.btn.btn-outline-secondary.btn-apply-filters:hover,
+.btn.btn-outline-secondary.btn-apply-filters:focus,
+.btn.btn-outline-secondary.btn-apply-filters:active {
+    background-color: rgb(200, 50, 70) !important;
+    border-color: rgb(200, 50, 70) !important;
+    border-width: 3px !important;
+    color: #fff !important;
+}
+
+/* Increase padding above the filter buttons section */
+.filter-section:has(.btn-apply-filters) {
+    padding-top: 24px;
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-bottom: 16px;
+}
+

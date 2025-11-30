@@ -98,10 +98,12 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true;
 $isWatched = false;
 $user = null;
 
-if ($isLoggedIn)
+if ($isLoggedIn && isset($_SESSION['user_id']))
 {
     $user = $userRepo->getById($_SESSION['user_id']);
-    $isWatched = $watchlistServ->isWatched($user->getUserId(), $auctionId);
+    if ($user !== null) {
+        $isWatched = $watchlistServ->isWatched($user->getUserId(), $auctionId);
+    }
 }
 
 require Utilities::basePath('views/auction.view.php');
