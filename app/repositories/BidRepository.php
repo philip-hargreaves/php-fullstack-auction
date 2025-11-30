@@ -11,39 +11,23 @@ use PDOException;
 class BidRepository
 {
     private Database $db;
-    private UserRepository $userRepo;
-    private AuctionRepository $auctionRepo;
 
-    public function __construct(Database $db, UserRepository $userRepo, AuctionRepository $auctionRepo) {
+    public function __construct(Database $db) {
         $this->db = $db;
-        $this->userRepo = $userRepo;
-        $this->auctionRepo = $auctionRepo;
     }
 
     private function hydrate($row): ?Bid {
         if (empty($row)) {
             return null;
         }
-        $object = new Bid(
+
+        return new Bid(
             (int)$row['id'],
             (int)$row['buyer_id'],
             (int)$row['auction_id'],
             (float)$row['bid_amount'],
             $row['bid_datetime']
         );
-
-        // Set relationship properties
-        $buyer = $this->userRepo->getById($row['buyer_id']);
-        $auction = $this->auctionRepo->getById($row['auction_id']);
-
-        if ($buyer === null || $auction === null)
-        {
-            return null;
-        }
-        $object->setBuyer($buyer);
-        $object->setAuction($auction);
-
-        return $object;
     }
 
     private function extract(bid $bid): array {

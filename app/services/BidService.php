@@ -6,6 +6,7 @@ use app\repositories\UserRepository;
 use infrastructure\Database;
 use app\repositories\BidRepository;
 use DateTime;
+use infrastructure\DIContainer;
 use PDOException;
 use infrastructure\Utilities;
 
@@ -72,6 +73,8 @@ class BidService
 
         // Check if $buyer is a buyer
         $isBuyer = false;
+        $userService = DIContainer::get('userServ');
+        $userService->fillRolesInUsers([$user]);
         foreach ($user->getRoles() as $role) {
             if ($role->getName() == 'buyer') {
                 $isBuyer = true;
@@ -180,21 +183,6 @@ class BidService
         return $this->bidRepo->getByAuctionId($auctionId);
     }
 
-    public function getWinningBidByAuctionId($auctionId): ?Bid {
-        // Get Auction status
-        $auction = $this->auctionRepo->getById($auctionId);
-        $isAuctionActive = $auction->getAuctionStatus() == 'Active';
-        if ($isAuctionActive) {
-            // Get Item Status
-            $item = $auction->getItem();
-            $isItemSold = $auction->getAuctionStatus() == 'Sold';
-            if ($isItemSold) {
-                return $this->bidRepo->getById($auction->getWinningBidID());
-            }
-        }
-        return null;
-    }
-
     public function getBidsForUser(int $userId): array
     {
         return $this->bidRepo->getByUserId($userId);
@@ -203,5 +191,68 @@ class BidService
     public function countBidsByAuctionId(int $auctionId): int
     {
         return $this->bidRepo->countByAuctionId($auctionId);
+    }
+
+    // --- FILL RELATIONSHIP PROPERTIES FUNCTION ---
+    public function fillBuyersInBids(array $bids): void
+    {
+        if (empty($bids)) return;
+
+        // Collect Buyer IDs
+        $userIds = [];
+        foreach ($bids as $bid) {
+            $userIds[] = $bid->getBuyerId();
+        }
+        $userIds = array_unique($userIds);
+
+        if (empty($userIds)) return;
+
+        // Fetch Users (1 Query)
+        $users = $this->userRepo->getByIds($userIds);
+
+        // Map ID => User Object
+        $userMap = [];
+        foreach ($users as $user) {
+            $userMap[$user->getUserId()] = $user;
+        }
+
+        // Attach to Bids
+        foreach ($bids as $bid) {
+            $buyerId = $bid->getBuyerId();
+            if (isset($userMap[$buyerId])) {
+                $bid->setBuyer($userMap[$buyerId]);
+            }
+        }
+    }
+
+    public function fillAuctionsInBids(array $bids): void
+    {
+        if (empty($bids)) return;
+
+        // Collect Auction IDs
+        $auctionIds = [];
+        foreach ($bids as $bid) {
+            $auctionIds[] = $bid->getAuctionId();
+        }
+        $auctionIds = array_unique($auctionIds);
+
+        if (empty($auctionIds)) return;
+
+        // Fetch Auctions (1 Query)
+        $auctions = $this->auctionRepo->getByIds($auctionIds);
+
+        // Map ID => Auction Object
+        $auctionMap = [];
+        foreach ($auctions as $auction) {
+            $auctionMap[$auction->getAuctionId()] = $auction;
+        }
+
+        // Attach to Bids
+        foreach ($bids as $bid) {
+            $aucId = $bid->getAuctionId();
+            if (isset($auctionMap[$aucId])) {
+                $bid->setAuction($auctionMap[$aucId]);
+            }
+        }
     }
 }

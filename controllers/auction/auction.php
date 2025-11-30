@@ -15,13 +15,18 @@ $auctionServ = DIContainer::get('auctionServ');
 $userRepo = DIContainer::get('userRepo');
 $watchlistServ = DIContainer::get('watchlistServ');
 $auctionImageRepo = DIContainer::get('auctionImageRepo');
+$itemServ = DIContainer::get('itemServ');
 
-// Get Auction, Item, and Bids entities
+// Get Auction
 $auction = $auctionServ->getById($auctionId);
+$auctionServ->fillItemInAuctions([$auction]); // Fill Item property
+$auctionServ->fillCategoryInAuctions([$auction]); // Fill Category property
+// Get Item
 $item = $auction->getItem();
+$itemServ->fillSellerInItems([$item]);
+// Get Bids
 $bids = $bidServ->getBidsByAuctionId($auctionId);
-// Keep only the first 15 elements (0 to 15)
-$bids = array_slice($bids, 0, 15);
+$bids = array_slice($bids, 0, 15); // Keep only the first 15 elements (0 to 15)
 
 // Get auction images
 $imageArray = $auctionImageRepo->getByAuctionId($auction->getAuctionId());
@@ -37,10 +42,10 @@ $endTime = $auction->getEndDateTime();
 $startingPrice = $auction->getStartingPrice();
 $reservePrice = $auction->getReservePrice();
 $condition = $auction->getAuctionCondition();
+$category = $auction->getCategory();
 $imageUrls = [];
 
-foreach ($imageArray as $image)
-{
+foreach ($imageArray as $image) {
     $imageUrls[] = $image->getImageUrl();
 }
 

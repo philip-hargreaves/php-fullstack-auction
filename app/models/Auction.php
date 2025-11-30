@@ -1,7 +1,6 @@
 <?php
 
 namespace app\models;
-
 use DateTime;
 
 class Auction
@@ -19,12 +18,15 @@ class Auction
     private ?float $reservePrice;
     private string $auctionStatus; // enum('Scheduled', 'Active', 'Finished')
 
+    // CALCULATED PROPERTIES
+    private ?float $currentPrice = null;
+    private ?int $bidCount = null;
+    private ?string $itemName = null;
+
     // RELATIONSHIP PROPERTIES
     private ?Item $item = null;
     private ?Category $category = null;
-    private ?float $currentPrice = null;
     private ?array $auctionImages = null;
-    private ?int $bidCount = null;
 
     // CONSTRUCTOR
     public function __construct(
@@ -44,8 +46,8 @@ class Auction
         $this->auctionDescription = $auctionDescription;
         $this->auctionCondition = $auctionCondition;
         $this->startingPrice = $startingPrice;
-        $this->reservePrice = $reservePrice;
         $this->auctionStatus = $auctionStatus;
+        $this->reservePrice = $reservePrice;
         $this->categoryId = $categoryId;
         $this->winningBidId = $winningBidId;
         $this->auctionId = $auctionId;
@@ -54,172 +56,58 @@ class Auction
         $this->endDatetime = is_string($endDatetime) ? new DateTime($endDatetime) : $endDatetime;
     }
 
-    // BUSINESS LOGIC
+    // --- GETTERS ---
+    public function getAuctionId(): ?int { return $this->auctionId; }
+    public function getItemId(): int { return $this->itemId; }
+    public function getCategoryId(): ?int { return $this->categoryId; }
+    public function getWinningBidId(): ?int { return $this->winningBidId; }
+    public function getAuctionDescription(): string { return $this->auctionDescription; }
+    public function getAuctionCondition(): string { return $this->auctionCondition; }
+    public function getStartDatetime(): DateTime { return $this->startDatetime; }
+    public function getEndDatetime(): DateTime { return $this->endDatetime; }
+    public function getStartingPrice(): float { return $this->startingPrice; }
+    public function getReservePrice(): ?float { return $this->reservePrice; }
+    public function getAuctionStatus(): string { return $this->auctionStatus; }
+
+    // --- SETTERS ---
+    public function setAuctionId(?int $auctionId): void { $this->auctionId = $auctionId; }
+    public function setItemId(int $itemId): void { $this->itemId = $itemId; }
+    public function setCategoryId(?int $categoryId): void { $this->categoryId = $categoryId; }
+    public function setWinningBidId(?int $winningBidId): void { $this->winningBidId = $winningBidId; }
+    public function setAuctionDescription(string $auctionDescription): void { $this->auctionDescription = $auctionDescription; }
+    public function setAuctionCondition(string $auctionCondition): void { $this->auctionCondition = $auctionCondition; }
+    public function setStartDatetime(DateTime $startDatetime): void { $this->startDatetime = $startDatetime; }
+    public function setEndDatetime(DateTime $endDatetime): void { $this->endDatetime = $endDatetime; }
+    public function setStartingPrice(float $startingPrice): void { $this->startingPrice = $startingPrice; }
+    public function setReservePrice(?float $reservePrice): void { $this->reservePrice = $reservePrice; }
+    public function setAuctionStatus(string $auctionStatus): void { $this->auctionStatus = $auctionStatus; }
+
+    // --- GETTERS/SETTERS (Calculated) ---
+    public function getCurrentPrice(): ?float { return $this->currentPrice ?? $this->startingPrice; }
+    public function setCurrentPrice(?float $price): void { $this->currentPrice = $price; }
+
+    public function getBidCount(): ?int { return $this->bidCount ?? 0; }
+    public function setBidCount(?int $count): void { $this->bidCount = $count; }
+
+    public function getItemName(): ?string { return $this->itemName; }
+    public function setItemName(?string $itemName): void { $this->itemName = $itemName; }
+
+    // --- GETTERS/SETTERS (Relationships) ---
+    public function getItem(): ?Item { return $this->item; }
+    public function setItem(?Item $item): void { $this->item = $item; }
+
+    public function getCategory(): ?Category { return $this->category; }
+    public function setCategory(?Category $category): void { $this->category = $category; }
+
+    public function getAuctionImages(): ?array { return $this->auctionImages; }
+    public function setAuctionImages(?array $images): void { $this->auctionImages = $images; }
+
+    // --- BUSINESS LOGIC ---
     public function isAuctionActive(): bool
     {
         $now = new DateTime();
         return ($this->auctionStatus === 'Active') &&
             ($now >= $this->startDatetime) &&
             ($now < $this->endDatetime);
-    }
-
-    // GETTERS
-    public function getAuctionId(): ?int
-    {
-        return $this->auctionId;
-    }
-
-    public function getItemId(): int
-    {
-        return $this->itemId;
-    }
-
-    public function getCategoryId(): ?int
-    {
-        return $this->categoryId;
-    }
-
-    public function getWinningBidId(): ?int
-    {
-        return $this->winningBidId;
-    }
-
-    public function getAuctionDescription(): string
-    {
-        return $this->auctionDescription;
-    }
-
-    public function getAuctionCondition(): string
-    {
-        return $this->auctionCondition;
-    }
-
-    public function getStartDatetime(): DateTime
-    {
-        return $this->startDatetime;
-    }
-
-    public function getEndDatetime(): DateTime
-    {
-        return $this->endDatetime;
-    }
-
-    public function getStartingPrice(): float
-    {
-        return $this->startingPrice;
-    }
-
-    public function getReservePrice(): ?float {
-        return $this->reservePrice;
-    }
-
-    public function getAuctionStatus(): string
-    {
-        return $this->auctionStatus;
-    }
-
-    // SETTERS
-    public function setAuctionId(?int $auctionId): void
-    {
-        $this->auctionId = $auctionId;
-    }
-
-    public function setItemId(int $itemId): void
-    {
-        $this->itemId = $itemId;
-    }
-
-    public function setCategoryId(?int $categoryId): void
-    {
-        $this->categoryId = $categoryId;
-    }
-
-    public function setWinningBidId(?int $winningBidId): void
-    {
-        $this->winningBidId = $winningBidId;
-    }
-
-    public function setAuctionDescription(string $auctionDescription): void
-    {
-        $this->auctionDescription = $auctionDescription;
-    }
-
-    public function setAuctionCondition(string $auctionCondition): void
-    {
-        $this->auctionCondition = $auctionCondition;
-    }
-
-    public function setStartDatetime(DateTime $startDatetime): void
-    {
-        $this->startDatetime = $startDatetime;
-    }
-
-    public function setEndDatetime(DateTime $endDatetime): void
-    {
-        $this->endDatetime = $endDatetime;
-    }
-
-    public function setStartingPrice(float $startingPrice): void
-    {
-        $this->startingPrice = $startingPrice;
-    }
-
-    public function setReservePrice(?float $reservePrice): void {
-        $this->reservePrice = $reservePrice;
-    }
-
-    public function setAuctionStatus(string $auctionStatus): void
-    {
-        $this->auctionStatus = $auctionStatus;
-    }
-
-    // RELATIONSHIP GETTERS/SETTERS
-
-    public function setItem(Item $item): void
-    {
-        $this->item = $item;
-    }
-
-    public function getItem(): ?Item
-    {
-        return $this->item;
-    }
-
-    public function setCategory(?Category $category): void
-    {
-        $this->category = $category;
-    }
-
-    public function getCategory(): ?Category
-    {
-        return $this->category;
-    }
-
-    public function setCurrentPrice(?float $currentPrice): void
-    {
-        $this->currentPrice = $currentPrice;
-    }
-
-    public function getCurrentPrice(): ?float
-    {
-        return $this->currentPrice;
-    }
-
-    public function setAuctionImages(?array $auctionImages): void {
-        $this->auctionImages = $auctionImages;
-    }
-
-    public function getAuctionImages(): ?array {
-        return $this->auctionImages;
-    }
-
-    public function setBidCount(int $bidCount): void
-    {
-        $this->bidCount = $bidCount;
-    }
-
-    public function getBidCount(): ?int
-    {
-        return $this->bidCount;
     }
 }

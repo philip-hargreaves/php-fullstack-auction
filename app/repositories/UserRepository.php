@@ -9,15 +9,50 @@ use PDOException;
 class UserRepository
 {
     private Database $db;
-    private RoleRepository $roleRepository;
 
-    public function __construct(Database $db, RoleRepository $roleRepository)
+    public function __construct(Database $db)
     {
         $this->db = $db;
-        $this->roleRepository = $roleRepository;
     }
 
-    // Find user by email
+    private function hydrate(array $row): ?User
+    {
+        if (empty($row)) {
+            return null;
+        }
+
+        return new User(
+            (int)$row['id'],
+            $row['username'],
+            $row['email'],
+            $row['password'],
+            (bool)$row['is_active']
+        );
+    }
+
+    private function hydrateMany(array $rows) : array {
+        $objects = [];
+
+        foreach ($rows as $row) {
+            $object = $this->hydrate($row);
+
+            if ($object !== null) {
+                $objects[] = $object;
+            }
+        }
+        return $objects;
+    }
+
+    private function extract(User $user): array
+    {
+        return [
+            'username'  => $user->getUsername(),
+            'email'     => $user->getEmail(),
+            'password'  => $user->getPasswordHash(),
+            'is_active' => $user->isActive() ? 1 : 0,
+        ];
+    }
+
     public function getByEmail(string $email): ?User
     {
         // *** CHECK ONE QUERY REDUNDANT DATA VS TWO QUERIES WITH NO REDUNDANT DATA ***
@@ -33,7 +68,6 @@ class UserRepository
         return empty($rows) ? null : $this->hydrate($rows);
     }
 
-    // Find user by email OR username
     public function getByEmailOrUsername(string $emailOrUsername): ?User
     {
         // *** CHECK ONE QUERY REDUNDANT DATA VS TWO QUERIES WITH NO REDUNDANT DATA ***
@@ -49,23 +83,24 @@ class UserRepository
         return empty($rows) ? null : $this->hydrate($rows);
     }
 
-    // Find user by id
     public function getById(int $userId): ?User
     {
-        // *** CHECK ONE QUERY REDUNDANT DATA VS TWO QUERIES WITH NO REDUNDANT DATA ***
         $sql = "SELECT u.id, u.username, u.email, u.password, u.is_active,
-                         r.id AS role_id, r.role_name
-                  FROM users u
-                  LEFT JOIN user_roles ur ON u.id = ur.user_id
-                  LEFT JOIN roles r       ON ur.role_id = r.id
-                  WHERE u.id = :id";
+                     r.id AS role_id, r.role_name
+              FROM users u
+              LEFT JOIN user_roles ur ON u.id = ur.user_id
+              LEFT JOIN roles r       ON ur.role_id = r.id
+              WHERE u.id = :id";
         $params = ['id' => $userId];
         $rows = $this->db->query($sql, $params)->fetchAll();
 
-        return empty($rows) ? null : $this->hydrate($rows);
+        if (empty($rows)) {
+            return null;
+        }
+
+        return $this->hydrate($rows[0]);
     }
 
-    // Check if user exists by email
     public function existsByEmail(string $email): bool
     {
         $sql = 'SELECT 1 FROM users WHERE email = :email LIMIT 1';
@@ -75,23 +110,11 @@ class UserRepository
                 ->fetchColumn() !== false;
     }
 
-    // Check if user exists by username
     public function existsByUsername(string $username): bool
     {
         return $this->db
                 ->query('SELECT 1 FROM users WHERE username = :username LIMIT 1', ['username' => $username])
                 ->fetchColumn() !== false;
-    }
-
-
-    private function extract(User $user): array
-    {
-        return [
-            'username'  => $user->getUsername(),
-            'email'     => $user->getEmail(),
-            'password'  => $user->getPasswordHash(),
-            'is_active' => $user->isActive() ? 1 : 0,
-        ];
     }
 
     public function create(User $user): ?User
@@ -111,30 +134,18 @@ class UserRepository
         }
     }
 
-    private function hydrate(array $rows): ?User
+    public function getByIds(array $ids): array
     {
-        if (empty($rows)) {
-            return null;
-        }
-        $user = new User(
-            (int)$rows[0]['id'],
-            $rows[0]['username'],
-            $rows[0]['email'],
-            $rows[0]['password'],
-            (bool)$rows[0]['is_active']
-        );
+        if (empty($ids)) return [];
 
-        // Gather role IDs from non-empty join rows
-        $roleIds = [];
-        foreach ($rows as $row) {
-            if (!empty($row['role_id']) && !empty($row['role_name'])) {
-                $roleIds[] = (int)$row['role_id'];
-            }
-        }
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
 
-        // Hydrate roles via repository
-        $user->setRoles($this->roleRepository->getByIds($roleIds));
+        $sql = "SELECT * FROM users WHERE id IN ($placeholders)";
 
-        return $user;
+        $rows = $this->db->query($sql, array_values($ids))->fetchAll();
+
+        return $this->hydrateMany($rows);
     }
+
+
 }

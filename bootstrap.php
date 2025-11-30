@@ -12,7 +12,7 @@ use app\repositories\CategoryRepository;
 use app\services\BidService;
 use app\services\AuthService;
 use app\services\AuctionService;
-use app\services\RegistrationService;
+use app\services\UserService;
 use app\services\WatchlistService;
 use app\services\ImageService;
 use app\services\CategoryService;
@@ -85,7 +85,7 @@ DIContainer::bind('bidServ', new BidService(
 DIContainer::bind('authServ', new AuthService(
     DIContainer::get('userRepo')));
 
-DIContainer::bind('registrationServ', new RegistrationService(
+DIContainer::bind('registrationServ', new UserService(
     DIContainer::get('userRepo'),
     DIContainer::get('userRoleRepo'),
     DIContainer::get('roleRepo'),

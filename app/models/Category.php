@@ -9,8 +9,13 @@ class Category
     private string $categoryName;
     private ?int $parentCategoryId;
 
-    // RELATIONSHIP ATTRIBUTE
-    private array $childCategories;
+    // CALCULATED ATTRIBUTE
+    // These calculated attributes will 'not' be filled in hydrate(),
+    // and will be filled in service layer using 'In-Memory Service Processing'
+    // Because to get the 'Parent Path' in a single SQL query requires Recursive CTEs (Common Table Expressions) or complex Self-Joins
+    // It puts heavy load on the database CPU, and might returns duplicate rows
+    private array $childCategoryIds = [];
+    private array $parentCategoryPathIds = [];
 
     // CONSTRUCTOR
     public function __construct(
@@ -23,7 +28,7 @@ class Category
         $this->parentCategoryId = $parentCategoryId;
     }
 
-    // GETTER
+    // --- GETTERS
     public function getCategoryId(): int
     {
         return $this->categoryId;
@@ -39,7 +44,7 @@ class Category
         return $this->parentCategoryId;
     }
 
-    // SETTER
+    // --- SETTERS
     public function setCategoryId(int $categoryId): void
     {
         $this->categoryId = $categoryId;
@@ -55,12 +60,20 @@ class Category
         $this->parentCategoryId = $parentCategoryId;
     }
 
-    // RELATIONSHIP GETTERS/SETTERS
-    public function getChildCategories(): array {
-        return $this->childCategories;
+    // --- GETTERS/SETTERS (Relationships) ---
+    public function setChildCategoryIds(array $ids): void {
+        $this->childCategoryIds = $ids;
     }
 
-    public function setChildCategories(array $childCategories): void {
-        $this->childCategories = $childCategories;
+    public function getChildCategoryIds(): array {
+        return $this->childCategoryIds;
+    }
+
+    public function setParentCategoryPathIds(array $ids): void {
+        $this->parentCategoryPathIds = $ids;
+    }
+
+    public function getParentCategoryPathIds(): array {
+        return $this->parentCategoryPathIds;
     }
 }

@@ -20,16 +20,11 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
                 </thead>
                 <tbody>
                 <?php foreach ($auctions as $auction): ?>
-                    <?php $itemObj = $auction->getItem(); ?>
                     <tr>
                         <td>
-                            <?php if ($itemObj): ?>
-                                <a href="/auction?auction_id=<?= htmlspecialchars($auction->getAuctionId()) ?>">
-                                    <?= htmlspecialchars($itemObj->getItemName()) ?>
-                                </a>
-                            <?php else: ?>
-                                [Item Deleted]
-                            <?php endif; ?>
+                            <a href="/auction?auction_id=<?= htmlspecialchars($auction->getAuctionId()) ?>">
+                                <?= htmlspecialchars($auction->getItemName() ?? '[Item Missing]') ?>
+                            </a>
                         </td>
 
                         <td>£<?= htmlspecialchars(number_format($auction->getCurrentPrice() ?? $auction->getStartingPrice(), 2)) ?></td>

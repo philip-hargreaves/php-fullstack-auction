@@ -125,7 +125,7 @@ class ImageService
             }
 
             // Perform the Update
-            $image = $this->auctionImageRepo->update($image);
+            $this->auctionImageRepo->update($image);
 
             // Only commit if this function started the transaction.
             if ($startedTransaction) {

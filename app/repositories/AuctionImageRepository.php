@@ -112,26 +112,52 @@ class AuctionImageRepository
         $this->db->query($sql, ['auction_id' => $auctionId, 'id' => $excludeImageId]);
     }
 
-    public function update(AuctionImage $image): AuctionImage
+    public function update(AuctionImage $image): bool
     {
-        $param = $this->extract($image);
-        $sql = "UPDATE auction_images
-                SET auction_id = :auction_id, 
-                    image_url = :image_url, 
-                    is_main = :is_main, 
-                    uploaded_datetime = :uploaded_datetime
-                WHERE id = :id";
-
-        return $this->hydrate($this->db->query($sql, $param));
+        try {
+            $param = $this->extract($image);
+            $sql = "UPDATE auction_images
+                    SET auction_id = :auction_id, 
+                        image_url = :image_url, 
+                        is_main = :is_main, 
+                        uploaded_datetime = :uploaded_datetime
+                    WHERE id = :id";
+            $this->db->query($sql, $param);
+            return true;
+        } catch (PDOException $e) {
+            // Log error if needed
+            return false;
+        }
     }
 
     public function deleteByAuctionId(int $auctionId): bool {
         try {
             $sql = "DELETE FROM auction_images WHERE auction_id = :auction_id";
-            return (bool)$this->db->query($sql, ['auction_id' => $auctionId]);
+            $stmt = $this->db->query($sql, ['auction_id' => $auctionId]);
+
+            // Return true only if one or more row is deleted
+            return $stmt->rowCount() > 0;
         } catch (PDOException $e) {
             // TODO: add logging
             return false;
         }
+    }
+
+    public function getByAuctionIds(array $auctionIds): array
+    {
+        if (empty($auctionIds)) {
+            return [];
+        }
+
+        // Create placeholders: ?,?,?
+        $placeholders = implode(',', array_fill(0, count($auctionIds), '?'));
+
+        // ORDER BY is_main DESC
+        $sql = "SELECT * FROM auction_images 
+            WHERE auction_id IN ($placeholders) 
+            ORDER BY is_main DESC";
+        $rows = $this->db->query($sql, array_values($auctionIds))->fetchAll();
+
+        return $this->hydrateMany($rows);
     }
 }

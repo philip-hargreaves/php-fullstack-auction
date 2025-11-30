@@ -2,6 +2,7 @@
 namespace infrastructure;
 use DateInterval;
 use PDO;
+use DateTime;
 
 // Utility class for general purpose application helpers.
 class Utilities
@@ -56,11 +57,23 @@ class Utilities
             'object'    => $createdObject,
         ];
 
-        // Optional: Include field-specific validation errors in the response (example: registration form)
         if (!empty($errors)) {
             $result['errors'] = $errors;
         }
 
         return $result;
+    }
+
+    // Safely format dates for input
+    public static function formatForInput($date): string {
+        if (empty($date)) return '';
+
+        // If it's already a DateTime object
+        if ($date instanceof DateTime) {
+            return $date->format('Y-m-d\TH:i');
+        }
+
+        // If it's a string (e.g., from Database "2025-01-01 12:00:00")
+        return date('Y-m-d\TH:i', strtotime($date));
     }
 }

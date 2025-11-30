@@ -32,79 +32,23 @@ class Item
         $this->isSold = $isSold;
     }
 
-    // GETTERS
-
-    public function getItemId(): ?int
-    {
-        return $this->itemId;
-    }
-
-    public function getSellerId(): ?int
-    {
-        return $this->sellerId;
-    }
-
-    public function getCurrentAuctionId(): ?int
-    {
-        return $this->currentAuctionId;
-    }
-
-    public function getItemName(): string
-    {
-        return $this->itemName;
-    }
-
-    public function isDeleted(): bool
-    {
-        return $this->isDeleted;
-    }
-
-    public function isSold(): bool
-    {
-        return $this->isSold;
-    }
+    // GETTERS (Basic)
+    public function getItemId(): ?int { return $this->itemId; }
+    public function getSellerId(): ?int { return $this->sellerId; }
+    public function getCurrentAuctionId(): ?int { return $this->currentAuctionId; }
+    public function getItemName(): string { return $this->itemName; }
+    public function isDeleted(): bool { return $this->isDeleted; }
+    public function isSold(): bool { return $this->isSold; }
 
     // SETTERS
-
-    public function setItemId(?int $itemId): void
-    {
-        $this->itemId = $itemId;
-    }
-
-    public function setSellerId(?int $sellerId): void
-    {
-        $this->sellerId = $sellerId;
-    }
-
-    public function setCurrentAuctionId(?int $currentAuctionId): void
-    {
-        $this->currentAuctionId = $currentAuctionId;
-    }
-
-    public function setItemName(string $itemName): void
-    {
-        $this->itemName = $itemName;
-    }
-
-    public function setIsDeleted(bool $isDeleted): void
-    {
-        $this->isDeleted = $isDeleted;
-    }
-
-    public function setIsSold(bool $isSold): void
-    {
-        $this->isSold = $isSold;
-    }
+    public function setItemId(?int $itemId): void { $this->itemId = $itemId; }
+    public function setSellerId(?int $sellerId): void { $this->sellerId = $sellerId; }
+    public function setCurrentAuctionId(?int $currentAuctionId): void { $this->currentAuctionId = $currentAuctionId; }
+    public function setItemName(string $itemName): void { $this->itemName = $itemName; }
+    public function setIsDeleted(bool $isDeleted): void { $this->isDeleted = $isDeleted; }
+    public function setIsSold(bool $isSold): void { $this->isSold = $isSold; }
 
     // RELATIONSHIP GETTERS/SETTERS
-
-    public function setSeller(?User $seller): void
-    {
-        $this->seller = $seller;
-    }
-
-    public function getSeller(): ?User
-    {
-        return $this->seller;
-    }
+    public function setSeller(?User $seller): void { $this->seller = $seller; }
+    public function getSeller(): ?User { return $this->seller; }
 }

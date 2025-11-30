@@ -9,58 +9,109 @@ class CategoryService
 {
     private CategoryRepository $categoryRepo;
 
+    // In-memory cache to avoid repeated DB calls
+    // Structure: [ category_id => CategoryObject ]
+    private array $allCategoriesMap = [];
+
     public function __construct(CategoryRepository $categoryRepo)
     {
         $this->categoryRepo = $categoryRepo;
     }
 
     /**
-     * Returns an array of IDs from Root -> Target
-     * Used for the "Pre-fill" logic in your JS.
-     * Example: [1, 5, 20] (Electronics -> Computers -> Laptops)
+     * Loads all categories from DB once and indexes them by ID.
+     * This turns O(N) Database queries into O(1).
      */
-    public function getAllParentId(int $targetCategoryId): array
+    private function loadAllCategories(): void
     {
-        $path = [];
-        $currentId = $targetCategoryId;
-        $safetyCounter = 0; // <--- 1. Add counter
-
-        while ($currentId !== null) {
-            // <--- 2. Add Safety Brake
-            if ($safetyCounter++ > 50) {
-                break; // Stop if we go deeper than 100 levels (impossible in real life)
-            }
-
-            $category = $this->categoryRepo->findById($currentId);
-            if (!$category) break;
-
-            // <--- 3. Check for Self-Reference loop
-            if ($category->getParentCategoryId() === $currentId) {
-                break;
-            }
-
-            $path[] = $category->getCategoryId();
-            $currentId = $category->getParentCategoryId();
+        // If already loaded, don't query again
+        if (!empty($this->allCategoriesMap)) {
+            return;
         }
-        return array_reverse($path);
+
+        $all = $this->categoryRepo->getAll(); // SELECT * FROM categories
+
+        foreach ($all as $cat) {
+            $this->allCategoriesMap[$cat->getCategoryId()] = $cat;
+        }
     }
 
     /**
-     * Builds a nested array structure suitable for JSON output.
+     * Gets a Category with 'childCategoryIds' and 'parentCategoryPathIds' filled.
+     * Usage: Displaying a specific category page with breadcrumbs and sub-categories.
+     */
+    public function getById(int $id): ?Category
+    {
+        $this->loadAllCategories();
+
+        if (!isset($this->allCategoriesMap[$id])) {
+            return null;
+        }
+
+        $category = $this->allCategoriesMap[$id];
+
+        // Fill Children IDs
+        $childIds = [];
+        foreach ($this->allCategoriesMap as $cat) {
+            if ($cat->getParentCategoryId() === $id) {
+                $childIds[] = $cat->getCategoryId();
+            }
+        }
+        $category->setChildCategoryIds($childIds);
+
+        // Fill Parent Path IDs (Reuses the logic from getAllParentId)
+        $category->setParentCategoryPathIds($this->getAllParentId($id));
+
+        return $category;
+    }
+
+    /**
+     * Returns an array of IDs from Root -> Target
+     * Used for the "Pre-fill" logic in JS and Breadcrumbs.
+     * Example: [1, 5, 20] (Electronics -> Computers -> Laptops)
+     * * OPTIMIZED: uses in-memory map instead of DB loop.
+     */
+    public function getAllParentId(int $targetCategoryId): array
+    {
+        $this->loadAllCategories();
+
+        $path = [];
+        $currentId = $targetCategoryId;
+        $safetyCounter = 0;
+
+        // Traverse up using the memory map
+        while ($currentId !== null && isset($this->allCategoriesMap[$currentId])) {
+
+            if ($safetyCounter++ > 50) break; // Infinite loop protection
+
+            $category = $this->allCategoriesMap[$currentId];
+
+            // Circular reference protection
+            if ($category->getParentCategoryId() === $currentId) break;
+
+            $path[] = $category->getCategoryId();
+
+            // Move up
+            $currentId = $category->getParentCategoryId();
+        }
+
+        return array_reverse($path);
+    }
+
+    /** * Builds a nested array structure suitable for JSON output.
      * Structure: [ {id, name, children: [...]}, ... ]
+     * Used for the Category Selector Dropdown (JS).
      */
     public function getTree(): array
     {
-        // 1. Get all categories flat from DB
-        $categories = $this->categoryRepo->findAll();
+        // 1. Get all categories (Uses the optimized loader)
+        $this->loadAllCategories();
 
         $tree = [];
         $references = [];
 
-        // 2. First Pass: Initialize array nodes indexed by ID
-        // We use a plain array here instead of the Object because
-        // it is easier to json_encode for the JavaScript later.
-        foreach ($categories as $cat) {
+        // 2. Prepare nodes for JSON
+        foreach ($this->allCategoriesMap as $cat) {
             $references[$cat->getCategoryId()] = [
                 'id' => $cat->getCategoryId(),
                 'name' => $cat->getCategoryName(),
@@ -69,17 +120,14 @@ class CategoryService
             ];
         }
 
-        // 3. Second Pass: Link children to parents using References
-        foreach ($categories as $cat) {
+        // 3. Build Tree using References
+        foreach ($this->allCategoriesMap as $cat) {
             $id = $cat->getCategoryId();
             $parentId = $cat->getParentCategoryId();
 
             if ($parentId !== null && isset($references[$parentId])) {
-                // If it has a parent, add this node to the parent's 'children' array
-                // We use &$references to ensure we are modifying the original array in memory
                 $references[$parentId]['children'][] = &$references[$id];
             } else {
-                // If no parent, it is a Root node
                 $tree[] = &$references[$id];
             }
         }

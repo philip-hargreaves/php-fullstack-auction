@@ -10,11 +10,9 @@ use PDOException;
 class ItemRepository
 {
     private Database $db;
-    private UserRepository $userRepo;
 
-    public function __construct(Database $db, UserRepository $userRepo) {
+    public function __construct(Database $db) {
         $this->db = $db;
-        $this->userRepo = $userRepo;
     }
 
     private function hydrate($row): ?Item {
@@ -22,6 +20,7 @@ class ItemRepository
             return null;
         }
 
+        // Basic Properties (From DB Columns)
         $object = new Item(
             (string)$row['item_name'],
             $row['seller_id'] ? (int)$row['seller_id'] : null,
@@ -31,14 +30,30 @@ class ItemRepository
             (bool)$row['is_sold']
         );
 
-        // Set relationship properties
-        $seller = $this->userRepo->getById($object->getSellerId());
-
-        if ($seller) {
-            $object->setSeller($seller);
-        }
-
         return $object;
+    }
+
+    private function hydrateMany(array $rows) : array {
+        $objects = [];
+
+        foreach ($rows as $row) {
+            $object = $this->hydrate($row);
+
+            if ($object !== null) {
+                $objects[] = $object;
+            }
+        }
+        return $objects;
+    }
+
+    private function extract(Item $item): array {
+        $row = [];
+        $row['seller_id'] = $item->getSellerId();
+        $row['current_auction_id'] = $item->getCurrentAuctionId();
+        $row['item_name'] = $item->getItemName();
+        $row['is_deleted'] = $item->isDeleted() ? 1 : 0;
+        $row['is_sold'] = $item->isSold() ? 1 : 0;
+        return $row;
     }
 
     public function getById(int $itemId): ?Item {
@@ -55,16 +70,6 @@ class ItemRepository
             // TODO: add logging
             return null;
         }
-    }
-
-    private function extract(Item $item): array {
-        $row = [];
-        $row['seller_id'] = $item->getSellerId();
-        $row['current_auction_id'] = $item->getCurrentAuctionId();
-        $row['item_name'] = $item->getItemName();
-        $row['is_deleted'] = $item->isDeleted() ? 1 : 0;
-        $row['is_sold'] = $item->isSold() ? 1 : 0;
-        return $row;
     }
 
     public function create(Item $item): ?Item {
@@ -89,7 +94,6 @@ class ItemRepository
         }
     }
 
-    // You will likely need an update method to link the auction later
     public function update(Item $item): bool {
         try {
             $params = $this->extract($item);
@@ -108,5 +112,20 @@ class ItemRepository
         } catch (PDOException $e) {
             return false;
         }
+    }
+
+    public function getByIds(array $ids): array
+    {
+        if (empty($ids)) {
+            return [];
+        }
+
+        // Create placeholders (?,?,?) based on count
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+
+        $sql = "SELECT * FROM items WHERE id IN ($placeholders)";
+        $rows = $this->db->query($sql, array_values($ids))->fetchAll();
+
+        return $this->hydrateMany($rows);
     }
 }

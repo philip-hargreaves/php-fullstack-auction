@@ -4,6 +4,7 @@ use infrastructure\Request;
 use infrastructure\DIContainer;
 
 $auctionServ = DIContainer::get('auctionServ');
+$itemServ = DIContainer::get('itemServ');
 $categoryServ = DIContainer::get('categoryServ');
 $auctionMode = Request::get('auction_mode');
 
@@ -11,10 +12,13 @@ $auctionMode = Request::get('auction_mode');
 if ($auctionMode == 'update' || $auctionMode == 'relist') {
     if (!Request::has('auction_id')) {
         header("Location: /");
+        exit();
     }
     // Prepare placeholder inputs
     $auctionId = Request::get('auction_id');
     $auction = $auctionServ->getById($auctionId);
+    $item = $itemServ->getById($auction->getItemId());
+
 
     // Prepare the category path (Root -> Child -> GrandChild)
     $categoryId = $auction->getCategoryId();
@@ -28,17 +32,19 @@ if ($auctionMode == 'update' || $auctionMode == 'relist') {
     }
 
     // Prepare imageUrls
-    $images = $auction->getAuctionImages();
+    $auctionServ->fillAuctionImagesInAuctions([$auction]);
+    $images = $auction->getAuctionImages() ?? [];
     $imageUrls = [];
     foreach ($images as $image) {
         $imageUrls[] = $image->getImageUrl();
     }
 
+
     $prevAuction = [
-        'seller_id'             => $auction->getItem()->getSellerId(),
-        'item_name'             => $auction->getItem()->getItemName(),
-        'end_datetime'          => formatForInput($auction->getEndDatetime()),
-        'start_datetime'        => formatForInput($auction->getStartDatetime() ?? date("Y-m-d H:i:s")),
+        'seller_id'             => $item->getSellerId(),
+        'item_name'             => $item->getItemName(),
+        'end_datetime'          => Utilities::formatForInput($auction->getEndDatetime()),
+        'start_datetime'        => Utilities::formatForInput($auction->getStartDatetime() ?? date("Y-m-d H:i:s")),
         'starting_price'        => $auction->getStartingPrice(),
         'reserve_price'         => $auction->getReservePrice(),
         'auction_description'   => $auction->getAuctionDescription(),
@@ -63,25 +69,9 @@ if ($auctionMode == 'update' || $auctionMode == 'relist') {
 // Item Condition
 $itemConditions = ['New', 'Like New', 'Used'];
 
-
 // Get full category tree
-// Need a helper to turn your flat DB list into a nested tree
-// Structure should be: [{id: 1, name: 'Electronic', children: [...]} ...]
+// Turn flat DB list into a nested tree: [{id: 1, name: 'Electronic', children: [...]} ...]
 $allCategories = $categoryServ->getTree();
 $jsonCategoryTree = json_encode($allCategories); // Encode for JavaScript
-
-
-// Helper function to safely format dates for input
-function formatForInput($date) {
-    if (empty($date)) return '';
-
-    // If it's already a DateTime object
-    if ($date instanceof DateTime) {
-        return $date->format('Y-m-d\TH:i');
-    }
-
-    // If it's a string (e.g., from Database "2025-01-01 12:00:00")
-    return date('Y-m-d\TH:i', strtotime($date));
-}
 
 require Utilities::basePath('views/create-auction.view.php');

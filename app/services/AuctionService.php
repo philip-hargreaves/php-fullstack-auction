@@ -46,6 +46,7 @@ class AuctionService
     }
 
     public function getByUserId(int $sellerId): array {
+
         return $this->auctionRepo->getBySellerId($sellerId);
     }
 
@@ -233,6 +234,108 @@ class AuctionService
         }
     }
 
+    // --- FILL RELATIONSHIP PROPERTIES FUNCTION ---
+    public function fillItemInAuctions(array $auctions): void
+    {
+        if (empty($auctions)) return;
+
+        // Collect all Item IDs
+        $itemIds = [];
+        foreach ($auctions as $auction) {
+            $itemIds[] = $auction->getItemId();
+        }
+
+        // Remove duplicates
+        $itemIds = array_unique($itemIds);
+
+        // Fetch all Items in ONE query
+        $items = $this->itemRepo->getByIds($itemIds);
+
+        // Re-key the Items array by ID for instant lookup
+        $itemMap = [];
+        foreach ($items as $item) {
+            $itemMap[$item->getItemId()] = $item;
+        }
+
+        // Attach Items to Auctions
+        foreach ($auctions as $auction) {
+            $itemId = $auction->getItemId();
+
+            if (isset($itemMap[$itemId])) {
+                $auction->setItem($itemMap[$itemId]);
+            }
+        }
+    }
+
+    public function fillCategoryInAuctions(array $auctions): void
+    {
+        if (empty($auctions)) return;
+
+        // Collect all IDs
+        $categoryIds = [];
+        foreach ($auctions as $auction) {
+            $categoryIds[] = $auction->getCategoryId();
+        }
+
+        // Remove duplicates
+        $categoryIds = array_unique($categoryIds);
+
+        // Fetch all Items in ONE query
+        $categories = $this->categoryRepo->getByIds($categoryIds);
+
+        // Re-key the Items array by ID for instant lookup
+        $map = [];
+        foreach ($categories as $category) {
+            $map[$category->getCategoryId()] = $category;
+        }
+
+        // Attach Items to Auctions
+        foreach ($auctions as $auction) {
+            $categoryId = $auction->getCategoryId();
+
+            if (isset($map[$categoryId])) {
+                $auction->setCategory($map[$categoryId]);
+            }
+        }
+    }
+
+    public function fillAuctionImagesInAuctions(array $auctions): void
+    {
+        if (empty($auctions)) return;
+
+        // Collect all Auction IDs
+        $auctionIds = [];
+        foreach ($auctions as $auction) {
+            $auctionIds[] = $auction->getAuctionId();
+        }
+        $auctionIds = array_unique($auctionIds);
+
+        // Fetch all Images in ONE query
+        $allImages = $this->auctionImageRepo->getByAuctionIds($auctionIds);
+
+        // Group Images by Auction ID
+        $groupedImages = [];
+        foreach ($allImages as $image) {
+            $aucId = $image->getAuctionId();
+            if (!isset($groupedImages[$aucId])) {
+                $groupedImages[$aucId] = [];
+            }
+            $groupedImages[$aucId][] = $image;
+        }
+
+        // Attach Images to Auctions
+        foreach ($auctions as $auction) {
+            $aucId = $auction->getAuctionId();
+
+            if (isset($groupedImages[$aucId])) {
+                $auction->setAuctionImages($groupedImages[$aucId]);
+            } else {
+                // Important: Set empty array if no images found so it's not null
+                $auction->setAuctionImages([]);
+            }
+        }
+    }
+
     // --- PRIVATE HELPER FUNCTIONS ---
     private function instantiateAuction(array $input, int $itemId, string $status, ?int $auctionId = null): Auction
     {
@@ -326,7 +429,7 @@ class AuctionService
 
         // Check existence in DB
         // Assuming you have a getById method in categoryRepo
-        $category = $this->categoryRepo->findById($categoryId);
+        $category = $this->categoryRepo->getById($categoryId);
         if (!$category) {
             return Utilities::creationResult('Selected category does not exist.', false, null);
         }
@@ -449,7 +552,6 @@ class AuctionService
 
         return null; // No errors
     }
-
 
     public function getActiveListings(int $page = 1, int $perPage = 12, string $orderBy = 'ending_soonest'): array
     {

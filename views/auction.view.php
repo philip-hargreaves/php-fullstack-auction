@@ -1,4 +1,5 @@
 <?php
+use infrastructure\DIContainer;
 /**
  * @var $auctionId int
  * @var $title string
@@ -26,6 +27,7 @@
  * @var $timeText string
  * @var $itemIsSold bool
  * @var $itemIsDeleted bool
+ * @var $category
  */
 ?>
 
@@ -242,6 +244,8 @@
                                     <td>
                                         <?php
                                         // Semi-anonymise bidder names
+                                        $bidService = DIContainer::get('bidServ');
+                                        $bidService->fillBuyersInBids([$bid]);
                                         $username = $bid->getBuyer()->getUsername();
                                         $len = strlen($username);
                                         if ($len > 4) {
@@ -334,7 +338,7 @@
                     <tr>
                         <td class="text">Category</td>
                         <td class="text-end fw-bold">
-                            <?= htmlspecialchars("categoryName") ?>
+                            <?= htmlspecialchars($category->getCategoryName()) ?>
                         </td>
                     </tr>
                     </tbody>
