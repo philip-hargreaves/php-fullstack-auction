@@ -18,7 +18,7 @@ if ($targetUserId) {
     exit;
 }
 
-$userService = DIContainer::get('userService');
+$userService = DIContainer::get('userServ');
 
 $user = $userService->getUserAccount($targetUserId);
 

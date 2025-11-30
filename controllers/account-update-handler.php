@@ -11,7 +11,7 @@ if ($userId === null || !Request::isPost()) {
     exit;
 }
 
-$userService = DIContainer::get('userService');
+$userService = DIContainer::get('userServ');
 $username = Request::post('username');
 //$email = Request::post('email'); If user can change their email
 

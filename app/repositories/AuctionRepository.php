@@ -126,7 +126,8 @@ class AuctionRepository
     public function getActiveAuctionsBySellerId(int $sellerId): array
     {
         try {
-            $sql = "SELECT a.* FROM auctions a
+            $sql = "SELECT a.*, i.item_name 
+                    FROM auctions a
                     JOIN items i ON a.item_id = i.id
                     WHERE i.seller_id = :seller_id
                       AND a.auction_status = 'Active' 

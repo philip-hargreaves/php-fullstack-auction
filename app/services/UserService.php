@@ -4,7 +4,6 @@ namespace app\services;
 
 use app\repositories\UserRepository;
 use app\models\User;
-use app\repositories\UserRepository;
 use app\repositories\RoleRepository;
 use app\repositories\UserRoleRepository;
 use infrastructure\Database;
@@ -32,7 +31,7 @@ class UserService
 
     public function getUserAccount(int $userId): ?User
     {
-        return $this->userRepo->getById($userId);
+        return $this->userRepository->getById($userId);
     }
 
     public function updateAccount(int $userId, array $data): array
@@ -42,13 +41,56 @@ class UserService
             return Utilities::creationResult('Validation failed.', false, null, $errors);
         }
 
-        $success = $this->userRepo->updateAccount($userId, $data);
+        $success = $this->userRepository->updateAccount($userId, $data);
 
         if ($success) {
             return Utilities::creationResult('Account updated successfully.', true, null);
         } else {
             return Utilities::creationResult('Failed to update account.', false, null);
         }
+    }
+
+    // Validate account update data
+    private function validateAccountUpdate(int $userId, array $input): array
+    {
+        $username = trim($input['username'] ?? '');
+        $email    = trim($input['email'] ?? '');
+        $errors = [];
+
+        $currentUser = $this->userRepository->getById($userId);
+
+        if (!$currentUser) {
+            $errors['user'] = 'User not found.';
+            return $errors;
+        }
+
+        if ($username === '') {
+            $errors['username'] = 'Username is required.';
+        } elseif (strlen($username) < 8) {
+            $errors['username'] = 'Username must be at least 8 characters long.';
+        } elseif (strlen($username) > 25) {
+            $errors['username'] = 'Username must not exceed 25 characters.';
+        } elseif (!preg_match('/^[a-zA-Z0-9_-]+$/', $username)) {
+            $errors['username'] = 'Username can only contain letters, numbers, underscores, and hyphens.';
+        } else {
+            if ($username !== $currentUser->getUsername() && $this->userRepository->existsByUsername($username)) {
+                $errors['username'] = 'Username already taken.';
+            }
+        }
+
+        if ($email === '') {
+            $errors['email'] = 'Email is required.';
+        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errors['email'] = 'Please enter a valid email address.';
+        } elseif (strlen($email) > 100) {
+            $errors['email'] = 'Email must not exceed 100 characters.';
+        } else {
+            if ($email !== $currentUser->getEmail() && $this->userRepository->existsByEmail($email)) {
+                $errors['email'] = 'Email already taken.';
+            }
+        }
+
+        return $errors;
     }
 
     // Register a new user
@@ -140,7 +182,7 @@ class UserService
 
     public function changePassword(int $userId, array $data): array
     {
-        $user = $this->userRepo->getById($userId);
+        $user = $this->userRepository->getById($userId);
 
         $errors = $this->validatePasswordChange($user, $data);
         if (!empty($errors)) {
@@ -153,7 +195,7 @@ class UserService
 
         $newPasswordHash = password_hash($data['new_password'], PASSWORD_DEFAULT);
 
-        $success = $this->userRepo->updatePassword($userId, $newPasswordHash);
+        $success = $this->userRepository->updatePassword($userId, $newPasswordHash);
 
         if ($success) {
             return Utilities::creationResult('Password updated.', true, null);
@@ -170,8 +212,8 @@ class UserService
         $confirm = $data['confirm_password'] ?? '';
 
         // Password confirmation
-        if ($password !== '') {
-            if ($password !== $confirm) {
+        if ($new !== '') {
+            if ($new !== $confirm) {
                 $errors['password_confirmation'] = 'Passwords do not match.';
             }
         }

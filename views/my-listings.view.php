@@ -27,7 +27,19 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
                                 <?= htmlspecialchars($auction->getItemName() ?? '[Item Missing]') ?>
                             </a>
                         </td>
-                        <td><?= htmlspecialchars($auction->getAuctionStatus()) ?></td>
+                        <td>
+                            <?php
+                            $status = $auction->getAuctionStatus();
+                            $badgeClass = match($status) {
+                                'Active'    => 'bg-success',
+                                'Scheduled' => 'bg-info text-dark',
+                                'Sold'      => 'bg-warning text-dark',
+                                'Finished'  => 'bg-secondary',
+                                default     => 'bg-secondary'
+                            };
+                            ?>
+                            <span class="badge <?= $badgeClass ?>"><?= htmlspecialchars($status) ?></span>
+                        </td>
                         <td>
                             <?php
                             $price = $auction->getCurrentPrice();

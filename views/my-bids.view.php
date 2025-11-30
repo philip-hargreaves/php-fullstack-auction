@@ -23,7 +23,6 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
                 <?php foreach ($uniqueBids as $bid): ?>
                     <?php
                     $auctionObj = $bid->getAuction();
-                    $itemObj = $auctionObj ? $auctionObj->getItem() : null;
                     $auctionId = $bid->getAuctionId();
 
                     if (!$auctionObj) {
@@ -54,7 +53,7 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
                     <tr>
                         <td>
                             <a href="/auction?auction_id=<?= htmlspecialchars($auctionObj->getAuctionId()) ?>">
-                                <?= htmlspecialchars($itemObj ? $itemObj->getItemName() : '[Item Deleted]') ?>
+                                <?= htmlspecialchars($auctionObj->getItemName() ?? '[Item Deleted]') ?>
                             </a>
                         </td>
 
@@ -103,8 +102,7 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title">
-                                        Bid History: <?= htmlspecialchars($bids[0]->getAuction()->getItem()->getItemName()) ?>
-                                    </h5>
+                                        Bid History: <?= htmlspecialchars($bids[0]->getAuction()->getItemName() ?? 'Unknown Item') ?>                                    </h5>
                                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                                 </div>
                                 <div class="modal-body">

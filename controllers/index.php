@@ -168,7 +168,7 @@ foreach ($auctions as $auction) {
     $images = $auction->getAuctionImages();
     if (!empty($images)) {
         foreach ($images as $image) {
-            if ($image->getImageType() == 'image') {
+            if ($image->getImageUrl()) {
                 $processed['image_url'] = $image->getImageUrl();
                 break; // Get first image only
             }

@@ -12,7 +12,7 @@ if ($userId === null || !Request::isPost()) {
     exit;
 }
 
-$userService = DIContainer::get('userService');
+$userService = DIContainer::get('userServ');
 
 $currentPassword = Request::post('current_password');
 $newPassword = Request::post('new_password');
