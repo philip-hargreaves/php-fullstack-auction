@@ -333,15 +333,34 @@ class AuctionRepository
             $whereClause = !empty($whereConditions) ? 'WHERE ' . implode(' AND ', $whereConditions) : '';
             $havingClause = !empty($countHavingConditions) ? 'HAVING ' . implode(' AND ', $countHavingConditions) : '';
 
-            if (!empty($havingClause)) {
-                $sql = "SELECT COUNT(*) as total FROM (
-                    SELECT a.id 
-                    FROM auctions a
-                    LEFT JOIN bids b ON a.id = b.auction_id
-                    {$whereClause}
-                    GROUP BY a.id
-                    {$havingClause}
-                ) as filtered_auctions";
+            // Check items table (for keyword search) or bids table (for price filters) to see if needs join
+            $needsItemsJoin = ($keyword !== null && $keyword !== '');
+            $needsBidsJoin = !empty($havingClause);
+            
+            if ($needsBidsJoin || $needsItemsJoin) {
+                $joins = [];
+                if ($needsItemsJoin) {
+                    $joins[] = "JOIN items i ON a.item_id = i.id";
+                }
+                if ($needsBidsJoin) {
+                    $joins[] = "LEFT JOIN bids b ON a.id = b.auction_id";
+                }
+                $joinClause = implode(' ', $joins);
+                
+                if ($needsBidsJoin) {
+                    // Need GROUP BY and HAVING for price filters
+                    $sql = "SELECT COUNT(*) as total FROM (
+                        SELECT a.id 
+                        FROM auctions a
+                        {$joinClause}
+                        {$whereClause}
+                        GROUP BY a.id
+                        {$havingClause}
+                    ) as filtered_auctions";
+                } else {
+                    // Just need items join for keyword search, no GROUP BY needed
+                    $sql = "SELECT COUNT(*) as total FROM auctions a {$joinClause} {$whereClause}";
+                }
             } else {
                 $sql = "SELECT COUNT(*) as total FROM auctions a {$whereClause}";
             }

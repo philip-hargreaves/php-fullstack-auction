@@ -325,7 +325,7 @@ require Utilities::basePath('views/partials/header.php');
                 </div>
                 
                 <!-- Pagination -->
-                <?php if (!empty($processed_auctions)): ?>
+                <?php if (isset($max_page) && $max_page > 1): ?>
                 <div class="pagination-container mt-5">
         <nav aria-label="Search results pages">
             <ul class="pagination justify-content-center">
