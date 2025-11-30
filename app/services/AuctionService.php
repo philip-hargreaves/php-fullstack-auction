@@ -45,8 +45,7 @@ class AuctionService
         $this->auctionImageRepo = $auctionImageRepo;
     }
 
-    public function getByUserId(int $sellerId): array
-    {
+    public function getByUserId(int $sellerId): array {
         return $this->auctionRepo->getBySellerId($sellerId);
     }
     public function getByStatus(string $auctionStatus):array

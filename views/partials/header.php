@@ -41,8 +41,6 @@ $isSeller = AuthService::hasRole('seller');
     <link rel="stylesheet" href="/css/auction-page.css">
     <link rel="stylesheet" href="/css/alert.css">
     <link rel="stylesheet" href="/css/uploaded-images.css">
-
-    <!-- JW test-->
     <link rel="stylesheet" href="/css/out-bid-notification.css">
     <title>Auctivity</title>
 </head>
