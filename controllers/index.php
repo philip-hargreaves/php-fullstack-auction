@@ -13,6 +13,20 @@ $minPrice = Request::get('min_price', null);
 $maxPrice = Request::get('max_price', null);
 $categoryId = Request::get('category', null);
 
+// Validate and swap price range if reversed
+if ($minPrice !== null && $minPrice !== '' && $maxPrice !== null && $maxPrice !== '') {
+    $minPriceFloat = (float)$minPrice;
+    $maxPriceFloat = (float)$maxPrice;
+    if ($minPriceFloat > $maxPriceFloat) {
+        // Swap values if min is greater than max
+        $temp = $minPriceFloat;
+        $minPriceFloat = $maxPriceFloat;
+        $maxPriceFloat = $temp;
+        $minPrice = $minPriceFloat;
+        $maxPrice = $maxPriceFloat;
+    }
+}
+
 // Read condition from form (checkboxes with name="item_condition_id[]")
 $conditionInputs = isset($_GET['item_condition_id']) && is_array($_GET['item_condition_id']) ? $_GET['item_condition_id'] : [];
 
@@ -171,12 +185,12 @@ foreach ($auctions as $auction) {
         $winningBidId = $auction->getWinningBidId();
         if ($winningBidId !== null) {
             $processed['time_remaining'] = 'Sold';
-            $processed['status_class'] = 'text-success';
+            $processed['status_class'] = 'text-success'; // Green
         } else {
             $processed['time_remaining'] = 'Unsold';
-            $processed['status_class'] = 'text-danger';
+            $processed['status_class'] = 'text-danger'; // Red
         }
-        $processed['show_time_icon'] = false;
+        $processed['show_time_icon'] = false; // Don't show clock icon for finished auctions
     } elseif ($now > $endDate) {
         $processed['time_remaining'] = 'This auction has ended';
         $processed['status_class'] = '';
