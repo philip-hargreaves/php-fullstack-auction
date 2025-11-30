@@ -88,10 +88,21 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
                         <tr>
                             <td>
                                 <a href="/auction?auction_id=<?= htmlspecialchars($auction->getAuctionId()) ?>">
-                                    <?= htmlspecialchars($auction->getItem()->getItemName()) ?>
-                                </a>
+                                    <?= htmlspecialchars($auction->getItemName() ?? '[Item Name Unavailable]') ?>                                </a>
                             </td>
-                            <td><span class="badge bg-success"><?= htmlspecialchars($auction->getAuctionStatus()) ?></span></td>
+                            <td>
+                                <?php
+                                $status = $auction->getAuctionStatus();
+                                $badgeClass = match($status) {
+                                    'Active'    => 'bg-success',
+                                    'Scheduled' => 'bg-info text-dark',
+                                    'Sold'      => 'bg-warning text-dark',
+                                    'Finished'  => 'bg-secondary',
+                                    default     => 'bg-secondary'
+                                };
+                                ?>
+                                <span class="badge <?= $badgeClass ?>"><?= htmlspecialchars($status) ?></span>
+                            </td>
                             <td>£<?= htmlspecialchars(number_format($auction->getCurrentPrice(), 2)) ?></td>
                             <td><?= htmlspecialchars($auction->getEndDateTime()->format('Y-m-d H:i')) ?></td>
                         </tr>

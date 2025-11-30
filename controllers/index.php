@@ -51,7 +51,7 @@ foreach ($auctions as $auction) {
     $images = $auction->getAuctionImages();
     if (!($images == [] || $images == null) || !empty($imageUrls[0])) {
         foreach ($images as $image) {
-            if ($image->getImageType() == 'image') {
+            if ($image->getImageUrl()) {
                 $processed['image_url'] = $image->getImageUrl();
             }
         }
