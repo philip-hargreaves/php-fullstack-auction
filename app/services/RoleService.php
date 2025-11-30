@@ -67,4 +67,15 @@ class RoleService {
         }
     }
 
+    // Get all roles (for admin dashboard role management)
+    public function getAllRoles(): array
+    {
+        try {
+            $roles = $this->roleRepository->getAll();
+            return $roles;
+        } catch (\Throwable $e) {
+            return [];
+        }
+    }
+
 }
