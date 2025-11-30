@@ -50,7 +50,7 @@ if (empty($statusInputs)) {
                 $statuses[] = 'Finished';
                 break;
             case 'sold':
-                // This is to be done in separate PR, there is currently no distinction between finished and compeleted
+                // This is to be done in separate PR, there is currently no distinction between finished and completed
                 $statuses[] = 'Finished';
                 break;
         }

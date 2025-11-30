@@ -107,8 +107,13 @@ require Utilities::basePath('views/partials/header.php');
                                 <?php
                                 // Map database status values back to form values for checkboxes
                                 $activeStatuses = $activeFilters['statuses'] ?? ['Active'];
+                                // Check which form values were submitted (need to check $_GET since both map to 'Finished')
+                                $submittedStatuses = isset($_GET['auction_status']) && is_array($_GET['auction_status']) 
+                                    ? $_GET['auction_status'] 
+                                    : [];
                                 $hasActive = in_array('Active', $activeStatuses);
-                                $hasFinished = in_array('Finished', $activeStatuses);
+                                $hasCompleted = in_array('completed', $submittedStatuses) || in_array('Finished', $activeStatuses);
+                                $hasSold = in_array('sold', $submittedStatuses) || in_array('Finished', $activeStatuses);
                                 ?>
                                 <label class="checkbox-label">
                                     <input class="mer-checkbox" type="checkbox" value="active" name="auction_status[]"
@@ -117,12 +122,12 @@ require Utilities::basePath('views/partials/header.php');
                                 </label>
                                 <label class="checkbox-label">
                                     <input class="mer-checkbox" type="checkbox" value="completed" name="auction_status[]"
-                                        <?= $hasFinished ? 'checked' : '' ?>>
+                                        <?= $hasCompleted ? 'checked' : '' ?>>
                                     <span class="checkbox-text">Completed</span>
                                 </label>
                                 <label class="checkbox-label">
                                     <input class="mer-checkbox" type="checkbox" value="sold" name="auction_status[]"
-                                        <?= $hasFinished ? 'checked' : '' ?>>
+                                        <?= $hasSold ? 'checked' : '' ?>>
                                     <span class="checkbox-text">Sold</span>
                                 </label>
                             </div>
@@ -139,9 +144,11 @@ require Utilities::basePath('views/partials/header.php');
                         </button>
                         <div id="priceContent" class="accordion-content" aria-labelledby="priceAccordion">
                             <div class="price-range">
-                                <input type="number" class="price-input" name="min_price" placeholder="Min" min="0">
+                                <input type="number" class="price-input" name="min_price" placeholder="Min" min="0" 
+                                    value="<?= htmlspecialchars($activeFilters['minPrice'] ?? '') ?>">
                                 <span class="price-separator">-</span>
-                                <input type="number" class="price-input" name="max_price" placeholder="Max" min="0">
+                                <input type="number" class="price-input" name="max_price" placeholder="Max" min="0"
+                                    value="<?= htmlspecialchars($activeFilters['maxPrice'] ?? '') ?>">
                             </div>
                         </div>
                     </div>
@@ -167,6 +174,51 @@ require Utilities::basePath('views/partials/header.php');
                         </button>
                         <div class="sort-menu" id="sortMenu">
                             <form method="get" action="/">
+                                <?php
+                                // Preserve all active filters when sorting
+                                if (!empty($activeFilters['categoryId'])): ?>
+                                    <input type="hidden" name="category" value="<?= htmlspecialchars($activeFilters['categoryId']) ?>">
+                                <?php endif;
+                                
+                                if (!empty($activeFilters['conditions'])): ?>
+                                    <?php foreach ($activeFilters['conditions'] as $condition): ?>
+                                        <?php
+                                        // Map database values back to form values
+                                        $formValue = match($condition) {
+                                            'New' => 'new',
+                                            'Like New' => 'like_new',
+                                            'Used' => 'used',
+                                            default => null
+                                        };
+                                        if ($formValue): ?>
+                                            <input type="hidden" name="item_condition_id[]" value="<?= htmlspecialchars($formValue) ?>">
+                                        <?php endif; ?>
+                                    <?php endforeach; ?>
+                                <?php endif;
+                                
+                                if (!empty($activeFilters['statuses'])): ?>
+                                    <?php
+                                    // Check which status checkboxes were actually selected
+                                    $submittedStatuses = isset($_GET['auction_status']) && is_array($_GET['auction_status']) 
+                                        ? $_GET['auction_status'] 
+                                        : [];
+                                    // If no status was submitted but we have Active, it's the default
+                                    if (empty($submittedStatuses) && in_array('Active', $activeFilters['statuses'])) {
+                                        $submittedStatuses = ['active'];
+                                    }
+                                    foreach ($submittedStatuses as $status): ?>
+                                        <input type="hidden" name="auction_status[]" value="<?= htmlspecialchars($status) ?>">
+                                    <?php endforeach; ?>
+                                <?php endif;
+                                
+                                if (!empty($activeFilters['minPrice'])): ?>
+                                    <input type="hidden" name="min_price" value="<?= htmlspecialchars($activeFilters['minPrice']) ?>">
+                                <?php endif;
+                                
+                                if (!empty($activeFilters['maxPrice'])): ?>
+                                    <input type="hidden" name="max_price" value="<?= htmlspecialchars($activeFilters['maxPrice']) ?>">
+                                <?php endif; ?>
+                                
                                 <button type="submit" name="order_by" value="recommended" class="sort-option">Recommended order</button>
                                 <button type="submit" name="order_by" value="date" class="sort-option active">Newest</button>
                                 <button type="submit" name="order_by" value="ending_soonest" class="sort-option">Ending Soonest</button>
