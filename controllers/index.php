@@ -13,7 +13,7 @@ $ordering = Request::get('order_by', 'ending_soonest');
 // Handle page number, defaulting to page 1
 $curr_page = Request::get('page', 1);
 $auctionServ = DIContainer::get('auctionServ');
-$results_per_page = 20;
+$results_per_page = 16;
 
 $auctions = $auctionServ->getActiveAuctions($curr_page, $results_per_page, $ordering);
 $auctionServ->fillAuctionImagesInAuctions($auctions); // Fill in AuctionImages property

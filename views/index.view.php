@@ -113,25 +113,6 @@ require Utilities::basePath('views/partials/header.php');
 
             <!-- Main Content Area -->
             <div class="main-content-area">
-                <!-- Popular Categories -->
-                <?php if (!empty($popular_categories)): ?>
-                    <section class="popular-categories-section">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h4 class="section-title m-0">Popular categories</h4>
-                            <a href="/categories" class="btn btn-link text-decoration-none">View all</a>
-                        </div>
-                        <div class="horizontal-scroll-wrapper mb-3" style="">
-                            <?php foreach ($popular_categories as $index => $cat): ?>
-                                <a href="/category_view?id=<?= $cat->getCategoryId() ?>" class="category-card cat-color-<?= $index % 6 ?>">
-                                    <div class="cat-content">
-                                        <h4 class="cat-title"><?= htmlspecialchars($cat->getCategoryName()) ?></h4>
-                                    </div>
-                                </a>
-                            <?php endforeach; ?>
-                        </div>
-                    </section>
-                <?php endif; ?>
-
                 <!-- Processed Auctions -->
                 <div class="sort-container mb-3">
                     <div class="sort-dropdown">
@@ -197,6 +178,27 @@ require Utilities::basePath('views/partials/header.php');
                 </div>
 
                 <hr class="my-4">
+
+                <!-- Popular Categories -->
+                <?php if (!empty($popular_categories)): ?>
+                    <section class="popular-categories-section">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h4 class="section-title m-0">Popular categories</h4>
+                            <a href="/categories" class="btn btn-link text-decoration-none">View all</a>
+                        </div>
+                        <div class="horizontal-scroll-wrapper mb-3" style="">
+                            <?php foreach ($popular_categories as $index => $cat): ?>
+                                <a href="/category_view?id=<?= $cat->getCategoryId() ?>" class="category-card cat-color-<?= $index % 6 ?>">
+                                    <div class="cat-content">
+                                        <h4 class="cat-title"><?= htmlspecialchars($cat->getCategoryName()) ?></h4>
+                                    </div>
+                                </a>
+                            <?php endforeach; ?>
+                        </div>
+                    </section>
+                <?php endif; ?>
+
+                <hr class="my-2">
 
                 <!-- Pagination -->
                 <div class="pagination-container mt-5">
