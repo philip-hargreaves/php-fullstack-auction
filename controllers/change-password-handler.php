@@ -27,12 +27,12 @@ $data = [
 $result = $userService->changePassword($userId, $data);
 
 if ($result['success']) {
-    $_SESSION['account_success'] = 'Your password has been changed successfully.';
+    $_SESSION['account_success'] = $result['message'];
 
     header('Location: /account');
     exit;
 } else {
-    $_SESSION['account_errors'] = $result['errors'] ?? ['Failed to change password.'];
+    $_SESSION['account_errors'] = $result['errors'] ?? [$result['message']];
 }
 
 header('Location: /account');
