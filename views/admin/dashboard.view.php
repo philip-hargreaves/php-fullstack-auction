@@ -1,17 +1,22 @@
 <?php
 require \infrastructure\Utilities::basePath('views/partials/admin-header.php');
+
+use infrastructure\Request;
+
+// Get active tab from query parameter, default to 'dashboard'
+$activeTab = Request::get('tab', 'dashboard');
 ?>
 
 <div class="container my-5">
     <!-- Bootstrap Tabs -->
     <ul class="nav nav-tabs mb-4" id="adminTabs" role="tablist" style="border-bottom: 1px solid #3a3a3a;">
         <li class="nav-item" role="presentation">
-            <a class="nav-link active" id="dashboard-tab" data-toggle="tab" href="#dashboard" role="tab" aria-controls="dashboard" aria-selected="true" style="color: var(--color-text-primary);">
+            <a class="nav-link <?= $activeTab === 'dashboard' ? 'active' : '' ?>" id="dashboard-tab" data-toggle="tab" href="#dashboard" role="tab" aria-controls="dashboard" aria-selected="<?= $activeTab === 'dashboard' ? 'true' : 'false' ?>" style="color: var(--color-text-primary);">
                 <i class="fa fa-dashboard"></i> Dashboard
             </a>
         </li>
         <li class="nav-item" role="presentation">
-            <a class="nav-link" id="users-tab" data-toggle="tab" href="#users" role="tab" aria-controls="users" aria-selected="false" style="color: var(--color-text-primary);">
+            <a class="nav-link <?= $activeTab === 'users' ? 'active' : '' ?>" id="users-tab" data-toggle="tab" href="#users" role="tab" aria-controls="users" aria-selected="<?= $activeTab === 'users' ? 'true' : 'false' ?>" style="color: var(--color-text-primary);">
                 <i class="fa fa-users"></i> User Management
             </a>
         </li>
@@ -19,7 +24,7 @@ require \infrastructure\Utilities::basePath('views/partials/admin-header.php');
 
     <div class="tab-content" id="adminTabContent">
         <!-- Dashboard Tab -->
-        <div class="tab-pane fade show active" id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
+        <div class="tab-pane fade <?= $activeTab === 'dashboard' ? 'show active' : '' ?>" id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
             <h2 class="mb-4" style="color: var(--color-text-primary);">Website Statistics</h2>
             
             <div class="row mb-4">
@@ -94,7 +99,7 @@ require \infrastructure\Utilities::basePath('views/partials/admin-header.php');
         </div>
         
         <!-- User Management Tab -->
-        <div class="tab-pane fade" id="users" role="tabpanel" aria-labelledby="users-tab">
+        <div class="tab-pane fade <?= $activeTab === 'users' ? 'show active' : '' ?>" id="users" role="tabpanel" aria-labelledby="users-tab">
             <h2 class="mb-4" style="color: var(--color-text-primary);">User Management</h2>
             
             <!-- User Table -->
@@ -160,6 +165,8 @@ require \infrastructure\Utilities::basePath('views/partials/admin-header.php');
                                                 <form method="POST" action="/admin/user/update-status" style="display: inline; flex-shrink: 0;">
                                                     <input type="hidden" name="user_id" value="<?= htmlspecialchars($user->getUserId()) ?>">
                                                     <input type="hidden" name="is_active" value="<?= $user->isActive() ? '0' : '1' ?>">
+                                                    <input type="hidden" name="tab" value="users">
+                                                    <input type="hidden" name="page" value="<?= htmlspecialchars($curr_page) ?>">
                                                     <button type="submit" class="btn btn-sm <?= $user->isActive() ? 'btn-warning' : 'btn-success' ?>" style="white-space: nowrap;">
                                                         <?= $user->isActive() ? 'Deactivate' : 'Activate' ?>
                                                     </button>
@@ -187,6 +194,8 @@ require \infrastructure\Utilities::basePath('views/partials/admin-header.php');
                                                                     <input type="hidden" name="user_id" value="<?= htmlspecialchars($user->getUserId()) ?>">
                                                                     <input type="hidden" name="role_name" value="<?= htmlspecialchars($roleName) ?>">
                                                                     <input type="hidden" name="action" value="revoke">
+                                                                    <input type="hidden" name="tab" value="users">
+                                                                    <input type="hidden" name="page" value="<?= htmlspecialchars($curr_page) ?>">
                                                                     <button type="submit" class="dropdown-item text-danger" style="cursor: pointer; border: none; background: none; width: 100%; text-align: left; padding: 8px 16px; display: block;">
                                                                         <i class="fa fa-minus-circle"></i> Revoke <?= htmlspecialchars($roleName) ?>
                                                                     </button>
@@ -197,6 +206,8 @@ require \infrastructure\Utilities::basePath('views/partials/admin-header.php');
                                                                     <input type="hidden" name="user_id" value="<?= htmlspecialchars($user->getUserId()) ?>">
                                                                     <input type="hidden" name="role_name" value="<?= htmlspecialchars($roleName) ?>">
                                                                     <input type="hidden" name="action" value="assign">
+                                                                    <input type="hidden" name="tab" value="users">
+                                                                    <input type="hidden" name="page" value="<?= htmlspecialchars($curr_page) ?>">
                                                                     <button type="submit" class="dropdown-item text-success" style="cursor: pointer; border: none; background: none; width: 100%; text-align: left; padding: 8px 16px; display: block;">
                                                                         <i class="fa fa-plus-circle"></i> Assign <?= htmlspecialchars($roleName) ?>
                                                                     </button>
@@ -324,6 +335,19 @@ $(document).ready(function() {
                 'margin-bottom': ''
             });
         }
+    });
+    
+    // Handle tab clicks - update URL without reload
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+        var tabId = $(e.target).attr('href').substring(1); // Remove #
+        var newUrl = '/admin?tab=' + (tabId === 'dashboard' ? 'dashboard' : 'users');
+        // Preserve page parameter if on users tab
+        <?php if ($activeTab === 'users' && isset($curr_page)): ?>
+        if (tabId === 'users' && <?= $curr_page ?> > 1) {
+            newUrl += '&page=<?= $curr_page ?>';
+        }
+        <?php endif; ?>
+        window.history.pushState({}, '', newUrl);
     });
 });
 </script>

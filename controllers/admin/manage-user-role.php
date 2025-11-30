@@ -55,5 +55,18 @@ if ($result['success']) {
     $_SESSION['admin_error'] = $result['message'] ?? 'Failed to manage user role.';
 }
 
-header('Location: /admin');
+// Get tab and page from POST to preserve them
+$tab = Request::post('tab', 'dashboard');
+$page = Request::post('page', '1');
+
+// Build redirect URL with tab and page
+$redirectUrl = '/admin';
+if ($tab === 'users') {
+    $redirectUrl .= '?tab=users';
+    if ($page !== '1') {
+        $redirectUrl .= '&page=' . urlencode($page);
+    }
+}
+
+header('Location: ' . $redirectUrl);
 exit;

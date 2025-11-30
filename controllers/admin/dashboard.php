@@ -51,7 +51,10 @@ $stats = [
     'totalRevenue' => $bidService->getTotalRevenue(),
 ];
 
-// Build query string for pagination (preserve any future filters)
+// Get active tab from query parameter
+$activeTab = Request::get('tab', 'dashboard');
+
+// Build query string for pagination (preserve tab and any future filters)
 $querystring = "";
 foreach ($_GET as $key => $value) {
     if ($key != "page") {
@@ -63,6 +66,11 @@ foreach ($_GET as $key => $value) {
             $querystring .= htmlspecialchars($key) . "=" . htmlspecialchars($value) . "&amp;";
         }
     }
+}
+
+// Ensure tab parameter is in querystring if we're on users tab
+if ($activeTab === 'users' && strpos($querystring, 'tab=') === false) {
+    $querystring = 'tab=users&amp;' . $querystring;
 }
 
 require Utilities::basePath('views/admin/dashboard.view.php');
