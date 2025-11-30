@@ -5,6 +5,7 @@ use app\repositories\AuctionImageRepository;
 use app\repositories\AuctionRepository;
 use app\repositories\CategoryRepository;
 use app\repositories\ItemRepository;
+use app\services\CategoryService;
 use DateInterval;
 use infrastructure\Database;
 use app\models\Auction;
@@ -24,6 +25,7 @@ class AuctionService
     private BidService $bidService;
     private CategoryRepository $categoryRepo;
     private AuctionImageRepository $auctionImageRepo;
+    private CategoryService $categoryService;
 
     public function __construct(
         Database               $db,
@@ -33,7 +35,8 @@ class AuctionService
         ImageService           $imageService,
         BidService             $bidService,
         CategoryRepository     $categoryRepo,
-        AuctionImageRepository $auctionImageRepo
+        AuctionImageRepository $auctionImageRepo,
+        CategoryService        $categoryService
     )
     {
         $this->db = $db;
@@ -44,6 +47,7 @@ class AuctionService
         $this->bidService = $bidService;
         $this->categoryRepo = $categoryRepo;
         $this->auctionImageRepo = $auctionImageRepo;
+        $this->categoryService = $categoryService;
     }
 
     public function getByUserId(int $sellerId): array
@@ -557,12 +561,20 @@ class AuctionService
 
     private function extractFilters(array $filters): array
     {
+        $categoryId = $filters['categoryId'] ?? null;
+        
+        // If a category is selected, get all descendant category IDs (including children)
+        $categoryIds = null;
+        if ($categoryId !== null) {
+            $categoryIds = $this->categoryService->getAllDescendantIds($categoryId);
+        }
+        
         return [
             'statuses' => $filters['statuses'] ?? ['Active'],
             'conditions' => $filters['conditions'] ?? [],
             'minPrice' => $filters['minPrice'] ?? null,
             'maxPrice' => $filters['maxPrice'] ?? null,
-            'categoryId' => $filters['categoryId'] ?? null,
+            'categoryIds' => $categoryIds, // Changed to array of IDs
         ];
     }
 
@@ -579,7 +591,7 @@ class AuctionService
             $extracted['conditions'],
             $extracted['minPrice'],
             $extracted['maxPrice'],
-            $extracted['categoryId']
+            $extracted['categoryIds']
         );
     }
 
@@ -593,7 +605,7 @@ class AuctionService
             $extracted['conditions'],
             $extracted['minPrice'],
             $extracted['maxPrice'],
-            $extracted['categoryId']
+            $extracted['categoryIds']
         );
     }
 }
