@@ -26,15 +26,16 @@ class AuctionService
     private AuctionImageRepository $auctionImageRepo;
 
     public function __construct(
-        Database $db,
-        AuctionRepository $auctionRepo,
-        ItemRepository $itemRepo,
-        ItemService $itemService,
-        ImageService $imageService,
-        BidService $bidService,
-        CategoryRepository $categoryRepo,
+        Database               $db,
+        AuctionRepository      $auctionRepo,
+        ItemRepository         $itemRepo,
+        ItemService            $itemService,
+        ImageService           $imageService,
+        BidService             $bidService,
+        CategoryRepository     $categoryRepo,
         AuctionImageRepository $auctionImageRepo
-    ) {
+    )
+    {
         $this->db = $db;
         $this->auctionRepo = $auctionRepo;
         $this->itemRepo = $itemRepo;
@@ -45,22 +46,23 @@ class AuctionService
         $this->auctionImageRepo = $auctionImageRepo;
     }
 
-    public function getByUserId(int $sellerId): array {
-
+    public function getByUserId(int $sellerId): array
+    {
         return $this->auctionRepo->getBySellerId($sellerId);
     }
 
-    public function getWatchedByUserId(int $userId): array {
+    public function getWatchedByUserId(int $userId): array
+    {
         return $this->auctionRepo->getWatchedAuctionsByUserId($userId);
     }
 
-    public function getById(int $auctionId): ?Auction {
+    public function getById(int $auctionId): ?Auction
+    {
         return $this->auctionRepo->getById($auctionId);
     }
 
     public function createAuction(array $itemInput, array $auctionInput, array $imageInputs): array
     {
-
         $pdo = $this->db->connection;
         Utilities::beginTransaction($pdo);
 
@@ -92,7 +94,6 @@ class AuctionService
             }
 
             // Link Item & Save Images
-
             if (!$this->finalizeAuctionSetup($auction, $item, $imageInputs)) {
                 $pdo->rollBack();
                 return Utilities::creationResult("Failed to link item or save images.", false, null);
@@ -280,16 +281,16 @@ class AuctionService
         // Remove duplicates
         $categoryIds = array_unique($categoryIds);
 
-        // Fetch all Items in ONE query
+        // Fetch all Categories in ONE query
         $categories = $this->categoryRepo->getByIds($categoryIds);
 
-        // Re-key the Items array by ID for instant lookup
+        // Re-key the Categories array by ID for instant lookup
         $map = [];
         foreach ($categories as $category) {
             $map[$category->getCategoryId()] = $category;
         }
 
-        // Attach Items to Auctions
+        // Attach Categories to Auctions
         foreach ($auctions as $auction) {
             $categoryId = $auction->getCategoryId();
 
@@ -494,7 +495,7 @@ class AuctionService
             // Note: Creating a clone of $now to avoid modifying the original $now object
             $bufferTime = (clone $now)->sub(new DateInterval('PT1H'));
 
-            if ($start < $bufferTime && !($mode == 'update') ) {
+            if ($start < $bufferTime && !($mode == 'update')) {
                 return Utilities::creationResult("Auction start date cannot be in the past.", false, null);
             }
 
@@ -513,7 +514,7 @@ class AuctionService
 
             return Utilities::creationResult('', true, [
                 'start_datetime' => $start->format('Y-m-d H:i:s'),
-                'end_datetime'   => $end->format('Y-m-d H:i:s')
+                'end_datetime' => $end->format('Y-m-d H:i:s')
             ]);
 
         } catch (Exception $e) {
@@ -554,15 +555,45 @@ class AuctionService
         return null; // No errors
     }
 
-    public function getActiveListings(int $page = 1, int $perPage = 12, string $orderBy = 'ending_soonest'): array
+    private function extractFilters(array $filters): array
     {
-        $offset = ($page - 1) * $perPage;
-        return $this->auctionRepo->getByFilters($perPage, $offset, $orderBy);
+        return [
+            'statuses' => $filters['statuses'] ?? ['Active'],
+            'conditions' => $filters['conditions'] ?? [],
+            'minPrice' => $filters['minPrice'] ?? null,
+            'maxPrice' => $filters['maxPrice'] ?? null,
+            'categoryId' => $filters['categoryId'] ?? null,
+        ];
     }
 
-    // Count active auctions for pagination
-    public function countActiveListings(): int
+    public function getAuctions(int $page = 1, int $perPage = 12, string $orderBy = 'ending_soonest', array $filters = []): array
     {
-        return $this->auctionRepo->countByFilters();
+        $extracted = $this->extractFilters($filters);
+        $offset = ($page - 1) * $perPage;
+
+        return $this->auctionRepo->getByFilters(
+            $perPage,
+            $offset,
+            $orderBy,
+            $extracted['statuses'],
+            $extracted['conditions'],
+            $extracted['minPrice'],
+            $extracted['maxPrice'],
+            $extracted['categoryId']
+        );
+    }
+
+    // Count filtered auctions for pagination
+    public function countAuctions(array $filters = []): int
+    {
+        $extracted = $this->extractFilters($filters);
+
+        return $this->auctionRepo->countByFilters(
+            $extracted['statuses'],
+            $extracted['conditions'],
+            $extracted['minPrice'],
+            $extracted['maxPrice'],
+            $extracted['categoryId']
+        );
     }
 }
