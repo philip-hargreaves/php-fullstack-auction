@@ -6,6 +6,7 @@ use infrastructure\Database;
 use infrastructure\Utilities;
 use PDOException;
 
+// Data access for user
 class UserRepository
 {
     private Database $db;
@@ -26,7 +27,8 @@ class UserRepository
             $row['username'],
             $row['email'],
             $row['password'],
-            (bool)$row['is_active']
+            (bool)$row['is_active'],
+            $row['created_datetime'] ?? date('Y-m-d H:i:s')
         );
     }
 
@@ -78,7 +80,7 @@ class UserRepository
 
     public function getByEmail(string $email): ?User
     {
-        $sql = "SELECT u.id, u.username, u.email, u.password, u.is_active,
+        $sql = "SELECT u.id, u.username, u.email, u.password, u.is_active, u.created_datetime,
                        r.id AS role_id, r.role_name
                 FROM users u
                 LEFT JOIN user_roles ur ON u.id = ur.user_id
@@ -92,7 +94,7 @@ class UserRepository
 
     public function getByEmailOrUsername(string $emailOrUsername): ?User
     {
-        $sql = "SELECT u.id, u.username, u.email, u.password, u.is_active,
+        $sql = "SELECT u.id, u.username, u.email, u.password, u.is_active, u.created_datetime,
                        r.id AS role_id, r.role_name
                 FROM users u
                 LEFT JOIN user_roles ur ON u.id = ur.user_id
@@ -106,7 +108,7 @@ class UserRepository
 
     public function getById(int $userId): ?User
     {
-        $sql = "SELECT u.id, u.username, u.email, u.password, u.is_active,
+        $sql = "SELECT u.id, u.username, u.email, u.password, u.is_active, u.created_datetime,
                        r.id AS role_id, r.role_name
                 FROM users u
                 LEFT JOIN user_roles ur ON u.id = ur.user_id
@@ -148,47 +150,6 @@ class UserRepository
         } catch (PDOException $e) {
             // TODO: add logging
             return null;
-        }
-    }
-
-    public function updateAccount(int $userId, array $data): bool
-    {
-        try {
-            $sql = "UPDATE users 
-                    SET username = :username, email = :email 
-                    WHERE id = :id";
-            $params = [
-                'username' => $data['username'],
-                'email' => $data['email'],
-                'id' => $userId
-            ];
-
-            $stmt = $this->db->query($sql, $params);
-
-            return $stmt->rowCount() > 0;
-
-        } catch (PDOException $e) {
-            return false;
-        }
-    }
-
-    public function updatePassword(int $userId, string $newPasswordHash): bool
-    {
-        try {
-            $sql = "UPDATE users 
-                    SET password = :password 
-                    WHERE id = :id";
-            $params = [
-                'password' => $newPasswordHash,
-                'id' => $userId
-            ];
-
-            $stmt = $this->db->query($sql, $params);
-
-            return $stmt->rowCount() > 0;
-
-        } catch (PDOException $e) {
-            return false;
         }
     }
 
