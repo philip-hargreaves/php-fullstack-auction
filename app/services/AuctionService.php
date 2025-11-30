@@ -556,10 +556,12 @@ class AuctionService
 
     public function getActiveAuctions(int $page = 1, int $perPage = 12, string $orderBy = 'ending_soonest'): array
     {
-
         $offset = ($page - 1) * $perPage;
         if ($orderBy == 'recommended') {
-            return $this->auctionRepo->getRecommended(AuthService::getUserId(), $perPage, $offset);
+            return $this->auctionRepo->getRecommendedByUserIdAndFilter(
+                AuthService::getUserId(), $perPage, $offset, fallBackOrderBy: 'ending_soonest',
+                myLimit: 1000, similarUserLimit: 1000,
+                bidWeight: 5, watchlistWeight: 2);
         }
         return $this->auctionRepo->getByFilters($perPage, $offset, $orderBy);
     }

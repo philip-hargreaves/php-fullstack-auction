@@ -9,22 +9,15 @@ class RecommendationService {
         $this->auctionRepo = $auctionRepo;
     }
 
-    public function getRecommendedAuctions(?int $userId, int $requiredCount): array {
+    public function getRecommendedAuctions(?int $userId, int $requiredCount, int $offset = 0): array {
         if (is_null($userId)) {
-            $recommendedAuctions = $this->auctionRepo->getByFilters($requiredCount, 0, 'popularity');
+            $recommendedAuctions = $this->auctionRepo->getByFilters($requiredCount, 0, 'ending_soonest');
         } else {
-            $recommendedAuctions = $this->auctionRepo->getRecommendedAuctionsByUserId($userId, $requiredCount);
-
-            // If doesn't have enough, fill with popular auctions
-            if (Count($recommendedAuctions) < $requiredCount) {
-                $slotsToFill = $requiredCount - Count($recommendedAuctions);
-                $popularAuctions = $this->auctionRepo->getByFilters($slotsToFill, 0, 'popularity');
-                $recommendedAuctions = array_merge($recommendedAuctions, $popularAuctions);
-            }
+            $recommendedAuctions = $this->auctionRepo->getRecommendedByUserIdAndFilter(
+                $userId, $requiredCount, $offset,
+                myLimit: 30, similarUserLimit: 100,
+                bidWeight: 3, watchlistWeight: 1 );
         }
-
-
-
         return $recommendedAuctions;
     }
 }

@@ -32,22 +32,19 @@ $low_page_boost = max(2 - ($max_page - $curr_page), 0);
 $low_page = max(1, $curr_page - 2 - $low_page_boost);
 $high_page = min($max_page, $curr_page + 2 + $high_page_boost);
 
-
 // Process auctions for display
 $processed_auctions = proccessAuctions($auctions);
 
-// Process Recommended auctions
+// Process Recommended auctions for display
 $recommendationServ = DIContainer::get('recommendationServ');
 $authServ = DIContainer::get('authServ');
 $recommended_auctions = $recommendationServ->getRecommendedAuctions($authServ->getUserId(), 10);
 $auctionServ->fillAuctionImagesInAuctions($recommended_auctions);
 $processed_recommended_auctions = proccessAuctions($recommended_auctions);
 
-// Get popular categories
+// Get popular categories for display
 $categoryServ = DIContainer::get('categoryServ');
 $popular_categories = $categoryServ->getPopularCategories(10);
-
-
 
 function proccessAuctions(array $auctions): array {
     $processed_auctions = [];
@@ -101,7 +98,5 @@ function proccessAuctions(array $auctions): array {
     }
     return $processed_auctions;
 }
-
-
 
 require Utilities::basePath('views/index.view.php');

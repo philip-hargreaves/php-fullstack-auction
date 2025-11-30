@@ -228,25 +228,25 @@
 
 /* Add this to handle the space next to the sidebar */
 .main-content-area {
-    flex: 1;            /* Take up remaining space next to sidebar */
-    min-width: 0;       /* CRITICAL: This allows the div to be smaller than the scrollable content inside it */
-    width: 100%;        /* Ensure it fills available width */
+    flex: 1;
+    min-width: 0;
+    width: 100%;
     display: flex;
     flex-direction: column;
 }
 
 /* Ensure your sidebar doesn't get squashed */
 .filter-sidebar {
-    flex-shrink: 0;    /* Prevents sidebar from shrinking when content is wide */
-    width: 280px;      /* Adjust to your preference */
+    flex-shrink: 0;
+    width: 280px;
 }
 
 .horizontal-scroll-wrapper {
-    display: flex;         /* Lines items up in a row */
-    overflow-x: auto;      /* Enables the horizontal scroll */
-    gap: 20px;             /* Matches your gallery gap */
-    padding-bottom: 15px;  /* Space for the scrollbar/shadows */
-    width: 100%;           /* Constrain to parent width */
+    display: flex;
+    overflow-x: auto;
+    gap: 20px;
+    padding-bottom: 15px;
+    width: 100%;
 
     /* Smooth scrolling feel */
     -webkit-overflow-scrolling: touch;
@@ -275,14 +275,14 @@
 
 /* Target only cards inside the scroll wrapper */
 .horizontal-scroll-wrapper .auction-card {
-    flex: 0 0 200px;   /* Don't grow, Don't shrink, Fixed width 250px */
-    width: 200px;      /* Enforce width matches your main gallery columns */
-    height: 100%;      /* Ensure all cards in the row are same height */
+    flex: 0 0 200px;
+    width: 200px;
+    height: 100%;
 }
 
 /* Ensure the image container maintains aspect ratio inside the fixed card */
 .horizontal-scroll-wrapper .auction-image-container {
-    height: 200px;     /* Match width for 1:1 square */
+    height: 200px;
     width: 100%;
 }
 
@@ -295,11 +295,9 @@
 
 /* --- Category Card Adjustments --- */
 .category-card {
-    /* CRITICAL: Don't shrink, don't grow, fixed width */
     flex: 0 0 auto;
-    width: 170px; /* You can adjust this width */
+    width: 170px;
 
-    /* Keep previous styles */
     display: flex;
     justify-content: space-between;
     height: 70px;
@@ -311,10 +309,10 @@
 }
 
 .category-card:hover {
-    transform: translateY(-5px); /* Lift effect */
+    transform: translateY(-5px);
 }
 
-/* --- Colors (Same as before) --- */
+/* --- Colors --- */
 .cat-content { padding: 12px; }
 .cat-title { font-size: 1.1rem; font-weight: bold; margin: 0; }
 
