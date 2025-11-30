@@ -229,49 +229,62 @@ require Utilities::basePath('views/partials/header.php');
                     </div>
                 </div>
                 <div class="auction-gallery">
-                    <?php foreach ($processed_auctions as $auction):
-                        // Use image from database, or default placeholder
-                        $imageUrl = $auction['image_url'] ?? 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=300&h=300&fit=crop';
-                        ?>
-                    <div class="auction-card card h-100">
-                        <div class="auction-image-container">
-                            <a href="/auction?auction_id=<?= htmlspecialchars($auction['auction_id']) ?>">
-                                <img src="<?= htmlspecialchars($imageUrl) ?>" 
-                                     alt="<?= htmlspecialchars($auction['title']) ?>" 
-                                     class="auction-image card-img-top">
-                            </a>
+                    <?php if (empty($processed_auctions)): ?>
+                        <!-- No Results Message -->
+                        <div style="text-align: center; padding: 60px 20px; width: 100%; grid-column: 1 / -1;">
+                            <i class="fa fa-search" style="font-size: 64px; color: #ccc; margin-bottom: 20px;" aria-hidden="true"></i>
+                            <h3 style="color: #333; margin-bottom: 10px; font-weight: 600;">No auctions found</h3>
+                            <p style="color: #666; margin-bottom: 25px; font-size: 16px;">
+                                We couldn't find any auctions matching your filters. Please try adjusting your search criteria.
+                            </p>
+                            <a href="/" class="btn btn-primary">Clear All Filters</a>
                         </div>
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start mb-0">
-                                <div>
-                                    <h6 class="card-title mb-0">
-                                        <a href="/auction?auction_id=<?= htmlspecialchars($auction['auction_id']) ?>" class="text-decoration-none">
-                                            <?= htmlspecialchars($auction['title']) ?>
-                                        </a>
-                                    </h6>
-                                    <?php if (isset($auction['condition'])): ?>
-                                        <div class="auction-condition"><?= htmlspecialchars($auction['condition']) ?></div>
-                                    <?php endif; ?>
+                    <?php else: ?>
+                        <?php foreach ($processed_auctions as $auction):
+                            // Use image from database, or default placeholder
+                            $imageUrl = $auction['image_url'] ?? 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=300&h=300&fit=crop';
+                            ?>
+                        <div class="auction-card card h-100">
+                            <div class="auction-image-container">
+                                <a href="/auction?auction_id=<?= htmlspecialchars($auction['auction_id']) ?>">
+                                    <img src="<?= htmlspecialchars($imageUrl) ?>" 
+                                         alt="<?= htmlspecialchars($auction['title']) ?>" 
+                                         class="auction-image card-img-top">
+                                </a>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-0">
+                                    <div>
+                                        <h6 class="card-title mb-0">
+                                            <a href="/auction?auction_id=<?= htmlspecialchars($auction['auction_id']) ?>" class="text-decoration-none">
+                                                <?= htmlspecialchars($auction['title']) ?>
+                                            </a>
+                                        </h6>
+                                        <?php if (isset($auction['condition'])): ?>
+                                            <div class="auction-condition"><?= htmlspecialchars($auction['condition']) ?></div>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="auction-info">
+                                        <?= htmlspecialchars($auction['bid_text']) ?>
+                                    </div>
                                 </div>
-                                <div class="auction-info">
-                                    <?= htmlspecialchars($auction['bid_text']) ?>
+                                <div class="d-flex justify-content-between align-items-end">
+                                    <div class="auction-price">
+                                        <span class="price-amount">£<?= number_format($auction['current_price'], 2) ?></span>
+                                    </div>
+                                    <div class="auction-time">
+                                        <i class="fa fa-clock-o" aria-hidden="true"></i>
+                                        <span><?= htmlspecialchars($auction['time_remaining']) ?></span>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="d-flex justify-content-between align-items-end">
-                                <div class="auction-price">
-                                    <span class="price-amount">£<?= number_format($auction['current_price'], 2) ?></span>
-                                </div>
-                                <div class="auction-time">
-                                    <i class="fa fa-clock-o" aria-hidden="true"></i>
-                                    <span><?= htmlspecialchars($auction['time_remaining']) ?></span>
-                                </div>
-                            </div>
                         </div>
-                    </div>
-            <?php endforeach; ?>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </div>
                 
                 <!-- Pagination -->
+                <?php if (!empty($processed_auctions)): ?>
                 <div class="pagination-container mt-5">
         <nav aria-label="Search results pages">
             <ul class="pagination justify-content-center">
@@ -309,6 +322,7 @@ require Utilities::basePath('views/partials/header.php');
             </ul>
         </nav>
                 </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>
