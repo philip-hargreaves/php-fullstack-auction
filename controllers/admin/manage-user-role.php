@@ -1,0 +1,51 @@
+<?php
+
+use infrastructure\DIContainer;
+use infrastructure\Request;
+
+$requirePost = true;
+require __DIR__ . '/require-admin.php';
+
+// Get form data
+$targetUserId = Request::post('user_id');
+$roleName = Request::post('role_name');
+$action = Request::post('action'); // 'assign' or 'revoke'
+
+// Validate input
+if (empty($targetUserId) || !filter_var($targetUserId, FILTER_VALIDATE_INT)) {
+    $_SESSION['admin_error'] = 'Invalid user ID.';
+    header('Location: /admin');
+    exit;
+}
+
+if (empty($roleName)) {
+    $_SESSION['admin_error'] = 'Role name is required.';
+    header('Location: /admin');
+    exit;
+}
+
+if (empty($action) || !in_array($action, ['assign', 'revoke'], true)) {
+    $_SESSION['admin_error'] = 'Invalid action. Must be "assign" or "revoke".';
+    header('Location: /admin');
+    exit;
+}
+
+// Get service
+$userService = DIContainer::get('userServ');
+
+// Perform action
+if ($action === 'assign') {
+    $result = $userService->assignUserRole((int)$targetUserId, $roleName);
+} else {
+    // revoke
+    $result = $userService->revokeUserRole((int)$targetUserId, $roleName, $currentAdminId);
+}
+
+if ($result['success']) {
+    $_SESSION['admin_success'] = $result['message'];
+} else {
+    $_SESSION['admin_error'] = $result['message'] ?? 'Failed to manage user role.';
+}
+
+header('Location: /admin');
+exit;
