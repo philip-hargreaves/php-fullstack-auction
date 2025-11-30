@@ -395,31 +395,47 @@ class UserService
         }
     }
 
-    // Revoke a role from a user (for admin dashboard)
-    public function revokeUserRole(int $userId, string $roleName, ?int $currentAdminId = null): array
+    // Helper validation method
+    private function validateUserAndRole(int $userId, string $roleName): array
     {
         // Validate user ID
         if (!filter_var($userId, FILTER_VALIDATE_INT) || $userId <= 0) {
-            return Utilities::creationResult('Invalid user ID.', false, null);
+            return ['error' => Utilities::creationResult('Invalid user ID.', false, null)];
         }
 
         // Validate role name
         $roleName = trim($roleName);
         if ($roleName === '') {
-            return Utilities::creationResult('Role name is required.', false, null);
+            return ['error' => Utilities::creationResult('Role name is required.', false, null)];
         }
 
         // Check if user exists
         $user = $this->userRepository->getById($userId);
         if ($user === null) {
-            return Utilities::creationResult('User not found.', false, null);
+            return ['error' => Utilities::creationResult('User not found.', false, null)];
         }
 
         // Check if role exists
         $role = $this->roleRepository->getByName($roleName);
         if ($role === null) {
-            return Utilities::creationResult('Role not found.', false, null);
+            return ['error' => Utilities::creationResult('Role not found.', false, null)];
         }
+
+        return ['user' => $user, 'role' => $role, 'roleName' => $roleName];
+    }
+
+    // Revoke a role from a user (for admin dashboard)
+    public function revokeUserRole(int $userId, string $roleName, ?int $currentAdminId = null): array
+    {
+        // Validate user and role
+        $validation = $this->validateUserAndRole($userId, $roleName);
+        if (isset($validation['error'])) {
+            return $validation['error'];
+        }
+
+        $user = $validation['user'];
+        $role = $validation['role'];
+        $roleName = $validation['roleName'];
 
         // Check if user has the role
         if (!$user->hasRoles($roleName)) {
@@ -454,28 +470,15 @@ class UserService
     // Assign a role to a user (for admin dashboard)
     public function assignUserRole(int $userId, string $roleName): array
     {
-        // Validate user ID
-        if (!filter_var($userId, FILTER_VALIDATE_INT) || $userId <= 0) {
-            return Utilities::creationResult('Invalid user ID.', false, null);
+        // Validate user and role
+        $validation = $this->validateUserAndRole($userId, $roleName);
+        if (isset($validation['error'])) {
+            return $validation['error'];
         }
 
-        // Validate role name
-        $roleName = trim($roleName);
-        if ($roleName === '') {
-            return Utilities::creationResult('Role name is required.', false, null);
-        }
-
-        // Check if user exists
-        $user = $this->userRepository->getById($userId);
-        if ($user === null) {
-            return Utilities::creationResult('User not found.', false, null);
-        }
-
-        // Check if role exists
-        $role = $this->roleRepository->getByName($roleName);
-        if ($role === null) {
-            return Utilities::creationResult('Role not found.', false, null);
-        }
+        $user = $validation['user'];
+        $role = $validation['role'];
+        $roleName = $validation['roleName'];
 
         // Check if user already has the role
         if ($user->hasRoles($roleName)) {
