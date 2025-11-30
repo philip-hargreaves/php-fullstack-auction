@@ -89,7 +89,7 @@ $activeTab = Request::get('tab', 'dashboard');
                 <div class="col-md-4 mb-3">
                     <div class="card" style="background-color: var(--color-background-primary); border: 1px solid #3a3a3a;">
                         <div class="card-body text-center">
-                            <i class="fa fa-pound fa-3x mb-3" style="color: #ffc107;"></i>
+                            <i class="fa fa-money fa-3x mb-3" style="color: #ffc107;"></i>
                             <h3 style="color: var(--color-text-primary); font-size: 2.5rem; font-weight: bold;">£<?= number_format($stats['totalRevenue'], 2) ?></h3>
                             <p class="mb-0" style="color: var(--color-text-secondary); font-size: 1.1rem;">Total Revenue</p>
                         </div>
