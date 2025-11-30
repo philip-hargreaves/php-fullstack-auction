@@ -87,24 +87,47 @@ $isAdmin = AuthService::hasRole('admin');
             bottom: 100% !important;
             margin-bottom: 0.125rem;
         }
+        /* Bootstrap tabs styling for admin dashboard */
+        .nav-tabs {
+            border-bottom: 1px solid #3a3a3a !important;
+        }
+        .nav-tabs .nav-link {
+            color: var(--color-text-secondary) !important;
+            border: 1px solid transparent !important;
+            border-top-left-radius: 0.25rem !important;
+            border-top-right-radius: 0.25rem !important;
+        }
+        .nav-tabs .nav-link:hover {
+            border-color: #3a3a3a #3a3a3a #3a3a3a !important;
+            color: var(--color-text-primary) !important;
+        }
+        .nav-tabs .nav-link.active {
+            color: var(--color-text-primary) !important;
+            background-color: var(--color-background-primary) !important;
+            border-color: #3a3a3a #3a3a3a var(--color-background-primary) !important;
+        }
     </style>
 </head>
 <body>
 
 <!-- Admin Navigation Bar -->
 <header class="page-header">
-    <div class="navigation-top">
-        <!-- Left Section: Admin Branding (no link) -->
-        <div class="left-section">
+    <div class="navigation-top" style="display: flex; justify-content: space-between; align-items: center; position: relative;">
+        <!-- Left Section: Logo (non-clickable) -->
+        <div class="left-section" style="flex: 0 0 auto;">
             <div class="logo-link" style="cursor: default; pointer-events: none; display: flex; align-items: center;">
                 <i class="fa fa-cube logo-icon"></i>
                 <span class="logo-text">auctivity</span>
-                <span style="margin-left: 24px; color: var(--color-text-primary); font-size: 24px; font-weight: 600;">Admin Dashboard</span>
             </div>
         </div>
-
-        <!-- Right Section: Admin Tools Only -->
-        <div class="right-section">
+        
+        <!-- Center Section: Admin Dashboard Title (absolutely centered) -->
+        <div class="center-section" style="position: absolute; left: 50%; transform: translateX(-50%);">
+            <span style="color: var(--color-text-primary); font-size: 24px; font-weight: 600;">Admin Dashboard</span>
+        </div>
+        
+        <!-- Right Section: Logout -->
+        <div class="right-section" style="flex: 0 0 auto; margin-left: auto;">
             <?php if ($isLoggedIn && $isAdmin): ?>
                 <a href="/logout" class="nav-button" style="color: var(--color-text-primary) !important; text-decoration: none !important;">Logout</a>
             <?php endif; ?>

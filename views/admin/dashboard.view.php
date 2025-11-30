@@ -3,10 +3,101 @@ require \infrastructure\Utilities::basePath('views/partials/admin-header.php');
 ?>
 
 <div class="container my-5">
-    <h1 class="page-title">User Management</h1>
-    
+    <!-- Bootstrap Tabs -->
+    <ul class="nav nav-tabs mb-4" id="adminTabs" role="tablist" style="border-bottom: 1px solid #3a3a3a;">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link active" id="dashboard-tab" data-toggle="tab" href="#dashboard" role="tab" aria-controls="dashboard" aria-selected="true" style="color: var(--color-text-primary);">
+                <i class="fa fa-dashboard"></i> Dashboard
+            </a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" id="users-tab" data-toggle="tab" href="#users" role="tab" aria-controls="users" aria-selected="false" style="color: var(--color-text-primary);">
+                <i class="fa fa-users"></i> User Management
+            </a>
+        </li>
+    </ul>
 
-    <!-- User Table -->
+    <div class="tab-content" id="adminTabContent">
+        <!-- Dashboard Tab -->
+        <div class="tab-pane fade show active" id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
+            <h2 class="mb-4" style="color: var(--color-text-primary);">Website Statistics</h2>
+            
+            <div class="row mb-4">
+                <!-- Total Users -->
+                <div class="col-md-4 mb-3">
+                    <div class="card" style="background-color: var(--color-background-primary); border: 1px solid #3a3a3a;">
+                        <div class="card-body text-center">
+                            <i class="fa fa-users fa-3x mb-3" style="color: var(--color-auctivity-red);"></i>
+                            <h3 style="color: var(--color-text-primary); font-size: 2.5rem; font-weight: bold;"><?= number_format($stats['totalUsers']) ?></h3>
+                            <p class="mb-0" style="color: var(--color-text-secondary); font-size: 1.1rem;">Total Users</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Total Auctions -->
+                <div class="col-md-4 mb-3">
+                    <div class="card" style="background-color: var(--color-background-primary); border: 1px solid #3a3a3a;">
+                        <div class="card-body text-center">
+                            <i class="fa fa-gavel fa-3x mb-3" style="color: var(--color-auctivity-red);"></i>
+                            <h3 style="color: var(--color-text-primary); font-size: 2.5rem; font-weight: bold;"><?= number_format($stats['totalAuctions']) ?></h3>
+                            <p class="mb-0" style="color: var(--color-text-secondary); font-size: 1.1rem;">Total Auctions</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Active Auctions -->
+                <div class="col-md-4 mb-3">
+                    <div class="card" style="background-color: var(--color-background-primary); border: 1px solid #3a3a3a;">
+                        <div class="card-body text-center">
+                            <i class="fa fa-clock-o fa-3x mb-3" style="color: #28a745;"></i>
+                            <h3 style="color: var(--color-text-primary); font-size: 2.5rem; font-weight: bold;"><?= number_format($stats['activeAuctions']) ?></h3>
+                            <p class="mb-0" style="color: var(--color-text-secondary); font-size: 1.1rem;">Active Auctions</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-4">
+                <!-- Sold Auctions -->
+                <div class="col-md-4 mb-3">
+                    <div class="card" style="background-color: var(--color-background-primary); border: 1px solid #3a3a3a;">
+                        <div class="card-body text-center">
+                            <i class="fa fa-check-circle fa-3x mb-3" style="color: #28a745;"></i>
+                            <h3 style="color: var(--color-text-primary); font-size: 2.5rem; font-weight: bold;"><?= number_format($stats['soldAuctions']) ?></h3>
+                            <p class="mb-0" style="color: var(--color-text-secondary); font-size: 1.1rem;">Sold Auctions</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Total Bids -->
+                <div class="col-md-4 mb-3">
+                    <div class="card" style="background-color: var(--color-background-primary); border: 1px solid #3a3a3a;">
+                        <div class="card-body text-center">
+                            <i class="fa fa-hand-pointer-o fa-3x mb-3" style="color: var(--color-auctivity-red);"></i>
+                            <h3 style="color: var(--color-text-primary); font-size: 2.5rem; font-weight: bold;"><?= number_format($stats['totalBids']) ?></h3>
+                            <p class="mb-0" style="color: var(--color-text-secondary); font-size: 1.1rem;">Total Bids</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Total Revenue -->
+                <div class="col-md-4 mb-3">
+                    <div class="card" style="background-color: var(--color-background-primary); border: 1px solid #3a3a3a;">
+                        <div class="card-body text-center">
+                            <i class="fa fa-pound fa-3x mb-3" style="color: #ffc107;"></i>
+                            <h3 style="color: var(--color-text-primary); font-size: 2.5rem; font-weight: bold;">£<?= number_format($stats['totalRevenue'], 2) ?></h3>
+                            <p class="mb-0" style="color: var(--color-text-secondary); font-size: 1.1rem;">Total Revenue</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- User Management Tab -->
+        <div class="tab-pane fade" id="users" role="tabpanel" aria-labelledby="users-tab">
+            <h2 class="mb-4" style="color: var(--color-text-primary);">User Management</h2>
+            
+            <!-- User Table -->
     <?php if (empty($users)): ?>
         <div class="alert alert-info mt-4">
             No users found.
@@ -176,6 +267,8 @@ require \infrastructure\Utilities::basePath('views/partials/admin-header.php');
             Showing <?= count($users) ?> of <?= $total ?> users (Page <?= $curr_page ?> of <?= $max_page ?>)
         </div>
     <?php endif; ?>
+        </div>
+    </div>
 </div>
 
 <?php

@@ -10,6 +10,8 @@ require __DIR__ . '/require-admin.php';
 // Get services
 $userService = DIContainer::get('userServ');
 $roleService = DIContainer::get('roleServ');
+$auctionService = DIContainer::get('auctionServ');
+$bidService = DIContainer::get('bidServ');
 
 // Pagination
 $curr_page = (int)Request::get('page', 1);
@@ -38,6 +40,16 @@ $curr_page = min(max(1, $curr_page), $max_page);
 $allRoles = array_filter($roleService->getAllRoles(), function($role) {
     return $role->getName() !== 'admin';
 });
+
+// Get stats for dashboard
+$stats = [
+    'totalUsers' => $userService->countAll(),
+    'totalAuctions' => $auctionService->countAll(),
+    'activeAuctions' => $auctionService->countByStatus('Active'),
+    'soldAuctions' => $auctionService->countByStatus('Finished', true), // Finished with winning_bid_id
+    'totalBids' => $bidService->countAll(),
+    'totalRevenue' => $bidService->getTotalRevenue(),
+];
 
 // Build query string for pagination (preserve any future filters)
 $querystring = "";

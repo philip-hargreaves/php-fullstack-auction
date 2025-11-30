@@ -318,6 +318,13 @@ class UserService
         }
     }
 
+
+    // Count all users
+    public function countAll(): int
+    {
+        return $this->userRepository->countAll();
+    }
+
     // Get all users with pagination (for admin dashboard)
     public function getAllUsers(int $limit = 50, int $offset = 0): array
     {
