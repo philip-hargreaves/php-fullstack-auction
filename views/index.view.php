@@ -44,12 +44,12 @@ require Utilities::basePath('views/partials/header.php');
 
                                 <!-- Level 2: Subcategories (dynamically populated) -->
                                 <select class="filter-select category-level" id="categoryLevel2" data-level="2" style="display: none; margin-top: 8px;">
-                                    <option value="">-- Select Subcategory --</option>
+                                    <option value="">-- Subcategory --</option>
                                 </select>
 
                                 <!-- Level 3: Sub-subcategories (dynamically populated) -->
                                 <select class="filter-select category-level" id="categoryLevel3" data-level="3" style="display: none; margin-top: 8px;">
-                                    <option value="">-- Select Subcategory --</option>
+                                    <option value="">-- Subcategory --</option>
                                 </select>
 
                                 <!-- Hidden field for final category ID -->
@@ -191,7 +191,7 @@ require Utilities::basePath('views/partials/header.php');
                                         <?php endif; ?>
                                     <?php endforeach; ?>
                                 <?php endif;
-
+                                
                                 // Preserve status filters - use filter flags to determine which checkboxes were selected
                                 if (in_array('Active', $activeFilters['statuses'])): ?>
                                     <input type="hidden" name="auction_status[]" value="active">
@@ -438,7 +438,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!select) return;
             
             // Clear existing options except first
-            select.innerHTML = '<option value="">-- Select Subcategory --</option>';
+            select.innerHTML = '<option value="">-- Subcategory --</option>';
             
             if (!categoryId) {
                 select.style.display = 'none';
@@ -447,7 +447,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const lowerSelect = document.getElementById('categoryLevel' + i);
                     if (lowerSelect) {
                         lowerSelect.style.display = 'none';
-                        lowerSelect.innerHTML = '<option value="">-- Select Subcategory --</option>';
+                        lowerSelect.innerHTML = '<option value="">-- Subcategory --</option>';
                     }
                 }
                 return;
