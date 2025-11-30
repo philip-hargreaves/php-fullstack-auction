@@ -309,7 +309,7 @@ require Utilities::basePath('views/partials/header.php');
             <?php endfor; ?>
 
             <!-- Next Button -->
-            <?php if ($curr_page != $max_page) : ?>
+            <?php if ($curr_page < $max_page && $num_results > 0) : ?>
                 <li class="page-item">
                     <a class="page-link" href="/?<?php echo $querystring; ?>page=<?php echo $curr_page + 1; ?>" aria-label="Next">
                         <span aria-hidden="true"><i class="fa fa-arrow-right"></i></span>

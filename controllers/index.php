@@ -13,7 +13,7 @@ $minPrice = Request::get('min_price', null);
 $maxPrice = Request::get('max_price', null);
 $categoryId = Request::get('category', null);
 
-// Read condition from form
+// Read condition from form (checkboxes with name="item_condition_id[]")
 $conditionInputs = isset($_GET['item_condition_id']) && is_array($_GET['item_condition_id']) ? $_GET['item_condition_id'] : [];
 
 // Map form values to database values: new -> New, like_new -> Like New, used -> Used
@@ -32,10 +32,10 @@ foreach ($conditionInputs as $condition) {
     }
 }
 
-// Read auction_status from form
+// Read auction_status from form (checkboxes with name="auction_status[]")
 $statusInputs = isset($_GET['auction_status']) && is_array($_GET['auction_status']) ? $_GET['auction_status'] : [];
 
-// Map form values to database values
+// Map form values to database values: active -> Active, completed -> Finished (all finished auctions), sold -> Finished (with winning bid only)
 $statuses = [];
 $soldFilter = false;
 $completedFilter = false;
@@ -91,16 +91,15 @@ if (!empty($filters['categoryId'])) {
     }
 }
 
-// Handle page number, defaulting to page 1
+// Pagination
 $curr_page = (int)Request::get('page', 1);
 $results_per_page = 12;
-
+$num_results = $auctionServ->countAuctions($filters);
+$max_page = max(1, ceil($num_results / $results_per_page));
+$curr_page = min(max(1, $curr_page), $max_page);
 $auctions = $auctionServ->getAuctions($curr_page, $results_per_page, $ordering, $filters);
 $auctionServ->fillAuctionImagesInAuctions($auctions);
-$num_results = $auctionServ->countAuctions($filters);
-$max_page = ceil($num_results / $results_per_page);
 
-// Pagination
 $querystring = "";
 foreach ($_GET as $key => $value) {
     if ($key != "page") {
