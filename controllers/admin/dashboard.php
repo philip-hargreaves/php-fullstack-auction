@@ -34,8 +34,10 @@ if (!$result['success']) {
 $max_page = max(1, ceil($total / $results_per_page));
 $curr_page = min(max(1, $curr_page), $max_page);
 
-// Get all roles for role management dropdown
-$allRoles = $roleService->getAllRoles();
+// Get all roles for role management dropdown (exclude admin - only buyer and seller can be assigned)
+$allRoles = array_filter($roleService->getAllRoles(), function($role) {
+    return $role->getName() !== 'admin';
+});
 
 // Build query string for pagination (preserve any future filters)
 $querystring = "";

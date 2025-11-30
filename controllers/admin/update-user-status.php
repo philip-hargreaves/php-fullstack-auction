@@ -20,8 +20,18 @@ if (empty($targetUserId) || !filter_var($targetUserId, FILTER_VALIDATE_INT)) {
 // Convert is_active to boolean
 $isActiveBool = ($isActive === '1' || $isActive === 'true' || $isActive === true);
 
-// Get service and update status
+// Get service and check if target user is admin
 $userService = DIContainer::get('userServ');
+$targetUser = $userService->getUserAccount((int)$targetUserId);
+
+// Prevent modifying admin users
+if ($targetUser !== null && $targetUser->isAdmin()) {
+    $_SESSION['admin_error'] = 'Admin accounts cannot be modified.';
+    header('Location: /admin');
+    exit;
+}
+
+// Update status
 $result = $userService->updateUserActiveStatus((int)$targetUserId, $isActiveBool, $currentAdminId);
 
 if ($result['success']) {

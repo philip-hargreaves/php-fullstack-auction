@@ -419,25 +419,6 @@ class UserService
             return Utilities::creationResult("User does not have the '{$roleName}' role.", false, null);
         }
 
-        // Prevent admin from revoking their own admin role
-        if ($currentAdminId !== null && $userId === $currentAdminId && $roleName === 'admin') {
-            return Utilities::creationResult('You cannot revoke your own admin role.', false, null);
-        }
-
-        // Prevent revoking last admin role
-        if ($roleName === 'admin') {
-            $allUsers = $this->userRepository->getAllWithRoles(1000, 0);
-            $adminCount = 0;
-            foreach ($allUsers as $u) {
-                if ($u->isAdmin() && $u->isActive()) {
-                    $adminCount++;
-                }
-            }
-            if ($adminCount <= 1) {
-                return Utilities::creationResult('Cannot revoke the last admin role.', false, null);
-            }
-        }
-
         // Get the DB connection
         $pdo = $this->db->connection;
 

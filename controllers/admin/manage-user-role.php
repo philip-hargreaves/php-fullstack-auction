@@ -30,8 +30,16 @@ if (empty($action) || !in_array($action, ['assign', 'revoke'], true)) {
     exit;
 }
 
-// Get service
+// Get service and check if target user is admin
 $userService = DIContainer::get('userServ');
+$targetUser = $userService->getUserAccount((int)$targetUserId);
+
+// Prevent modifying admin users
+if ($targetUser !== null && $targetUser->isAdmin()) {
+    $_SESSION['admin_error'] = 'Admin accounts cannot be modified.';
+    header('Location: /admin');
+    exit;
+}
 
 // Perform action
 if ($action === 'assign') {
