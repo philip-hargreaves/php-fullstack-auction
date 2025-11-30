@@ -292,7 +292,9 @@ use infrastructure\DIContainer;
                     <tr>
                         <td class="text">Seller</td>
                         <td class="text-end fw-bold text-danger">
-                            <?= htmlspecialchars($sellerName) ?>
+                            <a href="/account?user_id=<?= htmlspecialchars($auction->getItem()->getSellerId()) ?>">
+                                <?= htmlspecialchars($sellerName) ?>
+                            </a>
                         </td>
                     </tr>
 

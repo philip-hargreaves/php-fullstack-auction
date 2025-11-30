@@ -65,6 +65,18 @@ class AuctionService
         return $this->auctionRepo->getById($auctionId);
     }
 
+    public function getActiveAuctionsByUserId(int $sellerId): array {
+        $auctions = $this->auctionRepo->getActiveAuctionsBySellerId($sellerId);
+
+        foreach ($auctions as $auction) {
+            $highestBid = $this->bidService->getHighestBidAmountByAuctionId($auction->getAuctionId());
+            $currentPrice = $highestBid > 0 ? $highestBid : $auction->getStartingPrice();
+            $auction->setCurrentPrice($currentPrice);
+        }
+
+        return $auctions;
+    }
+
     public function createAuction(array $itemInput, array $auctionInput, array $imageInputs): array
     {
         $pdo = $this->db->connection;

@@ -72,7 +72,7 @@ $isSeller = AuthService::hasRole('seller');
         <!-- Middle Section: Navigation Tabs (only when logged in) -->
         <?php if ($isLoggedIn): ?>
         <div class="middle-section">
-            <?php if ($isBuyer): ?>
+            <?php if ($isBuyer || $isSeller): ?>
                 <a href="/my-bids" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/my-bids') !== false ? 'active' : '' ?>">My Bids</a>
                 <a href="/watchlist" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/watchlist') !== false ? 'active' : '' ?>">Watchlist</a>
             <?php endif; ?>
