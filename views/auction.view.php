@@ -85,13 +85,13 @@ use infrastructure\DIContainer;
     <!-- Image Gallery + Auction Information -->
     <div class="row justify-content-center">
         <!-- Image Gallery -->
-        <div class="col-12 col-md-7 mb-4" style="max-width: 600px;">
+        <div class="col-12 col-md-7 mb-4"">
 
             <?php
             $defaultPath = "/images/default_item_image.jpg";
             $firstImage = !empty($imageUrls[0]) ? $imageUrls[0] : $defaultPath;
             ?>
-            <div id="image-gallery" class="gallery-container mb-2 border rounded bg-transparent" style="height: 400px; overflow: hidden;">
+            <div id="image-gallery" class="gallery-container mb-2 border rounded bg-transparent" style="max-width: 600px; height: 400px; overflow: hidden;">
                 <img src="<?= htmlspecialchars($firstImage) ?>"
                      alt="<?= htmlspecialchars($title) ?>"
                      class="d-block w-100 h-100"
@@ -127,7 +127,7 @@ use infrastructure\DIContainer;
             <?php endif; ?>
         </div>
         <!-- Auction Information -->
-        <div class="col-12 col-md-5 mx-auto">
+        <div class="col-12 col-md-5">
 
             <!-- Auction Content -->
             <div class="card bg-light p-3 mb-3">
