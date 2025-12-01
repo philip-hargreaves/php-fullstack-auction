@@ -169,18 +169,18 @@ class BidService
 
             $this->fillAuctionsInBids([$bid]);
             $auction = $bid->getAuction();
-            if ($bid->getBidAmount() > $auction->getReservePrice()) {
+            if ($auction->getReservePrice() !== null && $bid->getBidAmount() >= $auction->getReservePrice()) {
                 $auction->setWinningBidId($bid->getBidId());
                 $auction->setAuctionStatus('Finished');
                 $result = $this->auctionRepo->endSoldAuction($auction);
 
                 if ($result) {
+                    // Failed to end auction - rollback bid creation
                     $pdo->rollBack();
                     return Utilities::creationResult('Failed to create bid.', false, null);
-                } else {
-                    $pdo->commit();
-                    return Utilities::creationResult('Congratulation! You won the auction by meeting the reserve price!', true, $creationResult['object']);
                 }
+                $pdo->commit();
+                return Utilities::creationResult('Congratulation! You won the auction by meeting the reserve price!', true, $creationResult['object']);
             }
 
             // Insertion Succeed -> Commit Transaction
