@@ -249,13 +249,13 @@ $activeTab = Request::get('tab', 'dashboard');
                         $low_page = max(1, $curr_page - 2);
                         $high_page = min($max_page, $curr_page + 2);
                         for ($i = $low_page; $i <= $high_page; $i++):
-                        ?>
+                            ?>
                             <?php if ($i == $curr_page): ?>
-                                <li class="page-item active">
-                            <?php else: ?>
-                                <li class="page-item">
-                            <?php endif; ?>
-                                <a class="page-link" href="/admin?<?= htmlspecialchars($querystring) ?>page=<?= $i ?>"><?= $i ?></a>
+                            <li class="page-item active">
+                        <?php else: ?>
+                            <li class="page-item">
+                        <?php endif; ?>
+                            <a class="page-link" href="/admin?<?= htmlspecialchars($querystring) ?>page=<?= $i ?>"><?= $i ?></a>
                             </li>
                         <?php endfor; ?>
 
@@ -289,6 +289,15 @@ require \infrastructure\Utilities::basePath('views/partials/footer.php');
 <script>
 // Fix dropdown behavior for role management
 $(document).ready(function() {
+    // Activate the correct tab on page load based on URL parameter
+    var urlParams = new URLSearchParams(window.location.search);
+    var tabParam = urlParams.get('tab');
+    if (tabParam === 'users') {
+        $('#users-tab').tab('show');
+    } else {
+        $('#dashboard-tab').tab('show');
+    }
+    
     // Prevent dropdown from closing when clicking on form buttons
     $('.dropdown-item-form').on('click', function(e) {
         e.stopPropagation();
@@ -342,11 +351,10 @@ $(document).ready(function() {
         var tabId = $(e.target).attr('href').substring(1); // Remove #
         var newUrl = '/admin?tab=' + (tabId === 'dashboard' ? 'dashboard' : 'users');
         // Preserve page parameter if on users tab
-        <?php if ($activeTab === 'users' && isset($curr_page)): ?>
-        if (tabId === 'users' && <?= $curr_page ?> > 1) {
-            newUrl += '&page=<?= $curr_page ?>';
+        var pageParam = urlParams.get('page');
+        if (tabId === 'users' && pageParam) {
+            newUrl += '&page=' + pageParam;
         }
-        <?php endif; ?>
         window.history.pushState({}, '', newUrl);
     });
 });

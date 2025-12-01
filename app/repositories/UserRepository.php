@@ -216,14 +216,31 @@ class UserRepository
     public function getAllWithRoles(int $limit = 50, int $offset = 0): array
     {
         try {
+            $sql = "SELECT u.id
+                    FROM users u
+                    ORDER BY u.created_datetime DESC
+                    LIMIT {$limit} OFFSET {$offset}";
+            $userRows = $this->db->query($sql, [])->fetchAll();
+            
+            if (empty($userRows)) {
+                return [];
+            }
+            
+            // Extract user IDs
+            $userIds = array_column($userRows, 'id');
+            $placeholders = implode(',', array_fill(0, count($userIds), '?'));
+            
+            // Fetch those users with their roles
             $sql = "SELECT u.id, u.username, u.email, u.password, u.is_active, u.created_datetime,
                            r.id AS role_id, r.role_name
                     FROM users u
                     LEFT JOIN user_roles ur ON u.id = ur.user_id
                     LEFT JOIN roles r       ON ur.role_id = r.id
-                    ORDER BY u.created_datetime DESC
-                    LIMIT {$limit} OFFSET {$offset}";
-            $params = [];
+                    WHERE u.id IN ({$placeholders})
+                    ORDER BY FIELD(u.id, {$placeholders}), u.created_datetime DESC";
+            
+            // Duplicate user IDs for FIELD() ordering
+            $params = array_merge($userIds, $userIds);
             $rows = $this->db->query($sql, $params)->fetchAll();
 
             return $this->hydrateManyWithRoles($rows);
