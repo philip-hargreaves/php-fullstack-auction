@@ -307,6 +307,8 @@ class BidService
     {
         $allBids = $this->bidRepo->getByUserId($userId);
 
+        $this->fillAuctionsInBids($allBids);
+
         $uniqueBids = [];
         $groupedBids = [];
 
@@ -350,6 +352,11 @@ class BidService
     public function getTotalRevenue(): float
     {
         return $this->bidRepo->getTotalRevenue();
+    }
+
+    public function countBidsByAuctionId(int $auctionId): int
+    {
+        return $this->bidRepo->countByAuctionId($auctionId);
     }
 
     // --- FILL RELATIONSHIP PROPERTIES FUNCTION ---
@@ -399,6 +406,7 @@ class BidService
 
         // Fetch Auctions (1 Query)
         $auctions = $this->auctionRepo->getByIds($auctionIds);
+        $this->fillItemsInAuctions($auctions);
 
         // Map ID => Auction Object
         $auctionMap = [];
@@ -411,6 +419,67 @@ class BidService
             $aucId = $bid->getAuctionId();
             if (isset($auctionMap[$aucId])) {
                 $bid->setAuction($auctionMap[$aucId]);
+            }
+        }
+    }
+
+    private function fillItemsInAuctions(array $auctions): void
+    {
+        if (empty($auctions)) return;
+
+        $itemIds = [];
+        foreach ($auctions as $auction) {
+            $itemIds[] = $auction->getItemId();
+        }
+        $itemIds = array_unique($itemIds);
+
+        if (empty($itemIds)) return;
+
+        $itemRepo = DIContainer::get('itemRepo');
+        $items = $itemRepo->getByIds($itemIds);
+
+        $itemMap = [];
+        foreach ($items as $item) {
+            $itemMap[$item->getItemId()] = $item;
+        }
+
+        foreach ($auctions as $auction) {
+            $itemId = $auction->getItemId();
+            if (isset($itemMap[$itemId])) {
+                $auction->setItem($itemMap[$itemId]);
+            }
+        }
+    }
+    private function fillItemsInBids(array $bids): void
+    {
+        if (empty($bids)) return;
+
+        $itemIds = [];
+        foreach ($bids as $bid) {
+            $auction = $bid->getAuction();
+            if ($auction) {
+                $itemIds[] = $auction->getItemId();
+            }
+        }
+        $itemIds = array_unique($itemIds);
+
+        if (empty($itemIds)) return;
+
+        $itemRepo = DIContainer::get('itemRepo');
+        $items = $itemRepo->getByIds($itemIds);
+
+        $itemMap = [];
+        foreach ($items as $item) {
+            $itemMap[$item->getItemId()] = $item;
+        }
+
+        foreach ($bids as $bid) {
+            $auction = $bid->getAuction();
+            if ($auction) {
+                $itemId = $auction->getItemId();
+                if (isset($itemMap[$itemId])) {
+                    $auction->setItem($itemMap[$itemId]);
+                }
             }
         }
     }

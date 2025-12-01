@@ -10,6 +10,7 @@ use app\repositories\BidRepository;
 use app\repositories\UserRoleRepository;
 use app\repositories\WatchlistRepository;
 use app\repositories\CategoryRepository;
+use app\repositories\RatingRepository;
 use app\repositories\MessageRepository;
 use app\services\BidService;
 use app\services\AuthService;
@@ -24,6 +25,7 @@ use infrastructure\Database;
 use infrastructure\DIContainer;
 use app\services\RoleService;
 use app\services\ItemService;
+use app\services\RatingService;
 use app\services\ChatroomService;
 
 // --- Build all objects and bind them to the App Container ---
@@ -67,6 +69,10 @@ DIContainer::bind('notificationRepo', new NotificationRepository(
 ));
 
 DIContainer::bind('categoryRepo', new CategoryRepository(
+    DIContainer::get('db')
+));
+
+DIContainer::bind('ratingRepo', new RatingRepository(
     DIContainer::get('db')
 ));
 
@@ -136,6 +142,11 @@ DIContainer::bind('auctionServ', new AuctionService(
 DIContainer::bind('watchlistServ', new WatchlistService(
     DIContainer::get('watchlistRepo'),
     DIContainer::get('auctionServ')));
+
+DIContainer::bind('ratingServ', new RatingService(
+    DIContainer::get('ratingRepo'),
+    DIContainer::get('auctionRepo'),
+    DIContainer::get('bidRepo')));
 
 DIContainer::bind('chatServ', new ChatroomService(
     DIContainer::get('messageRepo')));

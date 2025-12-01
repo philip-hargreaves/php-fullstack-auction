@@ -9,40 +9,64 @@
             <th>Current Highest</th>
             <th>Remaining Time</th>
             <th>Status</th>
+            <th>Action</th>
         </tr>
         </thead>
         <tbody>
         <?php foreach ($bids as $bid): ?>
             <?php
-            $auctionObj = $bid->getAuction();
-            if (!$auctionObj) continue;
+            $auction = $bid->getAuction();
+            if (!$auction) continue;
 
-            $auctionId = $bid->getAuctionId();
+            $item = $auction->getItem();
+            $auctionId = $auction->getAuctionId();
             $myBidAmount = $bid->getBidAmount();
-            $currentPrice = $auctionObj->getCurrentPrice();
-            $auctionStatus = $auctionObj->getAuctionStatus();
-            $isWinning = $myBidAmount >= $currentPrice;
 
-            if ($auctionStatus == 'Active') {
-                $statusBadge = $isWinning
-                    ? '<span class="badge bg-success">Winning</span>'
-                    : '<span class="badge bg-danger">Outbid</span>';
-            } elseif ($auctionStatus == 'Sold') {
-                $statusBadge = $isWinning
-                    ? '<span class="badge bg-success">Won</span>'
-                    : '<span class="badge bg-secondary">Lost</span>';
-            } else {
-                $statusBadge = '<span class="badge bg-secondary">' . htmlspecialchars($auctionStatus) . '</span>';
+            $itemName = $auction->getItemName() ?? ($item ? $item->getItemName() : '[Item Deleted]');
+
+            $itemLinkClass = 'text-danger';
+
+            if (!$item) {
+                $itemLinkClass = 'text-danger font-italic';
+                $itemName = '[Item Deleted]';
             }
+
+            $currentPrice = $auction->getCurrentPrice() ?? $auction->getStartingPrice();
+            $rawStatus = $auction->getAuctionStatus();
+            $isHighestBidder = ($myBidAmount >= $currentPrice);
+
+            $isSold = ($item && $item->isSold());
+
+            $statusBadge = '';
+            $displayStatus = $rawStatus;
+
+            if ($rawStatus === 'Active') {
+                $statusBadge = $isHighestBidder
+                        ? '<span class="badge bg-success">Winning</span>'
+                        : '<span class="badge bg-danger">Outbid</span>';
+            } elseif ($isSold) {
+                $statusBadge = $isHighestBidder
+                        ? '<span class="badge bg-success">Won</span>'
+                        : '<span class="badge bg-secondary">Lost</span>';
+            } else {
+                if ($rawStatus === 'Finished') {
+                    $displayStatus = 'Unsold';
+                }
+                $statusBadge = '<span class="badge bg-secondary">' . htmlspecialchars($displayStatus) . '</span>';
+            }
+
+            $canRate = ($isSold && $isHighestBidder);
 
             $historyCount = isset($groupedBids[$auctionId]) ? count($groupedBids[$auctionId]) : 0;
             ?>
             <tr>
                 <td>
-                    <a href="/auction?auction_id=<?= htmlspecialchars($auctionObj->getAuctionId()) ?>">
-                        <?= htmlspecialchars($auctionObj->getItemName() ?? '[Item Name Unavailable]') ?>
+                    <a href="/auction?auction_id=<?= htmlspecialchars($auctionId) ?>"
+                       class="text-decoration-none font-weight-bold <?= $itemLinkClass ?>">
+                        <?= htmlspecialchars($itemName) ?>
                     </a>
                 </td>
+
                 <td>
                     <div class="d-flex align-items-center">
                         <span class="font-weight-bold mr-2">£<?= number_format($myBidAmount, 2) ?></span>
@@ -55,19 +79,32 @@
                         <?php endif; ?>
                     </div>
                 </td>
-                <td>£<?= number_format($currentPrice, 2) ?></td>
+
+                <td>£<?= number_format((float)$currentPrice, 2) ?></td>
+
                 <td>
-                    <?php if ($auctionStatus == 'Active'): ?>
+                    <?php if ($rawStatus === 'Active'): ?>
                         <?php
-                        $now = new DateTime();
-                        $diff = $now->diff($auctionObj->getEndDateTime());
+                        $diff = (new DateTime())->diff($auction->getEndDateTime());
                         echo \infrastructure\Utilities::displayTimeRemaining($diff);
                         ?>
                     <?php else: ?>
-                        <?= $auctionObj->getEndDateTime()->format('j M, H:i') ?>
+                        <?= $auction->getEndDateTime()->format('j M, H:i') ?>
                     <?php endif; ?>
                 </td>
+
                 <td><?= $statusBadge ?></td>
+
+                <td>
+                    <?php if ($canRate): ?>
+                        <a href="/rate?auction_id=<?= htmlspecialchars($auctionId) ?>"
+                           class="btn btn-sm btn-danger text-white" style="font-weight: 500;">
+                            Rate Seller
+                        </a>
+                    <?php else: ?>
+                        <span class="text-muted small">—</span>
+                    <?php endif; ?>
+                </td>
             </tr>
         <?php endforeach; ?>
         </tbody>
