@@ -146,7 +146,8 @@ DIContainer::bind('watchlistServ', new WatchlistService(
 DIContainer::bind('ratingServ', new RatingService(
     DIContainer::get('ratingRepo'),
     DIContainer::get('auctionRepo'),
-    DIContainer::get('bidRepo')));
+    DIContainer::get('bidRepo'),
+    DIContainer::get('itemRepo')));
 
 DIContainer::bind('chatServ', new ChatroomService(
     DIContainer::get('messageRepo')));

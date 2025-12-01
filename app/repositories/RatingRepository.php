@@ -28,9 +28,9 @@ class RatingRepository
                 'comment'    => $comment
             ];
 
-            $this->db->query($sql, $params);
+            $stmt = $this->db->query($sql, $params);
 
-            return $this->db->connection->rowCount() > 0;
+            return $stmt->rowCount() > 0;
 
         } catch (PDOException $e) {
             return false;
