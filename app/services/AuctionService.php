@@ -128,14 +128,13 @@ class AuctionService
             $auctionId = $auction -> getAuctionId();
             $recipientId = $item -> getSellerId();
 
-            //test debug
             $notificationCreateResult = $this -> notificationService -> createNotification($auctionId, $recipientId, 'email', 'auctionCreated');
 
-            if (!$notificationCreateResult['success']) {
+            if (!$notificationCreateResult['success'])
+            {
                 $pdo->rollBack();
                 return $notificationCreateResult;
             }
-            //////////////////////////////////////////////////////
 
             $pdo->commit();
             return Utilities::creationResult("Auction created successfully!", true, $auction);
