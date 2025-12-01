@@ -10,12 +10,10 @@ $auctionMode = Request::get('auction_mode');
 $authServ = DIContainer::get('authServ');
 
 // Check if user is logged in
-if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
-    if (!$authServ->isLoggedIn()) {
-        $_SESSION['error_message'] = 'Please log in to create an auction.';
-        header("Location: /");
-        exit();
-    }
+if (!$authServ->isLoggedIn()) {
+    $_SESSION['error_message'] = 'Please log in to create an auction.';
+    header("Location: /");
+    exit();
 }
 
 // All

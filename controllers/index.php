@@ -115,6 +115,7 @@ $results_per_page = 12;
 $num_results = $auctionServ->countAuctions($filters);
 $max_page = max(1, ceil($num_results / $results_per_page));
 $curr_page = min(max(1, $curr_page), $max_page);
+
 $auctions = $auctionServ->getAuctions($curr_page, $results_per_page, $ordering, $filters);
 $auctionServ->fillAuctionImagesInAuctions($auctions);
 
@@ -152,62 +153,78 @@ $activeFilters = [
 ];
 
 // Process auctions for display
-$processed_auctions = [];
-$now = new DateTime();
+$processed_auctions = proccessAuctions($auctions);
 
-foreach ($auctions as $auction) {
-    $processed = [];
+// Process Recommended auctions for display
+$recommendationServ = DIContainer::get('recommendationServ');
+$authServ = DIContainer::get('authServ');
+$recommended_auctions = $recommendationServ->getRecommendedAuctions($authServ->getUserId(), 10);
+$auctionServ->fillAuctionImagesInAuctions($recommended_auctions);
+$processed_recommended_auctions = proccessAuctions($recommended_auctions);
 
-    // Basic info from Auction object
-    $processed['auction_id'] = $auction->getAuctionId();
-    $processed['title'] = $auction->getItemName();
-    $processed['condition'] = $auction->getAuctionCondition();
-    $processed['current_price'] = $auction->getCurrentPrice();
+// Get popular categories for display
+$categoryServ = DIContainer::get('categoryServ');
+$popular_categories = $categoryServ->getPopularCategories(10);
 
-    // Get main image, or else use the default image
-    $images = $auction->getAuctionImages();
-    if (!empty($images)) {
-        foreach ($images as $image) {
-            if ($image->getImageUrl()) {
-                $processed['image_url'] = $image->getImageUrl();
-                break; // Get first image only
+function proccessAuctions(array $auctions): array {
+    $processed_auctions = [];
+    $now = new DateTime();
+
+    foreach ($auctions as $auction) {
+        $processed = [];
+
+        // Basic info from Auction object
+        $processed['auction_id'] = $auction->getAuctionId();
+        $processed['title'] = $auction->getItemName();
+        $processed['condition'] = $auction->getAuctionCondition();
+        $processed['current_price'] = $auction->getCurrentPrice();
+
+        // Get main image, or else use the default image
+        $images = $auction->getAuctionImages();
+        if (!empty($images)) {
+            foreach ($images as $image) {
+                if ($image->getImageUrl()) {
+                    $processed['image_url'] = $image->getImageUrl();
+                    break; // Get first image only
+                }
             }
         }
-    }
-    if (empty($processed['image_url'])) {
-        $processed['image_url'] = "/images/default_item_image.jpg";
-    }
-
-    // Bid count text
-    $bidCount = $auction->getBidCount();
-    $processed['bid_text'] = $bidCount == 1 ? '1 bid' : $bidCount . ' bids';
-
-    // Time remaining / Status for finished auctions
-    $endDate = $auction->getEndDateTime();
-    $auctionStatus = $auction->getAuctionStatus();
-
-    if ($auctionStatus == 'Finished') {
-        // Check if auction is sold (has winning bid) or unsold
-        $winningBidId = $auction->getWinningBidId();
-        if ($winningBidId !== null) {
-            $processed['time_remaining'] = 'Sold';
-            $processed['status_class'] = 'text-success'; // Green
-        } else {
-            $processed['time_remaining'] = 'Unsold';
-            $processed['status_class'] = 'text-danger'; // Red
+        if (empty($processed['image_url'])) {
+            $processed['image_url'] = "/images/default_item_image.jpg";
         }
-        $processed['show_time_icon'] = false; // Don't show clock icon for finished auctions
-    } elseif ($now > $endDate) {
-        $processed['time_remaining'] = 'This auction has ended';
-        $processed['status_class'] = '';
-        $processed['show_time_icon'] = true;
-    } else {
-        $time_to_end = date_diff($now, $endDate);
-        $processed['time_remaining'] = Utilities::displayTimeRemaining($time_to_end);
-        $processed['status_class'] = '';
-        $processed['show_time_icon'] = true;
+
+        // Bid count text
+        $bidCount = $auction->getBidCount();
+        $processed['bid_text'] = $bidCount == 1 ? '1 bid' : $bidCount . ' bids';
+
+        // Time remaining / Status for finished auctions
+        $endDate = $auction->getEndDateTime();
+        $auctionStatus = $auction->getAuctionStatus();
+
+        if ($auctionStatus == 'Finished') {
+            // Check if auction is sold (has winning bid) or unsold
+            $winningBidId = $auction->getWinningBidId();
+            if ($winningBidId !== null) {
+                $processed['time_remaining'] = 'Sold';
+                $processed['status_class'] = 'text-success'; // Green
+            } else {
+                $processed['time_remaining'] = 'Unsold';
+                $processed['status_class'] = 'text-danger'; // Red
+            }
+            $processed['show_time_icon'] = false; // Don't show clock icon for finished auctions
+        } elseif ($now > $endDate) {
+            $processed['time_remaining'] = 'This auction has ended';
+            $processed['status_class'] = '';
+            $processed['show_time_icon'] = true;
+        } else {
+            $time_to_end = date_diff($now, $endDate);
+            $processed['time_remaining'] = Utilities::displayTimeRemaining($time_to_end);
+            $processed['status_class'] = '';
+            $processed['show_time_icon'] = true;
+        }
+        $processed_auctions[] = $processed;
     }
-    $processed_auctions[] = $processed;
+    return $processed_auctions;
 }
 
 require Utilities::basePath('views/index.view.php');

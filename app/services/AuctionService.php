@@ -224,8 +224,8 @@ class AuctionService
             $auction->setWinningBidId($prevAuction->getWinningBidId());
 
             // 6. Execute Update
-            $result = $this->auctionRepo->update($auction);
-            if (!$result) {
+            $auction = $this->auctionRepo->update($auction);
+            if (!$auction) {
                 $pdo->rollBack();
                 return Utilities::creationResult("Failed to update auction.", false, null);
             }
@@ -524,9 +524,9 @@ class AuctionService
             $interval = $start->diff($end);
             $totalHours = ($interval->days * 24) + $interval->h + ($interval->i / 60);
 
-//            if ($totalHours < 24) {
-//                return Utilities::creationResult("Auction duration must be at least 24 hours.", false, null);
-//            }
+            if ($totalHours < 24) {
+                return Utilities::creationResult("Auction duration must be at least 24 hours.", false, null);
+            }
 
             return Utilities::creationResult('', true, [
                 'start_datetime' => $start->format('Y-m-d H:i:s'),
@@ -599,6 +599,27 @@ class AuctionService
         $extracted = $this->extractFilters($filters);
         $offset = ($page - 1) * $perPage;
 
+        if ($orderBy == 'recommended') {
+            return $this->auctionRepo->getRecommendedByUserIdAndFilter(
+                AuthService::getUserId(),
+                $perPage,
+                $offset,
+                'ending_soonest',
+                $extracted['statuses'],
+                $extracted['conditions'],
+                $extracted['minPrice'],
+                $extracted['maxPrice'],
+                $extracted['categoryIds'],
+                $extracted['soldFilter'],
+                $extracted['completedFilter'],
+                $extracted['keyword'],
+                $extracted['includeDescription'],
+                myLimit: 50,
+                similarUserLimit: 100,
+                bidWeight: 5,
+                watchlistWeight: 2);
+        }
+
         return $this->auctionRepo->getByFilters(
             $perPage,
             $offset,
@@ -631,6 +652,18 @@ class AuctionService
             $extracted['keyword'],
             $extracted['includeDescription']
         );
+    }
+
+    // Count all auctions
+    public function countAll(): int
+    {
+        return $this->auctionRepo->countAll();
+    }
+
+    // Count auctions by status
+    public function countByStatus(string $status, ?bool $soldOnly = null): int
+    {
+        return $this->auctionRepo->countByStatus($status, $soldOnly);
     }
 
     // Auction Status Update Cron Job

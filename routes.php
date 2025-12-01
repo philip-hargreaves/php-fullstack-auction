@@ -9,10 +9,6 @@
 // Index Page
 $router->get('/', 'controllers/index.php');
 
-// Create Auction Page (GET displays the form, POST submits the data)
-$router->get('/create-auction', 'controllers/create-auction.php');
-$router->post('/create-auction-result', 'controllers/create-auction-result.php');
-
 // GET Pages
 $router->get('/my-auctions', 'controllers/my-auctions.php');
 $router->get('/my-bids', 'controllers/my-bids.php');
@@ -20,6 +16,7 @@ $router->get('/my-bids', 'controllers/my-bids.php');
 $router->get('/account', 'controllers/account.php');
 $router->post('/account/update', 'controllers/account-update-handler.php');
 $router->post('/account/change-password', 'controllers/change-password-handler.php');
+
 // Create Auction Page
 $router->get('/create-auction', 'controllers/create_auction/create-auction-get.php');
 $router->post('/create-auction', 'controllers/create_auction/create-auction-post.php');
@@ -45,3 +42,8 @@ $router->get('/my-bids', 'controllers/my-bids.php');
 
 // Watchlist Page
 $router->get('/watchlist', 'controllers/watchlist.php');
+
+// Admin Dashboard
+$router->get('/admin', 'controllers/admin/dashboard.php');
+$router->post('/admin/user/update-status', 'controllers/admin/update-user-status.php');
+$router->post('/admin/user/manage-role', 'controllers/admin/manage-user-role.php');
