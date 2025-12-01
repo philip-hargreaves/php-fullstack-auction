@@ -27,6 +27,8 @@ class AuctionService
     private AuctionImageRepository $auctionImageRepo;
     private CategoryService $categoryService;
 
+    private NotificationService $notificationService;
+
     public function __construct(
         Database               $db,
         AuctionRepository      $auctionRepo,
@@ -36,7 +38,8 @@ class AuctionService
         BidService             $bidService,
         CategoryRepository     $categoryRepo,
         AuctionImageRepository $auctionImageRepo,
-        CategoryService        $categoryService
+        CategoryService        $categoryService,
+        NotificationService   $notificationService
     )
     {
         $this->db = $db;
@@ -120,6 +123,19 @@ class AuctionService
                 $pdo->rollBack();
                 return Utilities::creationResult("Failed to link item or save images.", false, null);
             }
+
+            //add email notification for when auction created
+            $auctionId = $auction -> getAuctionId();
+            $recipientId = $item -> getSellerId();
+
+            //test debug
+            $notificationCreateResult = $this -> notificationService -> createNotification($auctionId, $recipientId, 'email', 'auctionCreated');
+
+            if (!$notificationCreateResult['success']) {
+                $pdo->rollBack();
+                return $notificationCreateResult;
+            }
+            //////////////////////////////////////////////////////
 
             $pdo->commit();
             return Utilities::creationResult("Auction created successfully!", true, $auction);

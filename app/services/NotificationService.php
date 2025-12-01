@@ -46,12 +46,12 @@ class NotificationService
 
         $notification = $this -> notificationRepo -> create($outBidNotification);
 
-        // insertion failed, failed to create outbid notification
+        // insertion failed, failed to create notification
         if (is_null($notification)) {
-            return Utilities::creationResult("Failed to create outbid notification.", false, null);
+            return Utilities::creationResult("Failed to create notification.", false, null);
         }
 
-        return Utilities::creationResult("outbid notification successfully created!", true, $notification);
+        return Utilities::creationResult("notification successfully created!", true, $notification);
     }
 
     //prepares Email notification to be sent
@@ -88,7 +88,6 @@ class NotificationService
                     $recipientId = $notification -> getRecipientId();
 
                     //get email of recipient
-                    //$recipientUser = $this-> userRepo ->getById($recipientId);
                     $recipientUserEmail = $recipientUser -> getEmail();
 
                     //get auction name
@@ -142,6 +141,11 @@ class NotificationService
             $subject = "You have been outbid for " . $auctionItemName . "!";
             $message = "You have been outbid for " . $auctionItemName . "!";
         }
+        else if($notificationContentType === 'auctionCreated')
+        {
+            $subject = "Auction for ". $auctionItemName ." has been created!";
+            $message = "Auction for ". $auctionItemName ." has been created!";
+        }
 
         return [
             'subject' => $subject,
@@ -149,6 +153,7 @@ class NotificationService
         ];
     }
 
+    //currently only handles user being outbid
     public function preparePopUpNotifications(int $userId)
     {
         $notifications = $this -> notificationRepo -> getPendingNotification();

@@ -129,7 +129,9 @@ DIContainer::bind('auctionServ', new AuctionService(
     DIContainer::get('bidServ'),
     DIContainer::get('categoryRepo'),
     DIContainer::get('auctionImageRepo'),
-    DIContainer::get('categoryServ')));
+    DIContainer::get('categoryServ'),
+    DIContainer::get('notificationServ')
+));
 
 DIContainer::bind('watchlistServ', new WatchlistService(
     DIContainer::get('watchlistRepo'),
