@@ -8,6 +8,7 @@ use app\repositories\RoleRepository;
 use app\repositories\UserRoleRepository;
 use infrastructure\Database;
 use infrastructure\Utilities;
+use DateTime;
 
 
 class UserService
@@ -253,12 +254,14 @@ class UserService
 
     private function createUser(array $input): User
     {
+        $createdDateTime = new DateTime();
         $user = new User(
             0,
             trim($input['username']),
             trim($input['email']),
             password_hash((string)$input['password'], PASSWORD_DEFAULT),
-            true
+            true,
+            $createdDateTime
         );
 
         $savedUser = $this->userRepository->create($user);
