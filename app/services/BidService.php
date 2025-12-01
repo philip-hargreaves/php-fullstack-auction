@@ -169,6 +169,22 @@ class BidService
                 return $creationResult;
             }
 
+            //create email notification for when buyer places a bid
+            $auctionId = $creationResult['object'] -> getAuctionId();
+            $bidderId = $creationResult['object'] -> getBuyerId();
+
+            $result = $this->notificationServ->createNotification(
+                $auctionId,
+                $bidderId,
+                'email',
+                'placedBid'
+            );
+
+            if (!$result['success']) {
+                $pdo->rollBack();
+                return $creationResult;
+            }
+
 
             //if the new bid is greater than the previous greatest bid, then create out bid notification
             if($userOutBid != null)

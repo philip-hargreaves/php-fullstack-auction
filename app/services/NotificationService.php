@@ -146,6 +146,11 @@ class NotificationService
             $subject = "Auction for ". $auctionItemName ." has been created!";
             $message = "Dear " . $recipientUserName . "\n\r" . "You have created an Auction for ". $auctionItemName ." has been created!" . "\n\r" . "Sincerely, \nAuctivities team";
         }
+        else if($notificationContentType === 'placedBid')
+        {
+            $subject = "You have placed a bid for ". $auctionItemName .".";
+            $message = "Dear " . $recipientUserName . "\n\r" . "You have placed a bid for ". $auctionItemName ."." . "\n\r" . "Sincerely, \nAuctivities team";
+        }
 
         return [
             'subject' => $subject,

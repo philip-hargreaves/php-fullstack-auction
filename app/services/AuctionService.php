@@ -51,6 +51,7 @@ class AuctionService
         $this->categoryRepo = $categoryRepo;
         $this->auctionImageRepo = $auctionImageRepo;
         $this->categoryService = $categoryService;
+        $this->notificationService = $notificationService;
     }
 
     public function getByUserId(int $sellerId): array
