@@ -48,5 +48,56 @@
     window.showBecomeSellerModal = showBecomeSellerModal;
 </script>
 
+<!-- popup out bid notification -->
+<script>
+    function fetchNotifications()
+    {
+        console.log("fetchNotifications() called");
+
+        //Gets messages from notification controller
+        fetch('/notifications', {
+        method: 'GET',
+            credentials: 'same-origin'
+        })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(notifications) {
+                notifications.forEach(function(n) {
+                    showPopup(n);
+                });
+            })
+            .catch(function(err) {
+                console.error('Error fetching notifications:', err);
+            });
+    }
+
+    //calls fetNotification every 5 seconds in the background
+    setInterval(fetchNotifications, 5000);
+
+    //extracts message from notification and displays it
+    function showPopup(notification)
+    {
+        const div = document.createElement('div');
+        div.className = 'popup';
+        div.innerText = notification.message;
+        document.body.appendChild(div);
+
+        //Marks messages as having been sent
+        fetch('/notifications', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: notification.notificationId })
+        });
+
+        requestAnimationFrame(() => div.classList.add('show'));
+
+        //Message disappears after 4 seconds
+        setTimeout(function() {
+            div.remove();
+        }, 4000);
+    }
+</script>
+
 </body>
 </html>

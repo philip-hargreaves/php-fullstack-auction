@@ -43,6 +43,10 @@ $router->get('/my-bids', 'controllers/my-bids.php');
 // Watchlist Page
 $router->get('/watchlist', 'controllers/watchlist.php');
 
+//Notifications
+$router->get('/notifications', 'controllers/auction/notification.php');
+$router->post('/notifications', 'controllers/auction/notification.php');
+
 // Admin Dashboard
 $router->get('/admin', 'controllers/admin/dashboard.php');
 $router->post('/admin/user/update-status', 'controllers/admin/update-user-status.php');

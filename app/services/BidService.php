@@ -16,12 +16,14 @@ class BidService
     private AuctionRepository $auctionRepo;
     private UserRepository $userRepo;
     private Database $db;
+    private NotificationService $notificationServ;
 
-    public function __construct(BidRepository $bidRepo, AuctionRepository $auctionRepo, UserRepository $userRepo, Database $db) {
+    public function __construct(BidRepository $bidRepo, AuctionRepository $auctionRepo, UserRepository $userRepo, Database $db, NotificationService $notificationServ) {
         $this->bidRepo = $bidRepo;
         $this->auctionRepo = $auctionRepo;
         $this->userRepo = $userRepo;
         $this->db = $db;
+        $this->notificationServ = $notificationServ;
     }
 
     public function getHighestBidAmountByAuctionId($auctionId): float {
@@ -155,6 +157,9 @@ class BidService
                 return $validationResult;
             }
 
+            //Checks if the current bid being placed is higher than the previous highest bid
+            $userOutBid = $this -> userOutbid($input);
+
             // Validation Pass -> Create Bid
             $creationResult = $this->createBid($input);
 
@@ -162,6 +167,36 @@ class BidService
             if (!$creationResult['success']) {
                 $pdo->rollBack();
                 return $creationResult;
+            }
+
+
+            //if the new bid is greater than the previous greatest bid, then create out bid notification
+            if($userOutBid != null)
+            {
+                //get id of new highest bidder
+                $auctionId = $creationResult['object'] -> getAuctionId();
+                //$newHighestBidder = $creationResult['object'] -> getBuyerId();
+
+                //get id of previous highest bidder
+                $recipientId = $userOutBid -> getBuyerId();
+
+                //creates pop up and email notification for when user is outbid
+                $channels = ['popUp', 'email'];
+                foreach ($channels as $channel)
+                {
+
+                    $result = $this->notificationServ->createNotification(
+                        $auctionId,
+                        $recipientId,
+                        $channel,
+                        'outBid'
+                    );
+
+                    if (!$result['success']) {
+                        $pdo->rollBack();
+                        return $creationResult;
+                    }
+                }
             }
 
             // If bid amount > reserve price, end auction
@@ -195,8 +230,46 @@ class BidService
         }
     }
 
+    private function userOutbid($input)
+    {
+        $currentHighestBid = $this->bidRepo->getHighestBidByAuctionId($input['auction_id']);
+
+        if ($currentHighestBid === null)
+        {
+            return null;
+        }
+
+        $currentHighestBidderId = $currentHighestBid -> getBuyerId();
+
+        $newBidderId = $input['user_id'];
+
+        $newBidAmount = $input['bid_amount'];
+
+        //notification will not be sent to the user if already highest bidder.
+        if($currentHighestBidderId === $newBidderId)
+        {
+            return null;
+        }
+        else
+        {
+            if ($newBidAmount > $currentHighestBid -> getBidAmount())
+            {
+                return $currentHighestBid;
+            }
+            else
+            {
+                return null;
+            }
+        }
+    }
+
     public function getBidsByAuctionId($auctionId): array {
         return $this->bidRepo->getByAuctionId($auctionId);
+    }
+
+    public function getBidById(int $bidId)
+    {
+        return $this->bidRepo->getById($bidId);
     }
 
     public function getWinningBidByAuctionId($auctionId): ?Bid {

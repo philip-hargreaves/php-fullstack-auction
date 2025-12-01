@@ -21,6 +21,11 @@ class WatchlistService
         return $this->auctionServ->getWatchedByUserId($userId);
     }
 
+    public function getAllWatchList()
+    {
+        return $this -> watchlistRepo -> getAllWatchList();
+    }
+
     public function addAuctionToWatchlist(int $userId, int $auctionId): bool
     {
         return $this->watchlistRepo->addAuction($userId, $auctionId);

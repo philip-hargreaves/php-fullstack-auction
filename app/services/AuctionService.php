@@ -60,6 +60,12 @@ class AuctionService
         return $this->auctionRepo->getWatchedAuctionsByUserId($userId);
     }
 
+    public function getByStatus(string $auctionStatus):array
+    {
+        $auctions = $this -> auctionRepo -> getByAuctionStatus($auctionStatus);
+        return $auctions;
+    }
+
     public function getById(int $auctionId): ?Auction
     {
         return $this->auctionRepo->getById($auctionId);

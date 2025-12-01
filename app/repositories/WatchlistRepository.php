@@ -64,4 +64,22 @@ class WatchlistRepository
             return false;
         }
     }
+
+    public function getAllWatchList() : ?array
+    {
+        try
+        {
+            $sql = 'SELECT * FROM watchlists;';
+
+            $params = [];
+
+            $result = $this->db->query($sql, $params)->fetchAll();
+
+            return $result;
+        }
+        catch (PDOException $e)
+        {
+            return null;
+        }
+    }
 }
