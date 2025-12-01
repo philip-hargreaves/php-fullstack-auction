@@ -417,6 +417,8 @@ class BidService
         // Map ID => Auction Object
         $auctionMap = [];
         foreach ($auctions as $auction) {
+            $hasRated = $this->ratingRepo->hasRatingForAuction($auction->getAuctionId());
+            $auction->setHasRated($hasRated);
             $auctionMap[$auction->getAuctionId()] = $auction;
         }
 

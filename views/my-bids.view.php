@@ -5,21 +5,32 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
     <div class="container my-bids-page my-5">
         <h2 class="mb-4">My Bids</h2>
 
-        <div class="mb-5">
-            <h4 class="text-success border-bottom pb-2"><i class="fa fa-gavel"></i> Active Auctions</h4>
-            <?php
-            $bids = $activeBids;
-            require \infrastructure\Utilities::basePath('views/partials/bids-table.php');
-            ?>
-        </div>
+        <?php if (empty($activeBids) && empty($pastBids)): ?>
+            <div class="text-center py-5 border rounded bg-light mt-4">
+                <h5 class="text-muted mb-3">You have not placed any bids yet.</h5>
+                <a href="/" class="btn btn-primary btn-lg px-4 shadow-sm">Browse Listings</a>
+            </div>
+        <?php else: ?>
 
-        <div>
-            <h4 class="text-secondary border-bottom pb-2"><i class="fa fa-history"></i> Past Auctions</h4>
-            <?php
-            $bids = $pastBids;
-            require \infrastructure\Utilities::basePath('views/partials/bids-table.php');
-            ?>
-        </div>
+            <div class="mb-5">
+                <h4 class="text-success border-bottom pb-2"><i class="fa fa-gavel"></i> Active Auctions</h4>
+                <?php
+                $bids = $activeBids;
+                $tableType = 'active';
+                require \infrastructure\Utilities::basePath('views/partials/bids-table.php');
+                ?>
+            </div>
+
+            <div>
+                <h4 class="text-secondary border-bottom pb-2"><i class="fa fa-history"></i> Past Auctions</h4>
+                <?php
+                $bids = $pastBids;
+                $tableType = 'past';
+                require \infrastructure\Utilities::basePath('views/partials/bids-table.php');
+                ?>
+            </div>
+
+        <?php endif; ?>
 
         <?php if (!empty($groupedBids)): ?>
             <?php foreach ($groupedBids as $auctionId => $bids): ?>
@@ -62,6 +73,4 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
         <?php endif; ?>
     </div>
 
-<?php
-require \infrastructure\Utilities::basePath('views/partials/footer.php');
-?>
+<?php require \infrastructure\Utilities::basePath('views/partials/footer.php'); ?>
