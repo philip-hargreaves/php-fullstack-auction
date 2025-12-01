@@ -395,7 +395,7 @@ class AuctionRepository
         }
     }
 
-    public function update(Auction $auction): ?Auction
+    public function update(Auction $auction): bool
     {
         try {
             $params = $this->extract($auction);
@@ -416,9 +416,9 @@ class AuctionRepository
                 WHERE id = :id";
 
             $this->db->query($sql, $params);
-            return $auction;
+            return true;
         } catch (PDOException $e) {
-            return null;
+            return false;
         }
     }
 
@@ -628,6 +628,101 @@ class AuctionRepository
         } catch (PDOException $e) {
             // TODO: add logging
             return 0;
+        }
+    }
+
+    public function updateAuctionStatuses(): void
+    {
+        try {
+            // Start a Transaction
+            // Update auction_status + Fill winning_bid_id + Update Item is_sold)
+            $this->db->connection->beginTransaction();
+
+            // 1. Open auctions: Scheduled -> Active
+            $this->db->query("
+                UPDATE auctions 
+                SET auction_status = 'Active' 
+                WHERE auction_status = 'Scheduled' 
+                AND start_datetime <= NOW()
+            ");
+
+            // 2. Close auctions: Active -> Finished
+            // A. Identify Winners & Update winning_bid_id
+            $sqlSetWinner = "
+            UPDATE auctions a
+                JOIN bids b ON a.id = b.auction_id
+                SET a.winning_bid_id = b.id
+                WHERE a.auction_status = 'Active' 
+                AND a.end_datetime <= NOW()
+                AND b.bid_amount = (
+                    SELECT MAX(b2.bid_amount) 
+                    FROM bids b2 
+                    WHERE b2.auction_id = a.id
+                )
+            ";
+            $this->db->query($sqlSetWinner);
+
+            // B. Mark Items as SOLD or NOT SOLD
+            $sqlMarkSold = "
+                UPDATE items i
+                JOIN auctions a ON i.id = a.item_id
+                SET i.is_sold = 1
+                WHERE a.auction_status = 'Active'
+                AND a.end_datetime <= NOW()
+                AND a.winning_bid_id IS NOT NULL
+            ";
+            $this->db->query($sqlMarkSold);
+
+            $sqlMarkUnsold = "
+                UPDATE items i
+                JOIN auctions a ON i.id = a.item_id
+                SET i.is_sold = 0
+                WHERE a.auction_status = 'Active'
+                AND a.end_datetime <= NOW()
+                AND a.winning_bid_id IS NULL
+            ";
+            $this->db->query($sqlMarkUnsold);
+
+            // C. Change the auction_status
+            $sqlCloseAuctions = "
+                UPDATE auctions 
+                SET auction_status = 'Finished' 
+                WHERE auction_status = 'Active' 
+                AND end_datetime <= NOW()
+            ";
+            $this->db->query($sqlCloseAuctions);
+
+            $this->db->connection->commit();
+
+        } catch (PDOException $e) {
+            if ($this->db->connection->inTransaction()) {
+                $this->db->connection->rollBack();
+            }
+//            error_log("Auction Update Failed: " . $e->getMessage());
+        }
+    }
+
+    public function endSoldAuction(Auction $auction): bool {
+        try {
+            if ($auction->getAuctionStatus() == 'Finished' && $auction->getWinningBidId() != null) {
+                $result = $this->update($auction);
+                if ($result == false) {
+                    return false;
+                }
+
+                $sql = "
+                    UPDATE items 
+                    SET is_sold = 1
+                    WHERE item_id = :item_id
+                ";
+                $params = ["item_id" => $auction->getItemId()];
+
+                $this->db->query($sql, $params);
+                return true;
+            }
+            return false;
+        } catch (PDOException $e) {
+            return false;
         }
     }
 }

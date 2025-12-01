@@ -28,6 +28,7 @@ use infrastructure\DIContainer;
  * @var $itemIsSold bool
  * @var $itemIsDeleted bool
  * @var $category
+ * @var $sellerId int
  */
 ?>
 
@@ -131,22 +132,6 @@ use infrastructure\DIContainer;
                             <input type="hidden" name="auction_id" value="<?= $auctionId ?>">
                             <button type="submit" class="btn btn-primary btn-lg w-100">Place Bid</button>
                         </form>
-                        <!-- Flash errors -->
-                        <?php if (!empty($_SESSION['place_bid_error'])): ?>
-                            <div class="alert alert-danger shadow-sm" role="alert">
-                                <i class="fa fa-exclamation-circle"></i>
-                                <?php echo htmlspecialchars($_SESSION['place_bid_error']); ?>
-                            </div>
-                            <?php unset($_SESSION['place_bid_error']); ?>
-                        <?php endif; ?>
-                        <!-- Flash success -->
-                        <?php if (!empty($_SESSION['place_bid_success'])): ?>
-                            <div class="alert alert-success shadow-sm" role="alert">
-                                <i class="fa fa-check-circle"> </i>
-                                <?php echo htmlspecialchars($_SESSION['place_bid_success']); ?>
-                            </div>
-                            <?php unset($_SESSION['place_bid_success']); ?>
-                        <?php endif; ?>
                     <?php else: ?>
                         <button type="button" class="btn btn-primary btn-lg w-100" onclick="showLoginModal()">
                             Sign In to Place Bid
@@ -165,6 +150,22 @@ use infrastructure\DIContainer;
                     <!-- lead to index page -->
                 <?php endif; ?>
             </div>
+            <!-- Flash errors -->
+            <?php if (!empty($_SESSION['place_bid_error'])): ?>
+                <div class="alert alert-danger shadow-sm" role="alert">
+                    <i class="fa fa-exclamation-circle"></i>
+                    <?php echo htmlspecialchars($_SESSION['place_bid_error']); ?>
+                </div>
+                <?php unset($_SESSION['place_bid_error']); ?>
+            <?php endif; ?>
+            <!-- Flash success -->
+            <?php if (!empty($_SESSION['place_bid_success'])): ?>
+                <div class="alert alert-success shadow-sm" role="alert">
+                    <i class="fa fa-check-circle"> </i>
+                    <?php echo htmlspecialchars($_SESSION['place_bid_success']); ?>
+                </div>
+                <?php unset($_SESSION['place_bid_success']); ?>
+            <?php endif; ?>
 
             <!-- Add to Watchlist Button -->
             <?php if ($auctionStatus == 'Active'): ?>
@@ -292,7 +293,7 @@ use infrastructure\DIContainer;
                     <tr>
                         <td class="text">Seller</td>
                         <td class="text-end fw-bold text-danger">
-                            <a href="/account?user_id=<?= htmlspecialchars($auction->getItem()->getSellerId()) ?>">
+                            <a href="/account?user_id=<?= htmlspecialchars($sellerId) ?>">
                                 <?= htmlspecialchars($sellerName) ?>
                             </a>
                         </td>

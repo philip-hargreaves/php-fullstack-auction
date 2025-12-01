@@ -164,6 +164,25 @@ class BidService
                 return $creationResult;
             }
 
+            // If bid amount > reserve price, end auction
+            $bid = $creationResult['object'];
+
+            $this->fillAuctionsInBids([$bid]);
+            $auction = $bid->getAuction();
+            if ($auction->getReservePrice() !== null && $bid->getBidAmount() >= $auction->getReservePrice()) {
+                $auction->setWinningBidId($bid->getBidId());
+                $auction->setAuctionStatus('Finished');
+                $result = $this->auctionRepo->endSoldAuction($auction);
+
+                if ($result) {
+                    // Failed to end auction - rollback bid creation
+                    $pdo->rollBack();
+                    return Utilities::creationResult('Failed to create bid.', false, null);
+                }
+                $pdo->commit();
+                return Utilities::creationResult('Congratulation! You won the auction by meeting the reserve price!', true, $creationResult['object']);
+            }
+
             // Insertion Succeed -> Commit Transaction
             $pdo->commit();
             return $creationResult;
@@ -195,6 +214,38 @@ class BidService
         return null;
     }
 
+    public function getBidsForUserDashboard(int $userId): array
+    {
+        $allBids = $this->bidRepo->getByUserId($userId);
+
+        $uniqueBids = [];
+        $groupedBids = [];
+
+        foreach ($allBids as $bid) {
+            $auctionId = $bid->getAuctionId();
+            $groupedBids[$auctionId][] = $bid;
+
+            if (!isset($uniqueBids[$auctionId]) ||
+                $bid->getBidAmount() > $uniqueBids[$auctionId]->getBidAmount()) {
+
+                $auction = $bid->getAuction();
+                if ($auction) {
+                    $highestBidAmount = $this->getHighestBidAmountByAuctionId($auctionId);
+
+                    $currentPrice = $highestBidAmount > 0 ? $highestBidAmount : $auction->getStartingPrice();
+                    $auction->setCurrentPrice($currentPrice);
+                }
+
+                $uniqueBids[$auctionId] = $bid;
+            }
+        }
+
+        return [
+            'unique' => array_values($uniqueBids),
+            'grouped' => $groupedBids
+        ];
+    }
+
     public function getBidsForUser(int $userId): array
     {
         return $this->bidRepo->getByUserId($userId);
@@ -210,6 +261,69 @@ class BidService
     public function getTotalRevenue(): float
     {
         return $this->bidRepo->getTotalRevenue();
+    }
+
+    // --- FILL RELATIONSHIP PROPERTIES FUNCTION ---
+    public function fillBuyersInBids(array $bids): void
+    {
+        if (empty($bids)) return;
+
+        // Collect Buyer IDs
+        $userIds = [];
+        foreach ($bids as $bid) {
+            $userIds[] = $bid->getBuyerId();
+        }
+        $userIds = array_unique($userIds);
+
+        if (empty($userIds)) return;
+
+        // Fetch Users (1 Query)
+        $users = $this->userRepo->getByIds($userIds);
+
+        // Map ID => User Object
+        $userMap = [];
+        foreach ($users as $user) {
+            $userMap[$user->getUserId()] = $user;
+        }
+
+        // Attach to Bids
+        foreach ($bids as $bid) {
+            $buyerId = $bid->getBuyerId();
+            if (isset($userMap[$buyerId])) {
+                $bid->setBuyer($userMap[$buyerId]);
+            }
+        }
+    }
+
+    public function fillAuctionsInBids(array $bids): void
+    {
+        if (empty($bids)) return;
+
+        // Collect Auction IDs
+        $auctionIds = [];
+        foreach ($bids as $bid) {
+            $auctionIds[] = $bid->getAuctionId();
+        }
+        $auctionIds = array_unique($auctionIds);
+
+        if (empty($auctionIds)) return;
+
+        // Fetch Auctions (1 Query)
+        $auctions = $this->auctionRepo->getByIds($auctionIds);
+
+        // Map ID => Auction Object
+        $auctionMap = [];
+        foreach ($auctions as $auction) {
+            $auctionMap[$auction->getAuctionId()] = $auction;
+        }
+
+        // Attach to Bids
+        foreach ($bids as $bid) {
+            $aucId = $bid->getAuctionId();
+            if (isset($auctionMap[$aucId])) {
+                $bid->setAuction($auctionMap[$aucId]);
+            }
+        }
     }
 
 }

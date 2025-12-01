@@ -665,4 +665,11 @@ class AuctionService
     {
         return $this->auctionRepo->countByStatus($status, $soldOnly);
     }
+
+    // Auction Status Update Cron Job
+    public function updateAuctionStatuses(): void
+    {
+        // Pass the call down to the repository
+        $this->auctionRepo->updateAuctionStatuses();
+    }
 }
