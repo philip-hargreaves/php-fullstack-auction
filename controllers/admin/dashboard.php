@@ -60,17 +60,17 @@ foreach ($_GET as $key => $value) {
     if ($key != "page") {
         if (is_array($value)) {
             foreach ($value as $v) {
-                $querystring .= htmlspecialchars($key) . "[]=" . htmlspecialchars($v) . "&amp;";
+                $querystring .= htmlspecialchars($key) . "[]=" . htmlspecialchars($v) . "&";
             }
         } else {
-            $querystring .= htmlspecialchars($key) . "=" . htmlspecialchars($value) . "&amp;";
+            $querystring .= htmlspecialchars($key) . "=" . htmlspecialchars($value) . "&";
         }
     }
 }
 
 // Ensure tab parameter is in querystring if we're on users tab
 if ($activeTab === 'users' && strpos($querystring, 'tab=') === false) {
-    $querystring = 'tab=users&amp;' . $querystring;
+    $querystring = 'tab=users&' . $querystring;
 }
 
 require Utilities::basePath('views/admin/dashboard.view.php');
