@@ -19,6 +19,31 @@ INSERT IGNORE INTO users (id, username, email, password, is_active, created_date
     (206, 'seller_fiona', 'fiona@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-05-28 15:00:00'),
     (207, 'seller_george', 'george@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-06-10 10:45:00'),
     (208, 'seller_helen', 'helen@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-06-22 12:15:00'),
+    (209, 'buyer_ivan', 'ivan@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-07-05 09:20:00'),
+    (210, 'buyer_julia', 'julia@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-07-12 14:30:00'),
+    (211, 'buyer_kevin', 'kevin@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-07-18 11:15:00'),
+    (212, 'buyer_lisa', 'lisa@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-07-25 16:45:00'),
+    (213, 'buyer_mike', 'mike@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-08-01 10:00:00'),
+    (214, 'seller_nina', 'nina@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-08-08 13:20:00'),
+    (215, 'seller_oscar', 'oscar@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-08-15 08:30:00'),
+    (216, 'seller_paula', 'paula@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-08-22 15:10:00'),
+    (217, 'seller_quinn', 'quinn@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-08-29 11:40:00'),
+    (218, 'seller_rachel', 'rachel@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-09-05 14:25:00'),
+    (219, 'user_sam', 'sam@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-09-12 09:50:00'),
+    (220, 'user_tina', 'tina@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-09-19 12:15:00'),
+    (221, 'user_umar', 'umar@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-09-26 10:30:00'),
+    (222, 'user_victor', 'victor@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-10-03 16:20:00'),
+    (223, 'user_wendy', 'wendy@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-10-10 13:45:00'),
+    (224, 'user_xavier', 'xavier@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-10-17 11:00:00'),
+    (225, 'user_yara', 'yara@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-10-24 14:35:00'),
+    (226, 'user_zack', 'zack@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-10-31 09:25:00'),
+    (227, 'buyer_anna', 'anna@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-11-07 15:50:00'),
+    (228, 'buyer_ben', 'ben@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-11-14 10:15:00'),
+    (229, 'buyer_cara', 'cara@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-11-21 12:40:00'),
+    (230, 'buyer_dave', 'dave@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-11-28 08:55:00'),
+    (231, 'buyer_ella', 'ella@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-12-05 13:20:00'),
+    (232, 'seller_frank', 'frank@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-12-12 11:10:00'),
+    (233, 'seller_grace', 'grace@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-12-19 16:30:00'),
     (301, 'admin', 'admin@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-01-01 00:00:00');
 
 -- Assign roles to users
@@ -36,6 +61,31 @@ INSERT IGNORE INTO user_roles (user_id, role_id) VALUES
     (206, 1), (206, 2),
     (207, 1), (207, 2),
     (208, 1), (208, 2),
+    (209, 1),  -- ivan is a buyer
+    (210, 1),  -- julia is a buyer
+    (211, 1),  -- kevin is a buyer
+    (212, 1),  -- lisa is a buyer
+    (213, 1),  -- mike is a buyer
+    (214, 2),  -- nina is a seller
+    (215, 2),  -- oscar is a seller
+    (216, 2),  -- paula is a seller
+    (217, 2),  -- quinn is a seller
+    (218, 2),  -- rachel is a seller
+    (219, 1), (219, 2),  -- sam is both
+    (220, 1), (220, 2),  -- tina is both
+    (221, 1), (221, 2),  -- umar is both
+    (222, 1), (222, 2),  -- victor is both
+    (223, 1), (223, 2),  -- wendy is both
+    (224, 1), (224, 2),  -- xavier is both
+    (225, 1), (225, 2),  -- yara is both
+    (226, 1), (226, 2),  -- zack is both
+    (227, 1),  -- anna is a buyer
+    (228, 1),  -- ben is a buyer
+    (229, 1),  -- cara is a buyer
+    (230, 1),  -- dave is a buyer
+    (231, 1),  -- ella is a buyer
+    (232, 2),  -- frank is a seller
+    (233, 2),  -- grace is a seller
     (301, 1), (301, 3);  -- admin is both buyer and admin
 
 -- CATEGORIES (based on comments in old seed)
