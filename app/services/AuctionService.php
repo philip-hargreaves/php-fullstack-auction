@@ -599,6 +599,27 @@ class AuctionService
         $extracted = $this->extractFilters($filters);
         $offset = ($page - 1) * $perPage;
 
+        if ($orderBy == 'recommended') {
+            return $this->auctionRepo->getRecommendedByUserIdAndFilter(
+                AuthService::getUserId(),
+                $perPage,
+                $offset,
+                'ending_soonest',
+                $extracted['statuses'],
+                $extracted['conditions'],
+                $extracted['minPrice'],
+                $extracted['maxPrice'],
+                $extracted['categoryIds'],
+                $extracted['soldFilter'],
+                $extracted['completedFilter'],
+                $extracted['keyword'],
+                $extracted['includeDescription'],
+                myLimit: 50,
+                similarUserLimit: 100,
+                bidWeight: 5,
+                watchlistWeight: 2);
+        }
+
         return $this->auctionRepo->getByFilters(
             $perPage,
             $offset,
