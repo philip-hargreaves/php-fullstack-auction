@@ -159,8 +159,8 @@ CREATE TABLE notifications (
     id INT AUTO_INCREMENT PRIMARY KEY,
     auction_id INT NOT NULL,
     recipient_id INT NOT NULL,
-    notification_type VARCHAR(50) NOT NULL,
-    notification_content_type ENUM('auctionWinner', 'auctionFinished', 'auctionAboutToFinish', 'outBid', 'auctionCreated') NOT NULL, -- VARCHAR(50) NOT NULL,
+    notification_type ENUM('popUp', 'email'), -- VARCHAR(50) NOT NULL,
+    notification_content_type ENUM('auctionWinner', 'auctionFinished', 'auctionAboutToFinish', 'outBid', 'auctionCreated') NOT NULL,
     is_sent TINYINT DEFAULT 0,
     FOREIGN KEY (auction_id) REFERENCES auctions(id),
     FOREIGN KEY (recipient_id) REFERENCES users(id)

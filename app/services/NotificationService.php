@@ -85,10 +85,10 @@ class NotificationService
                 else
                 {
                     $notificationId = $notification -> getNotificationId();
-                    $recipientId = $notification -> getRecipientId();
 
                     //get email of recipient
                     $recipientUserEmail = $recipientUser -> getEmail();
+                    $recipientUserName = $recipientUser -> getUsername();
 
                     //get auction name
                     $auctionItemId = $auction -> getItemId();
@@ -97,7 +97,7 @@ class NotificationService
                     //get item name from auction item
                     $auctionItemName = $auctionItem -> getItemName();
 
-                    $message = $this -> createNotificationContent($auctionItemName, $notificationContentType);
+                    $message = $this -> createNotificationContent($recipientUserName, $auctionItemName, $notificationContentType);
 
                     $email = [
                         'notificationId' => $notificationId,
@@ -116,7 +116,7 @@ class NotificationService
     }
 
     //Contextual generation of Email messages
-    private function createNotificationContent($auctionItemName, $notificationContentType)
+    private function createNotificationContent($recipientUserName, $auctionItemName, $notificationContentType)
     {
         $subject = "";
         $message = "";
@@ -124,27 +124,27 @@ class NotificationService
         if($notificationContentType === 'auctionWinner')
         {
             $subject = "Auction winner for " . $auctionItemName . "!";
-            $message = "Congratulations! You have won the auction for " . $auctionItemName . "!";
+            $message = "Dear " . $recipientUserName . "\n\r". "Congratulations! You have won the auction for " . $auctionItemName . "!" . "\n\r" . "Sincerely,\nAuctivities team";
         }
         else if($notificationContentType === 'auctionFinished')
         {
             $subject = "Auction finished for " . $auctionItemName . "!";
-            $message = "Auction for ". $auctionItemName ." has been finished!";
+            $message = "Dear " . $recipientUserName . "\n\r" . "Auction for ". $auctionItemName ." has been finished!" . "\n\r" . "Sincerely, \nAuctivities team";
         }
         else if($notificationContentType === 'auctionAboutToFinish')
         {
             $subject = "Auction about to finish for " . $auctionItemName . "!";
-            $message = "There is less than 24 hours left for auction for ". $auctionItemName .".";
+            $message = "Dear " . $recipientUserName . "\n\r" . "There is less than 24 hours left for auction for ". $auctionItemName ."." . "\n\r" . "Sincerely, \nAuctivities team";
         }
         else if($notificationContentType === 'outBid')
         {
             $subject = "You have been outbid for " . $auctionItemName . "!";
-            $message = "You have been outbid for " . $auctionItemName . "!";
+            $message = "Dear " . $recipientUserName . "\n\r" . "You have been outbid for " . $auctionItemName . "!" . "\n\r" . "Sincerely, Auctivities team";
         }
         else if($notificationContentType === 'auctionCreated')
         {
             $subject = "Auction for ". $auctionItemName ." has been created!";
-            $message = "Auction for ". $auctionItemName ." has been created!";
+            $message = "Dear " . $recipientUserName . "\n\r" . "You have created an Auction for ". $auctionItemName ." has been created!" . "\n\r" . "Sincerely, \nAuctivities team";
         }
 
         return [
