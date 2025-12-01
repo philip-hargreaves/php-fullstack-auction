@@ -45,3 +45,7 @@ $router->get('/my-bids', 'controllers/my-bids.php');
 
 // Watchlist Page
 $router->get('/watchlist', 'controllers/watchlist.php');
+
+// Chatroom Page
+$router->post('/send-message', 'controllers/chatroom/send-message.php');
+$router->get('/chatroom', 'controllers/chatroom/chatroom.php');

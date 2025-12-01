@@ -16,6 +16,8 @@ $userRepo = DIContainer::get('userRepo');
 $watchlistServ = DIContainer::get('watchlistServ');
 $auctionImageRepo = DIContainer::get('auctionImageRepo');
 $itemServ = DIContainer::get('itemServ');
+$messageRepo = DIContainer::get('messageRepo');
+$authServ = DIContainer::get('authServ');
 
 // Get Auction
 $auction = $auctionServ->getById($auctionId);
@@ -26,8 +28,7 @@ $item = $auction->getItem();
 $itemServ->fillSellerInItems([$item]);
 // Get Bids
 $bids = $bidServ->getBidsByAuctionId($auctionId);
-$bidService = DIContainer::get('bidServ');
-$bidService->fillBuyersInBids($bids);
+$bidServ->fillBuyersInBids($bids);
 $displayedBids = array_slice($bids, 0, 15); // Keep only the first 15 elements (0 to 15)
 
 // Get auction images
@@ -46,6 +47,10 @@ $reservePrice = $auction->getReservePrice();
 $condition = $auction->getAuctionCondition();
 $category = $auction->getCategory();
 $imageUrls = [];
+$userId = $authServ->getUserId();
+if ($userId) {
+    $conversationId = $messageRepo->findOrCreateConversation($auctionId, $userId);
+}
 
 foreach ($imageArray as $image) {
     $imageUrls[] = $image->getImageUrl();

@@ -28,16 +28,65 @@ use infrastructure\DIContainer;
  * @var $itemIsSold bool
  * @var $itemIsDeleted bool
  * @var $category
+ * @var $conversationId
  */
 ?>
 
 <?php require \infrastructure\Utilities::basePath('views/partials/header.php'); ?>
 
 <div class="container my-4" >
+
+    <div class="row justify-content-between align-items-center mb-4">
+        <!-- Auction Title / Item Name (Left) -->
+        <div class="col-12 col-md-7 text-start">
+            <h2 class="mb-0"><?= htmlspecialchars($title) ?></h2>
+        </div>
+        <!-- Buttons (Right) -->
+        <div class="col-12 col-md-5 text-end">
+            <div class="d-flex justify-content-end align-items-center gap-2">
+                <!-- Add to Watchlist Button -->
+                <?php if ($auctionStatus == 'Active'): ?>
+                    <?php if ($isLoggedIn): ?>
+                        <?php if ($isWatched): ?>
+                            <form method="POST" action="/watchlist/remove" class="d-inline">
+                                <input type="hidden" name="auction_id" value="<?= htmlspecialchars($auctionId) ?>">
+                                <button type="button" class="btn btn-success me-1" disabled>Watching</button>
+                                <button type="submit" class="btn btn-outline-danger">Remove</button>
+                            </form>
+                        <?php else: ?>
+                            <form method="POST" action="/watchlist/add" class="d-inline">
+                                <input type="hidden" name="auction_id" value="<?= htmlspecialchars($auctionId) ?>">
+                                <button type="submit" class="btn btn-outline-secondary">
+                                    + Add to Watchlist
+                                </button>
+                            </form>
+                        <?php endif; ?>
+                    <?php else: ?>
+                        <button type="button" class="btn btn-outline-secondary" onclick="showLoginModal()">
+                            Sign In to Watch
+                        </button>
+                    <?php endif; ?>
+                <?php endif; ?>
+                <!-- Chat with seller Button -->
+                <?php if ($auctionStatus == 'Active' || $auctionStatus == 'Scheduled'): ?>
+                    <?php if ($isLoggedIn): ?>
+                        <a href="/chatroom?conversation_id=<?= htmlspecialchars($conversationId) ?>" class="btn btn-outline-secondary ml-3">
+                            Message Seller
+                        </a>
+                    <?php else: ?>
+                        <button type="button" class="btn btn-outline-secondary ml-3" onclick="showLoginModal()">
+                            Sign In to Message Seller
+                        </button>
+                    <?php endif; ?>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
     <!-- Image Gallery + Auction Information -->
     <div class="row justify-content-center">
         <!-- Image Gallery -->
-        <div class="col-12 col-md-7 mx-auto mb-4" style="max-width: 600px;">
+        <div class="col-12 col-md-7 mb-4" style="max-width: 600px;">
+
             <?php
             $defaultPath = "/images/default_item_image.jpg";
             $firstImage = !empty($imageUrls[0]) ? $imageUrls[0] : $defaultPath;
@@ -77,11 +126,9 @@ use infrastructure\DIContainer;
                 </div>
             <?php endif; ?>
         </div>
-
         <!-- Auction Information -->
         <div class="col-12 col-md-5 mx-auto">
-            <!-- Auction Title / Item Name -->
-            <h2 class="mb-3"><?= htmlspecialchars($title) ?></h2>
+
             <!-- Auction Content -->
             <div class="card bg-light p-3 mb-3">
                 <!-- Display Data Depending on Auction Status -->
@@ -166,34 +213,7 @@ use infrastructure\DIContainer;
                 <?php endif; ?>
             </div>
 
-            <!-- Add to Watchlist Button -->
-            <?php if ($auctionStatus == 'Active'): ?>
-                <div class="text-center mb-5">
-                    <?php if ($isLoggedIn): ?>
-                        <?php if ($isWatched): ?>
-                        <form method="POST" action="/watchlist/remove" class="d-inline">
-                            <input type="hidden" name="auction_id" value="<?= htmlspecialchars($auctionId) ?>">
 
-                            <button type="button" class="btn btn-sm btn-success me-2" disabled>Watching</button>
-
-                            <button type="submit" class="btn btn-sm btn-outline-danger">Remove from Watchlist</button>
-                        </form>
-                    <?php else: ?>
-                        <form method="POST" action="/watchlist/add" class="d-inline">
-                            <input type="hidden" name="auction_id" value="<?= htmlspecialchars($auctionId) ?>">
-                            <button type="submit" class="btn btn-outline-secondary">
-                                + Add to Watchlist
-                            </button>
-                        </form>
-                    <?php endif; ?>
-
-                    <?php else: ?>
-                        <button type="button" class="btn btn-outline-secondary" onclick="showLoginModal()">
-                            Sign In to Watch
-                        </button>
-                    <?php endif; ?>
-                </div>
-            <?php endif; ?>
         </div>
     </div>
     <hr class="my-5">
