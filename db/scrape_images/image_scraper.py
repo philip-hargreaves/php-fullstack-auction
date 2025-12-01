@@ -18,10 +18,10 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 # CONFIGURATION
-IMGBB_API_KEY = ''
+IMGBB_API_KEY = 'c26fe5fca2acb7c3b01ada08ba8d5e7a'
 UPLOAD_URL = 'https://api.imgbb.com/1/upload'
-INPUT_SQL_FILE = r'db\scrape_images\working_seeds.sql'
-OUTPUT_SQL_FILE = r'db\auction_images_seed.sql'
+INPUT_SQL_FILE = r'db\scrape_images\working_seed.sql'
+OUTPUT_SQL_FILE = r'db\scrape_images\auction_images_seed.sql'
 
 # IMGBB UPLOADER
 def upload_to_imgbb(file_path):
