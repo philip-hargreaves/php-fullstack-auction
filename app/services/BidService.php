@@ -3,6 +3,7 @@ namespace app\services;
 use app\models\Bid;
 use app\repositories\AuctionRepository;
 use app\repositories\UserRepository;
+use app\repositories\RatingRepository;
 use infrastructure\Database;
 use app\repositories\BidRepository;
 use DateTime;
@@ -16,13 +17,15 @@ class BidService
     private AuctionRepository $auctionRepo;
     private UserRepository $userRepo;
     private Database $db;
+    private RatingRepository $ratingRepo;
     private NotificationService $notificationServ;
 
-    public function __construct(BidRepository $bidRepo, AuctionRepository $auctionRepo, UserRepository $userRepo, Database $db, NotificationService $notificationServ) {
+    public function __construct(BidRepository $bidRepo, AuctionRepository $auctionRepo, UserRepository $userRepo, Database $db, RatingRepository $ratingRepo, NotificationService $notificationServ) {
         $this->bidRepo = $bidRepo;
         $this->auctionRepo = $auctionRepo;
         $this->userRepo = $userRepo;
         $this->db = $db;
+        $this->ratingRepo = $ratingRepo;
         $this->notificationServ = $notificationServ;
     }
 
@@ -325,6 +328,9 @@ class BidService
 
                     $currentPrice = $highestBidAmount > 0 ? $highestBidAmount : $auction->getStartingPrice();
                     $auction->setCurrentPrice($currentPrice);
+
+                    $hasRated = $this->ratingRepo->hasRatingForAuction($auction->getAuctionId());
+                    $auction->setHasRated($hasRated);
                 }
 
                 $uniqueBids[$auctionId] = $bid;

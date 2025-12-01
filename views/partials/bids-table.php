@@ -55,6 +55,7 @@
                 $statusBadge = '<span class="badge bg-secondary">' . htmlspecialchars($displayStatus) . '</span>';
             }
 
+            $hasRated = $auction->hasRated();
             $canRate = ($isSold && $isHighestBidder);
 
             $historyCount = isset($groupedBids[$auctionId]) ? count($groupedBids[$auctionId]) : 0;
@@ -97,10 +98,16 @@
 
                 <td>
                     <?php if ($canRate): ?>
-                        <a href="/rate?auction_id=<?= htmlspecialchars($auctionId) ?>"
-                           class="btn btn-sm btn-danger text-white" style="font-weight: 500;">
-                            Rate Seller
-                        </a>
+                        <?php if ($auction->hasRated()): ?>
+                            <button class="btn btn-sm btn-success disabled" disabled>
+                                Rated
+                            </button>
+                        <?php else: ?>
+                            <a href="/rate?auction_id=<?= htmlspecialchars($auctionId) ?>"
+                               class="btn btn-sm btn-danger text-white" style="font-weight: 500;">
+                                Rate Seller
+                            </a>
+                        <?php endif; ?>
                     <?php else: ?>
                         <span class="text-muted small">—</span>
                     <?php endif; ?>

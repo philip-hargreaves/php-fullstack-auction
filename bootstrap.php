@@ -108,8 +108,8 @@ DIContainer::bind('bidServ', new BidService(
     DIContainer::get('auctionRepo'),
     DIContainer::get('userRepo'),
     DIContainer::get('db'),
-    DIContainer::get('notificationServ')
-));
+    DIContainer::get('ratingRepo'),
+    DIContainer::get('notificationServ')));
 
 DIContainer::bind('authServ', new AuthService(
     DIContainer::get('userRepo')));

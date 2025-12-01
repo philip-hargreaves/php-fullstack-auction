@@ -71,4 +71,14 @@ class RatingService
     {
         return $this->ratingRepo->getAverageRatingForUser($sellerId);
     }
+
+    public function getSellerRatingCount(int $sellerId): int
+    {
+        return $this->ratingRepo->getRatingCountForUser($sellerId);
+    }
+
+    public function getSellerReviews(int $sellerId): array
+    {
+        return $this->ratingRepo->getRatingsByRatedUserId($sellerId);
+    }
 }

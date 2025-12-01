@@ -64,4 +64,36 @@ class RatingRepository
             return 0.0;
         }
     }
+
+    public function getRatingCountForUser(int $userId): int
+    {
+        try {
+            $sql = "SELECT COUNT(*) as total FROM ratings WHERE rated_id = :user_id";
+            $params = ['user_id' => $userId];
+
+            $result = $this->db->query($sql, $params)->fetch();
+            return (int)$result['total'];
+        } catch (PDOException $e) {
+            return 0;
+        }
+    }
+
+    public function getRatingsByRatedUserId(int $userId): array
+    {
+        try {
+            $sql = "SELECT r.*, u.username as rater_name, i.item_name, a.id as auction_id
+                    FROM ratings r
+                    JOIN users u ON r.rater_id = u.id
+                    JOIN auctions a ON r.auction_id = a.id
+                    JOIN items i ON a.item_id = i.id
+                    WHERE r.rated_id = :user_id
+                    ORDER BY r.rating_datetime DESC";
+
+            $params = ['user_id' => $userId];
+
+            return $this->db->query($sql, $params)->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            return [];
+        }
+    }
 }

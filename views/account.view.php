@@ -10,6 +10,38 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
         <?php else: ?>
             <h1 class="page-title mb-2">User Profile</h1> <h3 class="text-danger mt-0"><?= htmlspecialchars($user->getUsername()) ?></h3>
         <?php endif; ?>
+        <?php if ($isTargetUserSeller): ?>
+            <div class="d-flex align-items-center mb-4">
+
+                <button type="button" class="btn btn-link text-white font-weight-bold p-0 mr-2"
+                        style="font-size: 1.1rem; text-decoration: underline;"
+                        data-toggle="modal" data-target="#reviewsModal">
+                    (<?= $sellerRatingCount ?>)
+                </button>
+
+                <div class="mr-2">
+                    <?php
+                    if ($sellerRatingCount > 0) {
+                        for ($i = 1; $i <= 5; $i++) {
+                            if ($sellerRating >= $i) {
+                                echo '<i class="fa fa-star text-warning"></i>';
+                            } elseif ($sellerRating >= $i - 0.5) {
+                                echo '<i class="fa fa-star-half-o text-warning"></i>';
+                            } else {
+                                echo '<i class="fa fa-star-o text-muted"></i>';
+                            }
+                        }
+                    } else {
+                        echo '<span class="badge bg-secondary">New Seller</span>';
+                    }
+                    ?>
+                </div>
+
+                <?php if ($sellerRatingCount > 0): ?>
+                    <span class="text-muted small"><?= number_format($sellerRating, 1) ?> / 5.0</span>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
 
         <?php if ($isOwnProfile): ?>
             <?php if (isset($_SESSION['account_success'])): ?>
@@ -128,6 +160,57 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
 
             <?php endif; ?>
         <?php endif; ?>
+
+        <div class="modal fade" id="reviewsModal" tabindex="-1">
+            <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Seller Reviews (<?= $sellerRatingCount ?>)</h5>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <?php if (empty($sellerReviews)): ?>
+                            <p class="text-muted text-center my-4">No reviews yet.</p>
+                        <?php else: ?>
+                            <?php foreach ($sellerReviews as $review): ?>
+                                <div class="card mb-3 border-0 border-bottom">
+                                    <div class="card-body py-3 px-0">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h6 class="mb-1 font-weight-bold"><?= htmlspecialchars($review['rater_name']) ?></h6>
+
+                                                <div class="mb-1 text-warning" style="font-size: 0.8rem;">
+                                                    <?php
+                                                    for ($i = 1; $i <= 5; $i++) {
+                                                        echo ($i <= (int)$review['rating_value']) ? '★' : '☆';
+                                                    }
+                                                    ?>
+                                                </div>
+                                            </div>
+                                            <small class="text-muted">
+                                                <?= (new DateTime($review['rating_datetime']))->format('d M Y') ?>
+                                            </small>
+                                        </div>
+
+                                        <p class="mb-2 small text-muted">
+                                            Purchased:
+                                            <a href="/auction?auction_id=<?= $review['auction_id'] ?>" class="text-muted font-italic">
+                                                <?= htmlspecialchars($review['item_name'] ?? 'Item') ?>
+                                            </a>
+                                        </p>
+
+                                        <p class="card-text"><?= nl2br(htmlspecialchars($review['rating_comment'])) ?></p>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
 <?php

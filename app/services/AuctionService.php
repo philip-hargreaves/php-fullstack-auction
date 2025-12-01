@@ -694,4 +694,17 @@ class AuctionService
         // Pass the call down to the repository
         $this->auctionRepo->updateAuctionStatuses();
     }
+
+    public function getPublicAuctionsForSeller(int $sellerId): array
+    {
+        $auctions = $this->auctionRepo->getActiveAuctionsBySellerId($sellerId);
+
+        foreach ($auctions as $auction) {
+            $highestBid = $this->bidService->getHighestBidByAuctionId($auction->getAuctionId());
+            $currentPrice = $highestBid > 0 ? $highestBid : $auction->getStartingPrice();
+            $auction->setCurrentPrice($currentPrice);
+        }
+
+        return $auctions;
+    }
 }
