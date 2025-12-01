@@ -20,8 +20,8 @@ from selenium.webdriver.support import expected_conditions as EC
 # CONFIGURATION
 IMGBB_API_KEY = ''
 UPLOAD_URL = 'https://api.imgbb.com/1/upload'
-INPUT_SQL_FILE = r'C:\Repository\fullstack-auction-app\db\seed_1.0.sql'
-OUTPUT_SQL_FILE = r'C:\Repository\fullstack-auction-app\db\auction_images_seed.sql'
+INPUT_SQL_FILE = r'db\scrape_images\working_seeds.sql'
+OUTPUT_SQL_FILE = r'db\auction_images_seed.sql'
 
 # IMGBB UPLOADER
 def upload_to_imgbb(file_path):
