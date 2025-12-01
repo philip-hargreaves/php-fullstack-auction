@@ -571,27 +571,10 @@ class AuctionService
         return null; // No errors
     }
 
-    public function countAuctions(array $filters = []): int
-    {
-        $extracted = $this->extractFilters($filters);
-
-        return $this->auctionRepo->countByFilters(
-            $extracted['statuses'],
-            $extracted['conditions'],
-            $extracted['minPrice'],
-            $extracted['maxPrice'],
-            $extracted['categoryIds'],
-            $extracted['soldFilter'],
-            $extracted['completedFilter'],
-            $extracted['keyword'],
-            $extracted['includeDescription']
-        );
-    }
-
     private function extractFilters(array $filters): array
     {
         $categoryId = $filters['categoryId'] ?? null;
-
+        
         // If a category is selected, get all descendant category IDs (including children)
         $categoryIds = null;
         if ($categoryId !== null) {
@@ -651,5 +634,35 @@ class AuctionService
             $extracted['keyword'],
             $extracted['includeDescription']
         );
+    }
+
+    // Count filtered auctions for pagination
+    public function countAuctions(array $filters = []): int
+    {
+        $extracted = $this->extractFilters($filters);
+
+        return $this->auctionRepo->countByFilters(
+            $extracted['statuses'],
+            $extracted['conditions'],
+            $extracted['minPrice'],
+            $extracted['maxPrice'],
+            $extracted['categoryIds'],
+            $extracted['soldFilter'],
+            $extracted['completedFilter'],
+            $extracted['keyword'],
+            $extracted['includeDescription']
+        );
+    }
+
+    // Count all auctions
+    public function countAll(): int
+    {
+        return $this->auctionRepo->countAll();
+    }
+
+    // Count auctions by status
+    public function countByStatus(string $status, ?bool $soldOnly = null): int
+    {
+        return $this->auctionRepo->countByStatus($status, $soldOnly);
     }
 }

@@ -6,7 +6,6 @@ use app\repositories\UserRepository;
 use infrastructure\Database;
 use app\repositories\BidRepository;
 use DateTime;
-use infrastructure\DIContainer;
 use PDOException;
 use infrastructure\Utilities;
 
@@ -25,10 +24,10 @@ class BidService
         $this->db = $db;
     }
 
-    public function getHighestBidAmountByAuctionId($auctionId): ?float {
+    public function getHighestBidAmountByAuctionId($auctionId): float {
         $highestBid = $this->bidRepo->getHighestBidByAuctionId($auctionId);
         if(is_null($highestBid)) {
-            return null;
+            return 0;
         }else{
             return $highestBid->getBidAmount();
         }
@@ -73,8 +72,6 @@ class BidService
 
         // Check if $buyer is a buyer
         $isBuyer = false;
-        $userService = DIContainer::get('userServ');
-        $userService->fillRolesInUsers([$user]);
         foreach ($user->getRoles() as $role) {
             if ($role->getName() == 'buyer') {
                 $isBuyer = true;
@@ -111,15 +108,8 @@ class BidService
 
         // Check if the bid is high enough
         $highestBidAmount = $this->getHighestBidAmountByAuctionId($input['auction_id']);
-        $startingPrice = $auction->getStartingPrice();
-        if ($highestBidAmount > 0) {
-            if ($bidAmount < $highestBidAmount + 0.01) {
-                return Utilities::creationResult('Bid must be higher than £' . number_format($highestBidAmount, 2), false, null);
-            }
-        } else {
-            if ($bidAmount < $startingPrice) {
-                return Utilities::creationResult('Bid must be at least the starting price: £' . number_format($startingPrice, 2), false, null);
-            }
+        if ($bidAmount < $highestBidAmount + 0.01) {
+            return Utilities::creationResult('Bid must be at least' . number_format($highestBidAmount, 2), false, null);
         }
 
         return Utilities::creationResult('', true, $input);
@@ -195,6 +185,8 @@ class BidService
         $auction = $this->auctionRepo->getById($auctionId);
         $isAuctionActive = $auction->getAuctionStatus() == 'Active';
         if ($isAuctionActive) {
+            // Get Item Status
+            $item = $auction->getItem();
             $isItemSold = $auction->getAuctionStatus() == 'Sold';
             if ($isItemSold) {
                 return $this->bidRepo->getById($auction->getWinningBidID());
@@ -203,123 +195,21 @@ class BidService
         return null;
     }
 
-    public function getBidsForUserDashboard(int $userId): array
-    {
-        $allBids = $this->bidRepo->getByUserId($userId);
-
-        $uniqueBids = [];
-        $groupedBids = [];
-
-        foreach ($allBids as $bid) {
-            $auctionId = $bid->getAuctionId();
-            $groupedBids[$auctionId][] = $bid;
-
-            if (!isset($uniqueBids[$auctionId]) ||
-                $bid->getBidAmount() > $uniqueBids[$auctionId]->getBidAmount()) {
-
-                $auction = $bid->getAuction();
-                if ($auction) {
-                    $highestBidAmount = $this->getHighestBidAmountByAuctionId($auctionId);
-
-                    $currentPrice = $highestBidAmount > 0 ? $highestBidAmount : $auction->getStartingPrice();
-                    $auction->setCurrentPrice($currentPrice);
-                }
-
-                $uniqueBids[$auctionId] = $bid;
-            }
-        }
-
-        return [
-            'unique' => array_values($uniqueBids),
-            'grouped' => $groupedBids
-        ];
-    }
-
     public function getBidsForUser(int $userId): array
     {
-        $bids = $this->bidRepo->getByUserId($userId);
-
-        foreach ($bids as $bid)
-        {
-            $auction = $bid->getAuction();
-
-            if ($auction === null) {
-                continue;
-            }
-
-            $highestBid = $this->getHighestBidByAuctionId($auction->getAuctionId());
-            $currentPrice = $highestBid > 0 ? $highestBid : $auction->getStartingPrice();
-            $auction->setCurrentPrice($currentPrice);
-        }
-
-        return $bids;
+        return $this->bidRepo->getByUserId($userId);
     }
 
-    public function countBidsByAuctionId(int $auctionId): int
+    // Count all bids
+    public function countAll(): int
     {
-        return $this->bidRepo->countByAuctionId($auctionId);
+        return $this->bidRepo->countAll();
     }
 
-    // --- FILL RELATIONSHIP PROPERTIES FUNCTION ---
-    public function fillBuyersInBids(array $bids): void
+    // Get total revenue (sum of all winning bid amounts)
+    public function getTotalRevenue(): float
     {
-        if (empty($bids)) return;
-
-        // Collect Buyer IDs
-        $userIds = [];
-        foreach ($bids as $bid) {
-            $userIds[] = $bid->getBuyerId();
-        }
-        $userIds = array_unique($userIds);
-
-        if (empty($userIds)) return;
-
-        // Fetch Users (1 Query)
-        $users = $this->userRepo->getByIds($userIds);
-
-        // Map ID => User Object
-        $userMap = [];
-        foreach ($users as $user) {
-            $userMap[$user->getUserId()] = $user;
-        }
-
-        // Attach to Bids
-        foreach ($bids as $bid) {
-            $buyerId = $bid->getBuyerId();
-            if (isset($userMap[$buyerId])) {
-                $bid->setBuyer($userMap[$buyerId]);
-            }
-        }
+        return $this->bidRepo->getTotalRevenue();
     }
 
-    public function fillAuctionsInBids(array $bids): void
-    {
-        if (empty($bids)) return;
-
-        // Collect Auction IDs
-        $auctionIds = [];
-        foreach ($bids as $bid) {
-            $auctionIds[] = $bid->getAuctionId();
-        }
-        $auctionIds = array_unique($auctionIds);
-
-        if (empty($auctionIds)) return;
-
-        // Fetch Auctions (1 Query)
-        $auctions = $this->auctionRepo->getByIds($auctionIds);
-
-        // Map ID => Auction Object
-        $auctionMap = [];
-        foreach ($auctions as $auction) {
-            $auctionMap[$auction->getAuctionId()] = $auction;
-        }
-
-        // Attach to Bids
-        foreach ($bids as $bid) {
-            $aucId = $bid->getAuctionId();
-            if (isset($auctionMap[$aucId])) {
-                $bid->setAuction($auctionMap[$aucId]);
-            }
-        }
-    }
 }

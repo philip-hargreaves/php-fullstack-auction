@@ -13,7 +13,7 @@ require Utilities::basePath('views/partials/header.php');
 ?>
 
     <!-- Main Content with Filters -->
-    <div class="container-fluid mt-5 px-4">
+    <div class="container-fluid mt-2 px-4">
         <div class="main-content-wrapper mb-4 <?= !empty($activeFilters['keyword']) ? ' has-search-results' : '' ?>">
             <!-- Left Sidebar Filters -->
             <div class="filter-sidebar">
@@ -178,7 +178,7 @@ require Utilities::basePath('views/partials/header.php');
             </div>
 
             <!-- Main Content Area -->
-            <div class="main-content-area">
+            <div class="main-content-area mt-2">
                 <!-- Search Results Header and Sort Container (same row) -->
                 <div class="search-sort-container mb-3" style="display: flex; justify-content: space-between; align-items: center; min-height: 33px;">
                     <!-- Search Results Header -->

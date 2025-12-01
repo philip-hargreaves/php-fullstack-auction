@@ -334,7 +334,7 @@ class AuctionRepository
             $whereClause = !empty($whereConditions) ? 'WHERE ' . implode(' AND ', $whereConditions) : '';
             $havingClause = !empty($countHavingConditions) ? 'HAVING ' . implode(' AND ', $countHavingConditions) : '';
 
-            // Check items table (for keyword search) or bids table (for price filters) to see if needs join
+            // Check if we need to join items table (for keyword search) or bids table (for price filters)
             $needsItemsJoin = ($keyword !== null && $keyword !== '');
             $needsBidsJoin = !empty($havingClause);
             
@@ -595,5 +595,39 @@ class AuctionRepository
             }
         }
         return $sorted;
+    }
+
+    // Count all auctions
+    public function countAll(): int
+    {
+        try {
+            $sql = 'SELECT COUNT(*) as total FROM auctions';
+            $row = $this->db->query($sql, [])->fetch();
+            return (int)$row['total'];
+        } catch (PDOException $e) {
+            // TODO: add logging
+            return 0;
+        }
+    }
+
+    // Count auctions by status and optionally sold/unsold
+    public function countByStatus(string $status, ?bool $soldOnly = null): int
+    {
+        try {
+            $sql = 'SELECT COUNT(*) as total FROM auctions WHERE auction_status = :status';
+            $params = ['status' => $status];
+
+            if ($soldOnly === true) {
+                $sql .= ' AND winning_bid_id IS NOT NULL';
+            } elseif ($soldOnly === false) {
+                $sql .= ' AND winning_bid_id IS NULL';
+            }
+
+            $row = $this->db->query($sql, $params)->fetch();
+            return (int)$row['total'];
+        } catch (PDOException $e) {
+            // TODO: add logging
+            return 0;
+        }
     }
 }

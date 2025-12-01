@@ -42,3 +42,8 @@ $router->get('/my-bids', 'controllers/my-bids.php');
 
 // Watchlist Page
 $router->get('/watchlist', 'controllers/watchlist.php');
+
+// Admin Dashboard
+$router->get('/admin', 'controllers/admin/dashboard.php');
+$router->post('/admin/user/update-status', 'controllers/admin/update-user-status.php');
+$router->post('/admin/user/manage-role', 'controllers/admin/manage-user-role.php');
