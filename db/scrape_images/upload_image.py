@@ -6,7 +6,7 @@ import os
 
 # --- CONFIGURATION ---
 # Same API Key as your PHP script
-IMGBB_API_KEY = 'c26fe5fca2acb7c3b01ada08ba8d5e7a'
+IMGBB_API_KEY = ''
 UPLOAD_URL = 'https://api.imgbb.com/1/upload'
 
 def upload_to_imgbb(file_path):
