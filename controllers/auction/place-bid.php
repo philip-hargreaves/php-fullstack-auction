@@ -26,9 +26,6 @@ try {
         $_SESSION['place_bid_error'] = $result['message'];
     } else {
         $_SESSION['place_bid_success'] = $result['message'];
-//        if ($result['object']->getAuction()->getAuctionStatus() == 'Finished') {
-//            sleep(2);
-//        }
     }
 
     // lead back to auction page
