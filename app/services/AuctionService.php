@@ -224,8 +224,8 @@ class AuctionService
             $auction->setWinningBidId($prevAuction->getWinningBidId());
 
             // 6. Execute Update
-            $auction = $this->auctionRepo->update($auction);
-            if (!$auction) {
+            $result = $this->auctionRepo->update($auction);
+            if (!$result) {
                 $pdo->rollBack();
                 return Utilities::creationResult("Failed to update auction.", false, null);
             }
@@ -524,9 +524,9 @@ class AuctionService
             $interval = $start->diff($end);
             $totalHours = ($interval->days * 24) + $interval->h + ($interval->i / 60);
 
-            if ($totalHours < 24) {
-                return Utilities::creationResult("Auction duration must be at least 24 hours.", false, null);
-            }
+//            if ($totalHours < 24) {
+//                return Utilities::creationResult("Auction duration must be at least 24 hours.", false, null);
+//            }
 
             return Utilities::creationResult('', true, [
                 'start_datetime' => $start->format('Y-m-d H:i:s'),
@@ -631,5 +631,12 @@ class AuctionService
             $extracted['keyword'],
             $extracted['includeDescription']
         );
+    }
+
+    // Auction Status Update Cron Job
+    public function updateAuctionStatuses(): void
+    {
+        // Pass the call down to the repository
+        $this->auctionRepo->updateAuctionStatuses();
     }
 }
