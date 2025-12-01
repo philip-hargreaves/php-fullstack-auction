@@ -25,16 +25,15 @@ class Mailer
 
     public function send($to, $subject, $message)
     {
+        //Connect with Gmail SMPT server.
         $connection = fsockopen($this->host, $this->port, $errno, $errstr, 10);
         if (!$connection)
         {
             throw new Exception("Connection failed: $errstr ($errno)");
         }
+        $this->getServerResponse($connection);
 
         //Sends SMTP commands and receives server responses
-
-        //Connect with Gmail SMPT server, buffer length arbitrary
-        $this->getServerResponse($connection);
 
         //EHLO
         fwrite($connection, "EHLO {$this->host}\r\n");
