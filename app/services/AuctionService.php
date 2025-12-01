@@ -632,4 +632,16 @@ class AuctionService
             $extracted['includeDescription']
         );
     }
+
+    // Count all auctions
+    public function countAll(): int
+    {
+        return $this->auctionRepo->countAll();
+    }
+
+    // Count auctions by status
+    public function countByStatus(string $status, ?bool $soldOnly = null): int
+    {
+        return $this->auctionRepo->countByStatus($status, $soldOnly);
+    }
 }

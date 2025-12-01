@@ -27,14 +27,11 @@ class UserRepository
             $row['username'],
             $row['email'],
             $row['password'],
-            (bool)$row['is_active']
+            (bool)$row['is_active'],
+            $row['created_datetime'] ?? date('Y-m-d H:i:s')
         );
     }
 
-    /**
-     * Hydrates a User with roles from multiple JOIN rows
-     * (Each row contains the same user data but different role data)
-     */
     private function hydrateWithRoles(array $rows): ?User
     {
         if (empty($rows)) {
@@ -83,7 +80,7 @@ class UserRepository
 
     public function getByEmail(string $email): ?User
     {
-        $sql = "SELECT u.id, u.username, u.email, u.password, u.is_active,
+        $sql = "SELECT u.id, u.username, u.email, u.password, u.is_active, u.created_datetime,
                        r.id AS role_id, r.role_name
                 FROM users u
                 LEFT JOIN user_roles ur ON u.id = ur.user_id
@@ -97,7 +94,7 @@ class UserRepository
 
     public function getByEmailOrUsername(string $emailOrUsername): ?User
     {
-        $sql = "SELECT u.id, u.username, u.email, u.password, u.is_active,
+        $sql = "SELECT u.id, u.username, u.email, u.password, u.is_active, u.created_datetime,
                        r.id AS role_id, r.role_name
                 FROM users u
                 LEFT JOIN user_roles ur ON u.id = ur.user_id
@@ -111,7 +108,7 @@ class UserRepository
 
     public function getById(int $userId): ?User
     {
-        $sql = "SELECT u.id, u.username, u.email, u.password, u.is_active,
+        $sql = "SELECT u.id, u.username, u.email, u.password, u.is_active, u.created_datetime,
                        r.id AS role_id, r.role_name
                 FROM users u
                 LEFT JOIN user_roles ur ON u.id = ur.user_id
@@ -156,47 +153,6 @@ class UserRepository
         }
     }
 
-    public function updateAccount(int $userId, array $data): bool
-    {
-        try {
-            $sql = "UPDATE users 
-                    SET username = :username, email = :email 
-                    WHERE id = :id";
-            $params = [
-                'username' => $data['username'],
-                'email' => $data['email'],
-                'id' => $userId
-            ];
-
-            $stmt = $this->db->query($sql, $params);
-
-            return $stmt->rowCount() > 0;
-
-        } catch (PDOException $e) {
-            return false;
-        }
-    }
-
-    public function updatePassword(int $userId, string $newPasswordHash): bool
-    {
-        try {
-            $sql = "UPDATE users 
-                    SET password = :password 
-                    WHERE id = :id";
-            $params = [
-                'password' => $newPasswordHash,
-                'id' => $userId
-            ];
-
-            $stmt = $this->db->query($sql, $params);
-
-            return $stmt->rowCount() > 0;
-
-        } catch (PDOException $e) {
-            return false;
-        }
-    }
-
     public function getByIds(array $ids): array
     {
         if (empty($ids)) return [];
@@ -208,5 +164,102 @@ class UserRepository
         $rows = $this->db->query($sql, array_values($ids))->fetchAll();
 
         return $this->hydrateMany($rows);
+    }
+
+    // Hydrate multiple users with their roles from query results
+    // Groups rows by user ID and adds roles to each user
+    private function hydrateManyWithRoles(array $rows): array
+    {
+        if (empty($rows)) {
+            return [];
+        }
+
+        $users = [];
+        $currentUserId = null;
+        $currentUser = null;
+
+        foreach ($rows as $row) {
+            $userId = (int)$row['id'];
+
+            // New user encountered
+            if ($currentUserId !== $userId) {
+                // Save previous user if exists
+                if ($currentUser !== null) {
+                    $users[] = $currentUser;
+                }
+
+                // Create new user
+                $currentUser = $this->hydrate($row);
+                if ($currentUser === null) {
+                    continue;
+                }
+                $currentUserId = $userId;
+            }
+
+            // Add role to current user if role exists
+            if (!empty($row['role_id'])) {
+                $role = new Role((int)$row['role_id'], $row['role_name']);
+                $currentUser->addRole($role);
+            }
+        }
+
+        // Don't forget the last user
+        if ($currentUser !== null) {
+            $users[] = $currentUser;
+        }
+
+        return $users;
+    }
+
+    // Get all users with their roles (for admin dashboard)
+    // Supports pagination
+    public function getAllWithRoles(int $limit = 50, int $offset = 0): array
+    {
+        try {
+            $sql = "SELECT u.id, u.username, u.email, u.password, u.is_active, u.created_datetime,
+                           r.id AS role_id, r.role_name
+                    FROM users u
+                    LEFT JOIN user_roles ur ON u.id = ur.user_id
+                    LEFT JOIN roles r       ON ur.role_id = r.id
+                    ORDER BY u.created_datetime DESC
+                    LIMIT {$limit} OFFSET {$offset}";
+            $params = [];
+            $rows = $this->db->query($sql, $params)->fetchAll();
+
+            return $this->hydrateManyWithRoles($rows);
+        } catch (PDOException $e) {
+            // TODO: add logging
+            return [];
+        }
+    }
+
+    // Count total number of users
+    public function countAll(): int
+    {
+        try {
+            $sql = 'SELECT COUNT(*) as total FROM users';
+            $row = $this->db->query($sql, [])->fetch();
+            return (int)$row['total'];
+        } catch (PDOException $e) {
+            // TODO: add logging
+            return 0;
+        }
+    }
+
+    // Update user's active status
+    public function updateActiveStatus(int $userId, bool $isActive): bool
+    {
+        try {
+            $sql = 'UPDATE users SET is_active = :is_active WHERE id = :id';
+            $params = [
+                'is_active' => $isActive ? 1 : 0,
+                'id' => $userId
+            ];
+            $stmt = $this->db->query($sql, $params);
+            return $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            // TODO: add logging
+            return false;
+        }
     }
 }
