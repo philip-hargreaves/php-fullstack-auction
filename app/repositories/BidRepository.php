@@ -11,39 +11,23 @@ use PDOException;
 class BidRepository
 {
     private Database $db;
-    private UserRepository $userRepo;
-    private AuctionRepository $auctionRepo;
 
-    public function __construct(Database $db, UserRepository $userRepo, AuctionRepository $auctionRepo) {
+    public function __construct(Database $db) {
         $this->db = $db;
-        $this->userRepo = $userRepo;
-        $this->auctionRepo = $auctionRepo;
     }
 
     private function hydrate($row): ?Bid {
         if (empty($row)) {
             return null;
         }
-        $object = new Bid(
+
+        return new Bid(
             (int)$row['id'],
             (int)$row['buyer_id'],
             (int)$row['auction_id'],
             (float)$row['bid_amount'],
             $row['bid_datetime']
         );
-
-        // Set relationship properties
-        $buyer = $this->userRepo->getById($row['buyer_id']);
-        $auction = $this->auctionRepo->getById($row['auction_id']);
-
-        if ($buyer === null || $auction === null)
-        {
-            return null;
-        }
-        $object->setBuyer($buyer);
-        $object->setAuction($auction);
-
-        return $object;
     }
 
     private function extract(bid $bid): array {
@@ -59,7 +43,6 @@ class BidRepository
     public function getById(int $bidId): ?Bid
     {
         try {
-            // Query
             $sql = "SELECT * FROM bids WHERE id = :bid_id";
             $params = ['bid_id' => $bidId];
             $row = $this->db->query($sql, $params)->fetch();
@@ -149,6 +132,19 @@ class BidRepository
         }
     }
 
+    public function countByAuctionId(int $auctionId): int
+    {
+        try {
+            $sql = "SELECT COUNT(*) as total FROM bids WHERE auction_id = :auction_id";
+            $params = ['auction_id' => $auctionId];
+            $row = $this->db->query($sql, $params)->fetch();
+            return (int)$row['total'];
+        } catch (PDOException $e) {
+            // TODO: add logging
+            return 0;
+        }
+    }
+
     public function hydrateMany(array $rows): array {
         $objects = [];
 
@@ -160,34 +156,5 @@ class BidRepository
             }
         }
         return $objects;
-    }
-
-    // Count all bids
-    public function countAll(): int
-    {
-        try {
-            $sql = 'SELECT COUNT(*) as total FROM bids';
-            $row = $this->db->query($sql, [])->fetch();
-            return (int)$row['total'];
-        } catch (PDOException $e) {
-            // TODO: add logging
-            return 0;
-        }
-    }
-
-    // Get total revenue (sum of all winning bid amounts)
-    public function getTotalRevenue(): float
-    {
-        try {
-            $sql = 'SELECT COALESCE(SUM(b.bid_amount), 0) as total_revenue
-                    FROM auctions a
-                    INNER JOIN bids b ON a.winning_bid_id = b.id
-                    WHERE a.winning_bid_id IS NOT NULL';
-            $row = $this->db->query($sql, [])->fetch();
-            return (float)($row['total_revenue'] ?? 0);
-        } catch (PDOException $e) {
-            // TODO: add logging
-            return 0.0;
-        }
     }
 }

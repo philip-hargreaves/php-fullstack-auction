@@ -2,7 +2,6 @@
 
 use infrastructure\Request;
 use infrastructure\DIContainer;
-use app\services\AuthService;
 
 session_start();
 
@@ -31,13 +30,7 @@ try {
     // Attempt login via AuthService
     if ($authService->attemptLogin($emailOrUsername, $password)) {
         $_SESSION['login_success'] = 'Login successful!';
-        
-        // Redirect admins to admin dashboard, others to home page
-        if (AuthService::hasRole('admin')) {
-            header('Location: /admin');
-        } else {
-            header('Location: /');
-        }
+        header('Location: /');
         exit;
     }
 

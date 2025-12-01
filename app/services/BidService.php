@@ -260,18 +260,6 @@ class BidService
         return $this->bidRepo->countByAuctionId($auctionId);
     }
 
-    // Count all bids
-    public function countAll(): int
-    {
-        return $this->bidRepo->countAll();
-    }
-
-    // Get total revenue (sum of all winning bid amounts)
-    public function getTotalRevenue(): float
-    {
-        return $this->bidRepo->getTotalRevenue();
-    }
-
     // --- FILL RELATIONSHIP PROPERTIES FUNCTION ---
     public function fillBuyersInBids(array $bids): void
     {

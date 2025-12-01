@@ -128,9 +128,6 @@ $isSeller = AuthService::hasRole('seller');
                         Become a Seller
                     </button>
                 <?php endif; ?>
-                <?php if (AuthService::hasRole('admin')): ?>
-                    <a href="/admin" class="nav-button" style="color: var(--color-text-primary) !important; text-decoration: none !important;">Admin</a>
-                <?php endif; ?>
                 <a href="/notifications" class="nav-button notification-button" style="color: var(--color-text-primary) !important; text-decoration: none !important;">
                     <i class="fa fa-bell notification-icon"></i>
                 </a>

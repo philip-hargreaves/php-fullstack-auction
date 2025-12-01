@@ -178,17 +178,4 @@ class RoleRepository
 
         return $this->db->query($sql, array_values($userIds))->fetchAll();
     }
-
-    // Get all roles (for admin role management)
-    public function getAll(): array
-    {
-        try {
-            $sql = 'SELECT id, role_name FROM roles ORDER BY id ASC';
-            $rows = $this->db->query($sql, [])->fetchAll();
-            return $this->hydrateMany($rows);
-        } catch (PDOException $e) {
-            // TODO: add logging
-            return [];
-        }
-    }
 }

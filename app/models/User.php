@@ -1,7 +1,6 @@
 <?php
 
 namespace app\models;
-use DateTime;
 
 class User
 {
@@ -11,7 +10,6 @@ class User
     private string $email;
     private string $password;
     private bool $isActive;
-    private DateTime $createdDatetime;
 
     // RELATIONSHIP PROPERTIES
     private array $roles = [];
@@ -23,15 +21,13 @@ class User
         string $username,
         string $email,
         string $password,
-        int|bool $isActive,
-        string|DateTime $createdDatetime
+        int|bool $isActive
     ) {
         $this->userId = $userId;
         $this->username = $username;
         $this->email = $email;
         $this->password = $password;
         $this->isActive = (bool)$isActive;
-        $this->createdDatetime = is_string($createdDatetime) ? new DateTime($createdDatetime) : $createdDatetime;
     }
 
     // BUSINESS LOGIC METHODS
@@ -107,11 +103,6 @@ class User
         return $this->isActive;
     }
 
-    public function getCreatedDatetime(): DateTime
-    {
-        return $this->createdDatetime;
-    }
-
     public function getAddresses(): array {
         return $this->addresses;
     }
@@ -146,11 +137,6 @@ class User
     public function setUserId(int $userId): void
     {
         $this->userId = $userId;
-    }
-
-    public function setCreatedDatetime(DateTime $createdDatetime): void
-    {
-        $this->createdDatetime = $createdDatetime;
     }
 
     public function setAddresses(array $addresses): void {
