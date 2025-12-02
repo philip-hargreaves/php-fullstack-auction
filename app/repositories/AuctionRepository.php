@@ -704,24 +704,29 @@ class AuctionRepository
 
     public function endSoldAuction(Auction $auction): bool {
         try {
+
             if ($auction->getAuctionStatus() == 'Finished' && $auction->getWinningBidId() != null) {
                 $result = $this->update($auction);
-                if ($result == false) {
+//
+
+                if ($result === false) {
                     return false;
                 }
 
                 $sql = "
-                    UPDATE items 
+                    UPDATE items
                     SET is_sold = 1
-                    WHERE item_id = :item_id
+                    WHERE id = :item_id
                 ";
                 $params = ["item_id" => $auction->getItemId()];
 
-                $this->db->query($sql, $params);
+                $result = $this->db->query($sql, $params);
+
                 return true;
             }
             return false;
         } catch (PDOException $e) {
+            Utilities::dd($e);
             return false;
         }
     }

@@ -174,7 +174,7 @@ class BidService
                 $auction->setAuctionStatus('Finished');
                 $result = $this->auctionRepo->endSoldAuction($auction);
 
-                if ($result) {
+                if (!$result) {
                     // Failed to end auction - rollback bid creation
                     $pdo->rollBack();
                     return Utilities::creationResult('Failed to create bid.', false, null);
