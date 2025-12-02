@@ -4,12 +4,8 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
 
     <div class="container my-5">
 
-        <?php if ($isOwnProfile): ?>
-            <h1 class="page-title">Manage Account</h1>
-            <p class="lead">Account details for: <?= htmlspecialchars($user->getUsername()) ?></p>
-        <?php else: ?>
-            <h1 class="page-title mb-2">User Profile</h1> <h3 class="text-danger mt-0"><?= htmlspecialchars($user->getUsername()) ?></h3>
-        <?php endif; ?>
+        <h1 class="page-title mb-2">User Profile</h1>
+        <h3 class="text-danger mt-0"><?= htmlspecialchars($user->getUsername()) ?></h3>
         <?php if ($isTargetUserSeller): ?>
             <div class="d-flex align-items-center mb-4">
 
@@ -165,7 +161,7 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
             <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Seller Reviews (<?= $sellerRatingCount ?>)</h5>
+                        <h5 class="modal-title">Reviews (<?= $sellerRatingCount ?>)</h5>
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
                     </div>
                     <div class="modal-body">
