@@ -12,6 +12,9 @@ class Conversation
 
     // RELATIONSHIP PROPERTIES
     private array $users;
+    private array $messages;
+    private ?Auction $auction;
+    private Message $lastMessage;
 
     // CONSTRUCTOR
     public function __construct(
@@ -63,5 +66,21 @@ class Conversation
     public function getUsers(): array
     {
         return $this->users;
+    }
+
+    public function setMessages(array $messages): void {
+        $this->messages = $messages;
+    }
+
+    public function getMessages(): array {
+        return $this->messages;
+    }
+
+    public function setAuction(?Auction $auction): void {
+        $this->auction = $auction;
+    }
+
+    public function getAuction(): ?Auction {
+        return $this->auction;
     }
 }

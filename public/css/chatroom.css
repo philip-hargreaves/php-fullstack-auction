@@ -1,0 +1,196 @@
+.chat-container {
+    display: flex;
+    /* Calculate height: 100vh minus the approximate height of your header (e.g., 72px) */
+    height: calc(100vh - 72px);
+    width: 100%;
+    background-color: var(--color-background-primary);
+}
+
+/* --- SIDEBAR --- */
+.sidebar {
+    width: 320px;
+    flex-shrink: 0;
+    background-color: var(--color-background-secondary); /* #2d2d2d */
+    border-right: 1px solid var(--color-background-tertiary); /* #404040 */
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-header {
+    padding: 20px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    border-bottom: 1px solid var(--color-background-tertiary);
+}
+
+.conversation-list {
+    overflow-y: auto;
+    flex: 1;
+}
+
+.conversation-item {
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--color-background-tertiary);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.conversation-item:hover {
+    background-color: var(--color-background-tertiary); /* Lighter gray on hover */
+}
+
+.conversation-item.active {
+    background-color: #383838; /* Slightly lighter than secondary to show active */
+    border-left: 4px solid var(--color-auctivity-red);
+}
+
+.item-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--color-text-primary);
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.msg-time {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    font-weight: 400;
+}
+
+.seller-info {
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 5px;
+}
+
+.last-msg {
+    font-size: 0.85rem;
+    color: #888;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* --- MAIN CHAT AREA --- */
+.chat-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-background-primary); /* #222 */
+}
+
+.chat-header {
+    padding: 15px 25px;
+    background-color: var(--color-background-secondary); /* Match sidebar bg */
+    border-bottom: 1px solid var(--color-background-tertiary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-item-info h2 {
+    font-size: 1.1rem;
+    margin: 0 0 5px 0;
+    color: var(--color-text-primary);
+}
+
+.header-item-details {
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+}
+
+.header-price {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #4ade80; /* Bright Green for dark mode contrast */
+}
+
+/* Messages Box */
+.messages-box {
+    flex: 1;
+    padding: 25px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.message-bubble {
+    max-width: 70%;
+    padding: 12px 16px;
+    border-radius: 18px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    position: relative;
+}
+
+.message-sent {
+    align-self: flex-end;
+    background-color: var(--color-auctivity-red);
+    color: white;
+    border-bottom-right-radius: 4px;
+}
+
+.message-received {
+    align-self: flex-start;
+    background-color: var(--color-background-tertiary); /* #404040 */
+    color: var(--color-text-primary);
+    border-bottom-left-radius: 4px;
+}
+
+.message-meta {
+    font-size: 0.7rem;
+    margin-top: 5px;
+    text-align: right;
+    opacity: 0.7;
+}
+
+/* Input Area */
+.input-area {
+    padding: 20px;
+    background-color: var(--color-background-secondary);
+    border-top: 1px solid var(--color-background-tertiary);
+}
+
+.input-form {
+    display: flex;
+    gap: 12px;
+}
+
+.input-form input {
+    flex: 1;
+    padding: 12px 15px;
+    border-radius: 25px;
+    border: 1px solid #555;
+    background-color: var(--color-background-primary);
+    color: var(--color-text-primary);
+    outline: none;
+}
+
+.input-form input:focus {
+    border-color: var(--color-auctivity-red);
+}
+
+.input-form button {
+    padding: 10px 25px;
+    background-color: var(--color-auctivity-red);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.input-form button:hover {
+    opacity: 0.9;
+}
+
+/* Dark Mode Scrollbars */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--color-background-primary); }
+::-webkit-scrollbar-thumb { background: #555; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #777; }

@@ -47,3 +47,7 @@ $router->get('/watchlist', 'controllers/watchlist.php');
 $router->get('/admin', 'controllers/admin/dashboard.php');
 $router->post('/admin/user/update-status', 'controllers/admin/update-user-status.php');
 $router->post('/admin/user/manage-role', 'controllers/admin/manage-user-role.php');
+
+// Chatroom Page
+$router->post('/send-message', 'controllers/chatroom/send-message.php');
+$router->get('/chatroom', 'controllers/chatroom/chatroom.php');
