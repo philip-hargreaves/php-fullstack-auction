@@ -48,9 +48,11 @@ class NotificationRepository
 
     public function isExist(Notification $notification)
     {
-        $params = $this->extract($notification);
+        try
+        {
+            $params = $this->extract($notification);
 
-        $sqlCheck = "SELECT id 
+            $sqlCheck = "SELECT id 
                      FROM notifications 
                      WHERE auction_id = :auction_id
                        AND recipient_id = :recipient_id
@@ -58,22 +60,27 @@ class NotificationRepository
                        AND notification_content_type = :notification_content_type
                      LIMIT 1";
 
-        $paramsCheck = [
-            'auction_id' => $params['auction_id'],
-            'recipient_id' => $params['recipient_id'],
-            'notification_type' => $params['notification_type'],
-            'notification_content_type' => $params['notification_content_type']
-        ];
+            $paramsCheck = [
+                'auction_id' => $params['auction_id'],
+                'recipient_id' => $params['recipient_id'],
+                'notification_type' => $params['notification_type'],
+                'notification_content_type' => $params['notification_content_type']
+            ];
 
-        $existing = $this->db->query($sqlCheck, $paramsCheck)->fetch();
+            $existing = $this->db->query($sqlCheck, $paramsCheck)->fetch();
 
-        if ($existing)
-        {
-            return true;
+            if ($existing)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
-        else
+        catch (PDOException $e)
         {
-            return false;
+            return null;
         }
     }
 
