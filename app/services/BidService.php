@@ -21,6 +21,7 @@ class BidService
     private RatingRepository $ratingRepo;
     private NotificationService $notificationServ;
 
+
     public function __construct(BidRepository $bidRepo, AuctionRepository $auctionRepo, UserRepository $userRepo, Database $db, RatingRepository $ratingRepo, NotificationService $notificationServ) {
         $this->bidRepo = $bidRepo;
         $this->auctionRepo = $auctionRepo;
@@ -229,7 +230,7 @@ class BidService
                 $auction->setAuctionStatus('Finished');
                 $result = $this->auctionRepo->endSoldAuction($auction);
 
-                if ($result) {
+                if (!$result) {
                     // Failed to end auction - rollback bid creation
                     $pdo->rollBack();
                     return Utilities::creationResult('Failed to create bid.', false, null);
@@ -359,11 +360,6 @@ class BidService
     public function getTotalRevenue(): float
     {
         return $this->bidRepo->getTotalRevenue();
-    }
-
-    public function countBidsByAuctionId(int $auctionId): int
-    {
-        return $this->bidRepo->countByAuctionId($auctionId);
     }
 
     // --- FILL RELATIONSHIP PROPERTIES FUNCTION ---

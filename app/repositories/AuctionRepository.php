@@ -737,7 +737,7 @@ class AuctionRepository
                 $sql = "
                     UPDATE items 
                     SET is_sold = 1
-                    WHERE item_id = :item_id
+                    WHERE id = :item_id
                 ";
                 $params = ["item_id" => $auction->getItemId()];
 
