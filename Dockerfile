@@ -7,3 +7,4 @@ RUN a2enmod rewrite
 # Install necessary PHP extensions for database connection
 RUN docker-php-ext-install pdo pdo_mysql
 
+

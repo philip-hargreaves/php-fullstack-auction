@@ -2,6 +2,8 @@
 require Utilities::basePath('views/partials/header.php');
 /**
  * @var $processed_auctions array
+ * @var $processed_recommended_auctions array
+ * @var $popular_categories array
  * @var $curr_page
  * @var $querystring
  * @var $low_page
@@ -11,14 +13,14 @@ require Utilities::basePath('views/partials/header.php');
 ?>
 
     <!-- Main Content with Filters -->
-    <div class="container-fluid mt-5 px-4">
-        <div class="main-content-wrapper<?= !empty($activeFilters['keyword']) ? ' has-search-results' : '' ?>">
+    <div class="container-fluid mt-2 px-4">
+        <div class="main-content-wrapper mb-4 <?= !empty($activeFilters['keyword']) ? ' has-search-results' : '' ?>">
             <!-- Left Sidebar Filters -->
             <div class="filter-sidebar">
                 <form method="GET" action="/" id="filterForm">
                     <!-- Preserve sort order -->
                     <input type="hidden" name="order_by" value="<?= htmlspecialchars($activeFilters['ordering']) ?>">
-                    
+
                     <!-- Search Options Accordion -->
                     <div class="filter-section">
                         <button type="button" class="accordion-button" id="searchAccordion" aria-expanded="true" aria-controls="searchContent">
@@ -36,7 +38,7 @@ require Utilities::basePath('views/partials/header.php');
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Categories Accordion -->
                     <div class="filter-section">
                         <button type="button" class="accordion-button" id="categoryAccordion" aria-expanded="true" aria-controls="categoryContent">
@@ -52,7 +54,7 @@ require Utilities::basePath('views/partials/header.php');
                                     <option value="">All Categories</option>
                                     <?php if (!empty($activeFilters['categoryTree'])): ?>
                                         <?php foreach ($activeFilters['categoryTree'] as $cat): ?>
-                                            <option value="<?= $cat['id'] ?>" 
+                                            <option value="<?= $cat['id'] ?>"
                                                 <?= (!empty($activeFilters['selectedCategoryPath'][0]) && $activeFilters['selectedCategoryPath'][0] == $cat['id']) ? 'selected' : '' ?>>
                                                 <?= htmlspecialchars($cat['name']) ?>
                                             </option>
@@ -158,7 +160,7 @@ require Utilities::basePath('views/partials/header.php');
                         </button>
                         <div id="priceContent" class="accordion-content" aria-labelledby="priceAccordion">
                             <div class="price-range">
-                                <input type="number" class="price-input" name="min_price" placeholder="Min" min="0" 
+                                <input type="number" class="price-input" name="min_price" placeholder="Min" min="0"
                                     value="<?= htmlspecialchars($activeFilters['minPrice'] ?? '') ?>">
                                 <span class="price-separator">-</span>
                                 <input type="number" class="price-input" name="max_price" placeholder="Max" min="0"
@@ -176,7 +178,7 @@ require Utilities::basePath('views/partials/header.php');
             </div>
 
             <!-- Main Content Area -->
-            <div class="main-content-area">
+            <div class="main-content-area mt-2">
                 <!-- Search Results Header and Sort Container (same row) -->
                 <div class="search-sort-container mb-3" style="display: flex; justify-content: space-between; align-items: center; min-height: 33px;">
                     <!-- Search Results Header -->
@@ -194,7 +196,7 @@ require Utilities::basePath('views/partials/header.php');
                             </span>
                         </div>
                     <?php endif; ?>
-                    
+
                     <div class="sort-container" style="<?= !empty($activeFilters['keyword']) ? 'flex-shrink: 0;' : 'margin-left: auto;' ?>">
                     <div class="sort-dropdown">
                         <button type="button" class="sort-button" id="sortButton">
@@ -211,7 +213,7 @@ require Utilities::basePath('views/partials/header.php');
                                 if (!empty($activeFilters['categoryId'])): ?>
                                     <input type="hidden" name="category" value="<?= htmlspecialchars($activeFilters['categoryId']) ?>">
                                 <?php endif;
-                                
+
                                 if (!empty($activeFilters['conditions'])): ?>
                                     <?php foreach ($activeFilters['conditions'] as $condition): ?>
                                         <?php
@@ -227,36 +229,36 @@ require Utilities::basePath('views/partials/header.php');
                                         <?php endif; ?>
                                     <?php endforeach; ?>
                                 <?php endif;
-                                
+
                                 // Preserve status filters - use filter flags to determine which checkboxes were selected
                                 if (in_array('Active', $activeFilters['statuses'])): ?>
                                     <input type="hidden" name="auction_status[]" value="active">
                                 <?php endif;
-                                
+
                                 if ($activeFilters['completedFilter'] ?? false): ?>
                                     <input type="hidden" name="auction_status[]" value="completed">
                                 <?php endif;
-                                
+
                                 if ($activeFilters['soldFilter'] ?? false): ?>
                                     <input type="hidden" name="auction_status[]" value="sold">
                                 <?php endif; ?>
-                                
+
                                 <?php if (!empty($activeFilters['keyword'])): ?>
                                     <input type="hidden" name="keyword" value="<?= htmlspecialchars($activeFilters['keyword']) ?>">
                                 <?php endif; ?>
-                                
+
                                 <?php if (($activeFilters['includeDescription'] ?? false)): ?>
                                     <input type="hidden" name="include_description" value="1">
                                 <?php endif; ?>
-                                
+
                                 <?php if (!empty($activeFilters['minPrice'])): ?>
                                     <input type="hidden" name="min_price" value="<?= htmlspecialchars($activeFilters['minPrice']) ?>">
                                 <?php endif; ?>
-                                
+
                                 <?php if (!empty($activeFilters['maxPrice'])): ?>
                                     <input type="hidden" name="max_price" value="<?= htmlspecialchars($activeFilters['maxPrice']) ?>">
                                 <?php endif; ?>
-                                
+
                                 <button type="submit" name="order_by" value="recommended" class="sort-option">Recommended order</button>
                                 <button type="submit" name="order_by" value="date" class="sort-option active">Newest</button>
                                 <button type="submit" name="order_by" value="ending_soonest" class="sort-option">Ending Soonest</button>
@@ -267,7 +269,7 @@ require Utilities::basePath('views/partials/header.php');
                     </div>
                     </div>
                 </div>
-                
+
                 <div class="auction-gallery">
                     <?php if (empty($processed_auctions)): ?>
                         <!-- No Results Message -->
@@ -282,13 +284,127 @@ require Utilities::basePath('views/partials/header.php');
                     <?php else: ?>
                         <?php foreach ($processed_auctions as $auction):
                             // Use image from database, or default placeholder
-                            $imageUrl = $auction['image_url'] ?? 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=300&h=300&fit=crop';
+                            $imageUrl = $auction['image_url'] ?? '/images/default_item_image.jpg';
                             ?>
-                        <div class="auction-card card h-100">
+                            <div class="auction-card card h-100">
+                                <div class="auction-image-container">
+                                    <a href="/auction?auction_id=<?= htmlspecialchars($auction['auction_id']) ?>">
+                                        <img src="<?= htmlspecialchars($imageUrl) ?>"
+                                             alt="<?= htmlspecialchars($auction['title']) ?>"
+                                             class="auction-image card-img-top">
+                                    </a>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-0">
+                                        <div>
+                                            <h6 class="card-title mb-0">
+                                                <a href="/auction?auction_id=<?= htmlspecialchars($auction['auction_id']) ?>" class="text-decoration-none">
+                                                    <?= htmlspecialchars($auction['title']) ?>
+                                                </a>
+                                            </h6>
+                                            <?php if (isset($auction['condition'])): ?>
+                                                <div class="auction-condition"><?= htmlspecialchars($auction['condition']) ?></div>
+                                            <?php endif; ?>
+                                        </div>
+                                        <div class="auction-info">
+                                            <?= htmlspecialchars($auction['bid_text']) ?>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-end">
+                                        <div class="auction-price">
+                                            <span class="price-amount">£<?= number_format($auction['current_price'], 2) ?></span>
+                                        </div>
+                                        <div class="auction-time">
+                                            <i class="fa fa-clock-o" aria-hidden="true"></i>
+                                            <span><?= htmlspecialchars($auction['time_remaining']) ?></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+
+                <hr class="my-4">
+
+                <!-- Popular Categories -->
+                <?php if (!empty($popular_categories)): ?>
+                    <section class="popular-categories-section">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h4 class="section-title m-0">Popular categories</h4>
+                            <a href="/categories" class="btn btn-link text-decoration-none">View all</a>
+                        </div>
+                        <div class="horizontal-scroll-wrapper mb-3" style="">
+                            <?php foreach ($popular_categories as $index => $cat): ?>
+                                <a href="/category_view?id=<?= $cat->getCategoryId() ?>" class="category-card cat-color-<?= $index % 6 ?>">
+                                    <div class="cat-content">
+                                        <h4 class="cat-title"><?= htmlspecialchars($cat->getCategoryName()) ?></h4>
+                                    </div>
+                                </a>
+                            <?php endforeach; ?>
+                        </div>
+                    </section>
+                <?php endif; ?>
+
+                <hr class="my-4">
+
+                <!-- Pagination -->
+                <?php if (isset($max_page) && $max_page > 1): ?>
+                <div class="pagination-container">
+                    <nav aria-label="Search results pages">
+                        <ul class="pagination justify-content-center">
+                            <!-- Previous button -->
+                            <?php if ($curr_page != 1) : ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="/?<?php echo $querystring; ?>page=<?php echo $curr_page - 1; ?>" aria-label="Previous">
+                                        <span aria-hidden="true"><i class="fa fa-arrow-left"></i></span>
+                                        <span class="sr-only">Previous</span>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+
+                            <!-- Numbered Pages -->
+                            <?php for ($i = $low_page; $i <= $high_page; $i++) : ?>
+                                <?php if ($i == $curr_page) : ?>
+                                    <li class="page-item active">
+                                <?php else : ?>
+                                    <li class="page-item">
+                                <?php endif; ?>
+
+                                <a class="page-link" href="/?<?php echo $querystring; ?>page=<?php echo $i; ?>"><?php echo $i; ?></a>
+                                </li>
+                            <?php endfor; ?>
+
+                            <!-- Next Button -->
+                            <?php if ($curr_page < $max_page && $num_results > 0) : ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="/?<?php echo $querystring; ?>page=<?php echo $curr_page + 1; ?>" aria-label="Next">
+                                        <span aria-hidden="true"><i class="fa fa-arrow-right"></i></span>
+                                        <span class="sr-only">Next</span>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+                        </ul>
+                    </nav>
+                </div>
+                <?php endif; ?>
+            </div>
+        </div>
+        <!-- Recommended Auctions -->
+        <?php if (!empty($processed_recommended_auctions)): ?>
+            <div class="recommended-section">
+                <h4 class="mb-4">Recommended For You</h4>
+
+                <div class="horizontal-scroll-wrapper">
+                    <?php foreach ($processed_recommended_auctions as $recAuction):
+                        // Logic identical to your main loop
+                        $recImageUrl = $recAuction['image_url'] ?? '/images/default_item_image.jpg';
+                        ?>
+                        <div class="auction-card card scroller-card h-100">
                             <div class="auction-image-container">
-                                <a href="/auction?auction_id=<?= htmlspecialchars($auction['auction_id']) ?>">
-                                    <img src="<?= htmlspecialchars($imageUrl) ?>" 
-                                         alt="<?= htmlspecialchars($auction['title']) ?>" 
+                                <a href="/auction?auction_id=<?= htmlspecialchars($recAuction['auction_id']) ?>">
+                                    <img src="<?= htmlspecialchars($recImageUrl) ?>"
+                                         alt="<?= htmlspecialchars($recAuction['title']) ?>"
                                          class="auction-image card-img-top">
                                 </a>
                             </div>
@@ -296,82 +412,37 @@ require Utilities::basePath('views/partials/header.php');
                                 <div class="d-flex justify-content-between align-items-start mb-0">
                                     <div>
                                         <h6 class="card-title mb-0">
-                                            <a href="/auction?auction_id=<?= htmlspecialchars($auction['auction_id']) ?>" class="text-decoration-none">
-                                                <?= htmlspecialchars($auction['title']) ?>
+                                            <a href="/auction?auction_id=<?= htmlspecialchars($recAuction['auction_id']) ?>" class="text-decoration-none">
+                                                <?= htmlspecialchars($recAuction['title']) ?>
                                             </a>
                                         </h6>
-                                        <?php if (isset($auction['condition'])): ?>
-                                            <div class="auction-condition"><?= htmlspecialchars($auction['condition']) ?></div>
+                                        <?php if (isset($recAuction['condition'])): ?>
+                                            <div class="auction-condition"><?= htmlspecialchars($recAuction['condition']) ?></div>
                                         <?php endif; ?>
                                     </div>
                                     <div class="auction-info">
-                                        <?= htmlspecialchars($auction['bid_text']) ?>
+                                        <?= htmlspecialchars($recAuction['bid_text'] ?? '0 Bids') ?>
                                     </div>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-end">
                                     <div class="auction-price">
-                                        <span class="price-amount">£<?= number_format($auction['current_price'], 2) ?></span>
+                                        <span class="price-amount">£<?= number_format($recAuction['current_price'], 2) ?></span>
                                     </div>
                                     <div class="auction-time">
-                                        <?php if ($auction['show_time_icon'] ?? true): ?>
-                                            <i class="fa fa-clock-o" aria-hidden="true"></i>
-                                        <?php endif; ?>
-                                        <span class="<?= htmlspecialchars($auction['status_class'] ?? '') ?>">
-                                            <?= htmlspecialchars($auction['time_remaining']) ?>
-                                        </span>
+                                        <i class="fa fa-clock-o" aria-hidden="true"></i>
+                                        <span><?= htmlspecialchars($recAuction['time_remaining']) ?></span>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
+                    <?php endforeach; ?>
                 </div>
-                
-                <!-- Pagination -->
-                <?php if (isset($max_page) && $max_page > 1): ?>
-                <div class="pagination-container mt-5">
-        <nav aria-label="Search results pages">
-            <ul class="pagination justify-content-center">
-            <!-- Previous button -->
-            <?php if ($curr_page != 1) : ?>
-                <li class="page-item">
-                    <a class="page-link" href="/?<?php echo $querystring; ?>page=<?php echo $curr_page - 1; ?>" aria-label="Previous">
-                        <span aria-hidden="true"><i class="fa fa-arrow-left"></i></span>
-                        <span class="sr-only">Previous</span>
-                    </a>
-                </li>
-            <?php endif; ?>
-
-            <!-- Numbered Pages -->
-            <?php for ($i = $low_page; $i <= $high_page; $i++) : ?>
-                <?php if ($i == $curr_page) : ?>
-                    <li class="page-item active">
-                <?php else : ?>
-                    <li class="page-item">
-                <?php endif; ?>
-
-                <a class="page-link" href="/?<?php echo $querystring; ?>page=<?php echo $i; ?>"><?php echo $i; ?></a>
-                </li>
-            <?php endfor; ?>
-
-            <!-- Next Button -->
-            <?php if ($curr_page < $max_page && $num_results > 0) : ?>
-                <li class="page-item">
-                    <a class="page-link" href="/?<?php echo $querystring; ?>page=<?php echo $curr_page + 1; ?>" aria-label="Next">
-                        <span aria-hidden="true"><i class="fa fa-arrow-right"></i></span>
-                        <span class="sr-only">Next</span>
-                    </a>
-                </li>
-            <?php endif; ?>
-            </ul>
-        </nav>
-                </div>
-                <?php endif; ?>
             </div>
-        </div>
+            <hr class="my-3">
+        <?php endif; ?>
     </div>
     <!-- Pagination -->
-            <?php require Utilities::basePath('views/partials/footer.php'); ?>
+<?php require Utilities::basePath('views/partials/footer.php'); ?>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -462,7 +533,7 @@ document.addEventListener('DOMContentLoaded', function() {
     (function() {
         const categoryTree = <?= json_encode($activeFilters['categoryTree'] ?? []) ?>;
         const selectedPath = <?= json_encode($activeFilters['selectedCategoryPath'] ?? []) ?>;
-        
+
         // Build a flat map for quick lookup
         const categoryMap = {};
         function buildCategoryMap(categories, parentId = null) {
@@ -479,21 +550,21 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
         buildCategoryMap(categoryTree);
-        
+
         // Get children of a category
         function getChildren(categoryId) {
             const cat = categoryMap[categoryId];
             return cat ? cat.children : [];
         }
-        
+
         // Populate a dropdown level
         function populateLevel(level, categoryId) {
             const select = document.getElementById('categoryLevel' + level);
             if (!select) return;
-            
+
             // Clear existing options except first
             select.innerHTML = '<option value="">-- Subcategory --</option>';
-            
+
             if (!categoryId) {
                 select.style.display = 'none';
                 // Hide all lower levels
@@ -506,7 +577,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 return;
             }
-            
+
             const children = getChildren(categoryId);
             if (children.length > 0) {
                 select.style.display = 'block';
@@ -532,16 +603,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         }
-        
+
         // Function to sync category ID from dropdowns to hidden field
         function syncCategoryId() {
             const level1 = document.getElementById('categoryLevel1');
             const level2 = document.getElementById('categoryLevel2');
             const level3 = document.getElementById('categoryLevel3');
             const hiddenField = document.getElementById('selectedCategoryId');
-            
+
             if (!hiddenField) return;
-            
+
             // Priority: level3 > level2 > level1 (use deepest selected category)
             let selectedCategoryId = '';
             if (level3 && level3.value && level3.value !== '') {
@@ -551,10 +622,10 @@ document.addEventListener('DOMContentLoaded', function() {
             } else if (level1 && level1.value && level1.value !== '') {
                 selectedCategoryId = level1.value;
             }
-            
+
             hiddenField.value = selectedCategoryId;
         }
-        
+
         // Initialize on page load
         if (selectedPath.length > 0) {
             // Level 1 is already set in HTML
@@ -567,7 +638,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Set final category ID
             document.getElementById('selectedCategoryId').value = selectedPath[selectedPath.length - 1];
         }
-        
+
         // Event listeners for cascading
         document.getElementById('categoryLevel1')?.addEventListener('change', function() {
             const categoryId = this.value;
@@ -575,17 +646,17 @@ document.addEventListener('DOMContentLoaded', function() {
             populateLevel(2, categoryId);
             populateLevel(3, null);
         });
-        
+
         document.getElementById('categoryLevel2')?.addEventListener('change', function() {
             const categoryId = this.value;
             syncCategoryId();
             populateLevel(3, categoryId);
         });
-        
+
         document.getElementById('categoryLevel3')?.addEventListener('change', function() {
             syncCategoryId();
         });
-        
+
         // Ensure category ID is set before form submission
         const filterForm = document.getElementById('filterForm');
         if (filterForm) {

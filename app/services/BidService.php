@@ -6,7 +6,6 @@ use app\repositories\UserRepository;
 use infrastructure\Database;
 use app\repositories\BidRepository;
 use DateTime;
-use infrastructure\DIContainer;
 use PDOException;
 use infrastructure\Utilities;
 
@@ -25,10 +24,10 @@ class BidService
         $this->db = $db;
     }
 
-    public function getHighestBidAmountByAuctionId($auctionId): ?float {
+    public function getHighestBidAmountByAuctionId($auctionId): float {
         $highestBid = $this->bidRepo->getHighestBidByAuctionId($auctionId);
         if(is_null($highestBid)) {
-            return null;
+            return 0;
         }else{
             return $highestBid->getBidAmount();
         }
@@ -73,8 +72,6 @@ class BidService
 
         // Check if $buyer is a buyer
         $isBuyer = false;
-        $userService = DIContainer::get('userServ');
-        $userService->fillRolesInUsers([$user]);
         foreach ($user->getRoles() as $role) {
             if ($role->getName() == 'buyer') {
                 $isBuyer = true;
@@ -111,15 +108,8 @@ class BidService
 
         // Check if the bid is high enough
         $highestBidAmount = $this->getHighestBidAmountByAuctionId($input['auction_id']);
-        $startingPrice = $auction->getStartingPrice();
-        if ($highestBidAmount > 0) {
-            if ($bidAmount < $highestBidAmount + 0.01) {
-                return Utilities::creationResult('Bid must be higher than £' . number_format($highestBidAmount, 2), false, null);
-            }
-        } else {
-            if ($bidAmount < $startingPrice) {
-                return Utilities::creationResult('Bid must be at least the starting price: £' . number_format($startingPrice, 2), false, null);
-            }
+        if ($bidAmount < $highestBidAmount + 0.01) {
+            return Utilities::creationResult('Bid must be at least' . number_format($highestBidAmount, 2), false, null);
         }
 
         return Utilities::creationResult('', true, $input);
@@ -174,6 +164,25 @@ class BidService
                 return $creationResult;
             }
 
+            // If bid amount > reserve price, end auction
+            $bid = $creationResult['object'];
+
+            $this->fillAuctionsInBids([$bid]);
+            $auction = $bid->getAuction();
+            if ($auction->getReservePrice() !== null && $bid->getBidAmount() >= $auction->getReservePrice()) {
+                $auction->setWinningBidId($bid->getBidId());
+                $auction->setAuctionStatus('Finished');
+                $result = $this->auctionRepo->endSoldAuction($auction);
+
+                if ($result) {
+                    // Failed to end auction - rollback bid creation
+                    $pdo->rollBack();
+                    return Utilities::creationResult('Failed to create bid.', false, null);
+                }
+                $pdo->commit();
+                return Utilities::creationResult('Congratulation! You won the auction by meeting the reserve price!', true, $creationResult['object']);
+            }
+
             // Insertion Succeed -> Commit Transaction
             $pdo->commit();
             return $creationResult;
@@ -195,6 +204,8 @@ class BidService
         $auction = $this->auctionRepo->getById($auctionId);
         $isAuctionActive = $auction->getAuctionStatus() == 'Active';
         if ($isAuctionActive) {
+            // Get Item Status
+            $item = $auction->getItem();
             $isItemSold = $auction->getAuctionStatus() == 'Sold';
             if ($isItemSold) {
                 return $this->bidRepo->getById($auction->getWinningBidID());
@@ -237,27 +248,19 @@ class BidService
 
     public function getBidsForUser(int $userId): array
     {
-        $bids = $this->bidRepo->getByUserId($userId);
-
-        foreach ($bids as $bid)
-        {
-            $auction = $bid->getAuction();
-
-            if ($auction === null) {
-                continue;
-            }
-
-            $highestBid = $this->getHighestBidByAuctionId($auction->getAuctionId());
-            $currentPrice = $highestBid > 0 ? $highestBid : $auction->getStartingPrice();
-            $auction->setCurrentPrice($currentPrice);
-        }
-
-        return $bids;
+        return $this->bidRepo->getByUserId($userId);
     }
 
-    public function countBidsByAuctionId(int $auctionId): int
+    // Count all bids
+    public function countAll(): int
     {
-        return $this->bidRepo->countByAuctionId($auctionId);
+        return $this->bidRepo->countAll();
+    }
+
+    // Get total revenue (sum of all winning bid amounts)
+    public function getTotalRevenue(): float
+    {
+        return $this->bidRepo->getTotalRevenue();
     }
 
     // --- FILL RELATIONSHIP PROPERTIES FUNCTION ---
@@ -322,4 +325,5 @@ class BidService
             }
         }
     }
+
 }

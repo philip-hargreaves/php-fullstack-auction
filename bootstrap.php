@@ -17,6 +17,7 @@ use app\services\UserService;
 use app\services\WatchlistService;
 use app\services\ImageService;
 use app\services\CategoryService;
+use app\services\RecommendationService;
 use infrastructure\Database;
 use infrastructure\DIContainer;
 use app\services\RoleService;
@@ -120,3 +121,6 @@ DIContainer::bind('watchlistServ', new WatchlistService(
 
 DIContainer::bind('chatServ', new ChatroomService(
     DIContainer::get('messageRepo')));
+
+DIContainer::bind('recommendationServ', new RecommendationService(
+    DIContainer::get('auctionRepo')));

@@ -37,6 +37,7 @@ $imageArray = $auctionImageRepo->getByAuctionId($auction->getAuctionId());
 // Variables
 $title = $item->getItemName();
 $sellerName = $item->getSeller()->getUsername();
+$sellerId = $auction->getItem()->getSellerId();
 $description = $auction->getAuctionDescription();
 $highestBid = $bidServ->getHighestBidByAuctionId($auctionId);
 $highestBidAmount = $bidServ->getHighestBidAmountByAuctionId($auctionId);

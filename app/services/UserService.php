@@ -8,6 +8,7 @@ use app\repositories\RoleRepository;
 use app\repositories\UserRoleRepository;
 use infrastructure\Database;
 use infrastructure\Utilities;
+use DateTime;
 
 
 class UserService
@@ -253,12 +254,14 @@ class UserService
 
     private function createUser(array $input): User
     {
+        $createdDateTime = new DateTime();
         $user = new User(
             0,
             trim($input['username']),
             trim($input['email']),
             password_hash((string)$input['password'], PASSWORD_DEFAULT),
-            true
+            true,
+            $createdDateTime
         );
 
         $savedUser = $this->userRepository->create($user);
@@ -315,6 +318,198 @@ class UserService
             } else {
                 $user->setRoles([]);
             }
+        }
+    }
+
+
+    // Count all users
+    public function countAll(): int
+    {
+        return $this->userRepository->countAll();
+    }
+
+    // Get all users with pagination (for admin dashboard)
+    public function getAllUsers(int $limit = 50, int $offset = 0): array
+    {
+        // Pagination
+        $limit = max(1, min(100, (int)$limit));
+        $offset = max(0, (int)$offset);
+
+        try {
+            $users = $this->userRepository->getAllWithRoles($limit, $offset);
+            $total = $this->userRepository->countAll();
+
+            return Utilities::creationResult(
+                'Users retrieved successfully.',
+                true,
+                [
+                    'users' => $users,
+                    'total' => $total,
+                    'limit' => $limit,
+                    'offset' => $offset
+                ]
+            );
+        } catch (\Throwable $e) {
+            return Utilities::creationResult('Failed to retrieve users.', false, null);
+        }
+    }
+
+    // Update user's active status (for admin dashboard)
+    public function updateUserActiveStatus(int $userId, bool $isActive, ?int $currentAdminId = null): array
+    {
+        // Validate user ID
+        if (!filter_var($userId, FILTER_VALIDATE_INT) || $userId <= 0) {
+            return Utilities::creationResult('Invalid user ID.', false, null);
+        }
+
+        // Check if user exists
+        $user = $this->userRepository->getById($userId);
+        if ($user === null) {
+            return Utilities::creationResult('User not found.', false, null);
+        }
+
+        // Prevent admin from deactivating themselves
+        if ($currentAdminId !== null && $userId === $currentAdminId && !$isActive) {
+            return Utilities::creationResult('You cannot deactivate your own account.', false, null);
+        }
+
+        // Prevent deactivating last admin
+        if (!$isActive && $user->isAdmin()) {
+            $allUsers = $this->userRepository->getAllWithRoles(1000, 0);
+            $adminCount = 0;
+            foreach ($allUsers as $u) {
+                if ($u->isAdmin() && $u->isActive()) {
+                    $adminCount++;
+                }
+            }
+            if ($adminCount <= 1) {
+                return Utilities::creationResult('Cannot deactivate the last admin user.', false, null);
+            }
+        }
+
+        // Update status
+        $success = $this->userRepository->updateActiveStatus($userId, $isActive);
+
+        if ($success) {
+            $status = $isActive ? 'activated' : 'deactivated';
+            return Utilities::creationResult("User account {$status} successfully.", true, null);
+        } else {
+            return Utilities::creationResult('Failed to update user status.', false, null);
+        }
+    }
+
+    // Helper validation method
+    private function validateUserAndRole(int $userId, string $roleName): array
+    {
+        // Validate user ID
+        if (!filter_var($userId, FILTER_VALIDATE_INT) || $userId <= 0) {
+            return ['error' => Utilities::creationResult('Invalid user ID.', false, null)];
+        }
+
+        // Validate role name
+        $roleName = trim($roleName);
+        if ($roleName === '') {
+            return ['error' => Utilities::creationResult('Role name is required.', false, null)];
+        }
+
+        // Check if user exists
+        $user = $this->userRepository->getById($userId);
+        if ($user === null) {
+            return ['error' => Utilities::creationResult('User not found.', false, null)];
+        }
+
+        // Check if role exists
+        $role = $this->roleRepository->getByName($roleName);
+        if ($role === null) {
+            return ['error' => Utilities::creationResult('Role not found.', false, null)];
+        }
+
+        return ['user' => $user, 'role' => $role, 'roleName' => $roleName];
+    }
+
+    // Revoke a role from a user (for admin dashboard)
+    public function revokeUserRole(int $userId, string $roleName, ?int $currentAdminId = null): array
+    {
+        // Validate user and role
+        $validation = $this->validateUserAndRole($userId, $roleName);
+        if (isset($validation['error'])) {
+            return $validation['error'];
+        }
+
+        $user = $validation['user'];
+        $role = $validation['role'];
+        $roleName = $validation['roleName'];
+
+        // Check if user has the role
+        if (!$user->hasRoles($roleName)) {
+            return Utilities::creationResult("User does not have the '{$roleName}' role.", false, null);
+        }
+
+        // Get the DB connection
+        $pdo = $this->db->connection;
+
+        // Wrap role revocation in a transaction
+        try {
+            Utilities::beginTransaction($pdo);
+
+            // Revoke the role
+            $this->userRoleRepository->revokeRole($userId, $role);
+
+            // Commit the transaction
+            $pdo->commit();
+
+            return Utilities::creationResult("Role '{$roleName}' revoked successfully.", true, null);
+
+        } catch (\Throwable $e) {
+            // Roll back the transaction to avoid partial state
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+
+            return Utilities::creationResult('Failed to revoke role. Please try again later.', false, null);
+        }
+    }
+
+    // Assign a role to a user (for admin dashboard)
+    public function assignUserRole(int $userId, string $roleName): array
+    {
+        // Validate user and role
+        $validation = $this->validateUserAndRole($userId, $roleName);
+        if (isset($validation['error'])) {
+            return $validation['error'];
+        }
+
+        $user = $validation['user'];
+        $role = $validation['role'];
+        $roleName = $validation['roleName'];
+
+        // Check if user already has the role
+        if ($user->hasRoles($roleName)) {
+            return Utilities::creationResult("User already has the '{$roleName}' role.", false, null);
+        }
+
+        // Get the DB connection
+        $pdo = $this->db->connection;
+
+        // Wrap role assignment in a transaction
+        try {
+            Utilities::beginTransaction($pdo);
+
+            // Assign the role
+            $this->userRoleRepository->assignRole($userId, $role);
+
+            // Commit the transaction
+            $pdo->commit();
+
+            return Utilities::creationResult("Role '{$roleName}' assigned successfully.", true, null);
+
+        } catch (\Throwable $e) {
+            // Roll back the transaction to avoid partial state
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+
+            return Utilities::creationResult('Failed to assign role. Please try again later.', false, null);
         }
     }
 
