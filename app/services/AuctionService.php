@@ -27,6 +27,8 @@ class AuctionService
     private AuctionImageRepository $auctionImageRepo;
     private CategoryService $categoryService;
 
+    private NotificationService $notificationService;
+
     public function __construct(
         Database               $db,
         AuctionRepository      $auctionRepo,
@@ -36,7 +38,8 @@ class AuctionService
         BidService             $bidService,
         CategoryRepository     $categoryRepo,
         AuctionImageRepository $auctionImageRepo,
-        CategoryService        $categoryService
+        CategoryService        $categoryService,
+        NotificationService   $notificationService
     )
     {
         $this->db = $db;
@@ -48,6 +51,7 @@ class AuctionService
         $this->categoryRepo = $categoryRepo;
         $this->auctionImageRepo = $auctionImageRepo;
         $this->categoryService = $categoryService;
+        $this->notificationService = $notificationService;
     }
 
     public function getByUserId(int $sellerId): array
@@ -58,6 +62,12 @@ class AuctionService
     public function getWatchedByUserId(int $userId): array
     {
         return $this->auctionRepo->getWatchedAuctionsByUserId($userId);
+    }
+
+    public function getByStatus(string $auctionStatus):array
+    {
+        $auctions = $this -> auctionRepo -> getByAuctionStatus($auctionStatus);
+        return $auctions;
     }
 
     public function getById(int $auctionId): ?Auction
@@ -113,6 +123,18 @@ class AuctionService
             if (!$this->finalizeAuctionSetup($auction, $item, $imageInputs)) {
                 $pdo->rollBack();
                 return Utilities::creationResult("Failed to link item or save images.", false, null);
+            }
+
+            //add email notification for when auction created
+            $auctionId = $auction -> getAuctionId();
+            $recipientId = $item -> getSellerId();
+
+            $notificationCreateResult = $this -> notificationService -> createNotification($auctionId, $recipientId, 'email', 'auctionCreated');
+
+            if (!$notificationCreateResult['success'])
+            {
+                $pdo->rollBack();
+                return $notificationCreateResult;
             }
 
             $pdo->commit();
