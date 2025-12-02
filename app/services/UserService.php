@@ -35,6 +35,8 @@ class UserService
         return $this->userRepository->getById($userId);
     }
 
+
+
     public function updateAccount(int $userId, array $data): array
     {
         $errors = $this->validateAccountUpdate($userId, $data);
