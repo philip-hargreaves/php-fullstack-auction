@@ -35,7 +35,7 @@ class NotificationService
 
     public function createNotification($auctionId, $recipientId, $notificationType, $notificationContentType)
     {
-        $outBidNotification = new Notification(
+        $notification = new Notification(
             0,
             $auctionId,
             $recipientId,
@@ -44,14 +44,36 @@ class NotificationService
             0
         );
 
-        $notification = $this -> notificationRepo -> create($outBidNotification);
+        $notificationExists = $this -> notificationExist($notification);
 
-        // insertion failed, failed to create notification
-        if (is_null($notification)) {
+        if ($notificationExists === true)
+        {
+            return Utilities::creationResult("Notification already exists.", false, null);
+        }
+
+        $createdNotification = $this->notificationRepo->create($notification);
+
+        if (is_null($createdNotification)) {
             return Utilities::creationResult("Failed to create notification.", false, null);
         }
 
-        return Utilities::creationResult("notification successfully created!", true, $notification);
+        return Utilities::creationResult("Notification successfully created!", true, $createdNotification);
+    }
+
+    //checks if notification is already within the database for some notification types.
+    private function notificationExist(Notification $notification) :bool
+    {
+        $notificationContentType = $notification -> getNotificationContentType();
+
+        //only checks if the message type does not allow repeated sending
+        if($notificationContentType !== 'outBid' && $notificationContentType !== 'placedBid')
+        {
+            return $this -> notificationRepo -> isExist($notification);
+        }
+        else
+        {
+            return false;
+        }
     }
 
     //prepares Email notification to be sent

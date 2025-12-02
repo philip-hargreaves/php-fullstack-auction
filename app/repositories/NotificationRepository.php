@@ -46,14 +46,11 @@ class NotificationRepository
         return $row;
     }
 
-    public function create(Notification $notification)
+    public function isExist(Notification $notification)
     {
-        try
-        {
-            $params = $this->extract($notification);
+        $params = $this->extract($notification);
 
-            //Check if notification already exists
-            $sqlCheck = "SELECT id 
+        $sqlCheck = "SELECT id 
                      FROM notifications 
                      WHERE auction_id = :auction_id
                        AND recipient_id = :recipient_id
@@ -61,20 +58,30 @@ class NotificationRepository
                        AND notification_content_type = :notification_content_type
                      LIMIT 1";
 
-            $paramsCheck = [
-                'auction_id' => $params['auction_id'],
-                'recipient_id' => $params['recipient_id'],
-                'notification_type' => $params['notification_type'],
-                'notification_content_type' => $params['notification_content_type']
-            ];
+        $paramsCheck = [
+            'auction_id' => $params['auction_id'],
+            'recipient_id' => $params['recipient_id'],
+            'notification_type' => $params['notification_type'],
+            'notification_content_type' => $params['notification_content_type']
+        ];
 
-            $existing = $this->db->query($sqlCheck, $paramsCheck)->fetch();
+        $existing = $this->db->query($sqlCheck, $paramsCheck)->fetch();
 
-            if ($existing)
-            {
-                //If email already exists, skip creation
-                return null;
-            }
+        if ($existing)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public function create(Notification $notification)
+    {
+        try
+        {
+            $params = $this->extract($notification);
 
             $sql = "INSERT INTO notifications (auction_id, recipient_id, notification_type, notification_content_type, is_sent)
                     VALUES (:auction_id, :recipient_id, :notification_type, :notification_content_type, :is_sent)";

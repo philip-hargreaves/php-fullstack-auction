@@ -90,6 +90,12 @@ if(!empty($watchlist))
         {
             $notificationServ -> createNotification($auctionId, $recipientId, 'email', 'auctionAboutToFinish');
         }
+
+        //if auction finishes, users who have it in their watchlist will receive email
+        if($auctionStatus === 'Finished')
+        {
+            $notificationServ -> createNotification($auctionId, $recipientId, 'email', 'auctionFinished');
+        }
     }
 }
 
