@@ -20,10 +20,6 @@ class ChatroomService
 
     public function getConversationHistory(int $conversationId, int $userId): array
     {
-        // Security: Ensure user belongs to this conversation before showing messages
-        // (You could verify this via the repo or a separate query.
-        // For brevity, assuming the repository filters logically or we blindly fetch)
-
         $details = $this->messageRepo->getAuctionDetails($conversationId);
         $messages = $this->messageRepo->getMessagesByConversationId($conversationId);
 

@@ -59,10 +59,17 @@ use infrastructure\DIContainer;
         <?php if ($auctionDetails): ?>
             <div class="chat-header">
                 <div class="header-item-info">
-                    <h2><?= htmlspecialchars($auctionDetails['item_name']) ?></h2>
+                    <h2 class="mt-2 mb-3" style="color: --color-auctivity-red;">
+                        <a href="/auction?auction_id=<?= $auctionDetails["auction_id"] ?>"
+                           class="text-decoration-none text-reset">
+                            <?= htmlspecialchars($auctionDetails['item_name']) ?>
+                        </a>
+                    </h2>
                     <div class="header-item-details">
-                        Seller: <?= htmlspecialchars($auctionDetails['seller_name']) ?> |
-                        Ends: <?= date('M d, Y', strtotime($auctionDetails['end_datetime'])) ?>
+                        Seller: <a href="/account?user_id=<?= htmlspecialchars($auctionDetails['seller_id']) ?>" class="" style="color: white"><?= htmlspecialchars($auctionDetails['seller_name']) ?></a> |
+                        Ends: <?= date('M d, Y', strtotime($auctionDetails['end_datetime'] )) ?> |
+                        Status: <?= htmlspecialchars($auctionDetails['auction_status']) ?> |
+                        Remaining Time: <?= date('M d, Y', strtotime($auctionDetails['remaining_time'])) ?>
                     </div>
                 </div>
                 <div class="header-price">

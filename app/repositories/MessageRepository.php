@@ -5,6 +5,7 @@ namespace app\repositories;
 use app\models\Conversation;
 use app\models\Message;
 use infrastructure\Database;
+use infrastructure\Utilities;
 use PDO;
 use PDOException;
 
@@ -84,9 +85,12 @@ class MessageRepository
             SELECT 
                 i.item_name,
                 u.username as seller_name,
+                u.id as seller_id,
                 a.end_datetime,
                 a.starting_price, -- Assuming current bid logic is handled elsewhere or simple here
-                a.id as auction_id
+                a.id as auction_id,
+                a.auction_status as auction_status,
+                a.end_datetime - NOW() as remaining_time
             FROM conversations c
             JOIN auctions a ON c.auction_id = a.id
             JOIN items i ON a.item_id = i.id
@@ -94,6 +98,7 @@ class MessageRepository
             WHERE c.id = :conversation_id
         ";
         $stmt = $this->db->prepare($sql);
+
         $stmt->execute(['conversation_id' => $conversationId]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         return $result ?: null;
