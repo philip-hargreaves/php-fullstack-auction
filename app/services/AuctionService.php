@@ -695,6 +695,53 @@ class AuctionService
         $this->auctionRepo->updateAuctionStatuses();
     }
 
+    // Get all auctions with pagination (for admin dashboard)
+    public function getAllAuctions(int $limit = 50, int $offset = 0): array
+    {
+        // Pagination validation
+        $limit = max(1, min(100, (int)$limit));
+        $offset = max(0, (int)$offset);
+
+        try {
+            $auctions = $this->auctionRepo->getAllWithDetails($limit, $offset);
+            $total = $this->auctionRepo->countAll();
+
+            return Utilities::creationResult(
+                'Auctions retrieved successfully.',
+                true,
+                [
+                    'auctions' => $auctions,
+                    'total' => $total,
+                    'limit' => $limit,
+                    'offset' => $offset
+                ]
+            );
+        } catch (\Throwable $e) {
+            return Utilities::creationResult('Failed to retrieve auctions.', false, null);
+        }
+    }
+
+    // Delete auction (hard delete)
+    public function deleteAuction(int $auctionId): array
+    {
+        try {
+            $auction = $this->auctionRepo->getById($auctionId);
+            if (!$auction) {
+                return Utilities::creationResult('Auction not found.', false, null);
+            }
+
+            $result = $this->auctionRepo->delete($auctionId);
+
+            if ($result) {
+                return Utilities::creationResult('Auction deleted successfully.', true, null);
+            } else {
+                return Utilities::creationResult('Failed to delete auction.', false, null);
+            }
+        } catch (\Throwable $e) {
+            return Utilities::creationResult('Failed to delete auction.', false, null);
+        }
+    }
+
     public function getPublicAuctionsForSeller(int $sellerId): array
     {
         $auctions = $this->auctionRepo->getActiveAuctionsBySellerId($sellerId);
