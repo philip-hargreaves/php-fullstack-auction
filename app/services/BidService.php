@@ -9,6 +9,7 @@ use app\repositories\BidRepository;
 use DateTime;
 use PDOException;
 use infrastructure\Utilities;
+use infrastructure\DIContainer;
 
 
 class BidService

@@ -546,9 +546,9 @@ class AuctionService
             $interval = $start->diff($end);
             $totalHours = ($interval->days * 24) + $interval->h + ($interval->i / 60);
 
-            if ($totalHours < 24) {
-                return Utilities::creationResult("Auction duration must be at least 24 hours.", false, null);
-            }
+//            if ($totalHours < 24) {
+//                return Utilities::creationResult("Auction duration must be at least 24 hours.", false, null);
+//            }
 
             return Utilities::creationResult('', true, [
                 'start_datetime' => $start->format('Y-m-d H:i:s'),
