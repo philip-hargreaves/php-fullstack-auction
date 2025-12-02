@@ -190,4 +190,24 @@ class BidRepository
             return 0.0;
         }
     }
+
+    public function getAverageTimeToFirstBid(): ?float
+    {
+        try {
+            $sql = "SELECT AVG(TIMESTAMPDIFF(HOUR, a.start_datetime, first_bid.bid_datetime)) as avg_hours_to_first_bid
+                    FROM auctions a
+                    INNER JOIN (
+                        SELECT auction_id, MIN(bid_datetime) as bid_datetime
+                        FROM bids
+                        GROUP BY auction_id
+                    ) as first_bid ON a.id = first_bid.auction_id
+                    WHERE a.winning_bid_id IS NOT NULL";
+            
+            $row = $this->db->query($sql, [])->fetch();
+            
+            return $row['avg_hours_to_first_bid'] !== null ? (float)$row['avg_hours_to_first_bid'] : null;
+        } catch (PDOException $e) {
+            return null;
+        }
+    }
 }

@@ -139,6 +139,21 @@ class CategoryService
         return $this->categoryRepo->getPopularCategories($limit);
     }
 
+    public function getTopCategoriesByRevenue(int $limit = 5): array
+    {
+        return $this->categoryRepo->getTopCategoriesByRevenue($limit);
+    }
+
+    public function getTopCategoryByAvgBids(): ?array
+    {
+        return $this->categoryRepo->getTopCategoryByAvgBids();
+    }
+
+    public function getMostWatchedCategory(): ?array
+    {
+        return $this->categoryRepo->getMostWatchedCategory();
+    }
+
     // Used for filtering auctions by category and all its subcategories
     public function getAllDescendantIds(int $categoryId): array
     {

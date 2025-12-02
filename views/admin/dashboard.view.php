@@ -12,7 +12,7 @@ $activeTab = Request::get('tab', 'dashboard');
     <ul class="nav nav-tabs mb-4" id="adminTabs" role="tablist" style="border-bottom: 1px solid #3a3a3a;">
         <li class="nav-item" role="presentation">
             <a class="nav-link <?= $activeTab === 'dashboard' ? 'active' : '' ?>" id="dashboard-tab" href="/admin?tab=dashboard" role="tab" aria-controls="dashboard" aria-selected="<?= $activeTab === 'dashboard' ? 'true' : 'false' ?>" style="color: var(--color-text-primary);">
-                <i class="fa fa-dashboard"></i> Dashboard
+                <i class="fa fa-dashboard"></i> Website Statistics
             </a>
         </li>
         <li class="nav-item" role="presentation">
@@ -97,6 +97,154 @@ $activeTab = Request::get('tab', 'dashboard');
                             <i class="fa fa-money fa-3x mb-3" style="color: #ffc107;"></i>
                             <h3 style="color: var(--color-text-primary); font-size: 2.5rem; font-weight: bold;">£<?= number_format($stats['totalRevenue'], 2) ?></h3>
                             <p class="mb-0" style="color: var(--color-text-secondary); font-size: 1.1rem;">Total Revenue</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Complex Statistics Section -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h3 class="mb-3" style="color: var(--color-text-primary);">Advanced Analytics</h3>
+                </div>
+            </div>
+            
+            <div class="row mb-4">
+                <!-- Top Category by Average Bids -->
+                <div class="col-md-4 mb-3">
+                    <div class="card" style="background-color: var(--color-background-primary); border: 1px solid #3a3a3a;">
+                        <div class="card-body text-center">
+                            <i class="fa fa-hand-pointer-o fa-3x mb-3" style="color: #17a2b8;"></i>
+                            <?php if ($stats['topCategoryByAvgBids']): ?>
+                                <h3 style="color: var(--color-text-primary); font-size: 2.5rem; font-weight: bold;">
+                                    <?= number_format($stats['topCategoryByAvgBids']['avg_bids'], 1) ?>
+                                </h3>
+                                <p class="mb-0" style="color: var(--color-text-secondary); font-size: 1.1rem; font-weight: 500;">
+                                    <?= htmlspecialchars($stats['topCategoryByAvgBids']['category']->getCategoryName()) ?>
+                                </p>
+                                <small style="color: var(--color-text-secondary);">
+                                    Most Bidding Activity
+                                </small>
+                            <?php else: ?>
+                                <h3 style="color: var(--color-text-primary); font-size: 2.5rem; font-weight: bold;">N/A</h3>
+                                <p class="mb-0" style="color: var(--color-text-secondary); font-size: 1.1rem;">No Data</p>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Most Watched Category -->
+                <div class="col-md-4 mb-3">
+                    <div class="card" style="background-color: var(--color-background-primary); border: 1px solid #3a3a3a;">
+                        <div class="card-body text-center">
+                            <i class="fa fa-eye fa-3x mb-3" style="color: #ffc107;"></i>
+                            <?php if ($stats['mostWatchedCategory']): ?>
+                                <h3 style="color: var(--color-text-primary); font-size: 2.5rem; font-weight: bold;">
+                                    <?= number_format($stats['mostWatchedCategory']['total_watches']) ?>
+                                </h3>
+                                <p class="mb-0" style="color: var(--color-text-secondary); font-size: 1.1rem; font-weight: 500;">
+                                    <?= htmlspecialchars($stats['mostWatchedCategory']['category']->getCategoryName()) ?>
+                                </p>
+                                <small style="color: var(--color-text-secondary);">
+                                    Most Watched Category
+                                </small>
+                            <?php else: ?>
+                                <h3 style="color: var(--color-text-primary); font-size: 2.5rem; font-weight: bold;">N/A</h3>
+                                <p class="mb-0" style="color: var(--color-text-secondary); font-size: 1.1rem;">No Data</p>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Average Time to First Bid -->
+                <div class="col-md-4 mb-3">
+                    <div class="card" style="background-color: var(--color-background-primary); border: 1px solid #3a3a3a;">
+                        <div class="card-body text-center">
+                            <i class="fa fa-hourglass-half fa-3x mb-3" style="color: #6c757d;"></i>
+                            <h3 style="color: var(--color-text-primary); font-size: 2.5rem; font-weight: bold;">
+                                <?= $stats['avgTimeToFirstBid'] !== null ? number_format($stats['avgTimeToFirstBid'], 1) : 'N/A' ?>
+                            </h3>
+                            <p class="mb-0" style="color: var(--color-text-secondary); font-size: 1.1rem;">Avg Hours to First Bid</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Top Categories by Revenue -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card" style="background-color: var(--color-background-primary); border: 1px solid #3a3a3a;">
+                        <div class="card-header" style="background-color: var(--color-background-secondary); border-bottom: 1px solid #3a3a3a;">
+                            <h4 class="mb-0" style="color: var(--color-text-primary);">
+                                <i class="fa fa-trophy"></i> Top 5 Categories by Revenue
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            <?php if (empty($stats['topCategoriesByRevenue'])): ?>
+                                <p class="text-muted mb-0">No category revenue data available.</p>
+                            <?php else: ?>
+                                <div class="table-responsive">
+                                    <table class="table table-dark table-hover mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Category</th>
+                                                <th>Auctions Sold</th>
+                                                <th>Total Revenue</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($stats['topCategoriesByRevenue'] as $item): ?>
+                                                <tr>
+                                                    <td><?= htmlspecialchars($item['category']->getCategoryName()) ?></td>
+                                                    <td><?= number_format($item['auctions_sold']) ?></td>
+                                                    <td>£<?= number_format($item['total_revenue'], 2) ?></td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Most Active Sellers -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card" style="background-color: var(--color-background-primary); border: 1px solid #3a3a3a;">
+                        <div class="card-header" style="background-color: var(--color-background-secondary); border-bottom: 1px solid #3a3a3a;">
+                            <h4 class="mb-0" style="color: var(--color-text-primary);">
+                                <i class="fa fa-star"></i> Top 5 Most Active Sellers
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            <?php if (empty($stats['mostActiveSellers'])): ?>
+                                <p class="text-muted mb-0">No seller data available.</p>
+                            <?php else: ?>
+                                <div class="table-responsive">
+                                    <table class="table table-dark table-hover mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Seller</th>
+                                                <th>Auctions Created</th>
+                                                <th>Auctions Sold</th>
+                                                <th>Total Revenue</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($stats['mostActiveSellers'] as $seller): ?>
+                                                <tr>
+                                                    <td><?= htmlspecialchars($seller['username']) ?></td>
+                                                    <td><?= number_format($seller['auctions_created']) ?></td>
+                                                    <td><?= number_format($seller['auctions_sold']) ?></td>
+                                                    <td>£<?= number_format($seller['total_revenue'], 2) ?></td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>

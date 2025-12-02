@@ -12,6 +12,7 @@ $userService = DIContainer::get('userServ');
 $roleService = DIContainer::get('roleServ');
 $auctionService = DIContainer::get('auctionServ');
 $bidService = DIContainer::get('bidServ');
+$categoryService = DIContainer::get('categoryServ');
 
 // Pagination
 $curr_page = (int)Request::get('page', 1);
@@ -84,6 +85,13 @@ $stats = [
     'totalBids' => $bidService->countAll(),
     'totalRevenue' => $bidService->getTotalRevenue(),
 ];
+
+// Get complex stats
+$stats['topCategoriesByRevenue'] = $categoryService->getTopCategoriesByRevenue(5);
+$stats['mostActiveSellers'] = $auctionService->getMostActiveSellers(5);
+$stats['avgTimeToFirstBid'] = $bidService->getAverageTimeToFirstBid();
+$stats['topCategoryByAvgBids'] = $categoryService->getTopCategoryByAvgBids();
+$stats['mostWatchedCategory'] = $categoryService->getMostWatchedCategory();
 
 // Build query string for pagination
 $querystring = "";

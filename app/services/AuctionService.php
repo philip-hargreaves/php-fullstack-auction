@@ -688,6 +688,11 @@ class AuctionService
         return $this->auctionRepo->countByStatus($status, $soldOnly);
     }
 
+    public function getMostActiveSellers(int $limit = 5): array
+    {
+        return $this->auctionRepo->getMostActiveSellers($limit);
+    }
+
     // Auction Status Update Cron Job
     public function updateAuctionStatuses(): void
     {

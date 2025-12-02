@@ -343,6 +343,11 @@ class BidService
         return $this->bidRepo->getTotalRevenue();
     }
 
+    public function getAverageTimeToFirstBid(): ?float
+    {
+        return $this->bidRepo->getAverageTimeToFirstBid();
+    }
+
     // --- FILL RELATIONSHIP PROPERTIES FUNCTION ---
     public function fillBuyersInBids(array $bids): void
     {
