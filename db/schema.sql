@@ -25,15 +25,6 @@ CREATE TABLE user_roles (
     FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE
 );
 
-CREATE TABLE addresses (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    address VARCHAR(255) NOT NULL,
-    is_default TINYINT(1) NOT NULL DEFAULT 0,
-    is_deleted TINYINT(1) NOT NULL DEFAULT 0,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
-
 CREATE TABLE categories (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -49,7 +40,6 @@ CREATE TABLE items (
     item_name VARCHAR(255) NOT NULL,
     is_deleted TINYINT(1) NOT NULL DEFAULT 0,
     is_sold TINYINT(1) NOT NULL DEFAULT 0,
-
     FOREIGN KEY (seller_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
@@ -107,16 +97,6 @@ CREATE TABLE watchlists (
   PRIMARY KEY (user_id, auction_id),
   CONSTRAINT FK_Watchlist_User FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   CONSTRAINT FK_Watchlist_Auction FOREIGN KEY (auction_id) REFERENCES auctions(id) ON DELETE CASCADE
-);
-
-CREATE TABLE orders (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    auction_id INT NULL UNIQUE,
-    address_id INT NULL,
-    order_datetime DATETIME DEFAULT CURRENT_TIMESTAMP,
-    order_status  ENUM('Pending', 'IsConfirmed', 'Canceled', 'Shipped', 'Completed') NOT NULL DEFAULT 'Pending', -- unsure
-    FOREIGN KEY (auction_id) REFERENCES auctions(id) ON DELETE SET NULL,
-    FOREIGN KEY (address_id) REFERENCES addresses(id) ON DELETE SET NULL
 );
 
 CREATE TABLE ratings (
