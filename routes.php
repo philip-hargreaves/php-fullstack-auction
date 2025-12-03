@@ -52,9 +52,11 @@ $router->post('/notifications', 'controllers/auction/notification.php');
 
 // Admin Dashboard
 $router->get('/admin', 'controllers/admin/dashboard.php');
+$router->get('/admin/auction/view', 'controllers/admin/view-auction.php');
 $router->post('/admin/user/update-status', 'controllers/admin/update-user-status.php');
 $router->post('/admin/user/manage-role', 'controllers/admin/manage-user-role.php');
 
 // Chatroom Page
 $router->post('/send-message', 'controllers/chatroom/send-message.php');
 $router->get('/chatroom', 'controllers/chatroom/chatroom.php');
+$router->post('/admin/auction/delete', 'controllers/admin/delete-auction.php');

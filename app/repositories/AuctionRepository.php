@@ -655,6 +655,44 @@ class AuctionRepository
         }
     }
 
+    public function getMostActiveSellers(int $limit = 5): array
+    {
+        try {
+            $sql = "SELECT u.id, u.username, 
+                           COUNT(DISTINCT a.id) as auctions_created,
+                           COUNT(DISTINCT CASE WHEN a.winning_bid_id IS NOT NULL THEN a.id END) as auctions_sold,
+                           COALESCE(SUM(b.bid_amount), 0) as total_revenue
+                    FROM users u
+                    JOIN items i ON u.id = i.seller_id
+                    JOIN auctions a ON i.id = a.item_id
+                    LEFT JOIN bids b ON a.winning_bid_id = b.id
+                    GROUP BY u.id, u.username
+                    ORDER BY auctions_created DESC
+                    LIMIT :limit";
+            
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+            $stmt->execute();
+            
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            $result = [];
+            foreach ($rows as $row) {
+                $result[] = [
+                    'user_id' => (int)$row['id'],
+                    'username' => $row['username'],
+                    'auctions_created' => (int)$row['auctions_created'],
+                    'auctions_sold' => (int)$row['auctions_sold'],
+                    'total_revenue' => (float)$row['total_revenue']
+                ];
+            }
+            
+            return $result;
+        } catch (PDOException $e) {
+            return [];
+        }
+    }
+
     public function updateAuctionStatuses(): void
     {
         try {
