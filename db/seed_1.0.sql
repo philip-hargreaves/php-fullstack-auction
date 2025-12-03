@@ -9,8 +9,8 @@ INSERT IGNORE INTO roles (id, role_name) VALUES
 -- Insert test users with hashed passwords
 -- Password: password123 (hashed with bcrypt)
 INSERT IGNORE INTO users (id, username, email, password, is_active, created_datetime) VALUES
-    (101, 'john_buyer', 'john@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-01-15 10:00:00'),
-    (102, 'jane_seller', 'jane@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-02-20 14:30:00'),
+    (101, 'sabrina_buyer', 'ssss9178@gmail.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-01-15 10:00:00'),
+    (102, 'sabrina_seller', 'e74096027@gs.ncku.edu.tw', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-02-20 14:30:00'),
     (201, 'seller_alice', 'alice@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-03-10 09:15:00'),
     (202, 'seller_bob', 'bob@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-03-25 16:45:00'),
     (203, 'seller_charlie', 'charlie@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-04-05 11:20:00'),
@@ -232,7 +232,7 @@ INSERT IGNORE INTO categories (id, name, parent_category_id) VALUES
 -- ITEMS (simple: id, seller_id, item_name only)
 -- Description and condition are now on auctions table
 INSERT IGNORE INTO items (id, seller_id, item_name) VALUES
-    (2001, 102, 'ASUS ROG Strix G16 Gaming Laptop RTX 4070'),
+    (2001, 206, 'ASUS ROG Strix G16 Gaming Laptop RTX 4070'),
     (2002, 201, 'Alienware m18 R2 Gaming Laptop RTX 4080'),
     (2003, 202, 'Razer Blade 17 Gaming Laptop RTX 4060'),
     (2004, 203, 'Lenovo ThinkPad X1 Carbon Gen 11 Intel i7'),
@@ -241,7 +241,7 @@ INSERT IGNORE INTO items (id, seller_id, item_name) VALUES
     (2007, 206, 'Apple MacBook Pro 14" M2 Chip 16GB 512GB'),
     (2008, 207, 'Dell XPS 13 Plus Intel i7 16GB 512GB'),
     (2009, 208, 'LG Gram 17 Intel i7 16GB 1TB'),
-    (2010, 102, 'Custom Gaming PC RTX 4090 Intel i9'),
+    (2010, 206, 'Custom Gaming PC RTX 4090 Intel i9'),
     (2011, 201, 'Alienware Aurora R15 Gaming Desktop RTX 4080'),
     (2012, 202, 'Corsair One i300 Compact Gaming PC'),
     (2013, 203, 'Apple Mac Studio M2 Ultra 64GB 1TB'),
@@ -255,32 +255,32 @@ INSERT IGNORE INTO items (id, seller_id, item_name) VALUES
     (2024, 205, 'LG 38WN95C-W 38" Ultrawide 4K'),
     (2026, 207, 'Apple iPhone 15 Pro Max 256GB Titanium Blue'),
     (2027, 208, 'Apple iPhone 15 Pro 128GB Natural Titanium'),
-    (2028, 102, 'Apple iPhone 14 Pro Max 256GB Deep Purple'),
+    (2028, 208, 'Apple iPhone 14 Pro Max 256GB Deep Purple'),
     (2029, 201, 'Apple iPhone 13 Pro 256GB Sierra Blue'),
     (2030, 202, 'Samsung Galaxy S24 Ultra 512GB Phantom Black'),
     (2031, 203, 'Google Pixel 8 Pro 256GB Obsidian'),
     (2032, 204, 'OnePlus 12 256GB Flowy Emerald'),
     (2033, 205, 'Samsung Galaxy S23 Ultra 256GB Green'),
     (2034, 206, 'Google Pixel 7a 128GB Sea'),
-    (2037, 102, 'Apple iPad Pro 12.9" M2 256GB Space Grey'),
+    (2037, 206, 'Apple iPad Pro 12.9" M2 256GB Space Grey'),
     (2038, 201, 'Apple iPad Air 5th Gen M1 256GB Space Grey'),
-    (2039, 202, 'Apple iPad Mini 6 256GB Starlight'),
+    (2039, 102, 'Apple iPad Mini 6 256GB Starlight'),
     (2040, 203, 'Samsung Galaxy Tab S9 Ultra 512GB'),
     (2041, 204, 'Samsung Galaxy Tab S9+ 256GB'),
-    (2043, 206, 'Microsoft Surface Pro 9 Intel i7 16GB 256GB'),
-    (2046, 102, 'Apple Watch Series 9 45mm GPS Cellular'),
+    (2043, 102, 'Microsoft Surface Pro 9 Intel i7 16GB 256GB'),
+    (2046, 206, 'Apple Watch Series 9 45mm GPS Cellular'),
     (2047, 201, 'Apple Watch Ultra 2 49mm Titanium'),
     (2048, 202, 'Apple Watch SE 2nd Gen 44mm GPS'),
     (2049, 203, 'Samsung Galaxy Watch 6 Classic 47mm'),
     (2050, 204, 'Google Pixel Watch 2 41mm'),
     (2052, 206, 'Fitbit Charge 6 Fitness Tracker'),
-    (2055, 102, 'Canon EOS 5D Mark IV Body'),
+    (2055, 208, 'Canon EOS 5D Mark IV Body'),
     (2056, 201, 'Canon EOS 90D Body'),
     (2057, 202, 'Canon EOS R6 Mark II Body'),
     (2058, 203, 'Nikon D850 Body'),
     (2059, 204, 'Nikon D7500 Body'),
     (2063, 208, 'Sony Alpha A7III Mirrorless Camera Body'),
-    (2064, 102, 'Sony Alpha A7IV Body'),
+    (2064, 206, 'Sony Alpha A7IV Body'),
     (2065, 201, 'Sony Alpha A7R V Body'),
     (2066, 202, 'Fujifilm X-T5 Body'),
     (2067, 203, 'Fujifilm X-Pro3 Body'),
@@ -310,7 +310,8 @@ INSERT IGNORE INTO items (id, seller_id, item_name) VALUES
     (2130, 203, 'Finalmouse Starlight-12 Small Gaming Mouse'),
     (2133, 206, 'Logitech MX Master 3S Wireless Mouse'),
     (2138, 202, 'Samsung T7 Shield 2TB External SSD'),
-    (2139, 201, 'Alienware m18 R2 Gaming Laptop RTX 4090');
+    (2139, 102, 'Alienware m18 R2 Gaming Laptop RTX 4090');
+
 
 -- AUCTIONS (now includes auction_description, auction_condition, category_id)
 -- Active Auctions - Ending Soon (1-3 days) - 10 auctions
@@ -396,6 +397,81 @@ INSERT IGNORE INTO auctions (id, item_id, category_id, auction_description, auct
     (3064, 2043, 223, '2-in-1 tablet with detachable keyboard. Excellent condition, includes Surface Pen and keyboard cover.', 'Like New', '2024-12-01 10:00:00', '2024-12-15 12:00:00', 999.99, 1300.00, 'Finished'),
     (3065, 2048, 231, 'Budget-friendly Apple Watch in excellent condition. Includes charger and band. Perfect for fitness tracking.', 'Like New', '2024-12-02 14:00:00', '2024-12-16 15:00:00', 199.99, 280.00, 'Finished'),
     (3066, 2139, 111, 'High-end gaming laptop that ended with no bids. Excellent condition, barely used. Perfect for gaming enthusiasts.', 'Like New', '2024-11-01 10:00:00', '2024-11-15 12:00:00', 1999.99, 2500.00, 'Finished');
+
+INSERT IGNORE INTO auction_images (id, auction_id, image_url, is_main, uploaded_datetime) VALUES
+(5001, 3001, 'https://www.laptopsdirect.co.uk/Images/A1G614JI-N4046W_3_Supersize.jpg?v=3', 1, DATE_SUB(NOW(), INTERVAL 5 DAY)),
+(5002, 3002, 'https://cdn.shopify.com/s/files/1/0306/8677/files/apple-macbook-pro-14-inch-macbook-pro-14-inch-m2-pro-12-core-space-grey-2023-good-44361543942460.jpg', 1, DATE_SUB(NOW(), INTERVAL 4 DAY)),
+(5003, 3003, 'https://www.ourfriday.co.uk/image/cache/catalog/Apple/apple-iphone-15-pro-uk-blue-1-800x800.png', 1, DATE_SUB(NOW(), INTERVAL 6 DAY)),
+(5004, 3004, 'https://m.media-amazon.com/images/I/41nY3hriqHL.jpg', 1, DATE_SUB(NOW(), INTERVAL 5 DAY)),
+(5005, 3005, 'https://sony.scene7.com/is/image/sonyglobalsolutions/01_mobile-2?$productIntroPlatemobile$&fmt=png-alpha', 1, DATE_SUB(NOW(), INTERVAL 4 DAY)),
+(5006, 3006, 'https://m.media-amazon.com/images/I/514vwxueu7L.jpg', 1, DATE_SUB(NOW(), INTERVAL 6 DAY)),
+(5007, 3007, 'https://cdsassets.apple.com/live/SZLF0YNV/images/sp/111851_sp880-airpods-Pro-2nd-gen.png', 1, DATE_SUB(NOW(), INTERVAL 5 DAY)),
+(5008, 3008, 'https://m.media-amazon.com/images/I/61+gjRmdMfL._AC_UF894,1000_QL80_.jpg', 1, DATE_SUB(NOW(), INTERVAL 4 DAY)),
+(5009, 3009, 'https://m.media-amazon.com/images/I/61WRvXLabPL._AC_UF1000,1000_QL80_.jpg', 1, DATE_SUB(NOW(), INTERVAL 6 DAY)),
+(5010, 3010, 'https://m.media-amazon.com/images/I/61CKrZWOcrL._AC_UF1000,1000_QL80_.jpg', 1, DATE_SUB(NOW(), INTERVAL 5 DAY)),
+-- Active Auctions - Medium Term (3011 - 3030)
+(5011, 3011, 'https://m.media-amazon.com/images/I/51eoVpfxgVL._AC_UF1000,1000_QL80_.jpg', 1, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+(5012, 3012, 'https://m.media-amazon.com/images/I/71cDHzqFRVL._AC_UF1000,1000_QL80_.jpg', 1, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+(5013, 3013, 'https://m.media-amazon.com/images/I/81SSx5mnY8L._AC_UF1000,1000_QL80_.jpg', 1, DATE_SUB(NOW(), INTERVAL 4 DAY)),
+(5014, 3014, 'https://www.lg.com/content/dam/channel/wcms/uk/images/monitors/27GR93U-B_AEK_EEUK_UK_C/gallery/medium01.jpg', 1, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+(5015, 3015, 'https://m.media-amazon.com/images/I/81Wwngkh2OL.jpg', 1, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+(5016, 3016, 'https://www.dealmonday.co.uk/image/cache/wp/gp/Google/google-pixel-8-pro-obsidian-1-1-800x800.webp', 1, DATE_SUB(NOW(), INTERVAL 4 DAY)),
+(5017, 3017, 'https://www.ourfriday.co.uk/image/cache/catalog/Apple/apple-ipad-pro-12-6th-wifi-space-grey-1-800x800.webp', 1, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+(5018, 3018, 'https://m.media-amazon.com/images/I/71WRJxRG94L.jpg', 1, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+(5019, 3019, 'https://www.productiongear.co.uk/images/source/Canon/CAN-1483C026AA-3.jpg', 1, DATE_SUB(NOW(), INTERVAL 4 DAY)),
+(5020, 3020, 'https://www.e-infin.com/c/image/600/gallery/4294/1.jpg', 1, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+(5021, 3021, 'https://m.media-amazon.com/images/I/811KgXRxZrL._AC_UF1000,1000_QL80_.jpg', 1, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+(5022, 3022, 'https://m.media-amazon.com/images/I/41iw2zKsohL._AC_UF1000,1000_QL80_.jpg', 1, DATE_SUB(NOW(), INTERVAL 4 DAY)),
+(5023, 3023, 'https://m.media-amazon.com/images/I/71Z9S5x0+WL._AC_UF1000,1000_QL80_.jpg', 1, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+(5024, 3024, 'https://m.media-amazon.com/images/I/51-kkNP6OcL.jpg', 1, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+(5025, 3025, 'https://media.direct.playstation.com/is/image/psdglobal/DualSense-Edge-Main-v2', 1, DATE_SUB(NOW(), INTERVAL 4 DAY)),
+(5026, 3026, 'https://m.media-amazon.com/images/I/81Wsrt05uLL._AC_UF894,1000_QL80_.jpg', 1, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+(5027, 3027, 'https://m.media-amazon.com/images/I/611OVkJoZbL._AC_UF1000,1000_QL80_.jpg', 1, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+(5028, 3028, 'https://m.media-amazon.com/images/I/41SaRNJfLRL.jpg', 1, DATE_SUB(NOW(), INTERVAL 4 DAY)),
+(5029, 3029, 'https://m.media-amazon.com/images/I/613a-3jtieL._AC_UF1000,1000_QL80_.jpg', 1, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+(5030, 3030, 'https://m.media-amazon.com/images/I/61XXyxsfdRL.jpg', 1, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+
+-- Active Auctions - Longer Term (3031 - 3060)
+(5031, 3031, 'https://m.media-amazon.com/images/I/61-PB6CZPlL._AC_UF1000,1000_QL80_.jpg', 1, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(5032, 3032, 'https://m.media-amazon.com/images/I/816NMzQV-tL._AC_UF1000,1000_QL80_.jpg', 1, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+(5033, 3033, 'https://www.macstoreuk.com/wp-content/uploads/2022/03/mac-studio-scaled.jpg', 1, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(5034, 3034, 'https://m.media-amazon.com/images/I/71qx2uvvb3L.jpg', 1, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+(5035, 3035, 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/studio-display-og-202203?wid=1200&hei=630&fmt=jpeg&qlt=90&.v=1645125507093', 1, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(5036, 3036, 'https://m.media-amazon.com/images/I/71yzJoE7WlL._AC_UF894,1000_QL80_.jpg', 1, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+(5037, 3037, 'https://i.ebayimg.com/images/g/iHgAAOSw1ZxlvQqM/s-l1200.jpg', 1, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(5038, 3038, 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/refurb-ipad-air-5th-gen-wifi-spacegray-202409?wid=4000&hei=4000&fmt=jpeg&qlt=90&.v=1721699935882', 1, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+(5039, 3039, 'https://m.media-amazon.com/images/I/71IiLY5ld0L._AC_UF1000,1000_QL80_.jpg', 1, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(5040, 3040, 'https://m.media-amazon.com/images/I/61znlMU9aVL._AC_UF1000,1000_QL80_.jpg', 1, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+(5041, 3041, 'https://m.media-amazon.com/images/I/614yCqsWyIL._AC_UF1000,1000_QL80_.jpg', 1, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(5042, 3042, 'https://www.lcegroup.co.uk/NewProductImages1/F742A1A0-75DC-42A0-96B7-9B331EFAD742.jpg', 1, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+(5043, 3043, 'https://static.gopro.com/assets/blta2b8522e5372af40/blt86b2d5c67d4f1ed5/64d0e286369276296caf7a71/02-pdp-h12b-gallery-1920.png?width=3840&quality=80&auto=webp&disable=upscale', 1, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(5044, 3044, 'https://m.media-amazon.com/images/I/716++4xC2wL.jpg', 1, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+(5045, 3045, 'https://m.media-amazon.com/images/I/61VwGQqDg-L._AC_UF1000,1000_QL80_.jpg', 1, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(5046, 3046, 'https://m.media-amazon.com/images/I/71ZuBiz41tL._UF1000,1000_QL80_.jpg', 1, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+(5047, 3047, 'https://m.media-amazon.com/images/I/71m0aFDqciL._AC_UF894,1000_QL80_.jpg', 1, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(5048, 3048, 'https://m.media-amazon.com/images/I/61Eqdt502lL.jpg', 1, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+(5049, 3049, 'https://m.media-amazon.com/images/I/61oeXMLNPmL.jpg', 1, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(5050, 3050, 'https://m.media-amazon.com/images/I/713aS9vqfnL.jpg', 1, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+(5051, 3051, 'https://m.media-amazon.com/images/I/71CY3IBkG0L._AC_UF1000,1000_QL80_.jpg', 1, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(5052, 3052, 'https://m.media-amazon.com/images/I/714NZ1CHrYL._AC_UF1000,1000_QL80_.jpg', 1, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+(5053, 3053, 'https://www.serversdirect.co.uk/Images/GGGDT_2_Supersize.jpg?v=3', 1, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(5054, 3054, 'https://m.media-amazon.com/images/I/61pfpisYSES.jpg', 1, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+(5055, 3055, 'https://m.media-amazon.com/images/I/91MMzcvOwLL.jpg', 1, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(5056, 3056, 'https://m.media-amazon.com/images/I/81MzQGrNASL.jpg', 1, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+(5057, 3057, 'https://m.media-amazon.com/images/I/71FQ77EDtPL._AC_UF1000,1000_QL80_.jpg', 1, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(5058, 3058, 'https://m.media-amazon.com/images/I/61RAsVPOjxL._AC_UF1000,1000_QL80_.jpg', 1, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+(5059, 3059, 'https://m.media-amazon.com/images/I/71EYdOx09+L._AC_UF1000,1000_QL80_.jpg', 1, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(5060, 3060, 'https://m.media-amazon.com/images/I/71m09hEhnwL.jpg', 1, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+
+-- Scheduled Auctions (3061 - 3063)
+(5061, 3061, 'https://www.ourfriday.co.uk/image/cache/catalog/Apple/Apple-iPad-Mini-6---Starlight-1-1-800x800.png', 1, DATE_ADD(NOW(), INTERVAL 1 DAY)),
+(5062, 3062, 'https://m.media-amazon.com/images/I/71zBd4pZiqL.jpg', 1, DATE_ADD(NOW(), INTERVAL 2 DAY)),
+(5063, 3063, 'https://m.media-amazon.com/images/I/616HN4KwZ0L.jpg', 1, DATE_ADD(NOW(), INTERVAL 1 DAY)),
+
+-- Finished Auctions (3064 - 3066)
+(5064, 3064, 'https://m.media-amazon.com/images/I/519mC+BzXdL.jpg', 1, '2024-12-01 10:00:00'),
+(5065, 3065, 'https://m.media-amazon.com/images/I/71lG7br7k1L.jpg', 1, '2024-12-02 14:00:00'),
+(5066, 3066, 'https://m.media-amazon.com/images/I/71XhPxR76WL._AC_UF1000,1000_QL80_.jpg', 1, '2024-11-01 10:00:00');
 
 -- Update items to link to their auctions
 UPDATE items SET current_auction_id = 3001 WHERE id = 2001;
@@ -571,21 +647,27 @@ INSERT IGNORE INTO bids (id, buyer_id, auction_id, bid_amount, bid_datetime) VAL
     (4089, 206, 3023, 480.00, DATE_SUB(NOW(), INTERVAL 2 DAY)),
     (4090, 208, 3023, 520.00, DATE_SUB(NOW(), INTERVAL 1 DAY)),
     (4091, 201, 3024, 420.00, DATE_SUB(NOW(), INTERVAL 3 DAY)),
-    (4092, 203, 3024, 450.00, DATE_SUB(NOW(), INTERVAL 2 DAY)),
-    (4093, 205, 3024, 480.00, DATE_SUB(NOW(), INTERVAL 1 DAY)),
-    (4094, 202, 3025, 200.00, DATE_SUB(NOW(), INTERVAL 2 DAY)),
-    (4095, 204, 3025, 230.00, DATE_SUB(NOW(), INTERVAL 1 DAY));
+    (4092, 203, 3024, 450.00, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+    (4093, 101, 3024, 460.00, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+    (4094, 205, 3024, 480.00, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+    (4095, 202, 3025, 200.00, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+    (4096, 204, 3025, 230.00, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+    (4097, 101, 3025, 250.00, DATE_SUB(NOW(), INTERVAL 1 DAY));
 
 -- Bids on finished auctions
 INSERT IGNORE INTO bids (id, buyer_id, auction_id, bid_amount, bid_datetime) VALUES
-    (4096, 201, 3064, 1050.00, '2024-12-10 10:00:00'),
-    (4097, 203, 3064, 1100.00, '2024-12-11 14:00:00'),
-    (4098, 205, 3064, 1200.00, '2024-12-12 16:00:00'),
-    (4099, 202, 3065, 220.00, '2024-12-11 11:00:00'),
-    (4100, 204, 3065, 250.00, '2024-12-13 15:00:00');
+    (4098, 201, 3064, 1050.00, '2024-12-10 10:00:00'),
+    (4099, 203, 3064, 1100.00, '2024-12-11 14:00:00'),
+    (4100, 205, 3064, 1200.00, '2024-12-12 16:00:00'),
+    (4101, 101, 3064, 1300.00, '2024-12-12 16:00:02'),
+    (4102, 202, 3065, 220.00, '2024-12-11 11:00:00'),
+    (4103, 101, 3065, 230.00, '2024-12-12 10:00:00'),
+    (4104, 204, 3065, 250.00, '2024-12-13 15:00:00')
+;
+
 
 -- Update winning_bid_id for finished auctions
-UPDATE auctions SET winning_bid_id = 4098 WHERE id = 3064;
+UPDATE auctions SET winning_bid_id = 4101 WHERE id = 3064;
 -- Auction 3065 is left with NULL winning_bid_id to represent a completed but not sold auction
 
 -- WATCHLISTS (for testing "My Watchlist" page)
@@ -661,4 +743,3 @@ INSERT IGNORE INTO watchlists (user_id, auction_id, watched_datetime) VALUES
     (208, 3010, DATE_SUB(NOW(), INTERVAL 3 DAY)),
     (208, 3013, DATE_SUB(NOW(), INTERVAL 2 DAY)),
     (208, 3019, DATE_SUB(NOW(), INTERVAL 1 DAY));
-

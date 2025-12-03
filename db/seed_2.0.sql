@@ -1,0 +1,1401 @@
+USE auction_db;
+
+-- ******************************************************
+-- 1. ROLES AND USERS
+-- ******************************************************
+
+-- Insert roles (if they don't exist)
+INSERT IGNORE INTO roles (id, role_name)
+VALUES (1, 'buyer'),
+       (2, 'seller'),
+       (3, 'admin');
+
+-- Insert test users with hashed passwords
+-- Password: password123 (hashed with bcrypt)
+INSERT IGNORE INTO users (id, username, email, password, is_active, created_datetime)
+VALUES (101, 'sabrina_buyer', 'ssss9178@gmail.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1,
+        '2024-01-15 10:00:00'),
+       (102, 'sabrina_seller', 'e74096027@gs.ncku.edu.tw',
+        '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1, '2024-02-20 14:30:00'),
+       (201, 'seller_alice', 'alice@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1,
+        '2024-03-10 09:15:00'),
+       (202, 'seller_bob', 'bob@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1,
+        '2024-03-25 16:45:00'),
+       (203, 'seller_charlie', 'charlie@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1,
+        '2024-04-05 11:20:00'),
+       (204, 'seller_diana', 'diana@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1,
+        '2024-04-18 13:10:00'),
+       (205, 'seller_edward', 'edward@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1,
+        '2024-05-12 08:30:00'),
+       (206, 'seller_fiona', 'fiona@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1,
+        '2024-05-28 15:00:00'),
+       (207, 'seller_george', 'george@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1,
+        '2024-06-10 10:45:00'),
+       (208, 'seller_helen', 'helen@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1,
+        '2024-06-22 12:15:00'),
+       (209, 'buyer_ivan', 'ivan@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1,
+        '2024-07-05 09:20:00'),
+       (210, 'buyer_julia', 'julia@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1,
+        '2024-07-12 14:30:00'),
+       (211, 'buyer_kevin', 'kevin@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1,
+        '2024-07-18 11:15:00'),
+       (212, 'buyer_lisa', 'lisa@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1,
+        '2024-07-25 16:45:00'),
+       (213, 'buyer_mike', 'mike@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1,
+        '2024-08-01 10:00:00'),
+       (214, 'seller_nina', 'nina@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1,
+        '2024-08-08 13:20:00'),
+       (215, 'seller_oscar', 'oscar@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1,
+        '2024-08-15 08:30:00'),
+       (216, 'seller_paula', 'paula@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1,
+        '2024-08-22 15:10:00'),
+       (217, 'seller_quinn', 'quinn@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1,
+        '2024-08-29 11:40:00'),
+       (218, 'seller_rachel', 'rachel@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1,
+        '2024-09-05 14:25:00'),
+       (219, 'user_sam', 'sam@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1,
+        '2024-09-12 09:50:00'),
+       (220, 'user_tina', 'tina@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1,
+        '2024-09-19 12:15:00'),
+       (221, 'user_umar', 'umar@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1,
+        '2024-09-26 10:30:00'),
+       (222, 'user_victor', 'victor@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1,
+        '2024-10-03 16:20:00'),
+       (223, 'user_wendy', 'wendy@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1,
+        '2024-10-10 13:45:00'),
+       (224, 'user_xavier', 'xavier@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1,
+        '2024-10-17 11:00:00'),
+       (225, 'user_yara', 'yara@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1,
+        '2024-10-24 14:35:00'),
+       (226, 'user_zack', 'zack@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1,
+        '2024-10-31 09:25:00'),
+       (227, 'buyer_anna', 'anna@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1,
+        '2024-11-07 15:50:00'),
+       (228, 'buyer_ben', 'ben@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1,
+        '2024-11-14 10:15:00'),
+       (229, 'buyer_cara', 'cara@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1,
+        '2024-11-21 12:40:00'),
+       (230, 'buyer_dave', 'dave@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1,
+        '2024-11-28 08:55:00'),
+       (231, 'buyer_ella', 'ella@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1,
+        '2024-12-05 13:20:00'),
+       (232, 'seller_frank', 'frank@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1,
+        '2024-12-12 11:10:00'),
+       (233, 'seller_grace', 'grace@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1,
+        '2024-12-19 16:30:00'),
+       (301, 'admin', 'admin@example.com', '$2y$12$LbSlJ7uaWPoUF9OHsr58lOXVWwao14j42jXP3xpha8iFfSu1oQ8um', 1,
+        '2024-01-01 00:00:00');
+
+-- Assign roles to users
+INSERT IGNORE INTO user_roles (user_id, role_id)
+VALUES (101, 1), -- sabrina_buyer is a buyer
+       (102, 2), -- sabrina_seller is a seller
+       (201, 1),
+       (201, 2), -- alice
+       (202, 1),
+       (202, 2), -- bob
+       (203, 1),
+       (203, 2), -- charlie
+       (204, 1),
+       (204, 2), -- diana
+       (205, 1),
+       (205, 2), -- edward
+       (206, 1),
+       (206, 2), -- fiona
+       (207, 1),
+       (207, 2), -- george
+       (208, 1),
+       (208, 2), -- helen
+       (209, 1), -- ivan is a buyer
+       (210, 1), -- julia is a buyer
+       (211, 1), -- kevin is a buyer
+       (212, 1), -- lisa is a buyer
+       (213, 1), -- mike is a buyer
+       (214, 2), -- nina is a seller
+       (215, 2), -- oscar is a seller
+       (216, 2), -- paula is a seller
+       (217, 2), -- quinn is a seller
+       (218, 2), -- rachel is a seller
+       (219, 1),
+       (219, 2), -- sam is both
+       (220, 1),
+       (220, 2), -- tina is both
+       (221, 1),
+       (221, 2), -- umar is both
+       (222, 1),
+       (222, 2), -- victor is both
+       (223, 1),
+       (223, 2), -- wendy is both
+       (224, 1),
+       (224, 2), -- xavier is both
+       (225, 1),
+       (225, 2), -- yara is both
+       (226, 1),
+       (226, 2), -- zack is both
+       (227, 1), -- anna is a buyer
+       (228, 1), -- ben is a buyer
+       (229, 1), -- cara is a buyer
+       (230, 1), -- dave is a buyer
+       (231, 1), -- ella is a buyer
+       (232, 2), -- frank is a seller
+       (233, 2), -- grace is a seller
+       (301, 1),
+       (301, 3);
+-- admin is both buyer and admin
+
+-- ******************************************************
+-- 2. CATEGORIES
+-- ******************************************************
+
+-- TOP-LEVEL CATEGORY: Computers
+INSERT IGNORE INTO categories (id, name, parent_category_id)
+VALUES (1, 'Computers', NULL),
+       -- Subcategory Level 1: Laptops
+       (11, 'Laptops', 1),
+       --   Subcategory Level 2: Gaming Laptops
+       (111, 'Gaming Laptops', 11),
+       --   Subcategory Level 2: Business Laptops
+       (112, 'Business Laptops', 11),
+       --   Subcategory Level 2: Ultrabooks
+       (113, 'Ultrabooks', 11),
+       -- Subcategory Level 1: Desktops
+       (12, 'Desktops', 1),
+       --   Subcategory Level 2: Gaming PCs
+       (121, 'Gaming PCs', 12),
+       --   Subcategory Level 2: Workstations
+       (122, 'Workstations', 12),
+       --   Subcategory Level 2: All-in-Ones
+       (123, 'All-in-Ones', 12),
+       -- Subcategory Level 1: Monitors
+       (13, 'Monitors', 1),
+       --   Subcategory Level 2: Gaming Monitors
+       (131, 'Gaming Monitors', 13),
+       --   Subcategory Level 2: Professional Displays
+       (132, 'Professional Displays', 13),
+       --   Subcategory Level 2: Ultrawide Monitors
+       (133, 'Ultrawide Monitors', 13);
+
+-- TOP-LEVEL CATEGORY: Mobile Devices
+INSERT IGNORE INTO categories (id, name, parent_category_id)
+VALUES (2, 'Mobile Devices', NULL),
+       -- Subcategory Level 1: Smartphones
+       (21, 'Smartphones', 2),
+       --   Subcategory Level 2: iPhone
+       (211, 'iPhone', 21),
+       --   Subcategory Level 2: Android Flagship
+       (212, 'Android Flagship', 21),
+       --   Subcategory Level 2: Mid-Range
+       (213, 'Mid-Range', 21),
+       -- Subcategory Level 1: Tablets
+       (22, 'Tablets', 2),
+       --   Subcategory Level 2: iPad
+       (221, 'iPad', 22),
+       --   Subcategory Level 2: Android Tablets
+       (222, 'Android Tablets', 22),
+       --   Subcategory Level 2: 2-in-1
+       (223, '2-in-1', 22),
+       -- Subcategory Level 1: Smartwatches
+       (23, 'Smartwatches', 2),
+       --   Subcategory Level 2: Apple Watch
+       (231, 'Apple Watch', 23),
+       --   Subcategory Level 2: Wear OS
+       (232, 'Wear OS', 23),
+       --   Subcategory Level 2: Fitness Trackers
+       (233, 'Fitness Trackers', 23);
+
+-- TOP-LEVEL CATEGORY: Cameras
+INSERT IGNORE INTO categories (id, name, parent_category_id)
+VALUES (3, 'Cameras', NULL),
+       -- Subcategory Level 1: DSLR
+       (31, 'DSLR', 3),
+       --   Subcategory Level 2: Canon
+       (311, 'Canon', 31),
+       --   Subcategory Level 2: Nikon
+       (312, 'Nikon', 31),
+       -- Subcategory Level 1: Mirrorless
+       (32, 'Mirrorless', 3),
+       --   Subcategory Level 2: Sony
+       (321, 'Sony', 32),
+       --   Subcategory Level 2: Fujifilm
+       (322, 'Fujifilm', 32),
+       --   Subcategory Level 2: Canon RF
+       (323, 'Canon RF', 32),
+       -- Subcategory Level 1: Action Cameras
+       (33, 'Action Cameras', 3),
+       --   Subcategory Level 2: GoPro
+       (331, 'GoPro', 33),
+       --   Subcategory Level 2: DJI
+       (332, 'DJI', 33);
+
+-- TOP-LEVEL CATEGORY: Audio
+INSERT IGNORE INTO categories (id, name, parent_category_id)
+VALUES (4, 'Audio', NULL),
+       -- Subcategory Level 1: Headphones
+       (41, 'Headphones', 4),
+       --   Subcategory Level 2: Over-Ear
+       (411, 'Over-Ear', 41),
+       --   Subcategory Level 2: On-Ear
+       (412, 'On-Ear', 41),
+       -- Subcategory Level 1: Earbuds
+       (42, 'Earbuds', 4),
+       --   Subcategory Level 2: True Wireless
+       (421, 'True Wireless', 42),
+       -- Subcategory Level 1: Speakers
+       (43, 'Speakers', 4),
+       --   Subcategory Level 2: Smart Speakers
+       (431, 'Smart Speakers', 43),
+       --   Subcategory Level 2: Portable
+       (432, 'Portable', 43);
+
+-- TOP-LEVEL CATEGORY: Gaming
+INSERT IGNORE INTO categories (id, name, parent_category_id)
+VALUES (5, 'Gaming', NULL),
+       -- Subcategory Level 1: Consoles
+       (51, 'Consoles', 5),
+       --   Subcategory Level 2: PlayStation
+       (511, 'PlayStation', 51),
+       --   Subcategory Level 2: Xbox
+       (512, 'Xbox', 51),
+       --   Subcategory Level 2: Nintendo
+       (513, 'Nintendo', 51),
+       -- Subcategory Level 1: Accessories
+       (52, 'Accessories', 5),
+       --   Subcategory Level 2: Controllers
+       (521, 'Controllers', 52),
+       --   Subcategory Level 2: Headsets
+       (522, 'Headsets', 52),
+       --   Subcategory Level 2: Keyboards
+       (523, 'Keyboards', 52),
+       --   Subcategory Level 2: Mice
+       (524, 'Mice', 52);
+
+-- TOP-LEVEL CATEGORY: Accessories
+INSERT IGNORE INTO categories (id, name, parent_category_id)
+VALUES (6, 'Accessories', NULL),
+       -- Subcategory Level 1: Keyboards
+       (61, 'Keyboards', 6),
+       --   Subcategory Level 2: Mechanical
+       (611, 'Mechanical', 61),
+       -- Subcategory Level 1: Mice
+       (62, 'Mice', 6),
+       --   Subcategory Level 2: Gaming
+       (621, 'Gaming', 62),
+       --   Subcategory Level 2: Wireless
+       (622, 'Wireless', 62),
+       -- Subcategory Level 1: Storage
+       (63, 'Storage', 6),
+       --   Subcategory Level 2: External Drives
+       (631, 'External Drives', 63);
+
+
+-- ******************************************************
+-- 3. ITEMS
+-- ******************************************************
+
+INSERT IGNORE INTO items (id, seller_id, item_name)
+VALUES (2001, 206, 'ASUS ROG Strix G16 Gaming Laptop RTX 4070'),
+       (2002, 201, 'Alienware m18 R2 Gaming Laptop RTX 4080'),
+       (2003, 202, 'Razer Blade 17 Gaming Laptop RTX 4060'),
+       (2004, 203, 'Lenovo ThinkPad X1 Carbon Gen 11 Intel i7'),
+       (2005, 204, 'Dell Latitude 9440 2-in-1 Intel i7'),
+       (2006, 205, 'HP EliteBook 840 G10 Intel i7'),
+       (2007, 206, 'Apple MacBook Pro 14" M2 Chip 16GB 512GB'),
+       (2008, 207, 'Dell XPS 13 Plus Intel i7 16GB 512GB'),
+       (2009, 208, 'LG Gram 17 Intel i7 16GB 1TB'),
+       (2010, 206, 'Custom Gaming PC RTX 4090 Intel i9'),
+       (2011, 201, 'Alienware Aurora R15 Gaming Desktop RTX 4080'),
+       (2012, 202, 'Corsair One i300 Compact Gaming PC'),
+       (2013, 203, 'Apple Mac Studio M2 Ultra 64GB 1TB'),
+       (2014, 204, 'Dell Precision 7865 Tower AMD Threadripper'),
+       (2016, 206, 'Apple iMac 24" M1 Chip 8GB 256GB'),
+       (2018, 208, 'LG UltraGear 27" 4K 144Hz Gaming Monitor'),
+       (2019, 208, 'Samsung Odyssey G9 49" Curved Gaming Monitor'),
+       (2020, 201, 'ASUS ROG Swift PG32UCDM 32" 4K OLED'),
+       (2021, 202, 'Apple Studio Display 27" 5K Retina'),
+       (2022, 203, 'Dell UltraSharp U2723DE 27" 4K'),
+       (2024, 205, 'LG 38WN95C-W 38" Ultrawide 4K'),
+       (2026, 102, 'Apple iPhone 15 Pro Max 256GB Titanium Blue'),
+       (2027, 208, 'Apple iPhone 15 Pro 128GB Natural Titanium'),
+       (2028, 208, 'Apple iPhone 14 Pro Max 256GB Deep Purple'),
+       (2029, 201, 'Apple iPhone 13 Pro 256GB Sierra Blue'),
+       (2030, 202, 'Samsung Galaxy S24 Ultra 512GB Phantom Black'),
+       (2031, 203, 'Google Pixel 8 Pro 256GB Obsidian'),
+       (2032, 204, 'OnePlus 12 256GB Flowy Emerald'),
+       (2033, 205, 'Samsung Galaxy S23 Ultra 256GB Green'),
+       (2034, 206, 'Google Pixel 7a 128GB Sea'),
+       (2037, 206, 'Apple iPad Pro 12.9" M2 256GB Space Grey'),
+       (2038, 201, 'Apple iPad Air 5th Gen M1 256GB Space Grey'),
+       (2039, 102, 'Apple iPad Mini 6 256GB Starlight'),
+       (2040, 203, 'Samsung Galaxy Tab S9 Ultra 512GB'),
+       (2041, 204, 'Samsung Galaxy Tab S9+ 256GB'),
+       (2043, 102, 'Microsoft Surface Pro 9 Intel i7 16GB 256GB'),
+       (2046, 206, 'Apple Watch Series 9 45mm GPS Cellular'),
+       (2047, 201, 'Apple Watch Ultra 2 49mm Titanium'),
+       (2048, 202, 'Apple Watch SE 2nd Gen 44mm GPS'),
+       (2049, 203, 'Samsung Galaxy Watch 6 Classic 47mm'),
+       (2050, 204, 'Google Pixel Watch 2 41mm'),
+       (2052, 206, 'Fitbit Charge 6 Fitness Tracker'),
+       (2055, 208, 'Canon EOS 5D Mark IV Body'),
+       (2056, 201, 'Canon EOS 90D Body'),
+       (2057, 202, 'Canon EOS R6 Mark II Body'),
+       (2058, 203, 'Nikon D850 Body'),
+       (2059, 204, 'Nikon D7500 Body'),
+       (2063, 208, 'Sony Alpha A7III Mirrorless Camera Body'),
+       (2064, 206, 'Sony Alpha A7IV Body'),
+       (2065, 201, 'Sony Alpha A7R V Body'),
+       (2066, 202, 'Fujifilm X-T5 Body'),
+       (2067, 203, 'Fujifilm X-Pro3 Body'),
+       (2069, 205, 'Canon EOS R6 Mark II Body'),
+       (2072, 208, 'GoPro Hero 12 Black'),
+       (2073, 102, 'GoPro Hero 11 Black'),
+       (2075, 202, 'DJI Osmo Action 4'),
+       (2077, 204, 'Sony WH-1000XM5 Noise Cancelling Headphones'),
+       (2078, 205, 'Apple AirPods Max Space Grey'),
+       (2079, 206, 'Bose QuietComfort 45 Headphones'),
+       (2080, 207, 'Sennheiser Momentum 4 Wireless'),
+       (2081, 208, 'Beats Solo3 Wireless On-Ear Headphones'),
+       (2085, 203, 'Apple AirPods Pro 2nd Generation'),
+       (2086, 204, 'Sony WF-1000XM5 Earbuds'),
+       (2087, 205, 'Samsung Galaxy Buds2 Pro'),
+       (2093, 202, 'Sonos Era 300 Smart Speaker'),
+       (2094, 203, 'Amazon Echo Studio'),
+       (2097, 206, 'Bose SoundLink Flex Portable Speaker'),
+       (2101, 201, 'Sony PlayStation 5 Console'),
+       (2104, 204, 'Microsoft Xbox Series X Console'),
+       (2107, 207, 'Nintendo Switch OLED Model'),
+       (2110, 201, 'Sony DualSense Edge Wireless Controller'),
+       (2113, 204, 'SteelSeries Arctis Nova Pro Wireless Headset'),
+       (2116, 207, 'Razer BlackWidow V4 Pro Mechanical Keyboard'),
+       (2119, 201, 'Logitech G Pro X Superlight Gaming Mouse'),
+       (2122, 204, 'Keychron Q1 Pro Mechanical Keyboard'),
+       (2130, 203, 'Finalmouse Starlight-12 Small Gaming Mouse'),
+       (2133, 206, 'Logitech MX Master 3S Wireless Mouse'),
+       (2138, 202, 'Samsung T7 Shield 2TB External SSD'),
+       (2139, 102, 'Alienware m18 R2 Gaming Laptop RTX 4090');
+
+
+-- ******************************************************
+-- 4. AUCTIONS
+--    -- IDs 3031-3060 are manually changed to 'Finished' with past dates
+-- ******************************************************
+
+-- Active Auctions - Ending Soon (1-3 days) - 10 auctions
+INSERT IGNORE INTO auctions (id, item_id, category_id, auction_description, auction_condition, start_datetime,
+                             end_datetime, starting_price, reserve_price, auction_status)
+VALUES (3001, 2001, 111,
+        'Powerful gaming laptop with Intel i9, 32GB RAM, 1TB SSD, RTX 4070 graphics. 16 inch 165Hz display. Excellent condition, barely used. Perfect for gaming and content creation.',
+        'Like New', DATE_SUB(NOW(), INTERVAL 5 DAY), DATE_ADD(NOW(), INTERVAL 1 DAY), 1299.99, 1600.00, 'Active'),
+       (3002, 2007, 113,
+        'Excellent condition MacBook Pro with M2 chip, 16GB RAM, 512GB SSD. Perfect for professionals and creatives. Includes original charger and box. Barely used, like new condition.',
+        'Like New', DATE_SUB(NOW(), INTERVAL 4 DAY), DATE_ADD(NOW(), INTERVAL 2 DAY), 1899.99, 2200.00, 'Active'),
+       (3003, 2026, 211,
+        'Brand new iPhone 15 Pro Max in Titanium Blue. Still sealed in original packaging. Includes all accessories. Unlocked for all carriers.',
+        'New', DATE_SUB(NOW(), INTERVAL 6 DAY), DATE_ADD(NOW(), INTERVAL 1 DAY), 1099.99, 1400.00, 'Active'),
+       (3004, 2030, 212,
+        'Flagship smartphone with S Pen. Excellent condition, barely used. Includes original box and charger. Unlocked.',
+        'Like New', DATE_SUB(NOW(), INTERVAL 5 DAY), DATE_ADD(NOW(), INTERVAL 3 DAY), 899.99, 1200.00, 'Active'),
+       (3005, 2063, 321,
+        'Professional full-frame mirrorless camera with 24.2MP sensor. Includes body, battery, charger, and 2 memory cards. Excellent condition, well maintained.',
+        'Like New', DATE_SUB(NOW(), INTERVAL 4 DAY), DATE_ADD(NOW(), INTERVAL 2 DAY), 1299.99, 1600.00, 'Active'),
+       (3006, 2077, 411,
+        'Premium noise-cancelling wireless headphones. Excellent sound quality and battery life. Includes carrying case and charging cable. Lightly used.',
+        'Like New', DATE_SUB(NOW(), INTERVAL 6 DAY), DATE_ADD(NOW(), INTERVAL 1 DAY), 249.99, 300.00, 'Active'),
+       (3007, 2085, 421,
+        'Premium wireless earbuds with active noise cancellation. Excellent condition, includes charging case and all accessories.',
+        'Like New', DATE_SUB(NOW(), INTERVAL 5 DAY), DATE_ADD(NOW(), INTERVAL 3 DAY), 199.99, 280.00, 'Active'),
+       (3008, 2101, 511,
+        'PS5 console with one DualSense controller. Includes all original cables and packaging. Excellent condition, barely used. Comes with 3 games included.',
+        'Like New', DATE_SUB(NOW(), INTERVAL 4 DAY), DATE_ADD(NOW(), INTERVAL 2 DAY), 449.99, 550.00, 'Active'),
+       (3009, 2119, 524,
+        'Professional gaming mouse with high DPI sensor. Excellent condition, barely used. Perfect for competitive gaming.',
+        'Like New', DATE_SUB(NOW(), INTERVAL 6 DAY), DATE_ADD(NOW(), INTERVAL 1 DAY), 79.99, 110.00, 'Active'),
+       (3010, 2138, 631,
+        'Rugged external SSD with excellent performance. Excellent condition, includes USB-C cable. Perfect for backups.',
+        'Like New', DATE_SUB(NOW(), INTERVAL 5 DAY), DATE_ADD(NOW(), INTERVAL 3 DAY), 149.99, 220.00, 'Active'),
+
+-- Active Auctions - Medium Term (1-2 weeks) - 20 auctions
+       (3011, 2002, 111,
+        'High-end gaming laptop with Intel i9, 32GB RAM, 2TB SSD, RTX 4080 graphics. 18 inch 165Hz display. Excellent condition, well maintained. Perfect for serious gamers.',
+        'Like New', DATE_SUB(NOW(), INTERVAL 3 DAY), DATE_ADD(NOW(), INTERVAL 10 DAY), 1999.99, 2400.00, 'Active'),
+       (3012, 2008, 113,
+        'Ultrabook with Intel i7, 16GB RAM, 512GB SSD. 13.3 inch OLED display. Lightweight and portable. Good condition, some minor scratches on lid.',
+        'Used', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 12 DAY), 1299.99, 1600.00, 'Active'),
+       (3013, 2010, 121,
+        'High-end custom gaming PC with Intel i9, 64GB RAM, 2TB SSD, RTX 4090 graphics. Excellent condition, perfect for 4K gaming and streaming.',
+        'Like New', DATE_SUB(NOW(), INTERVAL 4 DAY), DATE_ADD(NOW(), INTERVAL 11 DAY), 2499.99, 3000.00, 'Active'),
+       (3014, 2018, 131,
+        '4K gaming monitor with 144Hz refresh rate. Excellent color accuracy and response time. Perfect for gaming and design work. Excellent condition, includes stand.',
+        'Like New', DATE_SUB(NOW(), INTERVAL 3 DAY), DATE_ADD(NOW(), INTERVAL 13 DAY), 349.99, 480.00, 'Active'),
+       (3015, 2027, 211,
+        'Excellent condition iPhone 15 Pro. Barely used, includes original box and charger. Unlocked for all carriers.',
+        'Like New', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 10 DAY), 999.99, 1300.00, 'Active'),
+       (3016, 2031, 212,
+        'Premium Android phone with excellent camera. Good condition with minor wear. Includes charger and case.',
+        'Used', DATE_SUB(NOW(), INTERVAL 4 DAY), DATE_ADD(NOW(), INTERVAL 12 DAY), 699.99, 900.00, 'Active'),
+       (3017, 2037, 221,
+        'Large iPad Pro with M2 chip. Excellent condition, includes Apple Pencil 2nd generation and Magic Keyboard. Perfect for professionals.',
+        'Like New', DATE_SUB(NOW(), INTERVAL 3 DAY), DATE_ADD(NOW(), INTERVAL 11 DAY), 999.99, 1300.00, 'Active'),
+       (3018, 2046, 231,
+        'Latest Apple Watch with fitness tracking. Good condition with some minor wear. Includes charger and band.',
+        'Used', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 13 DAY), 299.99, 400.00, 'Active'),
+       (3019, 2055, 311,
+        'Professional full-frame DSLR camera body. Excellent condition with low shutter count. Includes battery, charger, and body cap.',
+        'Like New', DATE_SUB(NOW(), INTERVAL 4 DAY), DATE_ADD(NOW(), INTERVAL 10 DAY), 1899.99, 2200.00, 'Active'),
+       (3020, 2064, 321,
+        'Professional full-frame mirrorless camera. Excellent condition, barely used. Perfect for photography and videography.',
+        'Like New', DATE_SUB(NOW(), INTERVAL 3 DAY), DATE_ADD(NOW(), INTERVAL 12 DAY), 1999.99, 2400.00, 'Active'),
+       (3021, 2078, 411,
+        'Premium over-ear headphones with active noise cancellation. Excellent condition, includes case and cable.',
+        'Like New', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 11 DAY), 449.99, 600.00, 'Active'),
+       (3022, 2086, 421,
+        'Premium wireless earbuds with noise cancellation. Excellent condition, includes charging case. Great sound quality.',
+        'Like New', DATE_SUB(NOW(), INTERVAL 4 DAY), DATE_ADD(NOW(), INTERVAL 13 DAY), 199.99, 280.00, 'Active'),
+       (3023, 2093, 431,
+        'Premium smart speaker with spatial audio. Excellent condition, includes power cable. Perfect for home audio setup.',
+        'Like New', DATE_SUB(NOW(), INTERVAL 3 DAY), DATE_ADD(NOW(), INTERVAL 10 DAY), 399.99, 550.00, 'Active'),
+       (3024, 2104, 512,
+        'Next-gen gaming console with 1TB SSD. Excellent condition, includes controller and all cables. Perfect for gaming enthusiasts.',
+        'Like New', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 12 DAY), 399.99, 500.00, 'Active'),
+       (3025, 2110, 521,
+        'Premium PS5 controller with customizable buttons. Excellent condition, includes case and accessories.',
+        'Like New', DATE_SUB(NOW(), INTERVAL 4 DAY), DATE_ADD(NOW(), INTERVAL 11 DAY), 179.99, 250.00, 'Active'),
+       (3026, 2116, 523,
+        'RGB mechanical keyboard with cherry switches. Excellent condition, includes wrist rest. Perfect for gaming and typing.',
+        'Like New', DATE_SUB(NOW(), INTERVAL 3 DAY), DATE_ADD(NOW(), INTERVAL 13 DAY), 199.99, 280.00, 'Active'),
+       (3027, 2122, 611,
+        'Premium mechanical keyboard with excellent build quality. Excellent condition, includes keycap puller and cable.',
+        'Like New', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 10 DAY), 149.99, 220.00, 'Active'),
+       (3028, 2130, 621,
+        'Ultra-lightweight gaming mouse with excellent sensor. Excellent condition, includes accessories. Highly sought after.',
+        'Like New', DATE_SUB(NOW(), INTERVAL 4 DAY), DATE_ADD(NOW(), INTERVAL 12 DAY), 99.99, 140.00, 'Active'),
+       (3029, 2133, 622,
+        'Premium productivity mouse with excellent ergonomics. Excellent condition, includes USB receiver.', 'Like New',
+        DATE_SUB(NOW(), INTERVAL 3 DAY), DATE_ADD(NOW(), INTERVAL 11 DAY), 79.99, 110.00, 'Active'),
+       (3030, 2004, 112,
+        'Business laptop with Intel i7, 16GB RAM, 1TB SSD. 14 inch display. Excellent condition, well maintained. Perfect for professionals.',
+        'Like New', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 10 DAY), 1299.99, 1600.00, 'Active'),
+
+-- Finished Auctions (formerly Longer Term Active, ID 3031 - 3060)
+       (3031, 2003, 111,
+        'Premium gaming laptop with Intel i7, 16GB RAM, 1TB SSD, RTX 4060 graphics. 17.3 inch QHD display. Good condition with minor wear.',
+        'Used', '2025-11-05 10:00:00', '2025-11-20 10:00:00', 1499.99, 1800.00, 'Finished'),
+       (3032, 2009, 113,
+        'Ultra-lightweight laptop with Intel i7, 16GB RAM, 1TB SSD. 17 inch display. Excellent condition, perfect for portability.',
+        'Like New', '2025-11-05 10:10:00', '2025-11-20 10:10:00', 1199.99, 1500.00, 'Finished'),
+       (3033, 2013, 122,
+        'Professional workstation with M2 Ultra chip, 64GB RAM, 1TB SSD. Excellent condition, perfect for video editing and 3D rendering.',
+        'Like New', '2025-11-05 10:20:00', '2025-11-20 10:20:00', 2999.99, 3600.00, 'Finished'),
+       (3034, 2019, 131,
+        'Ultrawide curved gaming monitor with 240Hz refresh rate. Excellent condition, includes stand and all cables. Perfect for immersive gaming.',
+        'Like New', '2025-11-05 10:30:00', '2025-11-20 10:30:00', 899.99, 1200.00, 'Finished'),
+       (3035, 2021, 132,
+        'Professional 5K display with excellent color accuracy. Perfect for creative professionals. Excellent condition, includes stand.',
+        'Like New', '2025-11-05 10:40:00', '2025-11-20 10:40:00', 1299.99, 1600.00, 'Finished'),
+       (3036, 2028, 211,
+        'Good condition iPhone 14 Pro Max with minor wear. Includes charger and case. Unlocked for all carriers.',
+        'Used', '2025-11-05 10:50:00', '2025-11-20 10:50:00', 799.99, 1000.00, 'Finished'),
+       (3037, 2032, 212,
+        'High-performance smartphone with fast charging. Excellent condition, includes original accessories.',
+        'Like New', '2025-11-05 11:00:00', '2025-11-20 11:00:00', 599.99, 800.00, 'Finished'),
+       (3038, 2038, 221,
+        'iPad Air with M1 chip, 256GB storage. Space Grey color. Includes Apple Pencil 2nd generation and smart folio case. Perfect condition.',
+        'Like New', '2025-11-05 11:10:00', '2025-11-20 11:10:00', 599.99, 750.00, 'Finished'),
+       (3039, 2047, 231,
+        'Premium Apple Watch with titanium case. Excellent condition, includes charger and band. Perfect for outdoor activities.',
+        'Like New', '2025-11-05 11:20:00', '2025-11-20 11:20:00', 699.99, 900.00, 'Finished'),
+       (3040, 2049, 232, 'Premium smartwatch with rotating bezel. Excellent condition, includes charger and band.',
+        'Like New', '2025-11-05 11:30:00', '2025-11-20 11:30:00', 299.99, 400.00, 'Finished'),
+       (3041, 2058, 312,
+        'High-resolution full-frame DSLR. Excellent condition, well maintained. Perfect for professional photography.',
+        'Like New', '2025-11-05 11:40:00', '2025-11-20 11:40:00', 1999.99, 2400.00, 'Finished'),
+       (3042, 2065, 321,
+        'High-resolution full-frame mirrorless camera. Excellent condition, perfect for landscape and studio photography.',
+        'Like New', '2025-11-05 11:50:00', '2025-11-20 11:50:00', 2999.99, 3600.00, 'Finished'),
+       (3043, 2072, 331,
+        'Latest action camera with excellent stabilization. Excellent condition, includes mounts and accessories.',
+        'Like New', '2025-11-05 12:00:00', '2025-11-20 12:00:00', 299.99, 400.00, 'Finished'),
+       (3044, 2080, 411,
+        'Premium wireless headphones with excellent sound quality. Excellent condition, includes case and cable.',
+        'Like New', '2025-11-05 12:10:00', '2025-11-20 12:10:00', 299.99, 400.00, 'Finished'),
+       (3045, 2087, 421,
+        'High-quality wireless earbuds with active noise cancellation. Good condition, includes charging case.', 'Used',
+        '2025-11-05 12:20:00', '2025-11-20 12:20:00', 149.99, 220.00, 'Finished'),
+       (3046, 2094, 431,
+        'High-fidelity smart speaker with Alexa. Excellent condition, includes power adapter. Perfect for smart home setup.',
+        'Like New', '2025-11-05 12:30:00', '2025-11-20 12:30:00', 79.99, 110.00, 'Finished'),
+       (3047, 2107, 513,
+        'Nintendo Switch OLED model with red and blue joy-cons. Includes dock, charger, and 5 games. Excellent condition, well cared for.',
+        'Like New', '2025-11-05 12:40:00', '2025-11-20 12:40:00', 299.99, 380.00, 'Finished'),
+       (3048, 2113, 522,
+        'Premium gaming headset with dual battery system. Excellent condition, includes all accessories.', 'Like New',
+        '2025-11-05 12:50:00', '2025-11-20 12:50:00', 249.99, 350.00, 'Finished'),
+       (3049, 2005, 112,
+        'Convertible business laptop with Intel i7, 16GB RAM, 512GB SSD. 14 inch touchscreen. Excellent condition, includes stylus.',
+        'Like New', '2025-11-05 13:00:00', '2025-11-20 13:00:00', 1199.99, 1500.00, 'Finished'),
+       (3050, 2006, 112,
+        'Professional business laptop with Intel i7, 16GB RAM, 512GB SSD. 14 inch display. Good condition, well maintained.',
+        'Used', '2025-11-05 13:10:00', '2025-11-20 13:10:00', 999.99, 1300.00, 'Finished'),
+       (3051, 2011, 121,
+        'Gaming desktop with Intel i9, 32GB RAM, 1TB SSD, RTX 4080 graphics. Excellent condition, includes keyboard and mouse.',
+        'Like New', '2025-11-05 13:20:00', '2025-11-20 13:20:00', 1999.99, 2400.00, 'Finished'),
+       (3052, 2012, 121,
+        'Compact gaming PC with Intel i9, 32GB RAM, 1TB SSD, RTX 4080. Excellent condition, space-saving design.',
+        'Like New', '2025-11-05 13:30:00', '2025-11-20 13:30:00', 2499.99, 3000.00, 'Finished'),
+       (3053, 2014, 122,
+        'Professional workstation with AMD Threadripper, 64GB RAM, 2TB SSD, RTX A5000 graphics. Excellent condition, perfect for CAD and rendering.',
+        'Like New', '2025-11-05 13:40:00', '2025-11-20 13:40:00', 3499.99, 4200.00, 'Finished'),
+       (3054, 2016, 123,
+        'All-in-one desktop with M1 chip. 24 inch 4.5K Retina display. Excellent condition, includes Magic Mouse and Keyboard.',
+        'Like New', '2025-11-05 13:50:00', '2025-11-20 13:50:00', 999.99, 1300.00, 'Finished'),
+       (3055, 2020, 131,
+        '4K OLED gaming monitor with 240Hz refresh rate. Excellent picture quality. Perfect for gaming and content creation. Excellent condition.',
+        'Like New', '2025-11-05 14:00:00', '2025-11-20 14:00:00', 1299.99, 1600.00, 'Finished'),
+       (3056, 2022, 132,
+        'Professional 4K monitor with excellent color accuracy. Perfect for design work. Excellent condition, includes stand.',
+        'Like New', '2025-11-05 14:10:00', '2025-11-20 14:10:00', 599.99, 800.00, 'Finished'),
+       (3057, 2024, 133,
+        'Ultrawide curved monitor with excellent color accuracy. Perfect for productivity and gaming. Excellent condition, includes stand.',
+        'Like New', '2025-11-05 14:20:00', '2025-11-20 14:20:00', 1499.99, 1800.00, 'Finished'),
+       (3058, 2029, 211,
+        'Excellent condition iPhone 13 Pro. Well maintained, includes original box and charger. Unlocked.', 'Like New',
+        '2025-11-05 14:30:00', '2025-11-20 14:30:00', 699.99, 900.00, 'Finished'),
+       (3059, 2033, 212, 'Flagship smartphone in excellent condition. Includes S Pen, charger, and case. Unlocked.',
+        'Like New', '2025-11-05 14:40:00', '2025-11-20 14:40:00', 899.99, 1200.00, 'Finished'),
+       (3060, 2034, 213,
+        'Mid-range smartphone with excellent camera. Good condition, includes charger. Great value for money.', 'Used',
+        '2025-11-05 14:50:00', '2025-11-20 14:50:00', 299.99, 400.00, 'Finished'),
+
+-- Scheduled Auctions - 3 auctions
+       (3061, 2039, 221,
+        'Compact iPad Mini in excellent condition. Includes Apple Pencil 2nd generation and case. Perfect for portability.',
+        'Like New', DATE_ADD(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 8 DAY), 449.99, 600.00, 'Scheduled'),
+       (3062, 2040, 222,
+        'Large tablet with S Pen included. Excellent condition, barely used. Perfect for productivity and creativity.',
+        'Like New', DATE_ADD(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 9 DAY), 799.99, 1000.00, 'Scheduled'),
+       (3063, 2041, 222,
+        'Premium Android tablet in excellent condition. Includes S Pen and keyboard cover. Perfect for work and entertainment.',
+        'Like New', DATE_ADD(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 10 DAY), 599.99, 800.00, 'Scheduled'),
+
+-- Finished Auctions (Original) - 3 auctions
+       (3064, 2043, 223,
+        '2-in-1 tablet with detachable keyboard. Excellent condition, includes Surface Pen and keyboard cover.',
+        'Like New', '2024-12-01 10:00:00', '2024-12-15 12:00:00', 999.99, 1300.00, 'Finished'),
+       (3065, 2048, 231,
+        'Budget-friendly Apple Watch in excellent condition. Includes charger and band. Perfect for fitness tracking.',
+        'Like New', '2024-12-02 14:00:00', '2024-12-16 15:00:00', 199.99, 280.00, 'Finished'),
+       (3066, 2139, 111,
+        'High-end gaming laptop that ended with no bids. Excellent condition, barely used. Perfect for gaming enthusiasts.',
+        'Like New', '2024-11-01 10:00:00', '2024-11-15 12:00:00', 1999.99, 2500.00, 'Finished');
+
+-- ******************************************************
+-- 5. AUCTION IMAGES (Corrected and Expanded)
+-- ******************************************************
+
+INSERT IGNORE INTO auction_images (id, auction_id, image_url, is_main, uploaded_datetime)
+VALUES (5001, 3001, 'https://www.laptopsdirect.co.uk/Images/A1G614JI-N4046W_3_Supersize.jpg?v=3', 1,
+        DATE_SUB(NOW(), INTERVAL 5 DAY)),
+       (5002, 3002,
+        'https://cdn.shopify.com/s/files/1/0306/8677/files/apple-macbook-pro-14-inch-macbook-pro-14-inch-m2-pro-12-core-space-grey-2023-good-44361543942460.jpg',
+        1, DATE_SUB(NOW(), INTERVAL 4 DAY)),
+       (5003, 3003, 'https://www.ourfriday.co.uk/image/cache/catalog/Apple/apple-iphone-15-pro-uk-blue-1-800x800.png',
+        1, DATE_SUB(NOW(), INTERVAL 6 DAY)),
+       (5004, 3004, 'https://m.media-amazon.com/images/I/41nY3hriqHL.jpg', 1, DATE_SUB(NOW(), INTERVAL 5 DAY)),
+       (5005, 3005,
+        'https://sony.scene7.com/is/image/sonyglobalsolutions/01_mobile-2?$productIntroPlatemobile$&fmt=png-alpha', 1,
+        DATE_SUB(NOW(), INTERVAL 4 DAY)),
+       (5006, 3006, 'https://m.media-amazon.com/images/I/514vwxueu7L.jpg', 1, DATE_SUB(NOW(), INTERVAL 6 DAY)),
+       (5007, 3007, 'https://cdsassets.apple.com/live/SZLF0YNV/images/sp/111851_sp880-airpods-Pro-2nd-gen.png', 1,
+        DATE_SUB(NOW(), INTERVAL 5 DAY)),
+       (5008, 3008, 'https://m.media-amazon.com/images/I/61+gjRmdMfL._AC_UF894,1000_QL80_.jpg', 1,
+        DATE_SUB(NOW(), INTERVAL 4 DAY)),
+       (5009, 3009, 'https://m.media-amazon.com/images/I/61WRvXLabPL._AC_UF1000,1000_QL80_.jpg', 1,
+        DATE_SUB(NOW(), INTERVAL 6 DAY)),
+       (5010, 3010, 'https://m.media-amazon.com/images/I/61CKrZWOcrL._AC_UF1000,1000_QL80_.jpg', 1,
+        DATE_SUB(NOW(), INTERVAL 5 DAY)),
+-- Active Auctions - Medium Term (3011 - 3030)
+       (5011, 3011, 'https://m.media-amazon.com/images/I/51eoVpfxgVL._AC_UF1000,1000_QL80_.jpg', 1,
+        DATE_SUB(NOW(), INTERVAL 3 DAY)),
+       (5012, 3012, 'https://m.media-amazon.com/images/I/71cDHzqFRVL._AC_UF1000,1000_QL80_.jpg', 1,
+        DATE_SUB(NOW(), INTERVAL 2 DAY)),
+       (5013, 3013, 'https://m.media-amazon.com/images/I/81SSx5mnY8L._AC_UF1000,1000_QL80_.jpg', 1,
+        DATE_SUB(NOW(), INTERVAL 4 DAY)),
+       (5014, 3014,
+        'https://www.lg.com/content/dam/channel/wcms/uk/images/monitors/27GR93U-B_AEK_EEUK_UK_C/gallery/medium01.jpg',
+        1, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+       (5015, 3015, 'https://m.media-amazon.com/images/I/81Wwngkh2OL.jpg', 1, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+       (5016, 3016,
+        'https://www.dealmonday.co.uk/image/cache/wp/gp/Google/google-pixel-8-pro-obsidian-1-1-800x800.webp', 1,
+        DATE_SUB(NOW(), INTERVAL 4 DAY)),
+       (5017, 3017,
+        'https://www.ourfriday.co.uk/image/cache/catalog/Apple/apple-ipad-pro-12-6th-wifi-space-grey-1-800x800.webp', 1,
+        DATE_SUB(NOW(), INTERVAL 3 DAY)),
+       (5018, 3018, 'https://m.media-amazon.com/images/I/71WRJxRG94L.jpg', 1, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+       (5019, 3019, 'https://www.productiongear.co.uk/images/source/Canon/CAN-1483C026AA-3.jpg', 1,
+        DATE_SUB(NOW(), INTERVAL 4 DAY)),
+       (5020, 3020, 'https://www.e-infin.com/c/image/600/gallery/4294/1.jpg', 1, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+       (5021, 3021, 'https://m.media-amazon.com/images/I/811KgXRxZrL._AC_UF1000,1000_QL80_.jpg', 1,
+        DATE_SUB(NOW(), INTERVAL 2 DAY)),
+       (5022, 3022, 'https://m.media-amazon.com/images/I/41iw2zKsohL._AC_UF1000,1000_QL80_.jpg', 1,
+        DATE_SUB(NOW(), INTERVAL 4 DAY)),
+       (5023, 3023, 'https://m.media-amazon.com/images/I/71Z9S5x0+WL._AC_UF1000,1000_QL80_.jpg', 1,
+        DATE_SUB(NOW(), INTERVAL 3 DAY)),
+       (5024, 3024, 'https://m.media-amazon.com/images/I/51-kkNP6OcL.jpg', 1, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+       (5025, 3025, 'https://media.direct.playstation.com/is/image/psdglobal/DualSense-Edge-Main-v2', 1,
+        DATE_SUB(NOW(), INTERVAL 4 DAY)),
+       (5026, 3026, 'https://m.media-amazon.com/images/I/81Wsrt05uLL._AC_UF894,1000_QL80_.jpg', 1,
+        DATE_SUB(NOW(), INTERVAL 3 DAY)),
+       (5027, 3027, 'https://m.media-amazon.com/images/I/611OVkJoZbL._AC_UF1000,1000_QL80_.jpg', 1,
+        DATE_SUB(NOW(), INTERVAL 2 DAY)),
+       (5028, 3028, 'https://m.media-amazon.com/images/I/41SaRNJfLRL.jpg', 1, DATE_SUB(NOW(), INTERVAL 4 DAY)),
+       (5029, 3029, 'https://m.media-amazon.com/images/I/613a-3jtieL._AC_UF1000,1000_QL80_.jpg', 1,
+        DATE_SUB(NOW(), INTERVAL 3 DAY)),
+       (5030, 3030, 'https://m.media-amazon.com/images/I/61XXyxsfdRL.jpg', 1, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+
+-- Finished Auctions (3031 - 3060)
+       (5031, 3031, 'https://m.media-amazon.com/images/I/61-PB6CZPlL._AC_UF1000,1000_QL80_.jpg', 1,
+        '2025-11-05 10:00:00'),
+       (5032, 3032, 'https://m.media-amazon.com/images/I/816NMzQV-tL._AC_UF1000,1000_QL80_.jpg', 1,
+        '2025-11-05 10:10:00'),
+       (5033, 3033, 'https://www.macstoreuk.com/wp-content/uploads/2022/03/mac-studio-scaled.jpg', 1,
+        '2025-11-05 10:20:00'),
+       (5034, 3034, 'https://m.media-amazon.com/images/I/71qx2uvvb3L.jpg', 1, '2025-11-05 10:30:00'),
+       (5035, 3035,
+        'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/studio-display-og-202203?wid=1200&hei=630&fmt=jpeg&qlt=90&.v=1645125507093',
+        1, '2025-11-05 10:40:00'),
+       (5036, 3036, 'https://m.media-amazon.com/images/I/71yzJoE7WlL._AC_UF894,1000_QL80_.jpg', 1,
+        '2025-11-05 10:50:00'),
+       (5037, 3037, 'https://i.ebayimg.com/images/g/iHgAAOSw1ZxlvQqM/s-l1200.jpg', 1, '2025-11-05 11:00:00'),
+       (5038, 3038,
+        'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/refurb-ipad-air-5th-gen-wifi-spacegray-202409?wid=4000&hei=4000&fmt=jpeg&qlt=90&.v=1721699935882',
+        1, '2025-11-05 11:10:00'),
+       (5039, 3039, 'https://m.media-amazon.com/images/I/71IiLY5ld0L._AC_UF1000,1000_QL80_.jpg', 1,
+        '2025-11-05 11:20:00'),
+       (5040, 3040, 'https://m.media-amazon.com/images/I/61znlMU9aVL._AC_UF1000,1000_QL80_.jpg', 1,
+        '2025-11-05 11:30:00'),
+       (5041, 3041, 'https://m.media-amazon.com/images/I/614yCqsWyIL._AC_UF1000,1000_QL80_.jpg', 1,
+        '2025-11-05 11:40:00'),
+       (5042, 3042, 'https://www.lcegroup.co.uk/NewProductImages1/F742A1A0-75DC-42A0-96B7-9B331EFAD742.jpg', 1,
+        '2025-11-05 11:50:00'),
+       (5043, 3043,
+        'https://static.gopro.com/assets/blta2b8522e5372af40/blt86b2d5c67d4f1ed5/64d0e286369276296caf7a71/02-pdp-h12b-gallery-1920.png?width=3840&quality=80&auto=webp&disable=upscale',
+        1, '2025-11-05 12:00:00'),
+       (5044, 3044, 'https://m.media-amazon.com/images/I/716++4xC2wL.jpg', 1, '2025-11-05 12:10:00'),
+       (5045, 3045, 'https://m.media-amazon.com/images/I/61VwGQqDg-L._AC_UF1000,1000_QL80_.jpg', 1,
+        '2025-11-05 12:20:00'),
+       (5046, 3046, 'https://m.media-amazon.com/images/I/71ZuBiz41tL._UF1000,1000_QL80_.jpg', 1, '2025-11-05 12:30:00'),
+       (5047, 3047, 'https://m.media-amazon.com/images/I/71m0aFDqciL._AC_UF894,1000_QL80_.jpg', 1,
+        '2025-11-05 12:40:00'),
+       (5048, 3048, 'https://m.media-amazon.com/images/I/61Eqdt502lL.jpg', 1, '2025-11-05 12:50:00'),
+       (5049, 3049, 'https://m.media-amazon.com/images/I/61oeXMLNPmL.jpg', 1, '2025-11-05 13:00:00'),
+       (5050, 3050, 'https://m.media-amazon.com/images/I/713aS9vqfnL.jpg', 1, '2025-11-05 13:10:00'),
+       (5051, 3051, 'https://m.media-amazon.com/images/I/71CY3IBkG0L._AC_UF1000,1000_QL80_.jpg', 1,
+        '2025-11-05 13:20:00'),
+       (5052, 3052, 'https://m.media-amazon.com/images/I/714NZ1CHrYL._AC_UF1000,1000_QL80_.jpg', 1,
+        '2025-11-05 13:30:00'),
+       (5053, 3053, 'https://www.serversdirect.co.uk/Images/GGGDT_2_Supersize.jpg?v=3', 1, '2025-11-05 13:40:00'),
+       (5054, 3054, 'https://m.media-amazon.com/images/I/61pfpisYSES.jpg', 1, '2025-11-05 13:50:00'),
+       (5055, 3055, 'https://m.media-amazon.com/images/I/91MMzcvOwLL.jpg', 1, '2025-11-05 14:00:00'),
+       (5056, 3056, 'https://m.media-amazon.com/images/I/81MzQGrNASL.jpg', 1, '2025-11-05 14:10:00'),
+       (5057, 3057, 'https://m.media-amazon.com/images/I/71FQ77EDtPL._AC_UF1000,1000_QL80_.jpg', 1,
+        '2025-11-05 14:20:00'),
+       (5058, 3058, 'https://m.media-amazon.com/images/I/61RAsVPOjxL._AC_UF1000,1000_QL80_.jpg', 1,
+        '2025-11-05 14:30:00'),
+       (5059, 3059, 'https://m.media-amazon.com/images/I/71EYdOx09+L._AC_UF1000,1000_QL80_.jpg', 1,
+        '2025-11-05 14:40:00'),
+       (5060, 3060, 'https://m.media-amazon.com/images/I/71m09hEhnwL.jpg', 1, '2025-11-05 14:50:00'),
+-- Scheduled Auctions (3061 - 3063)
+       (5061, 3061,
+        'https://www.ourfriday.co.uk/image/cache/catalog/Apple/Apple-iPad-Mini-6---Starlight-1-1-800x800.png', 1,
+        DATE_ADD(NOW(), INTERVAL 1 DAY)),
+       (5062, 3062, 'https://m.media-amazon.com/images/I/71zBd4pZiqL.jpg', 1, DATE_ADD(NOW(), INTERVAL 2 DAY)),
+       (5063, 3063, 'https://m.media-amazon.com/images/I/616HN4KwZ0L.jpg', 1, DATE_ADD(NOW(), INTERVAL 1 DAY)),
+-- Finished Auctions (Original)
+       (5064, 3064, 'https://m.media-amazon.com/images/I/519mC+BzXdL.jpg', 1, '2024-12-01 10:00:00'),
+       (5065, 3065, 'https://m.media-amazon.com/images/I/71lG7br7k1L.jpg', 1, '2024-12-02 14:00:00'),
+       (5066, 3066, 'https://m.media-amazon.com/images/I/71XhPxR76WL._AC_UF1000,1000_QL80_.jpg', 1,
+        '2024-11-01 10:00:00');
+
+
+-- ******************************************************
+-- 6. BIDS (Original and New)
+-- ******************************************************
+
+INSERT IGNORE INTO bids (id, buyer_id, auction_id, bid_amount, bid_datetime)
+VALUES (4001, 201, 3001, 1350.00, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+       (4002, 203, 3001, 1420.00, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+       (4003, 205, 3001, 1480.00, DATE_SUB(NOW(), INTERVAL 12 HOUR)),
+       (4004, 202, 3002, 1950.00, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+       (4005, 204, 3002, 2050.00, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+       (4006, 201, 3003, 1150.00, DATE_SUB(NOW(), INTERVAL 4 DAY)),
+       (4007, 203, 3003, 1200.00, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+       (4008, 205, 3003, 1250.00, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+       (4009, 207, 3003, 1300.00, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+       (4010, 202, 3004, 950.00, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+       (4011, 206, 3004, 1000.00, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+       (4012, 201, 3005, 1350.00, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+       (4013, 204, 3005, 1400.00, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+       (4014, 208, 3005, 1450.00, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+       (4015, 202, 3006, 270.00, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+       (4016, 203, 3007, 220.00, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+       (4017, 205, 3007, 240.00, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+       (4018, 201, 3008, 480.00, DATE_SUB(NOW(), INTERVAL 5 DAY)),
+       (4019, 202, 3008, 500.00, DATE_SUB(NOW(), INTERVAL 4 DAY)),
+       (4020, 204, 3008, 520.00, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+       (4021, 206, 3008, 530.00, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+       (4022, 208, 3008, 540.00, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+       (4023, 203, 3009, 90.00, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+       (4024, 201, 3010, 170.00, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+       (4025, 205, 3010, 190.00, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+       (4026, 201, 3011, 2100.00, DATE_SUB(NOW(), INTERVAL 8 DAY)),
+       (4027, 202, 3011, 2150.00, DATE_SUB(NOW(), INTERVAL 7 DAY)),
+       (4028, 203, 3011, 2200.00, DATE_SUB(NOW(), INTERVAL 6 DAY)),
+       (4029, 204, 3011, 2250.00, DATE_SUB(NOW(), INTERVAL 5 DAY)),
+       (4030, 205, 3011, 2280.00, DATE_SUB(NOW(), INTERVAL 4 DAY)),
+       (4031, 206, 3011, 2300.00, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+       (4032, 207, 3011, 2320.00, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+       (4033, 208, 3011, 2350.00, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+       (4034, 201, 3012, 1350.00, DATE_SUB(NOW(), INTERVAL 6 DAY)),
+       (4035, 203, 3012, 1400.00, DATE_SUB(NOW(), INTERVAL 5 DAY)),
+       (4036, 205, 3012, 1450.00, DATE_SUB(NOW(), INTERVAL 4 DAY)),
+       (4037, 206, 3012, 1480.00, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+       (4038, 207, 3012, 1500.00, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+       (4039, 208, 3012, 1520.00, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+       (4040, 201, 3013, 2600.00, DATE_SUB(NOW(), INTERVAL 10 DAY)),
+       (4041, 202, 3013, 2650.00, DATE_SUB(NOW(), INTERVAL 9 DAY)),
+       (4042, 203, 3013, 2700.00, DATE_SUB(NOW(), INTERVAL 8 DAY)),
+       (4043, 204, 3013, 2750.00, DATE_SUB(NOW(), INTERVAL 7 DAY)),
+       (4044, 205, 3013, 2800.00, DATE_SUB(NOW(), INTERVAL 6 DAY)),
+       (4045, 206, 3013, 2820.00, DATE_SUB(NOW(), INTERVAL 5 DAY)),
+       (4046, 207, 3013, 2850.00, DATE_SUB(NOW(), INTERVAL 4 DAY)),
+       (4047, 208, 3013, 2880.00, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+       (4048, 201, 3013, 2900.00, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+       (4049, 202, 3013, 2920.00, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+       (4050, 203, 3014, 400.00, DATE_SUB(NOW(), INTERVAL 5 DAY)),
+       (4051, 205, 3014, 420.00, DATE_SUB(NOW(), INTERVAL 4 DAY)),
+       (4052, 206, 3014, 440.00, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+       (4053, 207, 3014, 450.00, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+       (4054, 208, 3014, 460.00, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+       (4055, 201, 3015, 1050.00, DATE_SUB(NOW(), INTERVAL 7 DAY)),
+       (4056, 202, 3015, 1100.00, DATE_SUB(NOW(), INTERVAL 6 DAY)),
+       (4057, 204, 3015, 1150.00, DATE_SUB(NOW(), INTERVAL 5 DAY)),
+       (4058, 205, 3015, 1180.00, DATE_SUB(NOW(), INTERVAL 4 DAY)),
+       (4059, 206, 3015, 1200.00, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+       (4060, 207, 3015, 1220.00, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+       (4061, 208, 3015, 1250.00, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+       (4062, 201, 3016, 750.00, DATE_SUB(NOW(), INTERVAL 4 DAY)),
+       (4063, 203, 3016, 780.00, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+       (4064, 205, 3016, 820.00, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+       (4065, 207, 3016, 850.00, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+       (4066, 202, 3017, 1050.00, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+       (4067, 204, 3017, 1100.00, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+       (4068, 206, 3017, 1150.00, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+       (4069, 201, 3018, 320.00, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+       (4070, 203, 3018, 350.00, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+       (4071, 201, 3019, 2000.00, DATE_SUB(NOW(), INTERVAL 6 DAY)),
+       (4072, 202, 3019, 2050.00, DATE_SUB(NOW(), INTERVAL 5 DAY)),
+       (4073, 204, 3019, 2100.00, DATE_SUB(NOW(), INTERVAL 4 DAY)),
+       (4074, 205, 3019, 2120.00, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+       (4075, 206, 3019, 2150.00, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+       (4076, 208, 3019, 2180.00, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+       (4077, 201, 3020, 2100.00, DATE_SUB(NOW(), INTERVAL 5 DAY)),
+       (4078, 203, 3020, 2150.00, DATE_SUB(NOW(), INTERVAL 4 DAY)),
+       (4079, 205, 3020, 2200.00, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+       (4080, 207, 3020, 2250.00, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+       (4081, 208, 3020, 2300.00, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+       (4082, 202, 3021, 500.00, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+       (4083, 204, 3021, 550.00, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+       (4084, 206, 3021, 580.00, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+       (4085, 201, 3022, 220.00, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+       (4086, 203, 3022, 250.00, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+       (4087, 202, 3023, 420.00, DATE_SUB(NOW(), INTERVAL 4 DAY)),
+       (4088, 204, 3023, 450.00, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+       (4089, 206, 3023, 480.00, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+       (4090, 208, 3023, 520.00, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+       (4091, 201, 3024, 420.00, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+       (4092, 203, 3024, 450.00, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+       (4093, 101, 3024, 460.00, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+       (4094, 205, 3024, 480.00, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+       (4095, 202, 3025, 200.00, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+       (4096, 204, 3025, 230.00, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+       (4097, 101, 3025, 250.00, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+       (4098, 201, 3064, 1050.00, '2024-12-10 10:00:00'),
+       (4099, 203, 3064, 1100.00, '2024-12-11 14:00:00'),
+       (4100, 205, 3064, 1200.00, '2024-12-12 16:00:00'),
+       (4101, 101, 3064, 1300.00, '2024-12-12 16:00:02'),
+       (4102, 202, 3065, 220.00, '2024-12-11 11:00:00'),
+       (4103, 101, 3065, 230.00, '2024-12-12 10:00:00'),
+       (4104, 204, 3065, 250.00, '2024-12-13 15:00:00'),
+
+       -- New Bids for Finished Auctions (3031-3060)
+       (4105, 203, 3031, 1600.00, '2025-11-15 10:00:00'),
+       (4106, 204, 3031, 1750.00, '2025-11-18 10:00:00'),
+       (4107, 209, 3031, 1850.00, '2025-11-20 09:59:00'), -- WINNER: 209
+       (4108, 201, 3032, 1300.00, '2025-11-15 11:00:00'),
+       (4109, 211, 3032, 1450.00, '2025-11-19 15:00:00'),
+       (4110, 210, 3032, 1520.00, '2025-11-20 10:09:00'), -- WINNER: 210
+       (4111, 212, 3033, 3300.00, '2025-11-16 12:00:00'),
+       (4112, 213, 3033, 3500.00, '2025-11-18 17:00:00'),
+       (4113, 211, 3033, 3700.00, '2025-11-20 10:19:00'), -- WINNER: 211
+       (4114, 202, 3034, 1000.00, '2025-11-15 13:00:00'),
+       (4115, 209, 3034, 1150.00, '2025-11-19 19:00:00'),
+       (4116, 212, 3034, 1250.00, '2025-11-20 10:29:00'), -- WINNER: 212
+       (4117, 210, 3035, 1500.00, '2025-11-17 14:00:00'),
+       (4118, 212, 3035, 1580.00, '2025-11-19 21:00:00'),
+       (4119, 213, 3035, 1650.00, '2025-11-20 10:39:00'), -- WINNER: 213
+       (4120, 203, 3036, 850.00, '2025-11-15 15:00:00'),
+       (4121, 205, 3036, 950.00, '2025-11-18 23:00:00'),
+       (4122, 227, 3036, 1050.00, '2025-11-20 10:49:00'), -- WINNER: 227
+       (4123, 204, 3037, 700.00, '2025-11-16 16:00:00'),
+       (4124, 229, 3037, 780.00, '2025-11-19 01:00:00'),
+       (4125, 228, 3037, 820.00, '2025-11-20 10:59:00'),  -- WINNER: 228
+       (4126, 206, 3038, 650.00, '2025-11-17 17:00:00'),
+       (4127, 227, 3038, 760.00, '2025-11-19 03:00:00'),
+       (4128, 229, 3038, 800.00, '2025-11-20 11:09:00'),  -- WINNER: 229
+       (4129, 208, 3039, 800.00, '2025-11-15 18:00:00'),
+       (4130, 231, 3039, 920.00, '2025-11-18 05:00:00'),
+       (4131, 230, 3039, 950.00, '2025-11-20 11:19:00'),  -- WINNER: 230
+       (4132, 219, 3040, 350.00, '2025-11-16 19:00:00'),
+       (4133, 220, 3040, 400.00, '2025-11-19 07:00:00'),
+       (4134, 231, 3040, 410.00, '2025-11-20 11:29:00'),  -- WINNER: 231
+       (4135, 221, 3041, 2300.00, '2025-11-17 20:00:00'),
+       (4136, 222, 3041, 2410.00, '2025-11-19 09:00:00'),
+       (4137, 219, 3041, 2450.00, '2025-11-20 11:39:00'), -- WINNER: 219
+       (4138, 223, 3042, 3500.00, '2025-11-15 21:00:00'),
+       (4139, 224, 3042, 3650.00, '2025-11-18 11:00:00'),
+       (4140, 220, 3042, 3800.00, '2025-11-20 11:49:00'), -- WINNER: 220
+       (4141, 225, 3043, 350.00, '2025-11-16 22:00:00'),
+       (4142, 226, 3043, 400.00, '2025-11-19 13:00:00'),
+       (4143, 221, 3043, 410.00, '2025-11-20 11:59:00'),  -- WINNER: 221
+       (4144, 227, 3044, 350.00, '2025-11-17 23:00:00'),
+       (4145, 228, 3044, 400.00, '2025-11-19 15:00:00'),
+       (4146, 222, 3044, 410.00, '2025-11-20 12:09:00'),  -- WINNER: 222
+       (4147, 229, 3045, 180.00, '2025-11-15 01:00:00'),
+       (4148, 230, 3045, 220.00, '2025-11-18 17:00:00'),
+       (4149, 223, 3045, 230.00, '2025-11-20 12:19:00'),  -- WINNER: 223
+       (4150, 231, 3046, 100.00, '2025-11-16 02:00:00'),
+       (4151, 209, 3046, 110.00, '2025-11-19 19:00:00'),
+       (4152, 224, 3046, 120.00, '2025-11-20 12:29:00'),  -- WINNER: 224
+       (4153, 210, 3047, 350.00, '2025-11-17 03:00:00'),
+       (4154, 211, 3047, 380.00, '2025-11-19 21:00:00'),
+       (4155, 225, 3047, 390.00, '2025-11-20 12:39:00'),  -- WINNER: 225
+       (4156, 212, 3048, 300.00, '2025-11-15 04:00:00'),
+       (4157, 213, 3048, 350.00, '2025-11-18 23:00:00'),
+       (4158, 226, 3048, 360.00, '2025-11-20 12:49:00'),  -- WINNER: 226
+       (4159, 227, 3049, 1400.00, '2025-11-16 05:00:00'),
+       (4160, 228, 3049, 1500.00, '2025-11-19 01:00:00'),
+       (4161, 209, 3049, 1550.00, '2025-11-20 12:59:00'), -- WINNER: 209
+       (4162, 229, 3050, 1200.00, '2025-11-17 06:00:00'),
+       (4163, 230, 3050, 1300.00, '2025-11-19 03:00:00'),
+       (4164, 210, 3050, 1350.00, '2025-11-20 13:09:00'), -- WINNER: 210
+       (4165, 231, 3051, 2300.00, '2025-11-15 07:00:00'),
+       (4166, 201, 3051, 2400.00, '2025-11-18 05:00:00'),
+       (4167, 211, 3051, 2450.00, '2025-11-20 13:19:00'), -- WINNER: 211
+       (4168, 202, 3052, 2800.00, '2025-11-16 08:00:00'),
+       (4169, 203, 3052, 3000.00, '2025-11-19 07:00:00'),
+       (4170, 212, 3052, 3100.00, '2025-11-20 13:29:00'), -- WINNER: 212
+       (4171, 204, 3053, 4000.00, '2025-11-17 09:00:00'),
+       (4172, 205, 3053, 4200.00, '2025-11-19 09:00:00'),
+       (4173, 213, 3053, 4300.00, '2025-11-20 13:39:00'), -- WINNER: 213
+       (4174, 206, 3054, 1200.00, '2025-11-15 10:00:00'),
+       (4175, 207, 3054, 1300.00, '2025-11-18 11:00:00'),
+       (4176, 227, 3054, 1350.00, '2025-11-20 13:49:00'), -- WINNER: 227
+       (4177, 208, 3055, 1500.00, '2025-11-16 11:00:00'),
+       (4178, 209, 3055, 1600.00, '2025-11-19 13:00:00'),
+       (4179, 228, 3055, 1650.00, '2025-11-20 13:59:00'), -- WINNER: 228
+       (4180, 210, 3056, 700.00, '2025-11-17 12:00:00'),
+       (4181, 211, 3056, 800.00, '2025-11-19 15:00:00'),
+       (4182, 229, 3056, 850.00, '2025-11-20 14:09:00'),  -- WINNER: 229
+       (4183, 212, 3057, 1600.00, '2025-11-15 13:00:00'),
+       (4184, 213, 3057, 1800.00, '2025-11-18 17:00:00'),
+       (4185, 230, 3057, 1850.00, '2025-11-20 14:19:00'), -- WINNER: 230
+       (4186, 227, 3058, 800.00, '2025-11-16 14:00:00'),
+       (4187, 228, 3058, 900.00, '2025-11-19 19:00:00'),
+       (4188, 231, 3058, 950.00, '2025-11-20 14:29:00'),  -- WINNER: 231
+       (4189, 229, 3059, 1100.00, '2025-11-17 15:00:00'),
+       (4190, 230, 3059, 1200.00, '2025-11-19 21:00:00'),
+       (4191, 209, 3059, 1250.00, '2025-11-20 14:39:00'), -- WINNER: 209
+       (4192, 231, 3060, 350.00, '2025-11-15 16:00:00'),
+       (4193, 201, 3060, 400.00, '2025-11-18 23:00:00'),
+       (4194, 210, 3060, 410.00, '2025-11-20 14:49:00');
+-- WINNER: 210
+
+
+-- ******************************************************
+-- 7. UPDATE AUCTIONS & ITEMS (Winning Bids & Sold Status)
+-- ******************************************************
+
+-- Original Finished Auctions
+UPDATE auctions
+SET winning_bid_id = 4101
+WHERE id = 3064;
+-- Auction 3065 is left with NULL winning_bid_id (did not meet reserve)
+
+-- Newly Finished Auctions (3031-3060)
+UPDATE auctions
+SET winning_bid_id = 4107
+WHERE id = 3031;
+UPDATE auctions
+SET winning_bid_id = 4110
+WHERE id = 3032;
+UPDATE auctions
+SET winning_bid_id = 4113
+WHERE id = 3033;
+UPDATE auctions
+SET winning_bid_id = 4116
+WHERE id = 3034;
+UPDATE auctions
+SET winning_bid_id = 4119
+WHERE id = 3035;
+UPDATE auctions
+SET winning_bid_id = 4122
+WHERE id = 3036;
+UPDATE auctions
+SET winning_bid_id = 4125
+WHERE id = 3037;
+UPDATE auctions
+SET winning_bid_id = 4128
+WHERE id = 3038;
+UPDATE auctions
+SET winning_bid_id = 4131
+WHERE id = 3039;
+UPDATE auctions
+SET winning_bid_id = 4134
+WHERE id = 3040;
+UPDATE auctions
+SET winning_bid_id = 4137
+WHERE id = 3041;
+UPDATE auctions
+SET winning_bid_id = 4140
+WHERE id = 3042;
+UPDATE auctions
+SET winning_bid_id = 4143
+WHERE id = 3043;
+UPDATE auctions
+SET winning_bid_id = 4146
+WHERE id = 3044;
+UPDATE auctions
+SET winning_bid_id = 4149
+WHERE id = 3045;
+UPDATE auctions
+SET winning_bid_id = 4152
+WHERE id = 3046;
+UPDATE auctions
+SET winning_bid_id = 4155
+WHERE id = 3047;
+UPDATE auctions
+SET winning_bid_id = 4158
+WHERE id = 3048;
+UPDATE auctions
+SET winning_bid_id = 4161
+WHERE id = 3049;
+UPDATE auctions
+SET winning_bid_id = 4164
+WHERE id = 3050;
+UPDATE auctions
+SET winning_bid_id = 4167
+WHERE id = 3051;
+UPDATE auctions
+SET winning_bid_id = 4170
+WHERE id = 3052;
+UPDATE auctions
+SET winning_bid_id = 4173
+WHERE id = 3053;
+UPDATE auctions
+SET winning_bid_id = 4176
+WHERE id = 3054;
+UPDATE auctions
+SET winning_bid_id = 4179
+WHERE id = 3055;
+UPDATE auctions
+SET winning_bid_id = 4182
+WHERE id = 3056;
+UPDATE auctions
+SET winning_bid_id = 4185
+WHERE id = 3057;
+UPDATE auctions
+SET winning_bid_id = 4188
+WHERE id = 3058;
+UPDATE auctions
+SET winning_bid_id = 4191
+WHERE id = 3059;
+UPDATE auctions
+SET winning_bid_id = 4194
+WHERE id = 3060;
+
+-- Update items to link to their current_auction_id (Original logic, retained for completeness)
+UPDATE items
+SET current_auction_id = 3001
+WHERE id = 2001;
+UPDATE items
+SET current_auction_id = 3002
+WHERE id = 2007;
+UPDATE items
+SET current_auction_id = 3003
+WHERE id = 2026;
+UPDATE items
+SET current_auction_id = 3004
+WHERE id = 2030;
+UPDATE items
+SET current_auction_id = 3005
+WHERE id = 2063;
+UPDATE items
+SET current_auction_id = 3006
+WHERE id = 2077;
+UPDATE items
+SET current_auction_id = 3007
+WHERE id = 2085;
+UPDATE items
+SET current_auction_id = 3008
+WHERE id = 2101;
+UPDATE items
+SET current_auction_id = 3009
+WHERE id = 2119;
+UPDATE items
+SET current_auction_id = 3010
+WHERE id = 2138;
+UPDATE items
+SET current_auction_id = 3011
+WHERE id = 2002;
+UPDATE items
+SET current_auction_id = 3012
+WHERE id = 2008;
+UPDATE items
+SET current_auction_id = 3013
+WHERE id = 2010;
+UPDATE items
+SET current_auction_id = 3014
+WHERE id = 2018;
+UPDATE items
+SET current_auction_id = 3015
+WHERE id = 2027;
+UPDATE items
+SET current_auction_id = 3016
+WHERE id = 2031;
+UPDATE items
+SET current_auction_id = 3017
+WHERE id = 2037;
+UPDATE items
+SET current_auction_id = 3018
+WHERE id = 2046;
+UPDATE items
+SET current_auction_id = 3019
+WHERE id = 2055;
+UPDATE items
+SET current_auction_id = 3020
+WHERE id = 2064;
+UPDATE items
+SET current_auction_id = 3021
+WHERE id = 2078;
+UPDATE items
+SET current_auction_id = 3022
+WHERE id = 2086;
+UPDATE items
+SET current_auction_id = 3023
+WHERE id = 2093;
+UPDATE items
+SET current_auction_id = 3024
+WHERE id = 2104;
+UPDATE items
+SET current_auction_id = 3025
+WHERE id = 2110;
+UPDATE items
+SET current_auction_id = 3026
+WHERE id = 2116;
+UPDATE items
+SET current_auction_id = 3027
+WHERE id = 2122;
+UPDATE items
+SET current_auction_id = 3028
+WHERE id = 2130;
+UPDATE items
+SET current_auction_id = 3029
+WHERE id = 2133;
+UPDATE items
+SET current_auction_id = 3030
+WHERE id = 2004;
+UPDATE items
+SET current_auction_id = 3031
+WHERE id = 2003;
+UPDATE items
+SET current_auction_id = 3032
+WHERE id = 2009;
+UPDATE items
+SET current_auction_id = 3033
+WHERE id = 2013;
+UPDATE items
+SET current_auction_id = 3034
+WHERE id = 2019;
+UPDATE items
+SET current_auction_id = 3035
+WHERE id = 2021;
+UPDATE items
+SET current_auction_id = 3036
+WHERE id = 2028;
+UPDATE items
+SET current_auction_id = 3037
+WHERE id = 2032;
+UPDATE items
+SET current_auction_id = 3038
+WHERE id = 2038;
+UPDATE items
+SET current_auction_id = 3039
+WHERE id = 2047;
+UPDATE items
+SET current_auction_id = 3040
+WHERE id = 2049;
+UPDATE items
+SET current_auction_id = 3041
+WHERE id = 2058;
+UPDATE items
+SET current_auction_id = 3042
+WHERE id = 2065;
+UPDATE items
+SET current_auction_id = 3043
+WHERE id = 2072;
+UPDATE items
+SET current_auction_id = 3044
+WHERE id = 2080;
+UPDATE items
+SET current_auction_id = 3045
+WHERE id = 2087;
+UPDATE items
+SET current_auction_id = 3046
+WHERE id = 2094;
+UPDATE items
+SET current_auction_id = 3047
+WHERE id = 2107;
+UPDATE items
+SET current_auction_id = 3048
+WHERE id = 2113;
+UPDATE items
+SET current_auction_id = 3049
+WHERE id = 2005;
+UPDATE items
+SET current_auction_id = 3050
+WHERE id = 2006;
+UPDATE items
+SET current_auction_id = 3051
+WHERE id = 2011;
+UPDATE items
+SET current_auction_id = 3052
+WHERE id = 2012;
+UPDATE items
+SET current_auction_id = 3053
+WHERE id = 2014;
+UPDATE items
+SET current_auction_id = 3054
+WHERE id = 2016;
+UPDATE items
+SET current_auction_id = 3055
+WHERE id = 2020;
+UPDATE items
+SET current_auction_id = 3056
+WHERE id = 2022;
+UPDATE items
+SET current_auction_id = 3057
+WHERE id = 2024;
+UPDATE items
+SET current_auction_id = 3058
+WHERE id = 2029;
+UPDATE items
+SET current_auction_id = 3059
+WHERE id = 2033;
+UPDATE items
+SET current_auction_id = 3060
+WHERE id = 2034;
+UPDATE items
+SET current_auction_id = 3061
+WHERE id = 2039;
+UPDATE items
+SET current_auction_id = 3062
+WHERE id = 2040;
+UPDATE items
+SET current_auction_id = 3063
+WHERE id = 2041;
+UPDATE items
+SET current_auction_id = 3064
+WHERE id = 2043;
+UPDATE items
+SET current_auction_id = 3065
+WHERE id = 2048;
+UPDATE items
+SET current_auction_id = 3066
+WHERE id = 2139;
+
+
+-- Mark sold items (3031-3060 were all successful sales)
+UPDATE items
+SET is_sold = 1
+WHERE id IN (
+             2003, 2009, 2013, 2019, 2021, 2028, 2032, 2038, 2047, 2049,
+             2058, 2065, 2072, 2080, 2087, 2094, 2107, 2113, 2005, 2006,
+             2011, 2012, 2014, 2016, 2020, 2022, 2024, 2029, 2033, 2034,
+             2043 -- Original finished auction 3064
+    );
+
+
+-- ******************************************************
+-- 8. WATCHLISTS (Original)
+-- ******************************************************
+
+-- User 101 (buyer only) - watching several auctions
+INSERT IGNORE INTO watchlists (user_id, auction_id, watched_datetime)
+VALUES (101, 3001, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+       (101, 3003, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+       (101, 3008, DATE_SUB(NOW(), INTERVAL 5 DAY)),
+       (101, 3011, DATE_SUB(NOW(), INTERVAL 4 DAY)),
+       (101, 3015, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+       (101, 3020, DATE_SUB(NOW(), INTERVAL 6 DAY));
+
+-- User 201 (buyer + seller) - watching auctions from other sellers
+INSERT IGNORE INTO watchlists (user_id, auction_id, watched_datetime)
+VALUES (201, 3002, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+       (201, 3004, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+       (201, 3006, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+       (201, 3012, DATE_SUB(NOW(), INTERVAL 4 DAY)),
+       (201, 3016, DATE_SUB(NOW(), INTERVAL 5 DAY)),
+       (201, 3021, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+       (201, 3023, DATE_SUB(NOW(), INTERVAL 3 DAY));
+
+-- User 202 (buyer + seller) - watching various auctions
+INSERT IGNORE INTO watchlists (user_id, auction_id, watched_datetime)
+VALUES (202, 3001, DATE_SUB(NOW(), INTERVAL 4 DAY)),
+       (202, 3005, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+       (202, 3007, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+       (202, 3013, DATE_SUB(NOW(), INTERVAL 5 DAY)),
+       (202, 3017, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+       (202, 3019, DATE_SUB(NOW(), INTERVAL 6 DAY));
+
+-- User 203 (buyer + seller) - watching high-value items
+INSERT IGNORE INTO watchlists (user_id, auction_id, watched_datetime)
+VALUES (203, 3002, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+       (203, 3010, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+       (203, 3014, DATE_SUB(NOW(), INTERVAL 4 DAY)),
+       (203, 3020, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+       (203, 3024, DATE_SUB(NOW(), INTERVAL 5 DAY));
+
+-- User 204 (buyer + seller) - watching ending soon auctions
+INSERT IGNORE INTO watchlists (user_id, auction_id, watched_datetime)
+VALUES (204, 3001, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+       (204, 3003, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+       (204, 3009, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+       (204, 3015, DATE_SUB(NOW(), INTERVAL 4 DAY));
+
+-- User 205 (buyer + seller) - watching gaming items
+INSERT IGNORE INTO watchlists (user_id, auction_id, watched_datetime)
+VALUES (205, 3008, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+       (205, 3011, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+       (205, 3024, DATE_SUB(NOW(), INTERVAL 4 DAY)),
+       (205, 3025, DATE_SUB(NOW(), INTERVAL 1 DAY));
+
+-- User 206 (buyer + seller) - watching cameras and audio
+INSERT IGNORE INTO watchlists (user_id, auction_id, watched_datetime)
+VALUES (206, 3005, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+       (206, 3019, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+       (206, 3020, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+       (206, 3021, DATE_SUB(NOW(), INTERVAL 4 DAY)),
+       (206, 3022, DATE_SUB(NOW(), INTERVAL 5 DAY));
+
+-- User 207 (buyer + seller) - watching various items
+INSERT IGNORE INTO watchlists (user_id, auction_id, watched_datetime)
+VALUES (207, 3004, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+       (207, 3006, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+       (207, 3012, DATE_SUB(NOW(), INTERVAL 4 DAY)),
+       (207, 3018, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+       (207, 3023, DATE_SUB(NOW(), INTERVAL 5 DAY));
+
+-- User 208 (buyer + seller) - watching high-end items
+INSERT IGNORE INTO watchlists (user_id, auction_id, watched_datetime)
+VALUES (208, 3002, DATE_SUB(NOW(), INTERVAL 4 DAY)),
+       (208, 3010, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+       (208, 3013, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+       (208, 3019, DATE_SUB(NOW(), INTERVAL 1 DAY));
+
+
+-- ******************************************************
+-- 9. RATINGS (For all successful finished auctions)
+-- ******************************************************
+
+-- Rater ID (Buyer) -> Rated ID (Seller)
+-- Seller IDs: 3064: 102 | 3031(2003): 202 | 3032(2009): 208 | 3033(2013): 203 | 3034(2019): 102, etc.
+INSERT IGNORE INTO ratings (id, auction_id, rater_id, rated_id, rating_value, rating_comment, rating_datetime)
+VALUES
+    -- Original Finished Auction (3064: Buyer 101 -> Seller 102)
+    (6000, 3064, 101, 102, 5, 'Item was excellent and arrived quickly. Highly recommend this seller!',
+     '2024-12-18 10:00:00'),
+
+    -- Newly Finished Auctions (3031-3060)
+    (6001, 3031, 209, 202, 5, 'Great communication, item arrived quickly and exactly as described!',
+     '2025-11-25 10:00:00'),
+    (6002, 3032, 210, 208, 4, 'Fast shipping, minor delay in response, but overall good transaction.',
+     '2025-11-25 11:00:00'),
+    (6003, 3033, 211, 203, 5, 'Professional seller, highly recommend for high-value items.', '2025-11-25 12:00:00'),
+    (6004, 3034, 212, 102, 4, 'Monitor was well-packaged, took a day longer than expected to ship.',
+     '2025-11-25 13:00:00'),
+    (6005, 3035, 213, 202, 5, 'Studio Display arrived in perfect condition, A++ seller.', '2025-11-25 14:00:00'),
+    (6006, 3036, 227, 208, 5, 'Smooth transaction, phone was reset and ready to go.', '2025-11-25 15:00:00'),
+    (6007, 3037, 228, 204, 4, 'Good deal, but the charger was generic, not original.', '2025-11-25 16:00:00'),
+    (6008, 3038, 229, 201, 5, 'iPad Air exactly as described, seller included extra case!', '2025-11-25 17:00:00'),
+    (6009, 3039, 230, 201, 5, 'Ultra Watch arrived quickly and looks brand new. Fantastic seller!',
+     '2025-11-25 18:00:00'),
+    (6010, 3040, 231, 203, 4, 'Watch is great, communication was a bit slow after payment.', '2025-11-25 19:00:00'),
+    (6011, 3041, 219, 203, 5, 'Camera body arrived safely, excellent packing.', '2025-11-26 10:00:00'),
+    (6012, 3042, 220, 201, 5, 'A7R V arrived quickly, very honest seller regarding condition.', '2025-11-26 11:00:00'),
+    (6013, 3043, 221, 208, 5, 'GoPro received, all mounts included. Happy with the purchase.', '2025-11-26 12:00:00'),
+    (6014, 3044, 222, 207, 4, 'Headphones are excellent, small cosmetic mark missed in description.',
+     '2025-11-26 13:00:00'),
+    (6015, 3045, 223, 205, 3, 'Earbuds work, but shipping was very slow. Item fine.', '2025-11-26 14:00:00'),
+    (6016, 3046, 224, 203, 5, 'Speaker sounds amazing, fast and smooth transaction.', '2025-11-26 15:00:00'),
+    (6017, 3047, 225, 207, 5, 'Switch console package was perfect, included all games.', '2025-11-26 16:00:00'),
+    (6018, 3048, 226, 204, 5, 'Headset is top-quality, thanks for the fast delivery.', '2025-11-26 17:00:00'),
+    (6019, 3049, 209, 204, 4, 'Laptop is great, slight smudge on screen when it arrived.', '2025-11-26 18:00:00'),
+    (6020, 3050, 210, 205, 5, 'Business laptop exactly as described. Very satisfied.', '2025-11-26 19:00:00'),
+    (6021, 3051, 211, 201, 5, 'Gaming PC arrived safely, excellent communication.', '2025-11-27 10:00:00'),
+    (6022, 3052, 212, 202, 4, 'Compact PC is amazing, seller responsive.', '2025-11-27 11:00:00'),
+    (6023, 3053, 213, 204, 5, 'Workstation is a beast! Honest and professional seller.', '2025-11-27 12:00:00'),
+    (6024, 3054, 227, 206, 5, 'iMac AIO perfect for my home office, thanks!', '2025-11-27 13:00:00'),
+    (6025, 3055, 228, 201, 4, 'Monitor looks great, packaging could have been sturdier.', '2025-11-27 14:00:00'),
+    (6026, 3056, 229, 203, 5, 'Dell display arrived well. Quick ship.', '2025-11-27 15:00:00'),
+    (6027, 3057, 230, 205, 5, 'Ultrawide monitor is incredible. Zero issues.', '2025-11-27 16:00:00'),
+    (6028, 3058, 231, 201, 5, 'iPhone 13 Pro in great shape. Satisfied.', '2025-11-27 17:00:00'),
+    (6029, 3059, 209, 205, 4, 'Phone is excellent. Minor scuff on camera bezel.', '2025-11-27 18:00:00'),
+    (6030, 3060, 210, 206, 5, 'Pixel 7a was a great deal, very happy.', '2025-11-27 19:00:00');
+
+-- Rater ID (Seller) -> Rated ID (Buyer)
+-- Buyer IDs: 3064: 101 | 3031: 209 | 3032: 210 | 3033: 211 | 3034: 212, etc.
+INSERT IGNORE INTO ratings (id, auction_id, rater_id, rated_id, rating_value, rating_comment, rating_datetime)
+VALUES
+    -- Original Finished Auction (3064: Seller 102 -> Buyer 101)
+    (6031, 3064, 102, 101, 5, 'Immediate payment, excellent buyer!', '2024-12-18 11:00:00'),
+
+    -- Newly Finished Auctions (3031-3060)
+    (6032, 3031, 202, 209, 5, 'Immediate payment, excellent buyer!', '2025-11-28 10:00:00'),
+    (6033, 3032, 208, 210, 5, 'Quick response and smooth transaction.', '2025-11-28 11:00:00'),
+    (6034, 3033, 203, 211, 5, 'Reliable buyer, highly recommended.', '2025-11-28 12:00:00'),
+    (6035, 3034, 102, 212, 4, 'Payment was prompt, small delay in confirming receipt.', '2025-11-28 13:00:00'),
+    (6036, 3035, 202, 213, 5, 'A pleasure to deal with, quick payment.', '2025-11-28 14:00:00'),
+    (6037, 3036, 208, 227, 5, 'Fast payment, great buyer.', '2025-11-28 15:00:00'),
+    (6038, 3037, 204, 228, 5, 'Smooth transaction, thank you.', '2025-11-28 16:00:00'),
+    (6039, 3038, 201, 229, 5, 'Responsive and paid quickly.', '2025-11-28 17:00:00'),
+    (6040, 3039, 201, 230, 5, 'Excellent communication and prompt payment.', '2025-11-28 18:00:00'),
+    (6041, 3040, 203, 231, 4, 'Paid on time, took a while to confirm delivery.', '2025-11-28 19:00:00'),
+    (6042, 3041, 203, 219, 5, 'Professional and reliable.', '2025-11-29 10:00:00'),
+    (6043, 3042, 201, 220, 5, 'Quick payment for a high-value item.', '2025-11-29 11:00:00'),
+    (6044, 3043, 208, 221, 5, 'No issues, very quick transaction.', '2025-11-29 12:00:00'),
+    (6045, 3044, 207, 222, 5, 'Perfect buyer, paid immediately.', '2025-11-29 13:00:00'),
+    (6046, 3045, 205, 223, 4, 'Payment was fine, slow to communicate.', '2025-11-29 14:00:00'),
+    (6047, 3046, 203, 224, 5, 'Quick payment, easy to work with.', '2025-11-29 15:00:00'),
+    (6048, 3047, 207, 225, 5, 'Quick and friendly communication.', '2025-11-29 16:00:00'),
+    (6049, 3048, 204, 226, 5, 'Paid immediately, thanks!', '2025-11-29 17:00:00'),
+    (6050, 3049, 204, 209, 5, 'Repeat buyer, always great.', '2025-11-29 18:00:00'),
+    (6051, 3050, 205, 210, 5, 'Smooth and fast payment.', '2025-11-29 19:00:00'),
+    (6052, 3051, 201, 211, 5, 'Excellent buyer for the PC.', '2025-11-30 10:00:00'),
+    (6053, 3052, 202, 212, 5, 'Seamless transaction.', '2025-11-30 11:00:00'),
+    (6054, 3053, 204, 213, 5, 'Reliable and paid for shipping quickly.', '2025-11-30 12:00:00'),
+    (6055, 3054, 206, 227, 5, 'Very easy to deal with.', '2025-11-30 13:00:00'),
+    (6056, 3055, 202, 228, 5, 'Quick and decisive buyer.', '2025-11-30 14:00:00'),
+    (6057, 3056, 203, 229, 5, 'Paid right away, no issues.', '2025-11-30 15:00:00'),
+    (6058, 3057, 205, 230, 5, 'Great communication.', '2025-11-30 16:00:00'),
+    (6059, 3058, 201, 231, 5, 'Prompt payment, excellent buyer.', '2025-11-30 17:00:00'),
+    (6060, 3059, 205, 209, 5, 'Excellent experience, highly recommend.', '2025-11-30 18:00:00'),
+    (6061, 3060, 206, 210, 5, 'Paid quickly, smooth close.', '2025-11-30 19:00:00');
