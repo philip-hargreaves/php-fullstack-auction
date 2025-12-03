@@ -44,13 +44,6 @@ class NotificationService
             0
         );
 
-//        $notificationExists = $this -> notificationExist($notification);
-//
-//        if ($notificationExists === true)
-//        {
-//            return Utilities::creationResult("Notification already exists.", false, null);
-//        }
-
         $createdNotification = $this->notificationRepo->create($notification);
 
         if (is_null($createdNotification)) {
