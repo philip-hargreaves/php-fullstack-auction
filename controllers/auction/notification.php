@@ -43,61 +43,7 @@ if(!empty($emailNotifications))
     }
 }
 
-
-//Fetch all finished auctions. Send notification to winner
-$auctions = $auctionServ -> getByStatus('Finished');
-
-if(!empty($auctions))
-{
-    foreach ($auctions as $auction)
-    {
-        $auctionId = $auction -> getAuctionId();
-        $winningBidId = $auction -> getWinningBidId();
-
-        if($winningBidId !== null)
-        {
-            $winningBid = $bidServ -> getBidById($winningBidId);
-            $recipientId = $winningBid -> getBuyerId();
-            $notificationServ -> createNotification($auctionId, $recipientId, 'email', 'auctionWinner');
-        }
-
-        $auctionItemId = $auction -> getItemId();
-        $auctionItem = $itemServ -> getByItemId($auctionItemId);
-        $recipientId = $auctionItem -> getSellerId();
-        $notificationServ -> createNotification($auctionId, $recipientId, 'email', 'auctionFinished');
-    }
-}
-
-//Fetch all watchlist and send notification to watched auctions ending in 24 hours
-$watchlist = $watchlistServ -> getAllWatchlist();
-
-if(!empty($watchlist))
-{
-    foreach ($watchlist as $watchlistItem)
-    {
-        $auctionId = $watchlistItem['auction_id'];
-        $recipientId = $watchlistItem['user_id'];
-
-        $auction = $auctionServ -> getById($auctionId);
-        $auctionEndDateTime = $auction -> getEndDatetime();
-        $auctionStatus = $auction -> getAuctionStatus();
-
-        $currentDateTime = new DateTime();
-
-        $secondsLeft = $auctionEndDateTime->getTimestamp() - $currentDateTime->getTimestamp();
-
-        if ($secondsLeft > 0 && $secondsLeft <= 86400 && $auctionStatus === 'Active')
-        {
-            $notificationServ -> createNotification($auctionId, $recipientId, 'email', 'auctionAboutToFinish');
-        }
-
-        //if auction finishes, users who have it in their watchlist will receive email
-        if($auctionStatus === 'Finished')
-        {
-            $notificationServ -> createNotification($auctionId, $recipientId, 'email', 'auctionFinished');
-        }
-    }
-}
+$notificationServ -> createBatchNotification();
 
 //Handles popup notifications
 $userId = $_SESSION['user_id'] ?? null;
