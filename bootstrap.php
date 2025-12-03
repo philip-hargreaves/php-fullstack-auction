@@ -1,5 +1,6 @@
 <?php
 
+use app\repositories\NotificationRepository;
 use app\repositories\AuctionImageRepository;
 use app\repositories\UserRepository;
 use app\repositories\RoleRepository;
@@ -9,11 +10,13 @@ use app\repositories\BidRepository;
 use app\repositories\UserRoleRepository;
 use app\repositories\WatchlistRepository;
 use app\repositories\CategoryRepository;
+use app\repositories\RatingRepository;
 use app\repositories\MessageRepository;
 use app\services\BidService;
 use app\services\AuthService;
 use app\services\AuctionService;
 use app\services\UserService;
+use app\services\NotificationService;
 use app\services\WatchlistService;
 use app\services\ImageService;
 use app\services\CategoryService;
@@ -22,6 +25,7 @@ use infrastructure\Database;
 use infrastructure\DIContainer;
 use app\services\RoleService;
 use app\services\ItemService;
+use app\services\RatingService;
 use app\services\ChatroomService;
 
 // --- Build all objects and bind them to the App Container ---
@@ -60,7 +64,15 @@ DIContainer::bind('bidRepo', new BidRepository(
     DIContainer::get('userRepo'),
     DIContainer::get('auctionRepo')));
 
+DIContainer::bind('notificationRepo', new NotificationRepository(
+    DIContainer::get('db')
+));
+
 DIContainer::bind('categoryRepo', new CategoryRepository(
+    DIContainer::get('db')
+));
+
+DIContainer::bind('ratingRepo', new RatingRepository(
     DIContainer::get('db')
 ));
 
@@ -82,12 +94,22 @@ DIContainer::bind('imageServ', new ImageService(
     DIContainer::get('auctionRepo'),
     DIContainer::get('db')));
 
+DIContainer :: bind('notificationServ', new NotificationService(
+    DIContainer::get('db'),
+    DIContainer::get('notificationRepo'),
+    DIContainer::get('userRepo'),
+    DIContainer::get('auctionRepo'),
+    DIContainer::get('itemRepo')
+));
+
 // Bind Services (they depend on repositories)
 DIContainer::bind('bidServ', new BidService(
     DIContainer::get('bidRepo'),
     DIContainer::get('auctionRepo'),
     DIContainer::get('userRepo'),
-    DIContainer::get('db')));
+    DIContainer::get('db'),
+    DIContainer::get('ratingRepo'),
+    DIContainer::get('notificationServ')));
 
 DIContainer::bind('authServ', new AuthService(
     DIContainer::get('userRepo')));
@@ -113,11 +135,19 @@ DIContainer::bind('auctionServ', new AuctionService(
     DIContainer::get('bidServ'),
     DIContainer::get('categoryRepo'),
     DIContainer::get('auctionImageRepo'),
-    DIContainer::get('categoryServ')));
+    DIContainer::get('categoryServ'),
+    DIContainer::get('notificationServ')
+));
 
 DIContainer::bind('watchlistServ', new WatchlistService(
     DIContainer::get('watchlistRepo'),
     DIContainer::get('auctionServ')));
+
+DIContainer::bind('ratingServ', new RatingService(
+    DIContainer::get('ratingRepo'),
+    DIContainer::get('auctionRepo'),
+    DIContainer::get('bidRepo'),
+    DIContainer::get('itemRepo')));
 
 DIContainer::bind('chatServ', new ChatroomService(
     DIContainer::get('messageRepo')));

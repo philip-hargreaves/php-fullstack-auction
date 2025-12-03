@@ -57,6 +57,11 @@ class ItemService
         return Utilities::creationResult("Item successfully created!", true, $item);
     }
 
+    public function getByItemId(int $itemId)
+    {
+        return $this -> itemRepo -> getById($itemId);
+    }
+
     private function validateAndFixType(array $input) : array
     {
         // Validate Seller ID

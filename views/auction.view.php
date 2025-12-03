@@ -340,16 +340,6 @@ use infrastructure\DIContainer;
                     </tr>
 
                     <tr>
-                        <td class="text">Item Status</td>
-                        <td class="text-end">
-                            <?php $badgeColor = ($itemIsSold) ? 'bg-success' : 'bg-secondary'; ?>
-                            <span class="badge rounded-pill <?= $badgeColor ?>">
-                            <?= htmlspecialchars($itemIsSold ? "Sold" : "Not Sold") ?>
-                        </span>
-                        </td>
-                    </tr>
-
-                    <tr>
                         <td class="text">Condition</td>
                         <td class="text-end fw-bold">
                             <?= htmlspecialchars($condition) ?>

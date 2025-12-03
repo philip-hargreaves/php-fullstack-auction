@@ -27,4 +27,22 @@ if (!empty($groupedBids)) {
     }
 }
 
+$activeBids = [];
+$pastBids = [];
+
+if (!empty($uniqueBids)) {
+    foreach ($uniqueBids as $bid) {
+        $auction = $bid->getAuction();
+        if (!$auction) {
+            continue;
+        }
+
+        if ($auction->getAuctionStatus() === 'Active') {
+            $activeBids[] = $bid;
+        } else {
+            $pastBids[] = $bid;
+        }
+    }
+}
+
 require Utilities::basePath('views/my-bids.view.php');

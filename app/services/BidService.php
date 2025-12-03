@@ -3,11 +3,13 @@ namespace app\services;
 use app\models\Bid;
 use app\repositories\AuctionRepository;
 use app\repositories\UserRepository;
+use app\repositories\RatingRepository;
 use infrastructure\Database;
 use app\repositories\BidRepository;
 use DateTime;
 use PDOException;
 use infrastructure\Utilities;
+use infrastructure\DIContainer;
 
 
 class BidService
@@ -16,12 +18,17 @@ class BidService
     private AuctionRepository $auctionRepo;
     private UserRepository $userRepo;
     private Database $db;
+    private RatingRepository $ratingRepo;
+    private NotificationService $notificationServ;
 
-    public function __construct(BidRepository $bidRepo, AuctionRepository $auctionRepo, UserRepository $userRepo, Database $db) {
+
+    public function __construct(BidRepository $bidRepo, AuctionRepository $auctionRepo, UserRepository $userRepo, Database $db, RatingRepository $ratingRepo, NotificationService $notificationServ) {
         $this->bidRepo = $bidRepo;
         $this->auctionRepo = $auctionRepo;
         $this->userRepo = $userRepo;
         $this->db = $db;
+        $this->ratingRepo = $ratingRepo;
+        $this->notificationServ = $notificationServ;
     }
 
     public function getHighestBidAmountByAuctionId($auctionId): float {
@@ -155,6 +162,9 @@ class BidService
                 return $validationResult;
             }
 
+            //Checks if the current bid being placed is higher than the previous highest bid
+            $userOutBid = $this -> userOutbid($input);
+
             // Validation Pass -> Create Bid
             $creationResult = $this->createBid($input);
 
@@ -162,6 +172,52 @@ class BidService
             if (!$creationResult['success']) {
                 $pdo->rollBack();
                 return $creationResult;
+            }
+
+            //create email notification for when buyer places a bid
+            $auctionId = $creationResult['object'] -> getAuctionId();
+            $bidderId = $creationResult['object'] -> getBuyerId();
+
+            $result = $this->notificationServ->createNotification(
+                $auctionId,
+                $bidderId,
+                'email',
+                'placedBid'
+            );
+
+            if (!$result['success']) {
+                $pdo->rollBack();
+                return $creationResult;
+            }
+
+
+            //if the new bid is greater than the previous greatest bid, then create out bid notification
+            if($userOutBid != null)
+            {
+                //get id of new highest bidder
+                $auctionId = $creationResult['object'] -> getAuctionId();
+                //$newHighestBidder = $creationResult['object'] -> getBuyerId();
+
+                //get id of previous highest bidder
+                $recipientId = $userOutBid -> getBuyerId();
+
+                //creates pop up and email notification for when user is outbid
+                $channels = ['popUp', 'email'];
+                foreach ($channels as $channel)
+                {
+
+                    $result = $this->notificationServ->createNotification(
+                        $auctionId,
+                        $recipientId,
+                        $channel,
+                        'outBid'
+                    );
+
+                    if (!$result['success']) {
+                        $pdo->rollBack();
+                        return $creationResult;
+                    }
+                }
             }
 
             // If bid amount > reserve price, end auction
@@ -195,8 +251,46 @@ class BidService
         }
     }
 
+    private function userOutbid($input)
+    {
+        $currentHighestBid = $this->bidRepo->getHighestBidByAuctionId($input['auction_id']);
+
+        if ($currentHighestBid === null)
+        {
+            return null;
+        }
+
+        $currentHighestBidderId = $currentHighestBid -> getBuyerId();
+
+        $newBidderId = $input['user_id'];
+
+        $newBidAmount = $input['bid_amount'];
+
+        //notification will not be sent to the user if already highest bidder.
+        if($currentHighestBidderId === $newBidderId)
+        {
+            return null;
+        }
+        else
+        {
+            if ($newBidAmount > $currentHighestBid -> getBidAmount())
+            {
+                return $currentHighestBid;
+            }
+            else
+            {
+                return null;
+            }
+        }
+    }
+
     public function getBidsByAuctionId($auctionId): array {
         return $this->bidRepo->getByAuctionId($auctionId);
+    }
+
+    public function getBidById(int $bidId)
+    {
+        return $this->bidRepo->getById($bidId);
     }
 
     public function getWinningBidByAuctionId($auctionId): ?Bid {
@@ -218,6 +312,8 @@ class BidService
     {
         $allBids = $this->bidRepo->getByUserId($userId);
 
+        $this->fillAuctionsInBids($allBids);
+
         $uniqueBids = [];
         $groupedBids = [];
 
@@ -234,6 +330,9 @@ class BidService
 
                     $currentPrice = $highestBidAmount > 0 ? $highestBidAmount : $auction->getStartingPrice();
                     $auction->setCurrentPrice($currentPrice);
+
+                    $hasRated = $this->ratingRepo->hasRatingForAuction($auction->getAuctionId());
+                    $auction->setHasRated($hasRated);
                 }
 
                 $uniqueBids[$auctionId] = $bid;
@@ -310,10 +409,13 @@ class BidService
 
         // Fetch Auctions (1 Query)
         $auctions = $this->auctionRepo->getByIds($auctionIds);
+        $this->fillItemsInAuctions($auctions);
 
         // Map ID => Auction Object
         $auctionMap = [];
         foreach ($auctions as $auction) {
+            $hasRated = $this->ratingRepo->hasRatingForAuction($auction->getAuctionId());
+            $auction->setHasRated($hasRated);
             $auctionMap[$auction->getAuctionId()] = $auction;
         }
 
@@ -322,6 +424,67 @@ class BidService
             $aucId = $bid->getAuctionId();
             if (isset($auctionMap[$aucId])) {
                 $bid->setAuction($auctionMap[$aucId]);
+            }
+        }
+    }
+
+    private function fillItemsInAuctions(array $auctions): void
+    {
+        if (empty($auctions)) return;
+
+        $itemIds = [];
+        foreach ($auctions as $auction) {
+            $itemIds[] = $auction->getItemId();
+        }
+        $itemIds = array_unique($itemIds);
+
+        if (empty($itemIds)) return;
+
+        $itemRepo = DIContainer::get('itemRepo');
+        $items = $itemRepo->getByIds($itemIds);
+
+        $itemMap = [];
+        foreach ($items as $item) {
+            $itemMap[$item->getItemId()] = $item;
+        }
+
+        foreach ($auctions as $auction) {
+            $itemId = $auction->getItemId();
+            if (isset($itemMap[$itemId])) {
+                $auction->setItem($itemMap[$itemId]);
+            }
+        }
+    }
+    private function fillItemsInBids(array $bids): void
+    {
+        if (empty($bids)) return;
+
+        $itemIds = [];
+        foreach ($bids as $bid) {
+            $auction = $bid->getAuction();
+            if ($auction) {
+                $itemIds[] = $auction->getItemId();
+            }
+        }
+        $itemIds = array_unique($itemIds);
+
+        if (empty($itemIds)) return;
+
+        $itemRepo = DIContainer::get('itemRepo');
+        $items = $itemRepo->getByIds($itemIds);
+
+        $itemMap = [];
+        foreach ($items as $item) {
+            $itemMap[$item->getItemId()] = $item;
+        }
+
+        foreach ($bids as $bid) {
+            $auction = $bid->getAuction();
+            if ($auction) {
+                $itemId = $auction->getItemId();
+                if (isset($itemMap[$itemId])) {
+                    $auction->setItem($itemMap[$itemId]);
+                }
             }
         }
     }

@@ -17,6 +17,9 @@ $router->get('/account', 'controllers/account.php');
 $router->post('/account/update', 'controllers/account-update-handler.php');
 $router->post('/account/change-password', 'controllers/change-password-handler.php');
 
+
+$router->get('/rate', 'controllers/auction/rate.php');
+$router->post('/rate', 'controllers/auction/rate-submit.php');
 // Create Auction Page
 $router->get('/create-auction', 'controllers/create_auction/create-auction-get.php');
 $router->post('/create-auction', 'controllers/create_auction/create-auction-post.php');
@@ -42,6 +45,10 @@ $router->get('/my-bids', 'controllers/my-bids.php');
 
 // Watchlist Page
 $router->get('/watchlist', 'controllers/watchlist.php');
+
+//Notifications
+$router->get('/notifications', 'controllers/auction/notification.php');
+$router->post('/notifications', 'controllers/auction/notification.php');
 
 // Admin Dashboard
 $router->get('/admin', 'controllers/admin/dashboard.php');
