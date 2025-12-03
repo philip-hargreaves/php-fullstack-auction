@@ -24,7 +24,24 @@ $auction = $auctionRepo->getById($auctionId);
 
 if (!$auction) {
     $_SESSION['error_message'] = "Auction not found.";
-    header('Location: /mybids');
+    header('Location: /my-bids');
+    exit;
+}
+
+$winningBidId = $auction->getWinningBidId();
+
+if (!$winningBidId) {
+    $_SESSION['error_message'] = "This auction has no winner yet.";
+    header('Location: /my-bids');
+    exit;
+}
+
+$bidRepo = DIContainer::get('bidRepo');
+$winningBid = $bidRepo->getById($winningBidId);
+
+if (!$winningBid || $winningBid->getBuyerId() !== $userId) {
+    $_SESSION['error_message'] = "Only the winner can rate this auction.";
+    header('Location: /my-bids');
     exit;
 }
 

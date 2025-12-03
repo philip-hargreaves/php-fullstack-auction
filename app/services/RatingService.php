@@ -24,15 +24,19 @@ class RatingService
 
     public function submitRating(int $auctionId, int $raterId, int $ratingValue, string $comment): array
     {
+        if ($ratingValue < 1 || $ratingValue > 5) {
+            return Utilities::creationResult('Rating value must be between 1 and 5.', false, null);
+        }
+
         $auction = $this->auctionRepo->getById($auctionId);
         if (!$auction) {
             return Utilities::creationResult('Auction not found.', false, null);
         }
 
-        $isSoldOrFinished = ($auction->getAuctionStatus() === 'Sold' || $auction->getAuctionStatus() === 'Finished');
+        $isSold = ($auction->getAuctionStatus() === 'Finished' && $auction->getWinningBidId() !== null);
 
-        if (!$isSoldOrFinished) {
-            return Utilities::creationResult('You can only rate auctions that are sold.', false, null);
+        if (!$isSold) {
+            return Utilities::creationResult('You can only rate auctions that are sold (finished with a winner).', false, null);
         }
 
         $item = $this->itemRepo->getById($auction->getItemId());
