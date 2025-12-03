@@ -764,4 +764,43 @@ class AuctionRepository
 //            error_log("Auction Update Failed: " . $e->getMessage());
         }
     }
+
+    // Get all auctions with details (for admin dashboard)
+    public function getAllWithDetails(int $limit = 50, int $offset = 0): array
+    {
+        try {
+            // First, get auction IDs for pagination
+            $sql = "SELECT a.id
+                    FROM auctions a
+                    ORDER BY a.start_datetime DESC
+                    LIMIT {$limit} OFFSET {$offset}";
+            $auctionRows = $this->db->query($sql, [])->fetchAll();
+            
+            if (empty($auctionRows)) {
+                return [];
+            }
+            
+            // Extract auction IDs
+            $auctionIds = array_column($auctionRows, 'id');
+            $placeholders = implode(',', array_fill(0, count($auctionIds), '?'));
+            
+            // Fetch auctions with details
+            $sql = "SELECT a.*, 
+                           i.item_name,
+                           COALESCE(MAX(b.bid_amount), a.starting_price) AS current_price,
+                           COUNT(b.id) AS bid_count
+                    FROM auctions a
+                    JOIN items i ON a.item_id = i.id
+                    LEFT JOIN bids b ON a.id = b.auction_id
+                    WHERE a.id IN ({$placeholders})
+                    GROUP BY a.id
+                    ORDER BY FIELD(a.id, {$placeholders}), a.start_datetime DESC";
+            
+            $rows = $this->db->query($sql, array_merge($auctionIds, $auctionIds))->fetchAll();
+            
+            return $this->hydrateMany($rows);
+        } catch (PDOException $e) {
+            return [];
+        }
+    }
 }
