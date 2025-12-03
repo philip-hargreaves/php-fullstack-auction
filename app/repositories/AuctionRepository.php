@@ -726,33 +726,4 @@ class AuctionRepository
 //            error_log("Auction Update Failed: " . $e->getMessage());
         }
     }
-
-    public function endSoldAuction(Auction $auction): bool {
-        try {
-
-            if ($auction->getAuctionStatus() == 'Finished' && $auction->getWinningBidId() != null) {
-                $result = $this->update($auction);
-//
-
-                if ($result === false) {
-                    return false;
-                }
-
-                $sql = "
-                    UPDATE items
-                    SET is_sold = 1
-                    WHERE id = :item_id
-                ";
-                $params = ["item_id" => $auction->getItemId()];
-
-                $result = $this->db->query($sql, $params);
-
-                return true;
-            }
-            return false;
-        } catch (PDOException $e) {
-            Utilities::dd($e);
-            return false;
-        }
-    }
 }
