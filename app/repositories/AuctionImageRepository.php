@@ -135,8 +135,8 @@ class AuctionImageRepository
             $sql = "DELETE FROM auction_images WHERE auction_id = :auction_id";
             $stmt = $this->db->query($sql, ['auction_id' => $auctionId]);
 
-            // Return true only if one or more row is deleted
-            return $stmt->rowCount() > 0;
+            // Return true if deletion succeeds (even if 0 rows deleted - means no images existed)
+            return true;
         } catch (PDOException $e) {
             // TODO: add logging
             return false;

@@ -198,7 +198,7 @@ require Utilities::basePath('views/partials/header.php');
                                     id="start_datetime"
                                     name="start_datetime"
                                     value="<?= $placeHolder['start_datetime'] ?? Utilities::formatForInput(date("Y-m-d H:i:s")) ?>"
-                                    <?= $isStartDatetimeLocked ? 'readonly style="color: #6A6A6A;"' : '' ?>>
+                                    <?= $isStartDatetimeLocked ? 'readonly style="color: #6A6A6A; background-color: #f5f5f5; cursor: not-allowed;"' : '' ?>>
                             <small class="form-text text-muted">
                                 <span class="text-danger"><?php if (!$isStartDatetimeLocked) {echo "* Required. ";} ?>
                                 </span><?php if ($isStartDatetimeLocked) {echo "*";} ?> Start date cannot be changed after the auction is created
