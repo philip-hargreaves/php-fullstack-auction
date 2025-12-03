@@ -17,6 +17,7 @@ class Auction
     private float $startingPrice;
     private ?float $reservePrice;
     private string $auctionStatus; // enum('Scheduled', 'Active', 'Finished')
+    private bool $hasRated = false;
 
     // CALCULATED PROPERTIES
     private ?float $currentPrice = null;
@@ -109,5 +110,15 @@ class Auction
         return ($this->auctionStatus === 'Active') &&
             ($now >= $this->startDatetime) &&
             ($now < $this->endDatetime);
+    }
+
+    public function setHasRated(bool $hasRated): void
+    {
+        $this->hasRated = $hasRated;
+    }
+
+    public function hasRated(): bool
+    {
+        return $this->hasRated;
     }
 }

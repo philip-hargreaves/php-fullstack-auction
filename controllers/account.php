@@ -19,6 +19,8 @@ if ($targetUserId) {
 }
 
 $userService = DIContainer::get('userServ');
+$auctionServ = DIContainer::get('auctionServ');
+$ratingServ = DIContainer::get('ratingServ');
 
 $user = $userService->getUserAccount($targetUserId);
 
@@ -38,5 +40,14 @@ if ($isOwnProfile) {
     $activeAuctions = $auctionServ->getActiveAuctionsByUserId($targetUserId);
 }
 $showSellerSection = $isTargetUserSeller || !empty($activeAuctions);
+
+$sellerRating = 0.0;
+$sellerRatingCount = 0;
+$sellerReviews = [];
+if ($isTargetUserSeller) {
+    $sellerRating = $ratingServ->getSellerRating($targetUserId);
+    $sellerRatingCount = $ratingServ->getSellerRatingCount($targetUserId);
+    $sellerReviews = $ratingServ->getSellerReviews($targetUserId);
+}
 
 require Utilities::basePath('views/account.view.php');

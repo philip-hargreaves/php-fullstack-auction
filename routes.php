@@ -17,6 +17,9 @@ $router->get('/account', 'controllers/account.php');
 $router->post('/account/update', 'controllers/account-update-handler.php');
 $router->post('/account/change-password', 'controllers/change-password-handler.php');
 
+
+$router->get('/rate', 'controllers/auction/rate.php');
+$router->post('/rate', 'controllers/auction/rate-submit.php');
 // Create Auction Page
 $router->get('/create-auction', 'controllers/create_auction/create-auction-get.php');
 $router->post('/create-auction', 'controllers/create_auction/create-auction-post.php');

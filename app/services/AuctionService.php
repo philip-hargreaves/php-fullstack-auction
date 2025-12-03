@@ -546,9 +546,9 @@ class AuctionService
             $interval = $start->diff($end);
             $totalHours = ($interval->days * 24) + $interval->h + ($interval->i / 60);
 
-            if ($totalHours < 24) {
-                return Utilities::creationResult("Auction duration must be at least 24 hours.", false, null);
-            }
+//            if ($totalHours < 24) {
+//                return Utilities::creationResult("Auction duration must be at least 24 hours.", false, null);
+//            }
 
             return Utilities::creationResult('', true, [
                 'start_datetime' => $start->format('Y-m-d H:i:s'),
@@ -693,5 +693,18 @@ class AuctionService
     {
         // Pass the call down to the repository
         $this->auctionRepo->updateAuctionStatuses();
+    }
+
+    public function getPublicAuctionsForSeller(int $sellerId): array
+    {
+        $auctions = $this->auctionRepo->getActiveAuctionsBySellerId($sellerId);
+
+        foreach ($auctions as $auction) {
+            $highestBid = $this->bidService->getHighestBidByAuctionId($auction->getAuctionId());
+            $currentPrice = $highestBid > 0 ? $highestBid : $auction->getStartingPrice();
+            $auction->setCurrentPrice($currentPrice);
+        }
+
+        return $auctions;
     }
 }

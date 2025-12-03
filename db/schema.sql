@@ -132,6 +132,8 @@ CREATE TABLE ratings (
     FOREIGN KEY (rated_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
+ALTER TABLE ratings ADD UNIQUE (auction_id);
+
 CREATE TABLE conversations (
     id INT AUTO_INCREMENT PRIMARY KEY,
     auction_id INT NULL,

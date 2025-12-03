@@ -3,11 +3,13 @@ namespace app\services;
 use app\models\Bid;
 use app\repositories\AuctionRepository;
 use app\repositories\UserRepository;
+use app\repositories\RatingRepository;
 use infrastructure\Database;
 use app\repositories\BidRepository;
 use DateTime;
 use PDOException;
 use infrastructure\Utilities;
+use infrastructure\DIContainer;
 
 
 class BidService
@@ -16,13 +18,16 @@ class BidService
     private AuctionRepository $auctionRepo;
     private UserRepository $userRepo;
     private Database $db;
+    private RatingRepository $ratingRepo;
     private NotificationService $notificationServ;
 
-    public function __construct(BidRepository $bidRepo, AuctionRepository $auctionRepo, UserRepository $userRepo, Database $db, NotificationService $notificationServ) {
+
+    public function __construct(BidRepository $bidRepo, AuctionRepository $auctionRepo, UserRepository $userRepo, Database $db, RatingRepository $ratingRepo, NotificationService $notificationServ) {
         $this->bidRepo = $bidRepo;
         $this->auctionRepo = $auctionRepo;
         $this->userRepo = $userRepo;
         $this->db = $db;
+        $this->ratingRepo = $ratingRepo;
         $this->notificationServ = $notificationServ;
     }
 
@@ -225,7 +230,7 @@ class BidService
                 $auction->setAuctionStatus('Finished');
                 $result = $this->auctionRepo->endSoldAuction($auction);
 
-                if ($result) {
+                if (!$result) {
                     // Failed to end auction - rollback bid creation
                     $pdo->rollBack();
                     return Utilities::creationResult('Failed to create bid.', false, null);
@@ -307,6 +312,8 @@ class BidService
     {
         $allBids = $this->bidRepo->getByUserId($userId);
 
+        $this->fillAuctionsInBids($allBids);
+
         $uniqueBids = [];
         $groupedBids = [];
 
@@ -323,6 +330,9 @@ class BidService
 
                     $currentPrice = $highestBidAmount > 0 ? $highestBidAmount : $auction->getStartingPrice();
                     $auction->setCurrentPrice($currentPrice);
+
+                    $hasRated = $this->ratingRepo->hasRatingForAuction($auction->getAuctionId());
+                    $auction->setHasRated($hasRated);
                 }
 
                 $uniqueBids[$auctionId] = $bid;
@@ -399,10 +409,13 @@ class BidService
 
         // Fetch Auctions (1 Query)
         $auctions = $this->auctionRepo->getByIds($auctionIds);
+        $this->fillItemsInAuctions($auctions);
 
         // Map ID => Auction Object
         $auctionMap = [];
         foreach ($auctions as $auction) {
+            $hasRated = $this->ratingRepo->hasRatingForAuction($auction->getAuctionId());
+            $auction->setHasRated($hasRated);
             $auctionMap[$auction->getAuctionId()] = $auction;
         }
 
@@ -411,6 +424,67 @@ class BidService
             $aucId = $bid->getAuctionId();
             if (isset($auctionMap[$aucId])) {
                 $bid->setAuction($auctionMap[$aucId]);
+            }
+        }
+    }
+
+    private function fillItemsInAuctions(array $auctions): void
+    {
+        if (empty($auctions)) return;
+
+        $itemIds = [];
+        foreach ($auctions as $auction) {
+            $itemIds[] = $auction->getItemId();
+        }
+        $itemIds = array_unique($itemIds);
+
+        if (empty($itemIds)) return;
+
+        $itemRepo = DIContainer::get('itemRepo');
+        $items = $itemRepo->getByIds($itemIds);
+
+        $itemMap = [];
+        foreach ($items as $item) {
+            $itemMap[$item->getItemId()] = $item;
+        }
+
+        foreach ($auctions as $auction) {
+            $itemId = $auction->getItemId();
+            if (isset($itemMap[$itemId])) {
+                $auction->setItem($itemMap[$itemId]);
+            }
+        }
+    }
+    private function fillItemsInBids(array $bids): void
+    {
+        if (empty($bids)) return;
+
+        $itemIds = [];
+        foreach ($bids as $bid) {
+            $auction = $bid->getAuction();
+            if ($auction) {
+                $itemIds[] = $auction->getItemId();
+            }
+        }
+        $itemIds = array_unique($itemIds);
+
+        if (empty($itemIds)) return;
+
+        $itemRepo = DIContainer::get('itemRepo');
+        $items = $itemRepo->getByIds($itemIds);
+
+        $itemMap = [];
+        foreach ($items as $item) {
+            $itemMap[$item->getItemId()] = $item;
+        }
+
+        foreach ($bids as $bid) {
+            $auction = $bid->getAuction();
+            if ($auction) {
+                $itemId = $auction->getItemId();
+                if (isset($itemMap[$itemId])) {
+                    $auction->setItem($itemMap[$itemId]);
+                }
             }
         }
     }
