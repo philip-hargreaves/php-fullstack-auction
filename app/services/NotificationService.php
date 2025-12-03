@@ -44,12 +44,12 @@ class NotificationService
             0
         );
 
-        $notificationExists = $this -> notificationExist($notification);
-
-        if ($notificationExists === true)
-        {
-            return Utilities::creationResult("Notification already exists.", false, null);
-        }
+//        $notificationExists = $this -> notificationExist($notification);
+//
+//        if ($notificationExists === true)
+//        {
+//            return Utilities::creationResult("Notification already exists.", false, null);
+//        }
 
         $createdNotification = $this->notificationRepo->create($notification);
 
@@ -60,20 +60,10 @@ class NotificationService
         return Utilities::creationResult("Notification successfully created!", true, $createdNotification);
     }
 
-    //checks if notification is already within the database for some notification types.
-    private function notificationExist(Notification $notification) :bool
+    //create batch notifications
+    public function createBatchNotification()
     {
-        $notificationContentType = $notification -> getNotificationContentType();
-
-        //only checks if the message type does not allow repeated sending
-        if($notificationContentType !== 'outBid' && $notificationContentType !== 'placedBid')
-        {
-            return $this -> notificationRepo -> isExist($notification);
-        }
-        else
-        {
-            return false;
-        }
+        $notificationsToCreate = $this -> notificationRepo -> createBatchNotification();
     }
 
     //prepares Email notification to be sent

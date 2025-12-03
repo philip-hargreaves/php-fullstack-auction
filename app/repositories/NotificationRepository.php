@@ -46,44 +46,6 @@ class NotificationRepository
         return $row;
     }
 
-    public function isExist(Notification $notification)
-    {
-        try
-        {
-            $params = $this->extract($notification);
-
-            $sqlCheck = "SELECT id 
-                     FROM notifications 
-                     WHERE auction_id = :auction_id
-                       AND recipient_id = :recipient_id
-                       AND notification_type = :notification_type
-                       AND notification_content_type = :notification_content_type
-                     LIMIT 1";
-
-            $paramsCheck = [
-                'auction_id' => $params['auction_id'],
-                'recipient_id' => $params['recipient_id'],
-                'notification_type' => $params['notification_type'],
-                'notification_content_type' => $params['notification_content_type']
-            ];
-
-            $existing = $this->db->query($sqlCheck, $paramsCheck)->fetch();
-
-            if ($existing)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        catch (PDOException $e)
-        {
-            return null;
-        }
-    }
-
     public function create(Notification $notification)
     {
         try
@@ -105,6 +67,110 @@ class NotificationRepository
         catch (PDOException $e)
         {
             // TODO: add logging
+            return null;
+        }
+    }
+
+    public function createBatchNotification()
+    {
+        try {
+            // Step 1: Fetch all missing notifications
+            $sql = "
+            SELECT 
+                a.id AS auction_id,
+                i.seller_id AS recipient_id,
+                'email' AS notification_type,
+                'auctionFinished' AS notification_content_type
+            FROM auctions a
+            JOIN items i ON a.item_id = i.id
+            LEFT JOIN notifications n 
+                   ON n.auction_id = a.id
+                  AND n.recipient_id = i.seller_id
+                  AND n.notification_content_type = 'auctionFinished'
+            WHERE a.auction_status = 'Finished' AND n.id IS NULL
+
+            UNION ALL
+
+            SELECT 
+                a.id AS auction_id,
+                b.buyer_id AS recipient_id,
+                'email' AS notification_type,
+                'auctionWinner' AS notification_content_type
+            FROM auctions a
+            JOIN bids b ON a.winning_bid_id = b.id
+            LEFT JOIN notifications n 
+                   ON n.auction_id = a.id
+                  AND n.recipient_id = b.buyer_id
+                  AND n.notification_content_type = 'auctionWinner'
+            WHERE a.auction_status = 'Finished' 
+              AND a.winning_bid_id IS NOT NULL 
+              AND n.id IS NULL
+
+            UNION ALL
+
+            SELECT 
+                w.auction_id,
+                w.user_id AS recipient_id,
+                'email' AS notification_type,
+                'auctionAboutToFinish' AS notification_content_type
+            FROM watchlists w
+            JOIN auctions a ON w.auction_id = a.id
+            LEFT JOIN notifications n
+                   ON n.auction_id = a.id
+                  AND n.recipient_id = w.user_id
+                  AND n.notification_content_type = 'auctionAboutToFinish'
+            WHERE a.auction_status = 'Active'
+              AND TIMESTAMPDIFF(SECOND, NOW(), a.end_datetime) BETWEEN 1 AND 86400
+              AND n.id IS NULL
+
+            UNION ALL
+
+            SELECT 
+                w.auction_id,
+                w.user_id AS recipient_id,
+                'email' AS notification_type,
+                'auctionFinished' AS notification_content_type
+            FROM watchlists w
+            JOIN auctions a ON w.auction_id = a.id
+            LEFT JOIN notifications n
+                   ON n.auction_id = a.id
+                  AND n.recipient_id = w.user_id
+                  AND n.notification_content_type = 'auctionFinished'
+            WHERE a.auction_status = 'Finished' AND n.id IS NULL
+        ";
+
+            // Fetch rows
+            $rows = $this->db->query($sql)->fetchAll();
+
+            if (empty($rows))
+            {
+                return null;
+            }
+
+            //Batch insertion of all rows into notifications table
+            $values = [];
+            $params = [];
+
+            foreach ($rows as $i => $row)
+            {
+                $values[] = "(:auction_id_$i, :recipient_id_$i, :notification_type_$i, :content_type_$i, :is_sent_$i)";
+                $params["auction_id_$i"] = $row['auction_id'];
+                $params["recipient_id_$i"] = $row['recipient_id'];
+                $params["notification_type_$i"] = $row['notification_type'];
+                $params["content_type_$i"] = $row['notification_content_type'];
+                $params["is_sent_$i"] = 0;
+            }
+
+            $sqlInsert = "INSERT INTO notifications (auction_id, recipient_id, notification_type, notification_content_type, is_sent)
+                      VALUES " . implode(",", $values);
+
+            // Execute batch insert
+            $this->db->query($sqlInsert, $params);
+
+            return count($rows);
+        }
+        catch (PDOException $e)
+        {
             return null;
         }
     }
