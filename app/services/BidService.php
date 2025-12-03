@@ -174,9 +174,9 @@ class BidService
                 return $creationResult;
             }
 
-            //create email notification for when buyer places a bid
-            $auctionId = $creationResult['object'] -> getAuctionId();
-            $bidderId = $creationResult['object'] -> getBuyerId();
+            // Create email notification for when buyer places a bid
+            $auctionId = $creationResult['object']->getAuctionId();
+            $bidderId = $creationResult['object']->getBuyerId();
 
             $result = $this->notificationServ->createNotification(
                 $auctionId,
@@ -195,7 +195,7 @@ class BidService
             if($userOutBid != null)
             {
                 //get id of new highest bidder
-                $auctionId = $creationResult['object'] -> getAuctionId();
+                $auctionId = $creationResult['object']->getAuctionId();
                 //$newHighestBidder = $creationResult['object'] -> getBuyerId();
 
                 //get id of previous highest bidder
@@ -225,19 +225,19 @@ class BidService
 
             $this->fillAuctionsInBids([$bid]);
             $auction = $bid->getAuction();
-            if ($auction->getReservePrice() !== null && $bid->getBidAmount() >= $auction->getReservePrice()) {
-                $auction->setWinningBidId($bid->getBidId());
-                $auction->setAuctionStatus('Finished');
-                $result = $this->auctionRepo->endSoldAuction($auction);
-
-                if (!$result) {
-                    // Failed to end auction - rollback bid creation
-                    $pdo->rollBack();
-                    return Utilities::creationResult('Failed to create bid.', false, null);
-                }
-                $pdo->commit();
-                return Utilities::creationResult('Congratulation! You won the auction by meeting the reserve price!', true, $creationResult['object']);
-            }
+//            if ($auction->getReservePrice() !== null && $bid->getBidAmount() >= $auction->getReservePrice()) {
+//                $auction->setWinningBidId($bid->getBidId());
+//                $auction->setAuctionStatus('Finished');
+//                $result = $this->auctionRepo->endSoldAuction($auction);
+//
+//                if (!$result) {
+//                    // Failed to end auction - rollback bid creation
+//                    $pdo->rollBack();
+//                    return Utilities::creationResult('Failed to create bid.', false, null);
+//                }
+//                $pdo->commit();
+//                return Utilities::creationResult('Congratulation! You won the auction by meeting the reserve price!', true, $creationResult['object']);
+//            }
 
             // Insertion Succeed -> Commit Transaction
             $pdo->commit();

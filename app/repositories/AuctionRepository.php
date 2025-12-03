@@ -671,13 +671,14 @@ class AuctionRepository
             ");
 
             // 2. Close auctions: Active -> Finished
-            // A. Identify Winners & Update winning_bid_id
+            // A. Check if reserve price is met and update winning_bid_id
             $sqlSetWinner = "
-            UPDATE auctions a
+                UPDATE auctions a
                 JOIN bids b ON a.id = b.auction_id
                 SET a.winning_bid_id = b.id
                 WHERE a.auction_status = 'Active' 
                 AND a.end_datetime <= NOW()
+                AND b.bid_amount >= a.reserve_price
                 AND b.bid_amount = (
                     SELECT MAX(b2.bid_amount) 
                     FROM bids b2 
