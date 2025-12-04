@@ -47,8 +47,8 @@
     window.showLoginModal = showLoginModal;
     window.showBecomeSellerModal = showBecomeSellerModal;
 </script>
-
-<!-- popup out bid notification -->
+<!---->
+<!-- popup out bid notification -->-->
 <script>
     function fetchNotifications()
     {
