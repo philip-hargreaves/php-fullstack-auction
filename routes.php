@@ -3,60 +3,56 @@
  * @var $router
 */
 
-// View POST data to controller
-// View GET data from controller
-
 // Index Page
-$router->get('/', 'controllers/index.php');
+$router->get('/', 'IndexController@index');
 
-// GET Pages
-$router->get('/my-auctions', 'controllers/my-auctions.php');
-$router->get('/my-bids', 'controllers/my-bids.php');
+// Account
+$router->get('/account', 'AccountController@show');
+$router->post('/account', 'AccountController@update');
+$router->post('/account/update', 'AccountController@update');
+$router->post('/account/password', 'AccountController@updatePassword');
+$router->post('/account/change-password', 'AccountController@updatePassword');
 
-$router->get('/account', 'controllers/account.php');
-$router->post('/account/update', 'controllers/account-update-handler.php');
-$router->post('/account/change-password', 'controllers/change-password-handler.php');
+// Ratings
+$router->get('/rate', 'RatingController@create');
+$router->post('/rate', 'RatingController@store');
 
+// Auctions
+$router->get('/auction', 'AuctionController@show');
+$router->get('/create-auction', 'AuctionController@create');
+$router->post('/create-auction', 'AuctionController@store');
+$router->get('/my-listings', 'AuctionController@mine');
 
-$router->get('/rate', 'controllers/auction/rate.php');
-$router->post('/rate', 'controllers/auction/rate-submit.php');
-// Create Auction Page
-$router->get('/create-auction', 'controllers/create_auction/create-auction-get.php');
-$router->post('/create-auction', 'controllers/create_auction/create-auction-post.php');
+// Authentication
+$router->get('/register', 'AuthController@showRegister');
+$router->post('/register', 'AuthController@register');
+$router->post('/login', 'AuthController@login');
+$router->get('/logout', 'AuthController@logout');
+$router->post('/logout', 'AuthController@logout');
+$router->post('/become-seller', 'AuthController@becomeSeller');
 
-// Registration and authentication
-$router->get('/register', 'controllers/auth/register.php');
-$router->post('/register', 'controllers/auth/register.store.php');
-$router->post('/login', 'controllers/auth/authenticate.php');
-$router->get('/logout', 'controllers/auth/logout.php');
-$router->post('/become-seller', 'controllers/auth/become-seller.php');
+// Bids
+$router->get('/my-bids', 'BidController@index');
+$router->post('/bid', 'BidController@store');
 
-// Auction Page
-$router->post('/bid', 'controllers/auction/place-bid.php');
-$router->get('/auction', 'controllers/auction/auction.php');
-$router->post('/watchlist/add', 'controllers/auction/watchlist-add.php');
-$router->post('/watchlist/remove', 'controllers/auction/watchlist-remove.php');
+// Watchlist
+$router->get('/watchlist', 'WatchlistController@index');
+$router->post('/watchlist', 'WatchlistController@store');
+$router->post('/watchlist/add', 'WatchlistController@store');
+$router->post('/watchlist/remove', 'WatchlistController@destroy');
 
-// My-listings Page
-$router->get('/my-listings', 'controllers/my-listings.php');
+// Notifications
+$router->get('/notifications', 'NotificationController@index');
+$router->post('/notifications', 'NotificationController@markSent');
 
-// My-Bids Page
-$router->get('/my-bids', 'controllers/my-bids.php');
+// Chat
+$router->get('/chatroom', 'ChatController@show');
+$router->post('/chatroom/message', 'ChatController@store');
+$router->post('/send-message', 'ChatController@store');
 
-// Watchlist Page
-$router->get('/watchlist', 'controllers/watchlist.php');
-
-//Notifications
-$router->get('/notifications', 'controllers/auction/notification.php');
-$router->post('/notifications', 'controllers/auction/notification.php');
-
-// Admin Dashboard
-$router->get('/admin', 'controllers/admin/dashboard.php');
-$router->get('/admin/auction/view', 'controllers/admin/view-auction.php');
-$router->post('/admin/user/update-status', 'controllers/admin/update-user-status.php');
-$router->post('/admin/user/manage-role', 'controllers/admin/manage-user-role.php');
-
-// Chatroom Page
-$router->post('/send-message', 'controllers/chatroom/send-message.php');
-$router->get('/chatroom', 'controllers/chatroom/chatroom.php');
-$router->post('/admin/auction/delete', 'controllers/admin/delete-auction.php');
+// Admin
+$router->get('/admin', 'Admin\\DashboardController@index');
+$router->get('/admin/auction/view', 'Admin\\AuctionController@show');
+$router->post('/admin/auction/delete', 'Admin\\AuctionController@destroy');
+$router->post('/admin/user/update-status', 'Admin\\UserController@updateStatus');
+$router->post('/admin/user/manage-role', 'Admin\\UserController@manageRole');

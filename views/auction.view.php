@@ -46,7 +46,7 @@ use infrastructure\DIContainer;
         <div class="col-12 col-md-5 text-end">
             <div class="d-flex justify-content-end align-items-center gap-2">
                 <!-- Add to Watchlist Button -->
-                <?php if ($auctionStatus == 'Active'): ?>
+                <?php if ($isAuctionActive): ?>
                     <?php if ($isLoggedIn): ?>
                         <?php if ($isWatched): ?>
                             <form method="POST" action="/watchlist/remove" class="d-inline">
@@ -322,9 +322,18 @@ use infrastructure\DIContainer;
                     <tr>
                         <td class="text">Auction Status</td>
                         <td class="text-end">
-                            <?php $badgeColor = ($auctionStatus === 'Active') ? 'bg-success' : 'bg-secondary'; ?>
+                            <?php 
+                            $displayStatus = $displayAuctionStatus ?? $auctionStatus;
+                            $badgeColor = match($displayStatus) {
+                                'Active' => 'bg-success',
+                                'Sold' => 'bg-primary',
+                                'Finished' => 'bg-secondary',
+                                'Deleted' => 'bg-danger',
+                                default => 'bg-secondary'
+                            };
+                            ?>
                             <span class="badge rounded-pill <?= $badgeColor ?>">
-                            <?= htmlspecialchars($auctionStatus) ?>
+                            <?= htmlspecialchars($displayStatus) ?>
                         </span>
                         </td>
                     </tr>

@@ -52,19 +52,20 @@ A comprehensive online auction platform built as a coursework project for COMP01
 ```
 fullstack-auction-app/
 ├── app/
+│   ├── http/
+│   │   └── controllers/ # REST controllers
 │   ├── models/          # Domain models (Auction, User, Bid, etc.)
 │   ├── repositories/    # Data access layer
 │   └── services/        # Business logic layer
-├── controllers/         # Request handlers
-├── views/              # Presentation layer (PHP views)
-├── infrastructure/     # Core infrastructure (Database, Router, DI Container)
-├── public/             # Web-accessible files (CSS, JS, images)
+├── views/               # Presentation layer (PHP views)
+├── infrastructure/      # Core infrastructure (Database, Router, DI Container)
+├── public/              # Web-accessible files (CSS, JS, images)
 ├── db/
-│   ├── schema.sql      # Database schema
-│   └── seed.sql        # Sample data
-├── docker-compose.yml  # Docker services configuration
-├── Dockerfile          # PHP/Apache container definition
-└── routes.php          # Route definitions
+│   ├── schema.sql       # Database schema
+│   └── seed.sql         # Sample data
+├── docker-compose.yml   # Docker services configuration
+├── Dockerfile           # PHP/Apache container definition
+└── routes.php           # Route definitions
 ```
 
 ## Prerequisites

@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 require_once __DIR__ . '/../infrastructure/autoloader.php';
 require_once __DIR__ . '/../infrastructure/Utilities.php';
 
