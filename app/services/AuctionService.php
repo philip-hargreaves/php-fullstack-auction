@@ -852,4 +852,63 @@ class AuctionService
 
         return $auctions;
     }
+
+    /** Process auctions for card display on index/listing pages */
+    public function processAuctionsForDisplay(array $auctions): array
+    {
+        $processed = [];
+        $now = new DateTime();
+
+        foreach ($auctions as $auction) {
+            $item = [];
+            $item['auction_id'] = $auction->getAuctionId();
+            $item['title'] = $auction->getItemName();
+            $item['condition'] = $auction->getAuctionCondition();
+            $item['current_price'] = $auction->getCurrentPrice();
+
+            // Get main image
+            $images = $auction->getAuctionImages();
+            $item['image_url'] = '/images/default_item_image.jpg';
+            if (!empty($images)) {
+                foreach ($images as $image) {
+                    if ($image->getImageUrl()) {
+                        $item['image_url'] = $image->getImageUrl();
+                        break;
+                    }
+                }
+            }
+
+            // Bid count
+            $bidCount = $auction->getBidCount();
+            $item['bid_text'] = $bidCount == 1 ? '1 bid' : $bidCount . ' bids';
+
+            // Time remaining / Status
+            $endDate = $auction->getEndDateTime();
+            $status = $auction->getAuctionStatus();
+
+            if ($status == 'Finished') {
+                $winningBidId = $auction->getWinningBidId();
+                if ($winningBidId !== null) {
+                    $item['time_remaining'] = 'Sold';
+                    $item['status_class'] = 'text-success';
+                } else {
+                    $item['time_remaining'] = 'Unsold';
+                    $item['status_class'] = 'text-danger';
+                }
+                $item['show_time_icon'] = false;
+            } elseif ($now > $endDate) {
+                $item['time_remaining'] = 'This auction has ended';
+                $item['status_class'] = '';
+                $item['show_time_icon'] = true;
+            } else {
+                $item['time_remaining'] = Utilities::displayTimeRemaining($now->diff($endDate));
+                $item['status_class'] = '';
+                $item['show_time_icon'] = true;
+            }
+
+            $processed[] = $item;
+        }
+
+        return $processed;
+    }
 }

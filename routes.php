@@ -7,7 +7,7 @@
 // View GET data from controller
 
 // Index Page
-$router->get('/', 'controllers/index.php');
+$router->get('/', 'IndexController@index');
 
 $router->get('/account', 'controllers/account.php');
 $router->post('/account/update', 'controllers/account-update-handler.php');
