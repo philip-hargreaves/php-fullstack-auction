@@ -17,8 +17,9 @@ $router->post('/account/password', 'AccountController@updatePassword');
 $router->post('/account/change-password', 'AccountController@updatePassword');
 
 
-$router->get('/rate', 'controllers/auction/rate.php');
-$router->post('/rate', 'controllers/auction/rate-submit.php');
+// Ratings (REST)
+$router->get('/rate', 'RatingController@create');
+$router->post('/rate', 'RatingController@store');
 // Auctions (REST controllers)
 $router->get('/auction', 'AuctionController@show');
 $router->get('/create-auction', 'AuctionController@create');
@@ -43,9 +44,9 @@ $router->post('/watchlist', 'WatchlistController@store');
 $router->post('/watchlist/add', 'WatchlistController@store');
 $router->post('/watchlist/remove', 'WatchlistController@destroy');
 
-//Notifications
-$router->get('/notifications', 'controllers/auction/notification.php');
-$router->post('/notifications', 'controllers/auction/notification.php');
+// Notifications (REST)
+$router->get('/notifications', 'NotificationController@index');
+$router->post('/notifications', 'NotificationController@markSent');
 
 // Admin Dashboard
 $router->get('/admin', 'controllers/admin/dashboard.php');
@@ -53,7 +54,8 @@ $router->get('/admin/auction/view', 'controllers/admin/view-auction.php');
 $router->post('/admin/user/update-status', 'controllers/admin/update-user-status.php');
 $router->post('/admin/user/manage-role', 'controllers/admin/manage-user-role.php');
 
-// Chatroom Page
-$router->post('/send-message', 'controllers/chatroom/send-message.php');
-$router->get('/chatroom', 'controllers/chatroom/chatroom.php');
+// Chat (REST)
+$router->get('/chatroom', 'ChatController@show');
+$router->post('/chatroom/message', 'ChatController@store');
+$router->post('/send-message', 'ChatController@store');
 $router->post('/admin/auction/delete', 'controllers/admin/delete-auction.php');
