@@ -9,10 +9,6 @@
 // Index Page
 $router->get('/', 'controllers/index.php');
 
-// GET Pages
-$router->get('/my-auctions', 'controllers/my-auctions.php');
-$router->get('/my-bids', 'controllers/my-bids.php');
-
 $router->get('/account', 'controllers/account.php');
 $router->post('/account/update', 'controllers/account-update-handler.php');
 $router->post('/account/change-password', 'controllers/change-password-handler.php');
@@ -20,9 +16,11 @@ $router->post('/account/change-password', 'controllers/change-password-handler.p
 
 $router->get('/rate', 'controllers/auction/rate.php');
 $router->post('/rate', 'controllers/auction/rate-submit.php');
-// Create Auction Page
-$router->get('/create-auction', 'controllers/create_auction/create-auction-get.php');
-$router->post('/create-auction', 'controllers/create_auction/create-auction-post.php');
+// Auctions (REST controllers)
+$router->get('/auction', 'AuctionController@show');
+$router->get('/create-auction', 'AuctionController@create');
+$router->post('/create-auction', 'AuctionController@store');
+$router->get('/my-listings', 'AuctionController@mine');
 
 // Authentication (REST controllers)
 $router->get('/register', 'AuthController@showRegister');
@@ -32,14 +30,10 @@ $router->get('/logout', 'AuthController@logout');
 $router->post('/logout', 'AuthController@logout');
 $router->post('/become-seller', 'AuthController@becomeSeller');
 
-// Auction Page
+// Bids & Watchlist
 $router->post('/bid', 'controllers/auction/place-bid.php');
-$router->get('/auction', 'controllers/auction/auction.php');
 $router->post('/watchlist/add', 'controllers/auction/watchlist-add.php');
 $router->post('/watchlist/remove', 'controllers/auction/watchlist-remove.php');
-
-// My-listings Page
-$router->get('/my-listings', 'controllers/my-listings.php');
 
 // My-Bids Page
 $router->get('/my-bids', 'controllers/my-bids.php');

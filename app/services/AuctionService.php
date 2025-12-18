@@ -75,6 +75,103 @@ class AuctionService
         return $this->auctionRepo->getById($auctionId);
     }
 
+    /** Prepare all data needed for auction detail view */
+    public function getAuctionViewData(int $auctionId): array
+    {
+        $auction = $this->auctionRepo->getById($auctionId);
+        $this->fillItemInAuctions([$auction]);
+        $this->fillCategoryInAuctions([$auction]);
+
+        $item = $auction->getItem();
+        $this->itemService->fillSellerInItems([$item]);
+
+        $bids = $this->bidService->getBidsByAuctionId($auctionId);
+        $this->bidService->fillBuyersInBids($bids);
+
+        $imageArray = $this->auctionImageRepo->getByAuctionId($auctionId);
+        $imageUrls = array_map(fn($img) => $img->getImageUrl(), $imageArray);
+
+        $highestBidAmount = $this->bidService->getHighestBidAmountByAuctionId($auctionId);
+
+        // Status-dependent text
+        $now = new DateTime();
+        $auctionStatus = $auction->getAuctionStatus();
+        $itemIsSold = $item->isSold();
+        $itemIsDeleted = $item->isDeleted();
+        $endTime = $auction->getEndDateTime();
+
+        $bidText = '';
+        $statusText = '';
+        $statusTextSmall = '';
+        $timeText = '';
+        $timeRemaining = '';
+
+        if ($itemIsDeleted) {
+            $statusText = 'Auction Deleted';
+            $statusTextSmall = 'This item is deleted by the seller.';
+        } else if ($itemIsSold) {
+            $bidText = 'Winning Bid: ';
+            $statusText = 'Auction Passed';
+            $statusTextSmall = 'The item is sold.';
+        } else if ($auctionStatus == 'Scheduled') {
+            $statusText = 'Upcoming Auction';
+            $statusTextSmall = 'This auction has not started yet.';
+            $timeText = 'Starting In: ';
+            $timeRemaining = $endTime->diff($now);
+        } else if ($auctionStatus == 'Active') {
+            $bidText = 'Current Bid: ';
+            $statusText = 'Auction Active';
+            $statusTextSmall = 'Reserve price not yet met.';
+            $timeText = 'Time Remaining: ';
+            $timeRemaining = $now->diff($endTime);
+        } else if ($auctionStatus == 'Finished') {
+            $bidText = 'Final Bid';
+            $statusText = 'Item Unsold';
+            $statusTextSmall = 'Auction ended without a winner.';
+        }
+
+        // Compute display status (accounts for sold/deleted items)
+        $displayAuctionStatus = $auctionStatus;
+        if ($itemIsDeleted) {
+            $displayAuctionStatus = 'Deleted';
+        } else if ($itemIsSold) {
+            $displayAuctionStatus = 'Sold';
+        }
+
+        return [
+            'auction' => $auction,
+            'auctionId' => $auctionId,
+            'item' => $item,
+            'bids' => $bids,
+            'displayedBids' => array_slice($bids, 0, 15),
+            'imageUrls' => $imageUrls,
+            'title' => $item->getItemName(),
+            'sellerName' => $item->getSeller()->getUsername(),
+            'sellerId' => $item->getSellerId(),
+            'description' => $auction->getAuctionDescription(),
+            'highestBid' => $this->bidService->getHighestBidByAuctionId($auctionId),
+            'highestBidAmount' => $highestBidAmount,
+            'startTime' => $auction->getStartDateTime(),
+            'endTime' => $endTime,
+            'startingPrice' => $auction->getStartingPrice(),
+            'reservePrice' => $auction->getReservePrice(),
+            'condition' => $auction->getAuctionCondition(),
+            'category' => $auction->getCategory(),
+            'currencyText' => '£',
+            'itemIsSold' => $itemIsSold,
+            'itemIsDeleted' => $itemIsDeleted,
+            'auctionStatus' => $auctionStatus,
+            'displayAuctionStatus' => $displayAuctionStatus,
+            'isAuctionActive' => $auctionStatus == 'Active' && !$itemIsSold && !$itemIsDeleted,
+            'bidText' => $bidText,
+            'statusText' => $statusText,
+            'statusTextSmall' => $statusTextSmall,
+            'timeText' => $timeText,
+            'timeRemaining' => $timeRemaining,
+            'winningBid' => $highestBidAmount,
+        ];
+    }
+
     public function getActiveAuctionsByUserId(int $sellerId): array {
         $auctions = $this->auctionRepo->getActiveAuctionsBySellerId($sellerId);
 
