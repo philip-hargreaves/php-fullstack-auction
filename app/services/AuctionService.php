@@ -27,6 +27,8 @@ class AuctionService
     private AuctionImageRepository $auctionImageRepo;
     private CategoryService $categoryService;
 
+    private NotificationService $notificationService;
+
     public function __construct(
         Database               $db,
         AuctionRepository      $auctionRepo,
@@ -36,7 +38,8 @@ class AuctionService
         BidService             $bidService,
         CategoryRepository     $categoryRepo,
         AuctionImageRepository $auctionImageRepo,
-        CategoryService        $categoryService
+        CategoryService        $categoryService,
+        NotificationService   $notificationService
     )
     {
         $this->db = $db;
@@ -48,6 +51,7 @@ class AuctionService
         $this->categoryRepo = $categoryRepo;
         $this->auctionImageRepo = $auctionImageRepo;
         $this->categoryService = $categoryService;
+        $this->notificationService = $notificationService;
     }
 
     public function getByUserId(int $sellerId): array
@@ -58,6 +62,12 @@ class AuctionService
     public function getWatchedByUserId(int $userId): array
     {
         return $this->auctionRepo->getWatchedAuctionsByUserId($userId);
+    }
+
+    public function getByStatus(string $auctionStatus):array
+    {
+        $auctions = $this -> auctionRepo -> getByAuctionStatus($auctionStatus);
+        return $auctions;
     }
 
     public function getById(int $auctionId): ?Auction
@@ -113,6 +123,18 @@ class AuctionService
             if (!$this->finalizeAuctionSetup($auction, $item, $imageInputs)) {
                 $pdo->rollBack();
                 return Utilities::creationResult("Failed to link item or save images.", false, null);
+            }
+
+            //add email notification for when auction created
+            $auctionId = $auction -> getAuctionId();
+            $recipientId = $item -> getSellerId();
+
+            $notificationCreateResult = $this -> notificationService -> createNotification($auctionId, $recipientId, 'email', 'auctionCreated');
+
+            if (!$notificationCreateResult['success'])
+            {
+                $pdo->rollBack();
+                return $notificationCreateResult;
             }
 
             $pdo->commit();
@@ -563,13 +585,8 @@ class AuctionService
         }
 
         // 4. Start Date Check (Locked)
-        // Convert both to DateTime objects for accurate comparison
-        $prevStartDate = $prevAuction->getStartDatetime();
-        $newStartDate = new \DateTime($newInput['start_datetime']);
-        
-        // Compare only up to minutes (ignore seconds) since datetime-local input doesn't include seconds
-        // This prevents false positives when the database has seconds but the form input doesn't
-        if ($prevStartDate->format('Y-m-d H:i') !== $newStartDate->format('Y-m-d H:i')) {
+        // convert both of them to Unix Timestamps (integers representing seconds)
+        if ($prevAuction->getStartDatetime()->getTimestamp() !== strtotime($newInput['start_datetime'])) {
             return "Start date cannot be changed after the auction is created.";
         }
 
@@ -671,11 +688,59 @@ class AuctionService
         return $this->auctionRepo->countByStatus($status, $soldOnly);
     }
 
+    public function getMostActiveSellers(int $limit = 5): array
+    {
+        return $this->auctionRepo->getMostActiveSellers($limit);
+    }
+
     // Auction Status Update Cron Job
     public function updateAuctionStatuses(): void
     {
         // Pass the call down to the repository
         $this->auctionRepo->updateAuctionStatuses();
+    }
+
+    // Get all auctions with pagination (for admin dashboard)
+    public function getAllAuctions(int $limit = 50, int $offset = 0): array
+    {
+        // Pagination validation
+        $limit = max(1, min(100, (int)$limit));
+        $offset = max(0, (int)$offset);
+
+        try {
+            $auctions = $this->auctionRepo->getAllWithDetails($limit, $offset);
+            $total = $this->auctionRepo->countAll();
+
+            return Utilities::creationResult(
+                'Auctions retrieved successfully.',
+                true,
+                [
+                    'auctions' => $auctions,
+                    'total' => $total,
+                    'limit' => $limit,
+                    'offset' => $offset
+                ]
+            );
+        } catch (\Throwable $e) {
+            return Utilities::creationResult('Failed to retrieve auctions.', false, null);
+        }
+    }
+
+    // Delete auction (hard delete)
+    public function deleteAuction(int $auctionId): array
+    {
+        try {
+            $auction = $this->auctionRepo->getById($auctionId);
+            if (!$auction) {
+                return Utilities::creationResult('Auction not found.', false, null);
+            }
+
+            $this->auctionRepo->delete($auctionId);
+
+            return Utilities::creationResult('Auction deleted successfully.', true, null);
+        } catch (\Throwable $e) {
+            return Utilities::creationResult('Failed to delete auction.', false, null);
+        }
     }
 
     public function getPublicAuctionsForSeller(int $sellerId): array

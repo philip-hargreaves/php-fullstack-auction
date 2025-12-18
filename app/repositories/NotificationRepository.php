@@ -212,4 +212,61 @@ class NotificationRepository
             return null;
         }
     }
+
+    public function getPendingPopupNotificationsForUser(int $userId): array
+    {
+        try {
+            $sql = "
+                SELECT 
+                    n.id AS notification_id,
+                    n.auction_id,
+                    n.recipient_id,
+                    n.notification_type,
+                    n.notification_content_type,
+                    u.is_active AS user_is_active,
+                    a.auction_status,
+                    i.item_name
+                FROM notifications n
+                JOIN users u ON n.recipient_id = u.id
+                JOIN auctions a ON n.auction_id = a.id
+                JOIN items i ON a.item_id = i.id
+                WHERE n.is_sent = 0 
+                  AND n.notification_type = 'popUp'
+                  AND n.recipient_id = :user_id
+            ";
+            
+            $rows = $this->db->query($sql, ['user_id' => $userId])->fetchAll();
+            return $rows ?: [];
+        } catch (PDOException $e) {
+            return [];
+        }
+    }
+
+    public function getPendingEmailNotificationsWithDetails(): array
+    {
+        try {
+            $sql = "
+                SELECT 
+                    n.id AS notification_id,
+                    n.auction_id,
+                    n.recipient_id,
+                    n.notification_content_type,
+                    u.is_active AS user_is_active,
+                    u.email AS recipient_email,
+                    u.username AS recipient_username,
+                    i.item_name
+                FROM notifications n
+                JOIN users u ON n.recipient_id = u.id
+                JOIN auctions a ON n.auction_id = a.id
+                JOIN items i ON a.item_id = i.id
+                WHERE n.is_sent = 0 
+                  AND n.notification_type = 'email'
+            ";
+            
+            $rows = $this->db->query($sql)->fetchAll();
+            return $rows ?: [];
+        } catch (PDOException $e) {
+            return [];
+        }
+    }
 }

@@ -561,6 +561,7 @@ class AuctionRepository
         FROM auctions a
         LEFT JOIN CandidateAuctions ca ON a.id = ca.auction_id
         LEFT JOIN CurrentUserRecentBids curb ON a.id = curb.auction_id
+        LEFT JOIN items i ON a.item_id = i.id
         WHERE curb.auction_id IS NULL
         {$whereClause}
         GROUP BY a.id
@@ -716,7 +717,7 @@ class AuctionRepository
                 SET a.winning_bid_id = b.id
                 WHERE a.auction_status = 'Active' 
                 AND a.end_datetime <= NOW()
-                AND b.bid_amount >= a.reserve_price
+                AND (a.reserve_price IS NULL OR b.bid_amount >= a.reserve_price)
                 AND b.bid_amount = (
                     SELECT MAX(b2.bid_amount) 
                     FROM bids b2 
@@ -801,6 +802,20 @@ class AuctionRepository
             return $this->hydrateMany($rows);
         } catch (PDOException $e) {
             return [];
+        }
+    }
+
+    public function delete(int $auctionId) : bool
+    {
+        try {
+            $sql = "DELETE FROM auctions WHERE auction_id = :auction_id";
+            $params = [':auction_id' => $auctionId];
+
+            $this->db->query($sql, $params);
+
+            return true;
+        } catch (PDOException $e) {
+            return false;
         }
     }
 }
