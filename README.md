@@ -230,18 +230,4 @@ The database is designed in Third Normal Form (3NF) with:
 
 See `db/schema.sql` for the complete schema definition.
 
-## Coursework Information
 
-This project was developed for **COMP0178: Database Fundamentals (PG – Term 1)** at UCL.
-
-### Design Principles
-
-- **Normalization**: Database schema is in Third Normal Form
-- **Repository Pattern**: Separation of data access from business logic
-- **Service Layer**: Business logic encapsulated in service classes
-- **Dependency Injection**: Loose coupling via DI container
-- **MVC Architecture**: Clear separation of concerns
-
-## License
-
-This is a coursework project developed for educational purposes.
