@@ -9,9 +9,12 @@
 // Index Page
 $router->get('/', 'IndexController@index');
 
-$router->get('/account', 'controllers/account.php');
-$router->post('/account/update', 'controllers/account-update-handler.php');
-$router->post('/account/change-password', 'controllers/change-password-handler.php');
+// Account (REST)
+$router->get('/account', 'AccountController@show');
+$router->post('/account', 'AccountController@update');
+$router->post('/account/update', 'AccountController@update');
+$router->post('/account/password', 'AccountController@updatePassword');
+$router->post('/account/change-password', 'AccountController@updatePassword');
 
 
 $router->get('/rate', 'controllers/auction/rate.php');
@@ -30,9 +33,9 @@ $router->get('/logout', 'AuthController@logout');
 $router->post('/logout', 'AuthController@logout');
 $router->post('/become-seller', 'AuthController@becomeSeller');
 
-// Bids
-$router->post('/bid', 'controllers/auction/place-bid.php');
-$router->get('/my-bids', 'controllers/my-bids.php');
+// Bids (REST)
+$router->get('/my-bids', 'BidController@index');
+$router->post('/bid', 'BidController@store');
 
 // Watchlist (REST)
 $router->get('/watchlist', 'WatchlistController@index');
