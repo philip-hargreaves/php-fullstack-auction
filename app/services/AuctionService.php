@@ -246,8 +246,8 @@ class AuctionService
             $auction->setWinningBidId($prevAuction->getWinningBidId());
 
             // 6. Execute Update
-            $this->auctionRepo->update($auction);
-            if (!$auction) {
+            $updateSuccess = $this->auctionRepo->update($auction);
+            if (!$updateSuccess) {
                 $pdo->rollBack();
                 return Utilities::creationResult("Failed to update auction.", false, null);
             }
