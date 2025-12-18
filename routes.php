@@ -24,12 +24,13 @@ $router->post('/rate', 'controllers/auction/rate-submit.php');
 $router->get('/create-auction', 'controllers/create_auction/create-auction-get.php');
 $router->post('/create-auction', 'controllers/create_auction/create-auction-post.php');
 
-// Registration and authentication
-$router->get('/register', 'controllers/auth/register.php');
-$router->post('/register', 'controllers/auth/register.store.php');
-$router->post('/login', 'controllers/auth/authenticate.php');
-$router->get('/logout', 'controllers/auth/logout.php');
-$router->post('/become-seller', 'controllers/auth/become-seller.php');
+// Authentication (REST controllers)
+$router->get('/register', 'AuthController@showRegister');
+$router->post('/register', 'AuthController@register');
+$router->post('/login', 'AuthController@login');
+$router->get('/logout', 'AuthController@logout');
+$router->post('/logout', 'AuthController@logout');
+$router->post('/become-seller', 'AuthController@becomeSeller');
 
 // Auction Page
 $router->post('/bid', 'controllers/auction/place-bid.php');
