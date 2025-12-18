@@ -1,7 +1,5 @@
 <?php
 use infrastructure\DIContainer;
-use infrastructure\Utilities;
-use infrastructure\Request;
 use infrastructure\SmtpConfig;
 use infrastructure\Mailer;
 
@@ -10,42 +8,41 @@ session_start();
 header('Content-Type: application/json');
 
 $notificationServ = DIContainer::get('notificationServ');
-$auctionServ = DIContainer::get('auctionServ');
-$bidServ = DIContainer::get('bidServ');
-$itemServ = DIContainer::get('itemServ');
-$watchlistServ = DIContainer::get('watchlistServ');
 
-//Send emails regardless of who has logged in
-$smtpConfig = new SmtpConfig();
-$config = $smtpConfig->getSmtpConfig();
-$mailer = new Mailer($config);
+// Rate-limited email sending - only try once per minute to avoid blocking every request
+$lockFile = sys_get_temp_dir() . '/auction_email_lock.txt';
+$now = time();
+$lastRun = file_exists($lockFile) ? (int)file_get_contents($lockFile) : 0;
 
-// fetch all notifications that have NOT had email sent
-$emailNotifications = $notificationServ -> prepareEmailNotifications();
-
-if(!empty($emailNotifications))
-{
-    foreach ($emailNotifications as $email)
-    {
-        try
-        {
+if ($now - $lastRun >= 60) {
+    // Update lock file first to prevent other requests from also sending
+    file_put_contents($lockFile, $now);
+    
+    // Create batch notifications
+    $notificationServ->createBatchNotification();
+    
+    // Send up to 5 pending emails (uses optimized single-query fetch)
+    $smtpConfig = new SmtpConfig();
+    $mailer = new Mailer($smtpConfig->getSmtpConfig());
+    
+    $emailNotifications = $notificationServ->prepareEmailNotifications();
+    $emailLimit = 5;
+    $sent = 0;
+    
+    foreach ($emailNotifications as $email) {
+        if ($sent >= $emailLimit) break;
+        
+        try {
             $mailer->send($email['recipientUserEmail'], $email['messageSubject'], $email['message']);
-
-            // mark as sent
             $notificationServ->markAsSent($email['notificationId']);
-        }
-        catch (Exception $e)
-        {
-            // Log error. Continues to next email. Ones failed to send not marked as sent
-            error_log("failed to send email: " . $e->getMessage());
-            continue;
+            $sent++;
+        } catch (Exception $e) {
+            error_log("Failed to send email: " . $e->getMessage());
         }
     }
 }
 
-$notificationServ -> createBatchNotification();
-
-//Handles popup notifications
+// Handle popup notifications (fast - uses optimized single query)
 $userId = $_SESSION['user_id'] ?? null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {

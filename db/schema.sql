@@ -163,3 +163,16 @@ CREATE INDEX idx_items_seller_id ON items(seller_id);
 
 -- 5. Index on bids.buyer_id for user bid history
 CREATE INDEX idx_bids_buyer_id ON bids(buyer_id);
+
+-- 6. Composite index for bids recommendation query
+CREATE INDEX idx_bids_buyer_datetime ON bids(buyer_id, bid_datetime DESC);
+
+-- 7. Indexes for notifications
+CREATE INDEX idx_notifications_pending ON notifications(is_sent, notification_type);
+CREATE INDEX idx_notifications_recipient ON notifications(recipient_id, is_sent);
+
+-- 8. Index for auction images lookup
+CREATE INDEX idx_auction_images_auction ON auction_images(auction_id);
+
+-- 9. Index on auctions.item_id for joins
+CREATE INDEX idx_auctions_item_id ON auctions(item_id);

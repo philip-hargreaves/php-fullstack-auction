@@ -59,62 +59,35 @@ class NotificationService
         $notificationsToCreate = $this -> notificationRepo -> createBatchNotification();
     }
 
-    //prepares Email notification to be sent
-    public function prepareEmailNotifications()
+    public function prepareEmailNotifications(): array
     {
-        $notifications = $this -> notificationRepo -> getPendingNotification();
+        // Use optimized query that fetches all data in one JOIN
+        $rows = $this->notificationRepo->getPendingEmailNotificationsWithDetails();
 
         $emailsToSend = [];
 
-        foreach ($notifications as $notification)
-        {
-            $notificationType = $notification -> getNotificationType();
-            $notificationContentType = $notification -> getNotificationContentType();
+        foreach ($rows as $row) {
+            $notificationId = (int)$row['notification_id'];
+            $isUserActive = (bool)$row['user_is_active'];
 
-            if ($notificationType === 'email')
-            {
-                //checks if user is still active.
-                $recipientId = $notification->getRecipientId();
-                $recipientUser = $this-> userRepo ->getById($recipientId);
-                $isUserActive = $recipientUser->isActive();
-
-                $auctionId  = $notification->getAuctionId();
-                $auction = $this -> auctionRepo -> getById($auctionId);
-
-                if($isUserActive === false)
-                {
-                    //if user or auction is no longer active, mark notification to sent without actually sending
-                    $notificationId = $notification -> getNotificationId();
-                    $this -> notificationRepo -> changeNotificationStatusToSent($notificationId);
-                }
-                else
-                {
-                    $notificationId = $notification -> getNotificationId();
-
-                    //get email of recipient
-                    $recipientUserEmail = $recipientUser -> getEmail();
-                    $recipientUserName = $recipientUser -> getUsername();
-
-                    //get auction name
-                    $auctionItemId = $auction -> getItemId();
-                    $auctionItem = $this -> itemRepo -> getById($auctionItemId);
-
-                    //get item name from auction item
-                    $auctionItemName = $auctionItem -> getItemName();
-
-                    $message = $this -> createNotificationContent($recipientUserName, $auctionItemName, $notificationContentType);
-
-                    $email = [
-                        'notificationId' => $notificationId,
-                        'recipientId' => $recipientId,
-                        'recipientUserEmail' => $recipientUserEmail,
-                        'messageSubject' => $message['subject'],
-                        'message' => $message['message'],
-                    ];
-
-                    $emailsToSend[] = $email;
-                }
+            if (!$isUserActive) {
+                $this->notificationRepo->changeNotificationStatusToSent($notificationId);
+                continue;
             }
+
+            $message = $this->createNotificationContent(
+                $row['recipient_username'],
+                $row['item_name'],
+                $row['notification_content_type']
+            );
+
+            $emailsToSend[] = [
+                'notificationId' => $notificationId,
+                'recipientId' => (int)$row['recipient_id'],
+                'recipientUserEmail' => $row['recipient_email'],
+                'messageSubject' => $message['subject'],
+                'message' => $message['message'],
+            ];
         }
 
         return $emailsToSend;
@@ -163,61 +136,31 @@ class NotificationService
         ];
     }
 
-    //currently only handles user being outbid
-    public function preparePopUpNotifications(int $userId)
+    public function preparePopUpNotifications(int $userId): array
     {
-        $notifications = $this -> notificationRepo -> getPendingNotification();
+        // Use optimized query that only fetches this user's popup notifications
+        $rows = $this->notificationRepo->getPendingPopupNotificationsForUser($userId);
 
         $notificationsToSend = [];
 
-        foreach ($notifications as $notification)
-        {
-            $notificationType = $notification -> getNotificationType();
+        foreach ($rows as $row) {
+            $notificationId = (int)$row['notification_id'];
+            $isUserActive = (bool)$row['user_is_active'];
+            $isAuctionActive = ($row['auction_status'] === 'Active');
 
-            if($notificationType === 'popUp')
-            {
-                //checks if user is still active.
-                $recipientId = $notification->getRecipientId();
-                $recipientUser = $this-> userRepo ->getById($recipientId);
-                $isUserActive = $recipientUser->isActive();
-
-                //checks if auction still active
-                $auctionId  = $notification->getAuctionId();
-                $auction = $this -> auctionRepo -> getById($auctionId);
-                $isAuctionActive = $auction-> isAuctionActive();
-
-                if($isUserActive === false || $isAuctionActive === false)
-                {
-                    //if user or auction is no longer active, mark notification to sent without actually sending
-                    $notificationId = $notification -> getNotificationId();
-                    $this -> notificationRepo -> changeNotificationStatusToSent($notificationId);
-                }
-                else
-                {
-                    $notificationId = $notification -> getNotificationId();
-                    $recipientId = $notification -> getRecipientId();
-
-                    //get auction name
-                    $auctionItemId = $auction -> getItemId();
-                    $auctionItem = $this -> itemRepo -> getById($auctionItemId);
-
-                    //get item name from auction item
-                    $auctionItemName = $auctionItem -> getItemName();
-
-                    if($userId === $recipientId)
-                    {
-                        //store messages
-                        $message = [
-                            'notificationId' => $notificationId,
-                            'recipientId' => $recipientId,
-                            'message' => "You have been outbid for " . $auctionItemName . "!",
-                        ];
-
-                        $notificationsToSend[] = $message;
-                    }
-                }
+            if (!$isUserActive || !$isAuctionActive) {
+                // If user or auction is no longer active, mark as sent without sending
+                $this->notificationRepo->changeNotificationStatusToSent($notificationId);
+                continue;
             }
+
+            $notificationsToSend[] = [
+                'notificationId' => $notificationId,
+                'recipientId' => (int)$row['recipient_id'],
+                'message' => "You have been outbid for " . $row['item_name'] . "!",
+            ];
         }
+
         return $notificationsToSend;
     }
 

@@ -72,8 +72,8 @@
             });
     }
 
-    //calls fetNotification every 5 seconds in the background
-    setInterval(fetchNotifications, 5000);
+    //calls fetchNotification every 30 seconds in the background
+    setInterval(fetchNotifications, 30000);
 
     //extracts message from notification and displays it
     function showPopup(notification)
