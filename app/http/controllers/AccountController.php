@@ -3,7 +3,6 @@ namespace app\http\controllers;
 
 use infrastructure\DIContainer;
 use infrastructure\Request;
-use infrastructure\Utilities;
 use app\services\AuthService;
 
 class AccountController extends Controller
@@ -36,8 +35,8 @@ class AccountController extends Controller
         $user = $this->userServ->getUserAccount($targetUserId);
 
         if ($user === null) {
-            http_response_code(404);
-            Utilities::dd("User Not Found");
+            $_SESSION['error'] = 'User not found.';
+            $this->redirect('/');
         }
 
         $isOwnProfile = ($currentUserId === $targetUserId);
