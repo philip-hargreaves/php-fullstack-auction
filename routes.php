@@ -30,16 +30,15 @@ $router->get('/logout', 'AuthController@logout');
 $router->post('/logout', 'AuthController@logout');
 $router->post('/become-seller', 'AuthController@becomeSeller');
 
-// Bids & Watchlist
+// Bids
 $router->post('/bid', 'controllers/auction/place-bid.php');
-$router->post('/watchlist/add', 'controllers/auction/watchlist-add.php');
-$router->post('/watchlist/remove', 'controllers/auction/watchlist-remove.php');
-
-// My-Bids Page
 $router->get('/my-bids', 'controllers/my-bids.php');
 
-// Watchlist Page
-$router->get('/watchlist', 'controllers/watchlist.php');
+// Watchlist (REST)
+$router->get('/watchlist', 'WatchlistController@index');
+$router->post('/watchlist', 'WatchlistController@store');
+$router->post('/watchlist/add', 'WatchlistController@store');
+$router->post('/watchlist/remove', 'WatchlistController@destroy');
 
 //Notifications
 $router->get('/notifications', 'controllers/auction/notification.php');
