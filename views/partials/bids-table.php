@@ -54,7 +54,7 @@ $type = $tableType ?? 'active';
             <tr>
                 <td>
                     <div class="text-truncate" style="max-width: 280px;" title="<?= htmlspecialchars($itemName) ?>">
-                        <a href="/auction?auction_id=<?= htmlspecialchars($auctionId) ?>"
+                        <a href="/auctions/<?= htmlspecialchars($auctionId) ?>"
                            class="text-decoration-none font-weight-bold <?= $itemLinkClass ?>">
                             <?= htmlspecialchars($itemName) ?>
                         </a>
@@ -94,7 +94,7 @@ $type = $tableType ?? 'active';
                         <?php if ($hasRated): ?>
                             <button class="btn btn-sm btn-success disabled py-0" disabled style="opacity: 0.8; font-size: 0.8rem;">Rated</button>
                         <?php else: ?>
-                            <a href="/rate?auction_id=<?= htmlspecialchars($auctionId) ?>"
+                            <a href="/auctions/<?= htmlspecialchars($auctionId) ?>/ratings/create"
                                class="btn btn-sm btn-danger text-white py-0" style="font-weight: 500; font-size: 0.8rem;">Rate</a>
                         <?php endif; ?>
                     <?php else: ?>

@@ -51,18 +51,20 @@ class BidController extends Controller
         $this->view('my-bids', compact('uniqueBids', 'groupedBids', 'activeBids', 'pastBids'));
     }
 
-    /** POST /bid - Place a bid on an auction */
+    /** POST /auctions/{id}/bids */
     public function store(array $params = []): void
     {
         $this->ensurePost();
 
+        $auctionId = $params['id'] ?? Request::post('auction_id', '');
+
         $input = [
             'bid_amount' => Request::post('bid_amount', ''),
-            'auction_id' => Request::post('auction_id', ''),
+            'auction_id' => $auctionId,
             'user_id'    => $this->userId(),
         ];
 
-        $redirectUrl = '/auction?auction_id=' . $input['auction_id'];
+        $redirectUrl = '/auctions/' . $auctionId;
 
         try {
             $result = $this->bidServ->placeBid($input);

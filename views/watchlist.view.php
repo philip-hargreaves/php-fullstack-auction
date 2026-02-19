@@ -22,7 +22,7 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
                 <?php foreach ($auctions as $auction): ?>
                     <tr>
                         <td>
-                            <a href="/auction?auction_id=<?= htmlspecialchars($auction->getAuctionId()) ?>">
+                            <a href="/auctions/<?= htmlspecialchars($auction->getAuctionId()) ?>">
                                 <?= htmlspecialchars($auction->getItemName() ?? '[Item Missing]') ?>
                             </a>
                         </td>
@@ -31,9 +31,8 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
 
                         <td><?= htmlspecialchars($auction->getEndDateTime()->format('Y-m-d H:i')) ?></td>
                         <td>
-                            <form method="POST" action="/watchlist/remove">
-                                <input type="hidden" name="auction_id" value="<?= htmlspecialchars($auction->getAuctionId()) ?>">
-
+                            <form method="POST" action="/watchlist/<?= htmlspecialchars($auction->getAuctionId()) ?>">
+                                <input type="hidden" name="_method" value="DELETE">
                                 <input type="hidden" name="redirect_to" value="/watchlist">
 
                                 <button type="submit" class="btn btn-link text-danger p-0" style="text-decoration: none;">Remove</button>

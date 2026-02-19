@@ -25,7 +25,7 @@ use infrastructure\DIContainer;
                 <?php foreach($conversations as $conv): ?>
                     <?php
                     // 1. Get the requested ID safely
-                    $currentId = $_GET['id'] ?? null;
+                    $currentId = $activeConversationId ?? null;
 
                     // 2. Fallback: If no ID in URL, the controller likely selected the first one by default
                     if (!$currentId && isset($activeConversationId)) {
@@ -36,7 +36,7 @@ use infrastructure\DIContainer;
                     $time = date('M d', strtotime($conv['last_message_time'] ?? "now"));
                     ?>
 
-                    <a href="/chatroom?conversation_id=<?= $conv['conversation_id'] ?>" style="text-decoration: none;">
+                    <a href="/conversations/<?= $conv['conversation_id'] ?>" style="text-decoration: none;">
                         <div class="conversation-item <?= $isActive ?>">
                             <div class="item-title">
                                 <span><?= htmlspecialchars(substr($conv['item_name'], 0, 22)) . (strlen($conv['item_name']) > 22 ? '...' : '') ?></span>
@@ -60,13 +60,13 @@ use infrastructure\DIContainer;
             <div class="chat-header">
                 <div class="header-item-info">
                     <h2 class="mt-2 mb-3" style="color: --color-auctivity-red;">
-                        <a href="/auction?auction_id=<?= $auctionDetails["auction_id"] ?>"
+                        <a href="/auctions/<?= $auctionDetails["auction_id"] ?>"
                            class="text-decoration-none text-reset">
                             <?= htmlspecialchars($auctionDetails['item_name']) ?>
                         </a>
                     </h2>
                     <div class="header-item-details">
-                        Seller: <a href="/account?user_id=<?= htmlspecialchars($auctionDetails['seller_id']) ?>" class="" style="color: white"><?= htmlspecialchars($auctionDetails['seller_name']) ?></a> |
+                        Seller: <a href="/users/<?= htmlspecialchars($auctionDetails['seller_id']) ?>" class="" style="color: white"><?= htmlspecialchars($auctionDetails['seller_name']) ?></a> |
                         Ends: <?= date('M d, Y', strtotime($auctionDetails['end_datetime'] )) ?> |
                         Status: <?= htmlspecialchars($auctionDetails['auction_status']) ?> |
                         Remaining Time: <?= date('M d, Y', strtotime($auctionDetails['remaining_time'])) ?>
@@ -97,8 +97,7 @@ use infrastructure\DIContainer;
             </div>
 
             <div class="input-area">
-                <form action="/send-message" method="POST" class="input-form">
-                    <input type="hidden" name="conversation_id" value="<?= $activeConversationId ?>">
+                <form action="/conversations/<?= $activeConversationId ?>/messages" method="POST" class="input-form">
                     <input type="text" name="message" placeholder="Type a message..." required autocomplete="off">
                     <button type="submit">Send</button>
                 </form>

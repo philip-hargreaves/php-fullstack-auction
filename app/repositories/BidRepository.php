@@ -3,9 +3,6 @@ namespace app\repositories;
 
 use app\models\Bid;
 use infrastructure\Database;
-use app\repositories\UserRepository;
-use app\repositories\auctionRepository;
-use PDO;
 use PDOException;
 
 class BidRepository
@@ -32,7 +29,6 @@ class BidRepository
             $row['bid_datetime']
         );
 
-        // Set relationship properties
         $buyer = $this->userRepo->getById($row['buyer_id']);
         $auction = $this->auctionRepo->getById($row['auction_id']);
 
@@ -59,15 +55,13 @@ class BidRepository
     public function getById(int $bidId): ?Bid
     {
         try {
-            // Query
             $sql = "SELECT * FROM bids WHERE id = :bid_id";
             $params = ['bid_id' => $bidId];
             $row = $this->db->query($sql, $params)->fetch();
 
-            // hydrate() will handle the empty row and return null
             return $this->hydrate($row);
         } catch (PDOException $e) {
-            // TODO: add logging
+            
             return null;
         }
     }
@@ -80,8 +74,6 @@ class BidRepository
                 VALUES (:buyer_id, :auction_id, :bid_amount, :bid_datetime)";
 
             $result = $this->db->query($sql, $params);
-
-            // Check if the insert was successful.
             if ($result) {
                 $id = (int)$this->db->connection->lastInsertId();
                 $bid->setBidId($id);
@@ -90,7 +82,7 @@ class BidRepository
                 return null;
             }
         } catch (PDOException $e) {
-            // TODO: add logging
+            
             return null;
         }
     }
@@ -105,10 +97,9 @@ class BidRepository
             $params = ['auction_id' => $auctionId];
             $row = $this->db->query($sql, $params)->fetch();
 
-            // hydrate will handle the empty row and return null
             return $this->hydrate($row);
         } catch (PDOException $e) {
-            // TODO: add logging
+            
             return null;
         }
     }
@@ -122,7 +113,6 @@ class BidRepository
             $params = ['auction_id' => $auctionId];
             $rows = $this->db->query($sql, $params)->fetchAll();
 
-            // Hydrate all rows to objects
             $objects = [];
             foreach ($rows as $row) {
                 $objects[] = $this->hydrate($row);
@@ -130,7 +120,7 @@ class BidRepository
 
             return $objects;
         } catch (PDOException $e) {
-            // TODO: add logging
+            
             return [];
         }
     }
@@ -144,7 +134,7 @@ class BidRepository
 
             return $this->hydrateMany($rows);
         } catch (PDOException $e) {
-            // TODO: add logging
+            
             return [];
         }
     }
@@ -162,7 +152,6 @@ class BidRepository
         return $objects;
     }
 
-    // Count all bids
     public function countAll(): int
     {
         try {
@@ -170,12 +159,11 @@ class BidRepository
             $row = $this->db->query($sql, [])->fetch();
             return (int)$row['total'];
         } catch (PDOException $e) {
-            // TODO: add logging
+            
             return 0;
         }
     }
 
-    // Get total revenue (sum of all winning bid amounts)
     public function getTotalRevenue(): float
     {
         try {
@@ -186,7 +174,7 @@ class BidRepository
             $row = $this->db->query($sql, [])->fetch();
             return (float)($row['total_revenue'] ?? 0);
         } catch (PDOException $e) {
-            // TODO: add logging
+            
             return 0.0;
         }
     }

@@ -15,7 +15,7 @@ class ChatController extends Controller
         $this->authServ = DIContainer::get('authServ');
     }
 
-    /** GET /chatroom - Show conversations */
+    /** GET /conversations or GET /conversations/{id} */
     public function show(array $params = []): void
     {
         $userId = $this->authServ->getUserId();
@@ -24,7 +24,7 @@ class ChatController extends Controller
         }
 
         $conversations = $this->chatServ->getConversationsByUserId($userId);
-        $activeConversationId = Request::get('conversation_id');
+        $activeConversationId = $params['id'] ?? null;
 
         $activeChat = null;
         $auctionDetails = null;
@@ -43,7 +43,7 @@ class ChatController extends Controller
         $this->view('chatroom', compact('conversations', 'activeConversationId', 'activeChat', 'auctionDetails'));
     }
 
-    /** POST /chatroom/message - Send a message */
+    /** POST /conversations/{id}/messages */
     public function store(array $params = []): void
     {
         $this->ensurePost();
@@ -53,12 +53,12 @@ class ChatController extends Controller
             $this->redirect('/register');
         }
 
-        $conversationId = Request::post('conversation_id', '');
+        $conversationId = $params['id'] ?? Request::post('conversation_id', '');
         $message = Request::post('message', '');
 
         $this->chatServ->postMessage($conversationId, $userId, $message);
 
-        $this->redirect('/chatroom?conversation_id=' . $conversationId);
+        $this->redirect('/conversations/' . $conversationId);
     }
 }
 

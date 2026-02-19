@@ -48,15 +48,15 @@ class WatchlistController extends Controller
             $_SESSION['error_message'] = 'This auction is already in your Watchlist.';
         }
 
-        $this->redirect('/auction?auction_id=' . $auctionId);
+        $this->redirect('/auctions/' . $auctionId);
     }
 
-    /** DELETE /watchlist/{auction_id} - Remove auction from watchlist */
+    /** DELETE /watchlist/{auction_id} */
     public function destroy(array $params = []): void
     {
         $userId = AuthService::getUserId();
         $auctionId = (int)($params['auction_id'] ?? Request::post('auction_id'));
-        $redirectUrl = Request::post('redirect_to') ?: '/auction?auction_id=' . $auctionId;
+        $redirectUrl = Request::post('redirect_to') ?: '/auctions/' . $auctionId;
 
         if ($userId === null || $userId <= 0 || $auctionId <= 0) {
             $this->redirect('/');

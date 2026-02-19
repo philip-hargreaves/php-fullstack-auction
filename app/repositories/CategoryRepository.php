@@ -61,7 +61,7 @@ class CategoryRepository
 
             return $this->hydrate($row);
         } catch (PDOException $e) {
-            // TODO: add logging
+            
             return null;
         }
     }
@@ -97,9 +97,6 @@ class CategoryRepository
     public function getPopularCategories(int $limit = 6): array
     {
         try {
-            // FIX 1: Changed 'c.category_name' to 'c.name' (to match your Schema)
-            // FIX 2: Ensure we are querying valid data.
-            // If auctions.category_id is usually NULL, you might need to join via items (see note below).
             $sql = "SELECT c.id, c.name, c.parent_category_id, COUNT(a.id) as activity_count
                 FROM categories c
                 JOIN auctions a ON c.id = a.category_id
@@ -118,7 +115,7 @@ class CategoryRepository
             foreach ($rows as $row) {
                 $categories[] = new Category(
                     (int)$row['id'],
-                    $row['name'], // Updated to match schema
+                    $row['name'],
                     $row['parent_category_id'] !== null ? (int)$row['parent_category_id'] : null
                 );
             }
@@ -126,8 +123,6 @@ class CategoryRepository
             return $categories;
 
         } catch (PDOException $e) {
-            // Tip: Uncomment this during development to see "Unknown Column" errors!
-            // Utilities::dd($e->getMessage());
             return [];
         }
     }

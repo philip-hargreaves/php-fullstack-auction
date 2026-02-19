@@ -315,8 +315,8 @@ $activeTab = Request::get('tab', 'dashboard');
                                         <?php else: ?>
                                             <div class="d-flex" style="flex-wrap: nowrap; gap: 8px;">
                                                 <!-- Activate/Deactivate Toggle -->
-                                                <form method="POST" action="/admin/user/update-status" style="display: inline; flex-shrink: 0;">
-                                                    <input type="hidden" name="user_id" value="<?= htmlspecialchars($user->getUserId()) ?>">
+                                                <form method="POST" action="/admin/users/<?= htmlspecialchars($user->getUserId()) ?>/status" style="display: inline; flex-shrink: 0;">
+                                                    <input type="hidden" name="_method" value="PUT">
                                                     <input type="hidden" name="is_active" value="<?= $user->isActive() ? '0' : '1' ?>">
                                                     <input type="hidden" name="tab" value="users">
                                                     <input type="hidden" name="page" value="<?= htmlspecialchars($curr_page) ?>">
@@ -343,8 +343,8 @@ $activeTab = Request::get('tab', 'dashboard');
                                                             ?>
                                                             <?php if ($hasRole): ?>
                                                                 <!-- Revoke Role -->
-                                                                <form method="POST" action="/admin/user/manage-role" class="dropdown-item-form">
-                                                                    <input type="hidden" name="user_id" value="<?= htmlspecialchars($user->getUserId()) ?>">
+                                                                <form method="POST" action="/admin/users/<?= htmlspecialchars($user->getUserId()) ?>/roles" class="dropdown-item-form">
+                                                                    <input type="hidden" name="_method" value="PUT">
                                                                     <input type="hidden" name="role_name" value="<?= htmlspecialchars($roleName) ?>">
                                                                     <input type="hidden" name="action" value="revoke">
                                                                     <input type="hidden" name="tab" value="users">
@@ -355,8 +355,8 @@ $activeTab = Request::get('tab', 'dashboard');
                                                                 </form>
                                                             <?php else: ?>
                                                                 <!-- Assign Role -->
-                                                                <form method="POST" action="/admin/user/manage-role" class="dropdown-item-form">
-                                                                    <input type="hidden" name="user_id" value="<?= htmlspecialchars($user->getUserId()) ?>">
+                                                                <form method="POST" action="/admin/users/<?= htmlspecialchars($user->getUserId()) ?>/roles" class="dropdown-item-form">
+                                                                    <input type="hidden" name="_method" value="PUT">
                                                                     <input type="hidden" name="role_name" value="<?= htmlspecialchars($roleName) ?>">
                                                                     <input type="hidden" name="action" value="assign">
                                                                     <input type="hidden" name="tab" value="users">
@@ -485,11 +485,11 @@ $activeTab = Request::get('tab', 'dashboard');
                                         </td>
                                         <td style="white-space: nowrap; padding: 12px 16px;">
                                             <div class="d-flex" style="flex-wrap: nowrap; gap: 8px;">
-                                                <a href="/admin/auction/view?auction_id=<?= htmlspecialchars($auction->getAuctionId()) ?>&tab=auctions&page=<?= htmlspecialchars($curr_page) ?>" class="btn btn-sm btn-primary" style="background-color: #007bff; border-color: #007bff; color: #ffffff; font-weight: 500;">
+                                                <a href="/admin/auctions/<?= htmlspecialchars($auction->getAuctionId()) ?>?tab=auctions&page=<?= htmlspecialchars($curr_page) ?>" class="btn btn-sm btn-primary" style="background-color: #007bff; border-color: #007bff; color: #ffffff; font-weight: 500;">
                                                     View
                                                 </a>
-                                                <form method="POST" action="/admin/auction/delete" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this auction? This will permanently delete the auction, its images, and watchlist entries. This action cannot be undone.');">
-                                                    <input type="hidden" name="auction_id" value="<?= htmlspecialchars($auction->getAuctionId()) ?>">
+                                                <form method="POST" action="/admin/auctions/<?= htmlspecialchars($auction->getAuctionId()) ?>" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this auction? This will permanently delete the auction, its images, and watchlist entries. This action cannot be undone.');">
+                                                    <input type="hidden" name="_method" value="DELETE">
                                                     <input type="hidden" name="tab" value="auctions">
                                                     <input type="hidden" name="page" value="<?= htmlspecialchars($curr_page) ?>">
                                                     <button type="submit" class="btn btn-sm btn-danger">

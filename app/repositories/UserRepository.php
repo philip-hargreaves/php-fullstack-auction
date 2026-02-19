@@ -3,10 +3,8 @@ namespace app\repositories;
 use app\models\User;
 use app\models\Role;
 use infrastructure\Database;
-use infrastructure\Utilities;
 use PDOException;
 
-// Data access for user
 class UserRepository
 {
     private Database $db;
@@ -38,13 +36,11 @@ class UserRepository
             return null;
         }
 
-        // Create user from first row
         $user = $this->hydrate($rows[0]);
         if ($user === null) {
             return null;
         }
 
-        // Add all roles from all rows
         foreach ($rows as $row) {
             if (!empty($row['role_id'])) {
                 $role = new Role((int)$row['role_id'], $row['role_name']);
@@ -148,7 +144,7 @@ class UserRepository
 
             return $user;
         } catch (PDOException $e) {
-            // TODO: add logging
+            
             return null;
         }
     }
@@ -207,8 +203,6 @@ class UserRepository
         return $this->hydrateMany($rows);
     }
 
-    // Hydrate multiple users with their roles from query results
-    // Groups rows by user ID and adds roles to each user
     private function hydrateManyWithRoles(array $rows): array
     {
         if (empty($rows)) {
@@ -222,14 +216,11 @@ class UserRepository
         foreach ($rows as $row) {
             $userId = (int)$row['id'];
 
-            // New user encountered
             if ($currentUserId !== $userId) {
-                // Save previous user if exists
                 if ($currentUser !== null) {
                     $users[] = $currentUser;
                 }
 
-                // Create new user
                 $currentUser = $this->hydrate($row);
                 if ($currentUser === null) {
                     continue;
@@ -237,14 +228,12 @@ class UserRepository
                 $currentUserId = $userId;
             }
 
-            // Add role to current user if role exists
             if (!empty($row['role_id'])) {
                 $role = new Role((int)$row['role_id'], $row['role_name']);
                 $currentUser->addRole($role);
             }
         }
 
-        // Don't forget the last user
         if ($currentUser !== null) {
             $users[] = $currentUser;
         }
@@ -252,8 +241,6 @@ class UserRepository
         return $users;
     }
 
-    // Get all users with their roles (for admin dashboard)
-    // Supports pagination
     public function getAllWithRoles(int $limit = 50, int $offset = 0): array
     {
         try {
@@ -267,11 +254,9 @@ class UserRepository
                 return [];
             }
             
-            // Extract user IDs
             $userIds = array_column($userRows, 'id');
             $placeholders = implode(',', array_fill(0, count($userIds), '?'));
             
-            // Fetch those users with their roles
             $sql = "SELECT u.id, u.username, u.email, u.password, u.is_active, u.created_datetime,
                            r.id AS role_id, r.role_name
                     FROM users u
@@ -280,18 +265,16 @@ class UserRepository
                     WHERE u.id IN ({$placeholders})
                     ORDER BY FIELD(u.id, {$placeholders}), u.created_datetime DESC";
             
-            // Duplicate user IDs for FIELD() ordering
             $params = array_merge($userIds, $userIds);
             $rows = $this->db->query($sql, $params)->fetchAll();
 
             return $this->hydrateManyWithRoles($rows);
         } catch (PDOException $e) {
-            // TODO: add logging
+            
             return [];
         }
     }
 
-    // Count total number of users
     public function countAll(): int
     {
         try {
@@ -299,12 +282,11 @@ class UserRepository
             $row = $this->db->query($sql, [])->fetch();
             return (int)$row['total'];
         } catch (PDOException $e) {
-            // TODO: add logging
+            
             return 0;
         }
     }
 
-    // Update user's active status
     public function updateActiveStatus(int $userId, bool $isActive): bool
     {
         try {
@@ -316,7 +298,7 @@ class UserRepository
             $stmt = $this->db->query($sql, $params);
             return $stmt->rowCount() > 0;
         } catch (PDOException $e) {
-            // TODO: add logging
+            
             return false;
         }
     }

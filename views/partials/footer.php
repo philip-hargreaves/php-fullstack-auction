@@ -47,14 +47,10 @@
     window.showLoginModal = showLoginModal;
     window.showBecomeSellerModal = showBecomeSellerModal;
 </script>
-<!---->
-<!-- popup out bid notification -->-->
+<!-- Popup outbid notification -->
 <script>
     function fetchNotifications()
     {
-        console.log("fetchNotifications() called");
-
-        //Gets messages from notification controller
         fetch('/notifications', {
         method: 'GET',
             credentials: 'same-origin'

@@ -22,7 +22,7 @@ class RatingController extends Controller
         $this->userRepo = DIContainer::get('userRepo');
     }
 
-    /** GET /rate - Show rating form */
+    /** GET /auctions/{id}/ratings/create */
     public function create(array $params = []): void
     {
         $userId = AuthService::getUserId();
@@ -30,28 +30,28 @@ class RatingController extends Controller
             $this->redirect('/');
         }
 
-        $auctionId = (int)Request::get('auction_id');
+        $auctionId = (int)($params['id'] ?? 0);
         if ($auctionId <= 0) {
             $_SESSION['error_message'] = "Invalid auction ID.";
-            $this->redirect('/my-bids');
+            $this->redirect('/bids');
         }
 
         $auction = $this->auctionRepo->getById($auctionId);
         if (!$auction) {
             $_SESSION['error_message'] = "Auction not found.";
-            $this->redirect('/my-bids');
+            $this->redirect('/bids');
         }
 
         $winningBidId = $auction->getWinningBidId();
         if (!$winningBidId) {
             $_SESSION['error_message'] = "This auction has no winner yet.";
-            $this->redirect('/my-bids');
+            $this->redirect('/bids');
         }
 
         $winningBid = $this->bidRepo->getById($winningBidId);
         if (!$winningBid || $winningBid->getBuyerId() !== $userId) {
             $_SESSION['error_message'] = "Only the winner can rate this auction.";
-            $this->redirect('/my-bids');
+            $this->redirect('/bids');
         }
 
         // Get item with seller
@@ -65,7 +65,7 @@ class RatingController extends Controller
 
         if (!$item) {
             $_SESSION['error_message'] = "Item data is missing.";
-            $this->redirect('/my-bids');
+            $this->redirect('/bids');
         }
 
         // Fill seller if not loaded
@@ -77,13 +77,13 @@ class RatingController extends Controller
         // Can't rate own auction
         if ($item->getSellerId() === $userId) {
             $_SESSION['error_message'] = "You cannot rate your own auction.";
-            $this->redirect('/my-listings');
+            $this->redirect('/auctions/mine');
         }
 
         $this->view('rate', compact('auction', 'item'));
     }
 
-    /** POST /rate - Submit rating */
+    /** POST /auctions/{id}/ratings */
     public function store(array $params = []): void
     {
         $this->ensurePost();
@@ -93,7 +93,7 @@ class RatingController extends Controller
             $this->redirect('/');
         }
 
-        $auctionId = (int)Request::post('auction_id');
+        $auctionId = (int)($params['id'] ?? Request::post('auction_id'));
         $ratingValue = (int)Request::post('rating_value');
         $comment = Request::post('comment');
 
@@ -105,7 +105,7 @@ class RatingController extends Controller
             $_SESSION['error_message'] = $result['message'];
         }
 
-        $this->redirect('/my-bids');
+        $this->redirect('/bids');
     }
 }
 

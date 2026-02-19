@@ -15,13 +15,13 @@ class UserController extends Controller
         $this->userServ = DIContainer::get('userServ');
     }
 
-    /** POST /admin/users/{id}/status - Update user active status */
+    /** PUT /admin/users/{id}/status */
     public function updateStatus(array $params = []): void
     {
         $this->requireAdmin();
         $this->ensurePost();
 
-        $targetUserId = (int)Request::post('user_id');
+        $targetUserId = (int)($params['id'] ?? Request::post('user_id'));
         $isActive = Request::post('is_active');
 
         if ($targetUserId <= 0) {
@@ -51,13 +51,13 @@ class UserController extends Controller
         $this->redirectBack();
     }
 
-    /** POST /admin/users/{id}/roles - Manage user role */
+    /** PUT /admin/users/{id}/roles */
     public function manageRole(array $params = []): void
     {
         $this->requireAdmin();
         $this->ensurePost();
 
-        $targetUserId = (int)Request::post('user_id');
+        $targetUserId = (int)($params['id'] ?? Request::post('user_id'));
         $roleName = Request::post('role_name');
         $action = Request::post('action');
 

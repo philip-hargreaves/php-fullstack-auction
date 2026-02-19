@@ -22,12 +22,12 @@ class AuctionController extends Controller
         $this->auctionImageRepo = DIContainer::get('auctionImageRepo');
     }
 
-    /** GET /admin/auctions/{id} - View single auction */
+    /** GET /admin/auctions/{id} */
     public function show(array $params = []): void
     {
         $this->requireAdmin();
 
-        $auctionId = (int)Request::get('auction_id');
+        $auctionId = (int)($params['id'] ?? 0);
         $tab = Request::get('tab', 'auctions');
         $page = Request::get('page', 1);
 
@@ -141,13 +141,13 @@ class AuctionController extends Controller
         ]);
     }
 
-    /** POST /admin/auctions/{id}/delete - Delete auction */
+    /** DELETE /admin/auctions/{id} */
     public function destroy(array $params = []): void
     {
         $this->requireAdmin();
         $this->ensurePost();
 
-        $auctionId = (int)Request::post('auction_id');
+        $auctionId = (int)($params['id'] ?? Request::post('auction_id'));
         $tab = Request::post('tab', 'auctions');
         $page = Request::post('page', 1);
 

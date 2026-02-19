@@ -4,8 +4,6 @@ namespace app\repositories;
 
 use app\models\Notification;
 use infrastructure\Database;
-
-use app\models;
 use PDOException;
 
 class NotificationRepository
@@ -66,7 +64,7 @@ class NotificationRepository
         }
         catch (PDOException $e)
         {
-            // TODO: add logging
+            
             return null;
         }
     }
@@ -74,7 +72,6 @@ class NotificationRepository
     public function createBatchNotification()
     {
         try {
-            // Step 1: Fetch all missing notifications
             $sql = "
             SELECT 
                 a.id AS auction_id,
@@ -139,7 +136,6 @@ class NotificationRepository
             WHERE a.auction_status = 'Finished' AND n.id IS NULL
         ";
 
-            // Fetch rows
             $rows = $this->db->query($sql)->fetchAll();
 
             if (empty($rows))
@@ -147,7 +143,6 @@ class NotificationRepository
                 return null;
             }
 
-            //Batch insertion of all rows into notifications table
             $values = [];
             $params = [];
 
@@ -164,7 +159,6 @@ class NotificationRepository
             $sqlInsert = "INSERT INTO notifications (auction_id, recipient_id, notification_type, notification_content_type, is_sent)
                       VALUES " . implode(",", $values);
 
-            // Execute batch insert
             $this->db->query($sqlInsert, $params);
 
             return count($rows);
@@ -194,7 +188,7 @@ class NotificationRepository
         }
         catch (PDOException $e)
         {
-            //TODO: add logging
+            
             return null;
         }
     }

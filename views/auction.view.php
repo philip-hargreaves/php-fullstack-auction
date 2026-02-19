@@ -49,13 +49,13 @@ use infrastructure\DIContainer;
                 <?php if ($isAuctionActive): ?>
                     <?php if ($isLoggedIn): ?>
                         <?php if ($isWatched): ?>
-                            <form method="POST" action="/watchlist/remove" class="d-inline">
-                                <input type="hidden" name="auction_id" value="<?= htmlspecialchars($auctionId) ?>">
+                            <form method="POST" action="/watchlist/<?= htmlspecialchars($auctionId) ?>" class="d-inline">
+                                <input type="hidden" name="_method" value="DELETE">
                                 <button type="button" class="btn btn-success me-1" disabled>Watching</button>
                                 <button type="submit" class="btn btn-outline-danger">Remove</button>
                             </form>
                         <?php else: ?>
-                            <form method="POST" action="/watchlist/add" class="d-inline">
+                            <form method="POST" action="/watchlist" class="d-inline">
                                 <input type="hidden" name="auction_id" value="<?= htmlspecialchars($auctionId) ?>">
                                 <button type="submit" class="btn btn-outline-secondary">
                                     + Add to Watchlist
@@ -71,7 +71,7 @@ use infrastructure\DIContainer;
                 <!-- Chat with seller Button -->
                 <?php if ($auctionStatus == 'Active' || $auctionStatus == 'Scheduled'): ?>
                     <?php if ($isLoggedIn): ?>
-                        <a href="/chatroom?conversation_id=<?= htmlspecialchars($conversationId) ?>" class="btn btn-outline-secondary ml-3">
+                        <a href="/conversations/<?= htmlspecialchars($conversationId) ?>" class="btn btn-outline-secondary ml-3">
                             Message Seller
                         </a>
                     <?php else: ?>
@@ -163,7 +163,7 @@ use infrastructure\DIContainer;
                     <hr class="mt-3 mb-3">
                     <!-- Place Bid Form -->
                     <?php if ($isLoggedIn): ?>
-                        <form method="POST" action="/bid">
+                        <form method="POST" action="/auctions/<?= htmlspecialchars($auctionId) ?>/bids">
                             <h6 class="text mb-3">Place your bid</h6>
                             <div class="input-group mb-3">
                                 <span class="input-group-text"><?= $currencyText ?></span>
@@ -176,7 +176,6 @@ use infrastructure\DIContainer;
                                        min="<?= ($highestBidAmount ?? $startingPrice) + 0.01 ?>"
                                        required>
                             </div>
-                            <input type="hidden" name="auction_id" value="<?= $auctionId ?>">
                             <button type="submit" class="btn btn-primary btn-lg w-100">Place Bid</button>
                         </form>
                     <?php else: ?>
@@ -313,7 +312,7 @@ use infrastructure\DIContainer;
                     <tr>
                         <td class="text">Seller</td>
                         <td class="text-end fw-bold text-danger">
-                            <a href="/account?user_id=<?= htmlspecialchars($sellerId) ?>">
+                            <a href="/users/<?= htmlspecialchars($sellerId) ?>">
                                 <?= htmlspecialchars($sellerName) ?>
                             </a>
                         </td>
@@ -385,21 +384,6 @@ use infrastructure\DIContainer;
 <?php require \infrastructure\Utilities::basePath('views/partials/footer.php'); ?>
 
 <script>
-    // Watchlist Glue: check for login and then call the generic functions.
-    //function handleWatchlistAdd() {
-    //    <?php //if (!$isLoggedIn): ?>
-    //    showLoginModal();
-    //    return;
-    //    <?php //else: ?>
-    //    // Call the generic function from view-scripts.js
-    //    addToWatchlist(<?php //echo json_encode($auctionId); ?>//);
-    //    <?php //endif; ?>
-    //}
-    //function handleWatchlistRemove() {
-    //    // Call the generic function from view-scripts.js
-    //    removeFromWatchlist(<?php //echo json_encode($auctionId); ?>//);
-    //}
-
     document.addEventListener("DOMContentLoaded", function () {
         // 1. Run Alerts FIRST (So they work even if the gallery fails)
         if (typeof autoDismissAlerts === 'function') {

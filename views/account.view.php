@@ -56,7 +56,8 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
 
             <div class="card p-4 mb-4">
                 <h3>Edit Account Details</h3>
-                <form method="POST" action="/account/update">
+                <form method="POST" action="/account">
+                    <input type="hidden" name="_method" value="PUT">
                     <div class="form-group mb-3">
                         <label for="username">Username</label>
                         <input type="text" class="form-control" name="username" value="<?= htmlspecialchars($user->getUsername()) ?>" required>
@@ -72,7 +73,8 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
 
             <div class="card p-4 mb-4">
                 <h3 class="mb-4">Change Password</h3>
-                <form method="POST" action="/account/change-password">
+                <form method="POST" action="/account/password">
+                    <input type="hidden" name="_method" value="PUT">
                     <div class="form-group mb-3">
                         <label for="current_password_display">Current Password</label>
                         <input type="text" class="form-control" id="current_password_display" value="**********" readonly disabled>
@@ -115,7 +117,7 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
                     <?php foreach ($activeAuctions as $auction): ?>
                         <tr>
                             <td>
-                                <a href="/auction?auction_id=<?= htmlspecialchars($auction->getAuctionId()) ?>">
+                                <a href="/auctions/<?= htmlspecialchars($auction->getAuctionId()) ?>">
                                     <?= htmlspecialchars($auction->getItemName() ?? '[Item Name Unavailable]') ?>                                </a>
                             </td>
                             <td>
@@ -143,7 +145,7 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
 
                     <div class="text-center py-5 border border-secondary rounded" style="background-color: rgba(255, 255, 255, 0.05);">
                         <h5 class="text-white-50 mb-4">You currently have no active auctions running.</h5>
-                        <a href="/create-auction" class="btn btn-danger btn-lg px-4">
+                        <a href="/auctions/create" class="btn btn-danger btn-lg px-4">
                             <i class="fa fa-plus mr-2"></i> Create Your First Auction
                         </a>
                     </div>
@@ -190,7 +192,7 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
 
                                         <p class="mb-2 small text-muted">
                                             Purchased:
-                                            <a href="/auction?auction_id=<?= $review['auction_id'] ?>" class="text-muted font-italic">
+                                            <a href="/auctions/<?= $review['auction_id'] ?>" class="text-muted font-italic">
                                                 <?= htmlspecialchars($review['item_name'] ?? 'Item') ?>
                                             </a>
                                         </p>

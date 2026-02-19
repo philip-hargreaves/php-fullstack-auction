@@ -9,7 +9,6 @@ class RoleRepository
 {
     private Database $db;
 
-    // Cache role objects so we only create each role once per request
     private array $cacheById = [];
     private array $cacheByName = [];
 
@@ -21,19 +20,17 @@ class RoleRepository
     public function getById(int $id): ?Role
     {
         try {
-            // Check cache first for $id
             if (isset($this->cacheById[$id])) {
                 return $this->cacheById[$id];
             }
 
-        // Not in cache, so fetch from DB
-        $sql = 'SELECT id, role_name FROM roles WHERE id = :id';
+            $sql = 'SELECT id, role_name FROM roles WHERE id = :id';
         $params = ['id' => $id];
         $row = $this->db->query($sql, $params)->fetch();
 
             return $row ? $this->hydrate($row) : null;
         } catch (PDOException $e) {
-            // TODO: add logging
+            
             return null;
         }
     }
@@ -48,20 +45,18 @@ class RoleRepository
             $placeholders = [];
             $params = [];
 
-            // Build one named placeholder per role ID
             foreach ($ids as $index => $id) {
                 $param = ':id_' . $index;
                 $placeholders[] = $param;
                 $params[$param] = $id;
             }
 
-            // Join the named placeholders into the IN clause, e.g. id IN (:id_0, :id_1)
             $sql = 'SELECT id, role_name FROM roles WHERE id IN (' . implode(', ', $placeholders) . ')';
             $rows = $this->db->query($sql, $params)->fetchAll();
 
             return $this->hydrateMany($rows);
         } catch (PDOException $e) {
-            // TODO: add logging
+            
             return [];
         }
     }
@@ -69,7 +64,6 @@ class RoleRepository
     public function getByName(string $name): ?Role
     {
         try {
-            // Normalise name to reduce errors when calling etc
             $key = strtolower($name);
 
             if (isset($this->cacheByName[$key])) {
@@ -85,7 +79,7 @@ class RoleRepository
 
             return $row ? $this->hydrate($row) : null;
         } catch (PDOException $e) {
-            // TODO: add logging
+            
             return null;
         }
     }
@@ -111,7 +105,7 @@ class RoleRepository
 
             return $this->hydrateMany($rows);
         } catch (PDOException $e) {
-            // TODO: add logging
+            
             return [];
         }
     }
@@ -154,7 +148,6 @@ class RoleRepository
 
     public function createRoleFromRow(array $row): ?Role
     {
-        // Remap 'role_id' (from JOIN) to 'id' (expected by hydrate)
         $hydrationData = [
             'id' => $row['role_id'],
             'role_name' => $row['role_name']
@@ -179,7 +172,6 @@ class RoleRepository
         return $this->db->query($sql, array_values($userIds))->fetchAll();
     }
 
-    // Get all roles (for admin role management)
     public function getAll(): array
     {
         try {
@@ -187,7 +179,7 @@ class RoleRepository
             $rows = $this->db->query($sql, [])->fetchAll();
             return $this->hydrateMany($rows);
         } catch (PDOException $e) {
-            // TODO: add logging
+            
             return [];
         }
     }

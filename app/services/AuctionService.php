@@ -563,8 +563,6 @@ class AuctionService
             return Utilities::creationResult('Invalid category format.', false, null);
         }
 
-        // Check existence in DB
-        // Assuming you have a getById method in categoryRepo
         $category = $this->categoryRepo->getById($categoryId);
         if (!$category) {
             return Utilities::creationResult('Selected category does not exist.', false, null);
@@ -638,14 +636,6 @@ class AuctionService
             if ($end <= $start) {
                 return Utilities::creationResult("End date must be after the start date.", false, null);
             }
-
-            // 3. Check Duration (24 Hours)
-            $interval = $start->diff($end);
-            $totalHours = ($interval->days * 24) + $interval->h + ($interval->i / 60);
-
-//            if ($totalHours < 24) {
-//                return Utilities::creationResult("Auction duration must be at least 24 hours.", false, null);
-//            }
 
             return Utilities::creationResult('', true, [
                 'start_datetime' => $start->format('Y-m-d H:i:s'),

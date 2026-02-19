@@ -18,11 +18,11 @@ class AccountController extends Controller
         $this->ratingServ = DIContainer::get('ratingServ');
     }
 
-    /** GET /account - Show user profile */
+    /** GET /account or GET /users/{id} */
     public function show(array $params = []): void
     {
         $currentUserId = AuthService::getUserId();
-        $targetUserId = Request::get('user_id');
+        $targetUserId = $params['id'] ?? null;
 
         if ($targetUserId) {
             $targetUserId = (int)$targetUserId;

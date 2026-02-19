@@ -53,15 +53,13 @@ class NotificationService
         return Utilities::creationResult("Notification successfully created!", true, $createdNotification);
     }
 
-    //create batch notifications
     public function createBatchNotification()
     {
-        $notificationsToCreate = $this -> notificationRepo -> createBatchNotification();
+        $this->notificationRepo->createBatchNotification();
     }
 
     public function prepareEmailNotifications(): array
     {
-        // Use optimized query that fetches all data in one JOIN
         $rows = $this->notificationRepo->getPendingEmailNotificationsWithDetails();
 
         $emailsToSend = [];
@@ -93,7 +91,6 @@ class NotificationService
         return $emailsToSend;
     }
 
-    //Contextual generation of Email messages
     private function createNotificationContent($recipientUserName, $auctionItemName, $notificationContentType)
     {
         $subject = "";
@@ -138,7 +135,6 @@ class NotificationService
 
     public function preparePopUpNotifications(int $userId): array
     {
-        // Use optimized query that only fetches this user's popup notifications
         $rows = $this->notificationRepo->getPendingPopupNotificationsForUser($userId);
 
         $notificationsToSend = [];
@@ -149,7 +145,6 @@ class NotificationService
             $isAuctionActive = ($row['auction_status'] === 'Active');
 
             if (!$isUserActive || !$isAuctionActive) {
-                // If user or auction is no longer active, mark as sent without sending
                 $this->notificationRepo->changeNotificationStatusToSent($notificationId);
                 continue;
             }

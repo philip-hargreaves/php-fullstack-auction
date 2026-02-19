@@ -50,7 +50,6 @@ class AuctionImageRepository
                     VALUES (:auction_id, :image_url, :is_main, :uploaded_datetime)";
             $result = $this->db->query($sql, $params);
 
-            // Check if the insert was successful.
             if ($result) {
                 $id = (int)$this->db->connection->lastInsertId();
                 $image->setImageId($id);
@@ -60,7 +59,7 @@ class AuctionImageRepository
                 return null;
             }
         } catch (PDOException $e) {
-            // TODO: add logging
+            
             return null;
         }
     }
@@ -74,20 +73,17 @@ class AuctionImageRepository
 
             $images = $this->hydrateMany($rows);
 
-            // Loop through images to find the main image
             foreach ($images as $index => $image) {
                 if ($image->isMain()) {
-                    // Remove and add it to the beginning of the array
                     unset($images[$index]);
                     array_unshift($images, $image);
                     break;
                 }
             }
 
-            // array_values re-indexes the array keys to ensure sequential
             return array_values($images);
         } catch (PDOException $e) {
-            // TODO: add logging
+            
             return [];
         }
     }
@@ -107,7 +103,6 @@ class AuctionImageRepository
 
     public function resetMainImageFlags(int $auctionId, int $excludeImageId): void
     {
-        // Resets the 'is_main' flag for all images in an auction except the current one
         $sql = "UPDATE auction_images SET is_main = 0 WHERE auction_id = :auction_id AND id != :id";
         $this->db->query($sql, ['auction_id' => $auctionId, 'id' => $excludeImageId]);
     }
@@ -125,7 +120,6 @@ class AuctionImageRepository
             $this->db->query($sql, $param);
             return true;
         } catch (PDOException $e) {
-            // Log error if needed
             return false;
         }
     }
@@ -135,10 +129,9 @@ class AuctionImageRepository
             $sql = "DELETE FROM auction_images WHERE auction_id = :auction_id";
             $stmt = $this->db->query($sql, ['auction_id' => $auctionId]);
 
-            // Return true if deletion succeeds (even if 0 rows deleted - means no images existed)
             return true;
         } catch (PDOException $e) {
-            // TODO: add logging
+            
             return false;
         }
     }
@@ -149,10 +142,7 @@ class AuctionImageRepository
             return [];
         }
 
-        // Create placeholders: ?,?,?
         $placeholders = implode(',', array_fill(0, count($auctionIds), '?'));
-
-        // ORDER BY is_main DESC
         $sql = "SELECT * FROM auction_images 
             WHERE auction_id IN ($placeholders) 
             ORDER BY is_main DESC";

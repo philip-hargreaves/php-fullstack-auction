@@ -13,7 +13,7 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
             <div class="row align-items-center">
                 <div class="col-md-12">
                     <h4 class="card-title mt-1 mb-2 text-truncate" title="<?= htmlspecialchars($auction->getItemName() ?? 'Unknown Item') ?>">
-                        <a href="/auction?auction_id=<?= htmlspecialchars($auction->getAuctionId()) ?>" class="text-white text-decoration-none hover-underline">
+                        <a href="/auctions/<?= htmlspecialchars($auction->getAuctionId()) ?>" class="text-white text-decoration-none hover-underline">
                             <?= htmlspecialchars($auction->getItemName() ?? 'Unknown Item') ?>
                         </a>
                     </h4>
@@ -25,7 +25,7 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
                             $sellerName = $item->getSeller()->getUsername();
                             $sellerId = $item->getSellerId();
                             ?>
-                            <a href="/account?user_id=<?= htmlspecialchars($sellerId) ?>" class="text-info font-weight-bold text-decoration-none ml-1">
+                            <a href="/users/<?= htmlspecialchars($sellerId) ?>" class="text-info font-weight-bold text-decoration-none ml-1">
                                 <?= htmlspecialchars($sellerName) ?>
                             </a>
                             <?php
@@ -39,8 +39,7 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
         </div>
     </div>
 
-    <form method="POST" action="/rate" class="needs-validation">
-        <input type="hidden" name="auction_id" value="<?= $auction->getAuctionId() ?>">
+    <form method="POST" action="/auctions/<?= htmlspecialchars($auction->getAuctionId()) ?>/ratings" class="needs-validation">
 
         <div class="form-group mb-4 p-4 bg-secondary rounded text-center" style="background-color: #2c2c2c !important;">
             <label class="form-label h5 text-white mb-3 d-block">How would you rate your experience?</label>

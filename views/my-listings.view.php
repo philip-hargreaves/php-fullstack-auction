@@ -7,7 +7,7 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
 
         <?php if (empty($auctions)): ?>
             <p>You have not listed any items for auction yet.</p>
-            <a href="/create-auction" class="btn btn-primary mt-2">+ Create your first auction</a>
+            <a href="/auctions/create" class="btn btn-primary mt-2">+ Create your first auction</a>
         <?php else: ?>
             <table class="table bids-table">
                 <thead>
@@ -23,7 +23,7 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
                 <?php foreach ($auctions as $auction): ?>
                     <tr>
                         <td>
-                            <a href="/auction?auction_id=<?= htmlspecialchars($auction->getAuctionId()) ?>">
+                            <a href="/auctions/<?= htmlspecialchars($auction->getAuctionId()) ?>">
                                 <?= htmlspecialchars($auction->getItemName() ?? '[Item Missing]') ?>
                             </a>
                         </td>
@@ -52,13 +52,13 @@ require \infrastructure\Utilities::basePath('views/partials/header.php');
                         </td>
                         <td>
                             <?php if ($auction->getAuctionStatus() != 'Finished'): ?>
-                                <a href="/create-auction?auction_mode=update&auction_id=<?= htmlspecialchars($auction->getAuctionId()) ?>">
+                                <a href="/auctions/<?= htmlspecialchars($auction->getAuctionId()) ?>/edit">
                                     Edit
                                 </a>
                             <?php else: ?>
                                 <?php if (!($auction->getItem()->isSold())): ?>
                                     <?php if ($auction->getItem()->getCurrentAuctionId() == $auction->getAuctionId()): ?>
-                                        <a href="/create-auction?auction_mode=relist&auction_id=<?= htmlspecialchars($auction->getAuctionId()) ?>">
+                                        <a href="/auctions/<?= htmlspecialchars($auction->getAuctionId()) ?>/relist">
                                             Relist
                                         </a>
                                     <?php else: ?>

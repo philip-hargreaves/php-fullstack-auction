@@ -110,14 +110,14 @@ $isSeller = AuthService::hasRole('seller');
         <?php if ($isLoggedIn): ?>
         <div class="middle-section">
             <?php if ($isBuyer || $isSeller): ?>
-                <a href="/my-bids" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/my-bids') !== false ? 'active' : '' ?>">My Bids</a>
+                <a href="/bids" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/bids') !== false ? 'active' : '' ?>">My Bids</a>
                 <a href="/watchlist" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/watchlist') !== false ? 'active' : '' ?>">Watchlist</a>
             <?php endif; ?>
 
             <?php if ($isSeller): ?>
-                <a href="/my-listings" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/my-listings') !== false ? 'active' : '' ?>">My Listings</a>
-                <a href="/create-auction?auction_mode=create" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/create-auction') !== false ? 'active' : '' ?>">Create Auction</a>
-                <a href="/chatroom" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/chatroom') !== false ? 'active' : '' ?>">Messages</a>
+                <a href="/auctions/mine" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/auctions/mine') !== false ? 'active' : '' ?>">My Listings</a>
+                <a href="/auctions/create" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/auctions/create') !== false ? 'active' : '' ?>">Create Auction</a>
+                <a href="/conversations" class="top-nav-link <?= strpos($_SERVER['REQUEST_URI'], '/conversations') !== false ? 'active' : '' ?>">Messages</a>
             <?php endif; ?>
 
         </div>
@@ -269,7 +269,7 @@ $isSeller = AuthService::hasRole('seller');
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                <form method="POST" action="/become-seller" style="display: inline;">
+                <form method="POST" action="/account/roles" style="display: inline;">
                     <button type="submit" class="btn btn-primary">Confirm & Upgrade</button>
                 </form>
             </div>

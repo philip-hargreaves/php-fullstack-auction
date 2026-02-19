@@ -5,7 +5,6 @@ namespace app\repositories;
 use app\models\Conversation;
 use app\models\Message;
 use infrastructure\Database;
-use infrastructure\Utilities;
 use PDO;
 use PDOException;
 
@@ -20,7 +19,6 @@ class MessageRepository
 
     public function getConversationsByUserId(int $userId): array
     {
-        // This query joins conversations, auctions, items, and finds the last message
         $sql = "
             SELECT 
                 c.id as conversation_id,
@@ -54,7 +52,6 @@ class MessageRepository
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // 2. Get Messages for a specific conversation
     public function getMessagesByConversationId(int $conversationId): array
     {
         $sql = "
@@ -74,11 +71,9 @@ class MessageRepository
         $stmt = $this->db->prepare($sql);
         $stmt->execute(['conversation_id' => $conversationId]);
 
-        // We return raw arrays here to easily access username, but you could map to Message objects
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // 3. Get Auction Header Info (Item details, Price)
     public function getAuctionDetails(int $conversationId): ?array
     {
         $sql = "
@@ -87,7 +82,7 @@ class MessageRepository
                 u.username as seller_name,
                 u.id as seller_id,
                 a.end_datetime,
-                a.starting_price, -- Assuming current bid logic is handled elsewhere or simple here
+                a.starting_price,
                 a.id as auction_id,
                 a.auction_status as auction_status,
                 a.end_datetime - NOW() as remaining_time
@@ -104,10 +99,8 @@ class MessageRepository
         return $result ?: null;
     }
 
-    // 4. Send a Message
     public function createMessage(int $conversationId, int $userId, string $content): bool
     {
-        // First, find the participant ID for this user in this conversation
         $stmtPart = $this->db->prepare("SELECT id FROM participants WHERE conversation_id = :c_id AND user_id = :u_id");
         $stmtPart->execute(['c_id' => $conversationId, 'u_id' => $userId]);
         $participant = $stmtPart->fetch(PDO::FETCH_ASSOC);
@@ -129,7 +122,6 @@ class MessageRepository
 
     public function findOrCreateConversation(int $auctionId, int $buyerId): int
     {
-        // 1. CHECK: Does the conversation already exist for this user + auction?
         $sqlCheck = "
             SELECT c.id
             FROM conversations c
@@ -151,12 +143,9 @@ class MessageRepository
             return (int)$existingId;
         }
 
-        // 2. CREATE: Conversation doesn't exist, so we create it.
         try {
             $this->db->connection->beginTransaction();
 
-            // Step A: Find the Seller ID for this auction
-            // We need to know who owns the item to add them as a participant
             $sqlSeller = "
                 SELECT i.seller_id 
                 FROM auctions a
@@ -171,22 +160,17 @@ class MessageRepository
                 throw new \Exception("Cannot create chat: Seller not found for this auction.");
             }
 
-            // Step B: Create the Conversation Record
             $sqlInsertConv = "INSERT INTO conversations (auction_id, started_datetime) VALUES (:auction_id, NOW())";
             $stmtConv = $this->db->prepare($sqlInsertConv);
             $stmtConv->execute(['auction_id' => $auctionId]);
 
             $newConversationId = (int)$this->db->connection->lastInsertId();
 
-            // Step C: Add Participants
-            // We add BOTH the Buyer (current user) and the Seller
             $sqlInsertPart = "INSERT INTO participants (conversation_id, user_id) VALUES (:cid, :uid)";
             $stmtPart = $this->db->prepare($sqlInsertPart);
 
-            // Add Buyer
             $stmtPart->execute(['cid' => $newConversationId, 'uid' => $buyerId]);
 
-            // Add Seller (Only if buyer is not the seller - prevents duplicate entry error or self-chat if logic allows)
             if ($buyerId != $sellerId) {
                 $stmtPart->execute(['cid' => $newConversationId, 'uid' => $sellerId]);
             }
@@ -197,8 +181,7 @@ class MessageRepository
 
         } catch (\Exception $e) {
             $this->db->connection->rollBack();
-            // Log error here if you have a logger
-            throw $e; // Re-throw to be
+            throw $e;
         }
     }
 }

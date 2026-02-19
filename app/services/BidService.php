@@ -45,30 +45,25 @@ class BidService
     }
 
     public function validateAndFixType(array $input): array {
-        // Check if auction_id is a valid ID
         if (!filter_var($input['auction_id'], FILTER_VALIDATE_INT)) {
             return Utilities::creationResult('Invalid auction ID.', false, null);
         }
         $input['auction_id'] = (int)$input['auction_id'];
         $auction = $this->auctionRepo->getById($input['auction_id']);
 
-        // Check if $auction exists
         if (is_null($auction)) {
             return Utilities::creationResult('Auction not found.', false, null);
         }
 
-        // Check if $auction is active
         if (!$auction->isAuctionActive()) {
             return Utilities::creationResult('This auction is not currently active.', false, null);
         }
 
-        // Check if user_id is a valid ID
         if (!filter_var($input['user_id'], FILTER_VALIDATE_INT)) {
             return Utilities::creationResult('Invalid user ID.', false, null);
         }
         $userId = $input['user_id'];
 
-        // Check if $buyer exist
         if (is_null($userId)) {
             return Utilities::creationResult('Buyer not found.', false, null);
         }
@@ -77,7 +72,6 @@ class BidService
             return Utilities::creationResult('Buyer not found.', false, null);
         }
 
-        // Check if $buyer is a buyer
         $isBuyer = false;
         foreach ($user->getRoles() as $role) {
             if ($role->getName() == 'buyer') {
@@ -90,17 +84,14 @@ class BidService
 
         $bidString = $input['bid_amount'];
 
-        // Check $bidAmount Required
         if (!isset($bidString) || $bidString === ''){
             return Utilities::creationResult('Bid amount is required.', false, null);
         }
 
-        // Check $bidAmount Type (HTML: type="number")
         if (!is_numeric($bidString)){
             return Utilities::creationResult('Bid must be a valid number.', false, null);
         }
 
-        // Check $bidAmount Precision
         if (!preg_match('/^\d+(\.\d{1,2})?$/', $bidString)){
             return Utilities::creationResult('Bid amount can only have up to 2 decimal places.', false, null);
         }
@@ -108,12 +99,10 @@ class BidService
         $input['bid_amount'] = (float)trim($input['bid_amount']);
         $bidAmount = $input['bid_amount'];
 
-        // Check $bidAmount Reasonable Maximum
         if ($bidAmount > 1000000000) {
             return Utilities::creationResult('Bid amount is too high.', false, null);
         }
 
-        // Check if the bid is high enough
         $highestBidAmount = $this->getHighestBidAmountByAuctionId($input['auction_id']);
         if ($bidAmount < $highestBidAmount + 0.01) {
             return Utilities::creationResult('Bid must be at least' . number_format($highestBidAmount, 2), false, null);
@@ -123,19 +112,16 @@ class BidService
     }
 
     private function createBid(array $input): array {
-        // Create object
         $bid = new Bid(
-            0, // 0 for a new bid
+            0,
             $input['user_id'],
             $input['auction_id'],
             $input['bid_amount'],
             new DateTime()
         );
 
-        // Execute bid insertion
         $bid = $this->bidRepo->create($bid);
 
-        // Insertion failed
         if (is_null($bid)) {
             return Utilities::creationResult('Failed to create bid.', false, null);
         }
@@ -144,37 +130,28 @@ class BidService
     }
 
     public function placeBid(array $input): array {
-        // Get the DB connection
         $pdo = $this->db->connection;
 
-        // --- Start Transaction ---
-        // Wrap validation + creation in a transaction so the highest bid won't be updated before creating
         try {
             Utilities::beginTransaction($pdo);
 
-            // Validate input
             $validationResult = $this->validateAndFixType($input);
             $input = $validationResult['object'];
 
-            // Validation Fail -> Abort transaction
             if (!$validationResult['success']) {
                 $pdo->rollBack();
                 return $validationResult;
             }
 
-            //Checks if the current bid being placed is higher than the previous highest bid
-            $userOutBid = $this -> userOutbid($input);
+            $userOutBid = $this->userOutbid($input);
 
-            // Validation Pass -> Create Bid
             $creationResult = $this->createBid($input);
 
-            // Insertion Failed
             if (!$creationResult['success']) {
                 $pdo->rollBack();
                 return $creationResult;
             }
 
-            // Create email notification for when buyer places a bid
             $auctionId = $creationResult['object']->getAuctionId();
             $bidderId = $creationResult['object']->getBuyerId();
 
@@ -190,22 +167,11 @@ class BidService
                 return $creationResult;
             }
 
-
-            //if the new bid is greater than the previous greatest bid, then create out bid notification
-            if($userOutBid != null)
-            {
-                //get id of new highest bidder
+            if ($userOutBid != null) {
                 $auctionId = $creationResult['object']->getAuctionId();
-                //$newHighestBidder = $creationResult['object'] -> getBuyerId();
+                $recipientId = $userOutBid->getBuyerId();
 
-                //get id of previous highest bidder
-                $recipientId = $userOutBid -> getBuyerId();
-
-                //creates pop up and email notification for when user is outbid
-                $channels = ['popUp', 'email'];
-                foreach ($channels as $channel)
-                {
-
+                foreach (['popUp', 'email'] as $channel) {
                     $result = $this->notificationServ->createNotification(
                         $auctionId,
                         $recipientId,
@@ -220,7 +186,6 @@ class BidService
                 }
             }
 
-            // Insertion Succeed -> Commit Transaction
             $pdo->commit();
             return $creationResult;
 
@@ -232,37 +197,23 @@ class BidService
         }
     }
 
-    private function userOutbid($input)
+    private function userOutbid(array $input): ?Bid
     {
         $currentHighestBid = $this->bidRepo->getHighestBidByAuctionId($input['auction_id']);
 
-        if ($currentHighestBid === null)
-        {
+        if ($currentHighestBid === null) {
             return null;
         }
 
-        $currentHighestBidderId = $currentHighestBid -> getBuyerId();
-
-        $newBidderId = $input['user_id'];
-
-        $newBidAmount = $input['bid_amount'];
-
-        //notification will not be sent to the user if already highest bidder.
-        if($currentHighestBidderId === $newBidderId)
-        {
+        if ($currentHighestBid->getBuyerId() === $input['user_id']) {
             return null;
         }
-        else
-        {
-            if ($newBidAmount > $currentHighestBid -> getBidAmount())
-            {
-                return $currentHighestBid;
-            }
-            else
-            {
-                return null;
-            }
+
+        if ($input['bid_amount'] > $currentHighestBid->getBidAmount()) {
+            return $currentHighestBid;
         }
+
+        return null;
     }
 
     public function getBidsByAuctionId($auctionId): array {
@@ -275,11 +226,9 @@ class BidService
     }
 
     public function getWinningBidByAuctionId($auctionId): ?Bid {
-        // Get Auction status
         $auction = $this->auctionRepo->getById($auctionId);
         $isAuctionActive = $auction->getAuctionStatus() == 'Active';
         if ($isAuctionActive) {
-            // Get Item Status
             $item = $auction->getItem();
             $isItemSold = $auction->getAuctionStatus() == 'Sold';
             if ($isItemSold) {
@@ -331,13 +280,11 @@ class BidService
         return $this->bidRepo->getByUserId($userId);
     }
 
-    // Count all bids
     public function countAll(): int
     {
         return $this->bidRepo->countAll();
     }
 
-    // Get total revenue (sum of all winning bid amounts)
     public function getTotalRevenue(): float
     {
         return $this->bidRepo->getTotalRevenue();
@@ -348,12 +295,10 @@ class BidService
         return $this->bidRepo->getAverageTimeToFirstBid();
     }
 
-    // --- FILL RELATIONSHIP PROPERTIES FUNCTION ---
     public function fillBuyersInBids(array $bids): void
     {
         if (empty($bids)) return;
 
-        // Collect Buyer IDs
         $userIds = [];
         foreach ($bids as $bid) {
             $userIds[] = $bid->getBuyerId();
@@ -362,16 +307,13 @@ class BidService
 
         if (empty($userIds)) return;
 
-        // Fetch Users (1 Query)
         $users = $this->userRepo->getByIds($userIds);
 
-        // Map ID => User Object
         $userMap = [];
         foreach ($users as $user) {
             $userMap[$user->getUserId()] = $user;
         }
 
-        // Attach to Bids
         foreach ($bids as $bid) {
             $buyerId = $bid->getBuyerId();
             if (isset($userMap[$buyerId])) {
@@ -384,7 +326,6 @@ class BidService
     {
         if (empty($bids)) return;
 
-        // Collect Auction IDs
         $auctionIds = [];
         foreach ($bids as $bid) {
             $auctionIds[] = $bid->getAuctionId();
@@ -393,11 +334,9 @@ class BidService
 
         if (empty($auctionIds)) return;
 
-        // Fetch Auctions (1 Query)
         $auctions = $this->auctionRepo->getByIds($auctionIds);
         $this->fillItemsInAuctions($auctions);
 
-        // Map ID => Auction Object
         $auctionMap = [];
         foreach ($auctions as $auction) {
             $hasRated = $this->ratingRepo->hasRatingForAuction($auction->getAuctionId());
@@ -405,7 +344,6 @@ class BidService
             $auctionMap[$auction->getAuctionId()] = $auction;
         }
 
-        // Attach to Bids
         foreach ($bids as $bid) {
             $aucId = $bid->getAuctionId();
             if (isset($auctionMap[$aucId])) {

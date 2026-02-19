@@ -288,7 +288,7 @@ require Utilities::basePath('views/partials/header.php');
                             ?>
                             <div class="auction-card card h-100">
                                 <div class="auction-image-container">
-                                    <a href="/auction?auction_id=<?= htmlspecialchars($auction['auction_id']) ?>">
+                                    <a href="/auctions/<?= htmlspecialchars($auction['auction_id']) ?>">
                                         <img src="<?= htmlspecialchars($imageUrl) ?>"
                                              alt="<?= htmlspecialchars($auction['title']) ?>"
                                              class="auction-image card-img-top">
@@ -298,7 +298,7 @@ require Utilities::basePath('views/partials/header.php');
                                     <div class="d-flex justify-content-between align-items-start mb-0">
                                         <div>
                                             <h6 class="card-title mb-0">
-                                                <a href="/auction?auction_id=<?= htmlspecialchars($auction['auction_id']) ?>" class="text-decoration-none">
+                                                <a href="/auctions/<?= htmlspecialchars($auction['auction_id']) ?>" class="text-decoration-none">
                                                     <?= htmlspecialchars($auction['title']) ?>
                                                 </a>
                                             </h6>
@@ -332,11 +332,11 @@ require Utilities::basePath('views/partials/header.php');
                     <section class="popular-categories-section">
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <h4 class="section-title m-0">Popular categories</h4>
-                            <a href="/categories" class="btn btn-link text-decoration-none">View all</a>
+                            <span></span>
                         </div>
                         <div class="horizontal-scroll-wrapper mb-3" style="">
                             <?php foreach ($popular_categories as $index => $cat): ?>
-                                <a href="/category_view?id=<?= $cat->getCategoryId() ?>" class="category-card cat-color-<?= $index % 6 ?>">
+                                <a href="/?category=<?= $cat->getCategoryId() ?>" class="category-card cat-color-<?= $index % 6 ?>">
                                     <div class="cat-content">
                                         <h4 class="cat-title"><?= htmlspecialchars($cat->getCategoryName()) ?></h4>
                                     </div>
@@ -402,7 +402,7 @@ require Utilities::basePath('views/partials/header.php');
                         ?>
                         <div class="auction-card card scroller-card h-100">
                             <div class="auction-image-container">
-                                <a href="/auction?auction_id=<?= htmlspecialchars($recAuction['auction_id']) ?>">
+                                <a href="/auctions/<?= htmlspecialchars($recAuction['auction_id']) ?>">
                                     <img src="<?= htmlspecialchars($recImageUrl) ?>"
                                          alt="<?= htmlspecialchars($recAuction['title']) ?>"
                                          class="auction-image card-img-top">
@@ -412,7 +412,7 @@ require Utilities::basePath('views/partials/header.php');
                                 <div class="d-flex justify-content-between align-items-start mb-0">
                                     <div>
                                         <h6 class="card-title mb-0">
-                                            <a href="/auction?auction_id=<?= htmlspecialchars($recAuction['auction_id']) ?>" class="text-decoration-none">
+                                            <a href="/auctions/<?= htmlspecialchars($recAuction['auction_id']) ?>" class="text-decoration-none">
                                                 <?= htmlspecialchars($recAuction['title']) ?>
                                             </a>
                                         </h6>

@@ -186,7 +186,7 @@ class AuctionRepository
         }
         catch (PDOException $e)
         {
-            // TODO: add logging
+            
             return [];
         }
     }
@@ -401,7 +401,6 @@ class AuctionRepository
     {
         try {
             $params = $this->extract($auction);
-            // Removed 'id' from INSERT params
             $sql = "INSERT INTO auctions (item_id, category_id, winning_bid_id, auction_description, 
                         auction_condition, start_datetime, end_datetime, starting_price, 
                         reserve_price, auction_status)
@@ -609,7 +608,6 @@ class AuctionRepository
     {
         $map = [];
         foreach ($auctions as $auction) {
-            // Assuming your Auction model has getId()
             $map[$auction->getAuctionId()] = $auction;
         }
 
@@ -630,7 +628,7 @@ class AuctionRepository
             $row = $this->db->query($sql, [])->fetch();
             return (int)$row['total'];
         } catch (PDOException $e) {
-            // TODO: add logging
+            
             return 0;
         }
     }
@@ -651,7 +649,7 @@ class AuctionRepository
             $row = $this->db->query($sql, $params)->fetch();
             return (int)$row['total'];
         } catch (PDOException $e) {
-            // TODO: add logging
+            
             return 0;
         }
     }
@@ -762,7 +760,7 @@ class AuctionRepository
             if ($this->db->connection->inTransaction()) {
                 $this->db->connection->rollBack();
             }
-//            error_log("Auction Update Failed: " . $e->getMessage());
+            
         }
     }
 

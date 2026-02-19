@@ -58,7 +58,6 @@ class ItemRepository
 
     public function getById(int $itemId): ?Item {
         try {
-            // Query updated for new schema
             $sql = "SELECT id, seller_id, current_auction_id, item_name, is_deleted, is_sold 
                     FROM items 
                     WHERE id = :item_id";
@@ -67,7 +66,7 @@ class ItemRepository
 
             return $this->hydrate($row);
         } catch (PDOException $e) {
-            // TODO: add logging
+            
             return null;
         }
     }
@@ -76,7 +75,6 @@ class ItemRepository
         try {
             $params = $this->extract($item);
 
-            // Updated SQL Insert
             $sql = "INSERT INTO items (seller_id, current_auction_id, item_name, is_deleted, is_sold)
                     VALUES (:seller_id, :current_auction_id, :item_name, :is_deleted, :is_sold)";
 
@@ -89,7 +87,7 @@ class ItemRepository
             }
             return null;
         } catch (PDOException $e) {
-            // TODO: add logging
+            
             return null;
         }
     }

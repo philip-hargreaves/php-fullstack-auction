@@ -61,7 +61,7 @@ require Utilities::basePath('views/partials/header.php');
         <!-- Input Form -->
         <div class="card">
             <div class="card-body">
-                <form method="POST" id="create-auction-form" action="/create-auction" enctype="multipart/form-data">
+                <form method="POST" id="create-auction-form" action="/auctions" enctype="multipart/form-data">
                     <!-- POST Auction Mode -->
                     <input type="hidden"
                            name="auction_mode"

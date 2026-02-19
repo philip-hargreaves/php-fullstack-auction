@@ -27,10 +27,10 @@ class AuctionController extends Controller
         $this->authServ = DIContainer::get('authServ');
     }
 
-    /** GET /auctions/{id} - Show single auction */
+    /** GET /auctions/{id} */
     public function show(array $params = []): void
     {
-        $auctionId = $params['id'] ?? Request::get('auction_id');
+        $auctionId = $params['id'] ?? null;
         $userId = $this->authServ->getUserId();
 
         // Get all auction data from service
@@ -53,7 +53,19 @@ class AuctionController extends Controller
         $this->view('auction', $data);
     }
 
-    /** GET /auctions/create - Show create/edit auction form */
+    /** GET /auctions/{id}/edit */
+    public function edit(array $params = []): void
+    {
+        $this->create(array_merge($params, ['auction_mode' => 'update']));
+    }
+
+    /** GET /auctions/{id}/relist */
+    public function relist(array $params = []): void
+    {
+        $this->create(array_merge($params, ['auction_mode' => 'relist']));
+    }
+
+    /** GET /auctions/create */
     public function create(array $params = []): void
     {
         if (!$this->authServ->isLoggedIn()) {
@@ -61,7 +73,8 @@ class AuctionController extends Controller
             $this->redirect('/');
         }
 
-        $auctionMode = Request::get('auction_mode');
+        $auctionMode = $params['auction_mode'] ?? 'create';
+        $auctionId = null;
         $prevAuction = null;
         $jsonCategoryPath = null;
         $titleText = "Create Auction";
@@ -69,11 +82,11 @@ class AuctionController extends Controller
         $ReservePriceText = null;
 
         if ($auctionMode == 'update' || $auctionMode == 'relist') {
-            if (!Request::has('auction_id')) {
+            $auctionId = $params['id'] ?? null;
+            if (!$auctionId) {
                 $this->redirect('/');
             }
 
-            $auctionId = Request::get('auction_id');
             $auction = $this->auctionServ->getById($auctionId);
             $item = $this->itemServ->getById($auction->getItemId());
 
@@ -120,7 +133,7 @@ class AuctionController extends Controller
         $jsonCategoryTree = json_encode($allCategories);
 
         $this->view('create-auction', compact(
-            'auctionMode', 'prevAuction', 'jsonCategoryPath', 'titleText',
+            'auctionMode', 'auctionId', 'prevAuction', 'jsonCategoryPath', 'titleText',
             'StartingPriceText', 'ReservePriceText', 'itemConditions',
             'allCategories', 'jsonCategoryTree'
         ));
@@ -171,21 +184,21 @@ class AuctionController extends Controller
                 $_SESSION['create_auction_old_input'] = $_POST;
 
                 if ($actionMode == 'create') {
-                    $this->redirect('/create-auction?auction_mode=create');
+                    $this->redirect('/auctions/create');
                 } else if ($actionMode == 'update') {
-                    $this->redirect("/create-auction?auction_mode=update&auction_id=$auctionId");
+                    $this->redirect("/auctions/$auctionId/edit");
                 } else if ($actionMode == 'relist') {
-                    $this->redirect("/create-auction?auction_mode=relist&auction_id=$auctionId");
+                    $this->redirect("/auctions/$auctionId/relist");
                 }
             }
 
             $_SESSION['create_auction_success'] = $result['message'];
             $createdAuctionID = $result['object']->getAuctionId();
-            $this->redirect("/auction?auction_id=" . $createdAuctionID);
+            $this->redirect("/auctions/" . $createdAuctionID);
 
         } catch (\Exception $e) {
             $_SESSION['create_auction_error'] = ['Fail to create an auction. Please try again.'];
-            $this->redirect('/create-auction');
+            $this->redirect('/auctions/create');
         }
     }
 
