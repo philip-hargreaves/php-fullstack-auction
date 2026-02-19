@@ -1,6 +1,6 @@
 # Fullstack Auction Application
 
-A comprehensive online auction platform built as a coursework project for COMP0178: Database Fundamentals. This application enables users to create, browse, bid on, and manage auctions with features including user authentication, role-based access control, real-time notifications, and collaborative filtering recommendations.
+A comprehensive online auction platform built using a custom framework. This application enables users to create, browse, bid on, and manage auctions with features including user authentication, role-based access control, real-time notifications, and collaborative filtering recommendations.
 
 ## Features
 
